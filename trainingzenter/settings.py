@@ -88,20 +88,34 @@ WSGI_APPLICATION = 'trainingzenter.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'itservices$tz_db_golive2024',
+#         'USER': 'itservices',
+#         'PASSWORD':'KFaz9buFqTmek56z',
+#         'HOST': 'localhost',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#             'charset': 'utf8mb4',
+#         }
+#     }
+# }
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'itservices$tz_db_golive2024',
-        'USER': 'itservices',
-        'PASSWORD':'KFaz9buFqTmek56z',
-        'HOST': 'itservices.mysql.pythonanywhere-services.com',
+        'NAME': 'tz_db3',
+        'USER': 'root',
+        'HOST': 'localhost',
+        'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
