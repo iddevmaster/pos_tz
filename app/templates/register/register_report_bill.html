@@ -1,0 +1,117 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายงานข้อมูลใบเสร็จ</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          รายงานข้อมูลใบเสร็จ
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="post"
+        action="/register/excel/bill"
+        autocomplete="off"
+        target="iframe_target"
+      >
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <input
+              type="text"
+              class="form-control daterange"
+              id="date_range"
+              name="date_range"
+              required
+              value="{{daterange}}"
+            />
+          </div>
+
+          <div class="col-lg-4 col-md-6 mb-4">
+            <select class="form-select select2" id="qcourse" name="qcourse">
+              <option value="0">-หลักสูตรทั้งหมด--</option>
+              {% for res1 in course_list %}
+              <option value="{{res1.course_id}}">
+                {{res1.course_code}} {{res1.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-4 col-md-6 mb-4">
+            <input
+              type="text"
+              id="qgeneration"
+              name="qgeneration"
+              class="form-control"
+              pattern="[0-9]+"
+              placeholder="รุ่น"
+            />
+          </div>
+
+          <div class="col-lg-4 col-md-6 mb-4">
+            <select class="form-select select2" id="qseller" name="qseller">
+              <option value="0">-ผู้ขายทั้งหมด--</option>
+              {% for res2 in list_user %}
+              <option value="{{res2.id}}">
+                {{res2.first_name}} {{res2.last_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-4 col-md-6 mb-4">
+            <input
+              type="text"
+              class="form-control"
+              id="qcustomer_name"
+              name="qcustomer_name"
+              placeholder="ค้นหาชื่อลูกค้า"
+            />
+          </div>
+        </div>
+        <div class="form-goup" align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-warning"
+            onclick="window.location.href='/register/export/bill'"
+          >
+            <i class="icon dripicons-clockwise"></i>
+            รีเซ็ต
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <iframe
+    id="iframe_target"
+    name="iframe_target"
+    src="/register/excel/bill"
+    style="height: 500px; width: 100%; border: thin; background-color: #fff"
+  ></iframe>
+</section>
+
+{% endblock %}

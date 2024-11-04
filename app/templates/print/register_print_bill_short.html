@@ -1,0 +1,233 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ใบกำกับภาษีอย่างย่อ / ใบเสร็จรับเงิน</title>
+    <link rel="shortcut icon" type="image/png" href="./favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      .table-bordered td,
+      .table-bordered th {
+        border: 1px solid #ddd;
+        padding: 10px;
+        word-break: break-all;
+      }
+      @import url(//db.onlinewebfonts.com/c/cc6c99b66a5b4c4e82ff2c6ed95077b4?family=Angsana+New);
+
+      body {
+        //font-family: Arial, Helvetica, sans-serif;
+        font-family: "Sarabun", sans-serif;
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+      }
+      .h4-14 h4 {
+        font-size: 12px;
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
+      .img {
+        margin-left: "auto";
+        margin-top: "auto";
+        height: 30px;
+      }
+      pre,
+      p {
+        /* width: 99%; */
+        /* overflow: auto; */
+        /* bpicklist: 1px solid #aaa; */
+        padding: 0;
+        margin: 0;
+      }
+      table {
+        font-family: arial, sans-serif;
+        width: 100%;
+        border-collapse: collapse;
+        padding: 1px;
+      }
+      .hm-p p {
+        text-align: left;
+        padding: 1px;
+        padding: 5px 4px;
+      }
+      td,
+      th {
+        text-align: left;
+        padding: 8px 6px;
+      }
+      .table-b td,
+      .table-b th {
+        border: 1px solid #ddd;
+      }
+      th {
+        /* background-color: #ddd; */
+      }
+      .hm-p td,
+      .hm-p th {
+        padding: 3px 0px;
+      }
+      .cropped {
+        float: right;
+        margin-bottom: 20px;
+        height: 100px; /* height of container */
+        overflow: hidden;
+      }
+      .cropped img {
+        width: 400px;
+        margin: 8px 0px 0px 80px;
+      }
+      .main-pd-wrapper {
+        box-shadow: 0 0 10px #ddd;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+      }
+      .table-bordered td,
+      .table-bordered th {
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+      }
+      .invoice-items {
+        font-size: 14px;
+        border-top: 1px dashed #ddd;
+      }
+      .invoice-items td {
+        padding: 14px 0;
+      }
+    </style>
+    <script>
+      function twdDigit(value) {
+        let v = 0;
+        if (value < 10) {
+          v = "0" + value;
+        } else {
+          v = value;
+        }
+        return v;
+      }
+      function dateRun() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1;
+        const date = d.getDate();
+        const f = date + "/" + twdDigit(month) + "/" + twdDigit(year);
+        document.getElementById("date_default").innerHTML = f;
+      }
+    </script>
+  </head>
+  <body onload="dateRun();window.print()">
+    <section class="main-pd-wrapper" style="width: 350px; margin: auto">
+      <div
+        style="
+          text-align: center;
+          margin: auto;
+          line-height: 1.5;
+          font-size: 14px;
+          color: #4a4a4a;
+        "
+      >
+        <div
+          style="
+            font-weight: bold;
+            color: #000;
+            margin-top: 15px;
+            font-size: 13px;
+          "
+        >
+          บริษัท ไอดีไดรฟ์ จำกัด (สาขา 00018)
+        </div>
+        <div
+          style="
+            font-weight: bold;
+            color: #000;
+            margin-top: 15px;
+            font-size: 13px;
+          "
+        >
+          ใบกำกับภาษีอย่างย่อ / ใบเสร็จรับเงิน
+        </div>
+        <p style="margin: 15px auto">เบอร์โทร 082-7513888 ,ID Line TZ00018</p>
+        <table style="font-size: 12px">
+          <tr>
+            <td><b>Taxid:</b> 0405536000531</td>
+            <td><b>CS:</b> {{ user.id |stringformat:"04d" }}</td>
+          </tr>
+          <tr>
+            <td><b>PosId No. :</b> {{machine.pm_id_code}}</td>
+            <td><b>Pos No. :</b> {{machine.pm_id_number}}</td>
+          </tr>
+        </table>
+
+        <hr style="border: 1px dashed rgb(131, 131, 131); margin: 25px auto" />
+      </div>
+      <table style="width: 100%; table-layout: fixed">
+        <thead>
+          <tr>
+            <th>No : {{data.rp_doc_number}}</th>
+            <th style="text-align: center">Qty</th>
+            <th style="text-align: right">
+              <span id="date_default"></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="invoice-items">
+            <td>
+              {% if content_regist.ev.ev_vat == 1 %}
+              <span> I </span>
+              {% else %}
+              <span> N</span>
+              {% endif %} {{items.rpi_code}} {{items.rpi_name}}
+            </td>
+            <td style="text-align: center">{{items.rpi_quantity}}</td>
+            <td style="text-align: right">
+              {{items.rpi_price_result |floatformat:2|intcomma }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table style="width: 100%; border-radius: 4px">
+        <thead>
+          <tr>
+            <th>ยอดขายสุทธิ</th>
+            <th style="text-align: right">
+              {{items.rpi_price_result |floatformat:2|intcomma }}
+            </th>
+          </tr>
+        </thead>
+      </table>
+
+      <table
+        style="
+          width: 100%;
+          margin-top: 15px;
+          border: 1px dashed #00cd00;
+          border-radius: 3px;
+        "
+      >
+        <thead>
+          <tr>
+            <td>ผู้รับเงิน</td>
+            <td style="text-align: right">
+              {{ user.first_name }} {{ user.last_name }}
+              สาขาศูนย์เทรนนิ่งเซ็นเตอร์
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">ราคารวมภาษีมูลค่าเพิ่มแล้ว I = Vat N = None Vat</td>
+          </tr>
+        </thead>
+      </table>
+    </section>
+  </body>
+</html>

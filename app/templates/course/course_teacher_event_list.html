@@ -1,0 +1,141 @@
+{% extends 'base.html' %} 
+{% block content %} 
+  {% load humanize static %}
+  {% load ex_functions %}
+<script>
+  function validate(evt) {
+    var theEvent = evt || window.event;
+
+    // Handle paste
+    if (theEvent.type === "paste") {
+      key = event.clipboardData.getData("text/plain");
+    } else {
+      // Handle key press
+      var key = theEvent.keyCode || theEvent.which;
+      key = String.fromCharCode(key);
+    }
+    var regex = /[0-9]|\./;
+    if (!regex.test(key)) {
+      theEvent.returnValue = false;
+      if (theEvent.preventDefault) theEvent.preventDefault();
+    }
+  }
+  function sumUnit() {
+    let id_tis_compensation = document.getElementById(
+      "id_tis_compensation"
+    ).value;
+    let id_tis_quantity = document.getElementById("id_tis_quantity").value;
+    if (isNaN(id_tis_compensation)) {
+      d_tis_compensation = document.getElementById(
+        "id_tis_compensation"
+      ).value = 0;
+    }
+
+    if (isNaN(id_tis_quantity)) {
+      id_tis_quantity = document.getElementById("id_tis_quantity").value = 0;
+    }
+    let sum = parseFloat(id_tis_compensation) * parseFloat(id_tis_quantity);
+    let fix = isNaN(sum) ? 0 : sum;
+
+    document.getElementById("id_tis_sum").value = fix.toFixed(2);
+    //alert(id_tis_compensation);
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    const id_tis_compensation = document.getElementById("id_tis_compensation");
+    const id_tis_quantity = document.getElementById("id_tis_quantity");
+    id_tis_compensation.addEventListener("change", function () {
+      sumUnit();
+    });
+    id_tis_compensation.addEventListener("keydown", function () {
+      sumUnit();
+    });
+    id_tis_compensation.addEventListener("keyup", function () {
+      sumUnit();
+    });
+    id_tis_quantity.addEventListener("change", function () {
+      sumUnit();
+    });
+    id_tis_quantity.addEventListener("keydown", function () {
+      sumUnit();
+    });
+    id_tis_quantity.addEventListener("keyup", function () {
+      sumUnit();
+    });
+  });
+  window.onload = function () {
+    document.getElementById("id_tis_quantity").value = 1;
+    document.getElementById("id_tis_sum").value = 0;
+  };
+  function setValueDeleteModal(id) {
+    document.getElementById("id_delete").value = id;
+  }
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>จัดการค่าตอบแทนครู</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/course/event">กำหนดวันอบรมและราคาอบรม</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          จัดการค่าตอบแทนครู
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+        <div align="center">
+            <h3>
+              หลักสูตร <u>{{main_data.course.course_name}} </u> วันที่
+              <u>{{main_data.ev_date_start}} - {{main_data.ev_date_end}} </u>
+            </h3>
+          </div>
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ครู - วิทยากร</th>
+            <th>ตำแหน่ง / หน้าที่</th>
+            <th>ค่าตอบแทน</th>
+            <th>จำนวนต่อหน่วย</th>
+            <th>หน่วย</th>
+            <th>สุทธิ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>
+              {{res.teacher.teacher_prefix_th}}{{res.teacher.teacher_firstname_th}}
+              {{res.teacher.teacher_lastname_th}}
+            </td>
+            <td>{{res.pi.pi_name}}</td>
+            <td align="right">
+              {{res.tis_compensation|floatformat:2|intcomma}}
+            </td>
+            <td align="right">{{ res.tis_quantity }}</td>
+            <td align="right">{{ res.tis_unit|unit_format }}</td>
+            <td align="right">{{res.tis_sum|floatformat:2|intcomma}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

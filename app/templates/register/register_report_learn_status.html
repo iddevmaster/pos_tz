@@ -1,0 +1,133 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายงานจบ/ไม่จบหลักสูตร</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          รายงานจบ/ไม่จบหลักสูตร
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="post"
+        action="/register/excel/learning_status"
+        autocomplete="off"
+        target="iframe_target"
+      >
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              class="form-control daterange"
+              id="date_range"
+              name="date_range"
+              required
+              value="{{daterange}}"
+            />
+          </div>
+
+          <div class="col-md-3 mb-4">
+            <div class="form-group">
+              <select
+                class="form-select"
+                name="qlearning_status"
+                id="qlearning_status"
+              >
+                <option value="">-สถานะทั้งหมด-</option>
+                <option value="0">ไม่จบหลักสูตร</option>
+                <option value="1">จบหลักสูตร</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <select class="form-select select2" id="qcourse" name="qcourse">
+              <option value="0">-หลักสูตรทั้งหมด-</option>
+              {% for res1 in course_list %}
+              <option value="{{res1.course_id}}">
+                {{res1.course_code}} {{res1.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              id="qgeneration"
+              name="qgeneration"
+              class="form-control"
+              pattern="[0-9]+"
+              placeholder="รุ่น"
+            />
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              id="qstudent_name"
+              name="qstudent_name"
+              placeholder="ค้นหาชื่อนักเรียน"
+            />
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              id="ref"
+              name="ref"
+              placeholder="รหัสลูกค้า"
+            />
+          </div>
+        </div>
+        <div class="form-goup" align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-warning"
+            onclick="window.location.href='/register/export/learning_status'"
+          >
+            <i class="icon dripicons-clockwise"></i>
+            รีเซ็ต
+          </button>
+        </div>
+      </form>
+    </div>
+    <span style="color: red; font-size: 16px">
+      หมายเหตุ : รหัสลูกค้า
+      มีเฉพาะประเภทสมัครในนามบริษัทและการชำระเงินประเภทเครดิต
+    </span>
+  </div>
+
+  <iframe
+    id="iframe_target"
+    name="iframe_target"
+    src="/register/excel/learning_status"
+    style="height: 500px; width: 100%; border: thin; background-color: #fff"
+  ></iframe>
+</section>
+
+{% endblock %}

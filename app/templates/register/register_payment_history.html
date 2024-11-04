@@ -1,0 +1,286 @@
+{% extends 'base.html' %} {% block content %}  {% load humanize %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>
+      {% if main.pay_type == 2 %}
+      <span>ใบเสนอราคา</span>
+      {% else %}
+      <span>ใบเสร็จ</span>
+
+      {% endif %} {% if main.close_the_sale < 1 %}
+      <span>
+        <a
+          href="/register/payment/update/{{main.register_id}}"
+          class="btn btn-success rounded-pill"
+        >
+          {% if main.pay_type == 2 %}
+          <span>แก้ไขใบเสนอราคา</span>
+          {% else %}
+          <span>แก้ไขใบเสร็จ</span>
+          {% endif %}
+        </a>
+      </span>
+      {% elif content_approve.status == 1 %}
+      <span>
+        <a
+          href="/register/payment/update/{{main.register_id}}"
+          class="btn btn-success rounded-pill"
+        >
+          {% if main.pay_type == 2 %}
+          <span>แก้ไขใบเสนอราคา</span>
+          {% else %}
+          <span>แก้ไขใบเสร็จ</span>
+          {% endif %}
+        </a>
+      </span>
+
+      {% elif content_approve_p.status == 0 %}
+      <button class="btn btn-secondary rounded-pill">
+        <span>กำลังรออนุมัติ..</span>
+      </button>
+
+      {% else %}
+      <button
+        class="btn btn-danger rounded-pill"
+        data-bs-toggle="modal"
+        data-bs-target="#CreateClick"
+      >
+        {% if main.pay_type == 2 %}
+        <span>แก้ไขใบเสนอราคา</span>
+        {% else %}
+        <span>แก้ไขใบเสร็จ</span>
+
+        {% endif %}
+      </button>
+
+      {% endif %}
+    </h3>
+  </div>
+
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/register/management">ดำเนินการ</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {% if main.pay_type == 2 %} ใบเสนอราคา {% else %} ใบเสร็จ {% endif %}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="row">
+    {% for res in data %}
+    <div class="col-lg-6 col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title">
+            <div class="row">
+              <div class="col-md-6"><h3>{{res.main.rp_doc_number}}</h3></div>
+              <div class="col-md-6" align="right">
+                <div
+                  class="btn-group mb-3"
+                  role="group"
+                  aria-label="Basic example"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="window.open('/register/print/{{res.main.rp_id}}','','width=950,height=650'); return false;"
+                  >
+                    <i class="icon dripicons-print"></i>
+                    พิมพ์
+                  </button>
+                  {% if main.pay_type == 1 %}
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="window.open('/register/print/{{res.main.rp_id}}?short=yes','','width=950,height=650'); return false;"
+                  >
+                    <i class="icon dripicons-print"></i>
+                    ใบเสร็จอย่างย่อ
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table class="table">
+            <tr>
+              <th>ชื่อลูกค้า</th>
+              <td>{{res.main.rp_name_customer}}</td>
+            </tr>
+            <tr>
+              <th>รหัสลูกค้า</th>
+              <td>{{res.main.rp_code_customer}}</td>
+            </tr>
+            <tr>
+              <th>TAX ID</th>
+              <td>{{res.main.rp_tax}}</td>
+            </tr>
+            <tr>
+              <th>ผู้เสนอขาย</th>
+              <td>{{res.main.rp_name_seller}}</td>
+            </tr>
+            <tr>
+              <th>ชื่อผู้ติดต่อ</th>
+              <td>{{res.main.rp_name_contact}}</td>
+            </tr>
+            <tr>
+              <th>ฝ่าย / สาขา</th>
+              <td>{{res.main.rp_branch}}</td>
+            </tr>
+            <tr>
+              <th>ที่อยู่</th>
+              <td>{{res.main.rp_address}}</td>
+            </tr>
+            <tr>
+              <th>เบอร์โทร</th>
+              <td>{{res.main.rp_phone}}</td>
+            </tr>
+            <tr>
+              <th>อีเมล</th>
+              <td>{{res.main.rp_email}}</td>
+            </tr>
+            {% if main.pay_type == 2 %}
+
+            <tr>
+              <th>ยืนยันราคาภายในวัน</th>
+              <td>{{res.main.rp_confirm_date_price}}</td>
+            </tr>
+            <tr>
+              <th>วันที่ส่งของ</th>
+              <td>{{res.main.rp_date_delivery}}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th>ผู้เข้าอบรมม</th>
+              <td>{{res.main.rp_quota}}</td>
+            </tr>
+            <tr>
+              <th>Ref 1</th>
+              <td>{{res.main.rp_ref1}}</td>
+            </tr>
+            <tr>
+              <th>Ref 2</th>
+              <td>{{res.main.rp_ref2}}</td>
+            </tr>
+          </table>
+
+          <div align="right">
+            <h2>
+              จำนวนเงินทั้งสิ้น
+              {{res.items.rpi_price_result|floatformat:2|intcomma}}
+            </h2>
+            <p>บาท</p>
+
+            <p>
+              {% if res.main.active == 1 %}
+
+              <span class="badge bg-success">ปิดการขาย</span>
+
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% comment %} Create {% endcomment %}
+  <div class="modal fade text-left" id="CreateClick">
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+      role="document"
+    >
+      <div class="modal-content">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title white" id="myModalLabel160">
+            แจ้งผู้อนุมัติเพื่อแก้ไขเอกสาร
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form
+            action="{% url 'RegisterApproveCreate' %}"
+            method="post"
+            autocomplete="off"
+            id="approve"
+          >
+            {% csrf_token %}
+            <input
+              type="hidden"
+              name="register_id"
+              value="{{main.register_id}}"
+            />
+            <input type="hidden" name="doc_type" value="1" />
+
+            <div class="form-group">
+              <label for="qapprove"> ผู้อนุมัติ</label>
+              <label style="color: red">*</label>
+              <select
+                class="form-select select2"
+                id="qapprove"
+                name="user_approve_id"
+                style="width: 100%%"
+                required
+              >
+                <option value="">-เลือกผู้อนุมัติ-</option>
+                {% for res2 in list_user %}
+                <option value="{{res2.id}}">
+                  {{res2.first_name}} {{res2.last_name}}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="remark"> หมายเหตุ</label>
+              <input
+                type="text"
+                name="remark"
+                id="remark"
+                class="form-control"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-light-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" form="approve" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">บันทึก</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

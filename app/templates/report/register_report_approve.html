@@ -1,0 +1,158 @@
+{% extends 'base.html' %} {% block content %}
+<script>
+  function set_close_the_sale(register_id) {
+    document.getElementById("register_id_update").value = register_id;
+  }
+
+  function cancle_register(register_id) {
+    document.getElementById("register_id_delete").value = register_id;
+  }
+  function default_date() {
+    const d = new Date();
+    let month = d.getMonth() + 1;
+    let year = d.getFullYear();
+    let formattedNumberMonth = month.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+
+    const url = new URL(location.href);
+    //alert(url.searchParams.get("qmonths"));
+    let qmonth = url.searchParams.get("qmonths");
+    let qyear = url.searchParams.get("qyear");
+    if (qmonth !== null && qyear !== null) {
+      document.getElementById("qmonths").value = qmonth;
+      document.getElementById("qyear").value = qyear;
+    } else {
+      document.getElementById("qmonths").value = formattedNumberMonth;
+      document.getElementById("qyear").value = year;
+    }
+  }
+
+  window.onload = default_date;
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ดำเนินการ</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">ดำเนินการ</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="get"
+        action="/register/export/approve_list"
+        autocomplete="off"
+      >
+        <div class="row">
+          <div class="col-lg-3 col-md-6">
+            <select class="form-select" id="qmonths" name="qmonths">
+              <option value="01">มกราคม</option>
+              <option value="02">กุมภาพันธ์</option>
+              <option value="03">มีนาคม</option>
+              <option value="04">เมษายน</option>
+              <option value="05">พฤษภาคม</option>
+              <option value="06">มิถุนายน</option>
+              <option value="07">กรกฎาคม</option>
+              <option value="08">สิงหาคม</option>
+              <option value="09">กันยายน</option>
+              <option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option>
+              <option value="12">ธันวาคม</option>
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="number"
+              class="form-control"
+              id="qyear"
+              name="qyear"
+              required
+              placeholder="ปี (ค.ศ.)"
+            />
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <button type="submit" class="btn btn-success">
+              <i class="icon dripicons-experiment"></i>
+              กรอง
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่สมัคร</th>
+            <th>ประเภท</th>
+            <th>หมายเหตุ</th>
+            <th>สถานะอนุมัติ</th>
+            <th>ผู้ทำรายการ</th>
+            <th>ผู้อนุมัติ</th>
+            <th>วันที่ทำรายการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>
+              <a
+                href="/register/payment/history/{{res.register.register_id}}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{res.register.register_number}}
+              </a>
+            </td>
+            <td>
+              {% if res.doc_type == 1 %}
+
+              <span>แก้ไขใบเสร็จ / ใบเสนอราคา</span>
+              {% else %}
+              <span>-</span>
+              {% endif %}
+            </td>
+            <td>{{res.remark}}</td>
+            <td>
+              {% if res.status == 0 %}
+              <span class="badge bg-info">อยู่ระหว่างดำเนินการ</span>
+              {% elif res.status == 1 %}
+              <span class="badge bg-success">ผ่านการอนุมัติ</span>
+              {% elif res.status == 2 %}
+              <span class="badge bg-danger">ไม่ผ่านการอนุมัติ</span>
+              {% else %}
+              <span>-</span>
+              {% endif %}
+            </td>
+            <td>{{res.user_crt.first_name}} {{res.user_crt.last_name}}</td>
+            <td>
+              {{res.user_approve.first_name}} {{res.user_approve.last_name}}
+            </td>
+            <td>{{res.crt_date|date:"d/m/Y H:i"}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %} {% block content %}
+<script>
+  var myVar = null;
+
+  function start_read_test() {
+    myStopFunctionTest();
+    myVar = setInterval(load_dataTest, 1500);
+  }
+
+  function myStopFunctionTest() {
+    clearInterval(myVar);
+  }
+
+  async function load_dataTest() {
+    let myObject = await fetch("{{api_id_card}}");
+
+    let jsondata = await myObject.text();
+
+    var data = jsondata.substr(13, jsondata.length - 14);
+    let jdata = JSON.parse(data);
+
+    if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
+      document.getElementById("error_load").innerHTML =
+        "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
+      return false;
+    }
+    document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
+    document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
+    document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
+    document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
+    document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
+    document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
+  }
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>คู่มือติดตั้งเครื่องอ่านบัตร</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          คู่มือติดตั้งเครื่องอ่านบัตร
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-header">
+      <div align="right">
+        <div class="btn-group mb-3">
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#CreateClick"
+          >
+            ทดสอบ
+          </button>
+
+          <a class="btn btn-warning" href="{{api_id_card}}" target="_blank">
+            เปิดสิทธิ์
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <iframe
+        src="https://drive.google.com/file/d/1JgeVw_R5bEBOo-TxhHhxmbDX9_ysf0pl/preview"
+        width="100%"
+        height="750"
+        allow="autoplay"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+{% comment %} Create {% endcomment %}
+<div class="modal fade text-left" id="CreateClick">
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document"
+  >
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title white" id="myModalLabel160">
+          ทดสอบดึงข้อมูลจากเครื่องอ่านบัตร ปชช.
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <button
+        type="button"
+        class="btn btn-info ml-1"
+        onclick="start_read_test()"
+      >
+        <i class="icon dripicons-card" aria-hidden="true"></i>
+        เครื่องอ่านบัตร
+      </button>
+      <div align="center">
+        <span id="error_load" style="color: red"></span>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>คำนำหน้าภาษาไทย</label>
+          <select
+            class="form-control"
+            name="student_prefix_th"
+            id="student_prefix_th"
+          >
+            <option value="">-เลือกข้อมูล-</option>
+            <option value="นาย">นาย</option>
+            <option value="นาง">นาง</option>
+            <option value="นางสาว">นางสาว</option>
+            <option value="น.ส.">น.ส.</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>ชื่อภาษาไทย</label> <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="student_firstname_th"
+            name="student_firstname_th"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>นามสกุลภาษาไทย</label> <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="student_lastname_th"
+            name="student_lastname_th"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>คำนำหน้าภาษาอังกฤษ</label>
+
+          <select
+            class="form-control"
+            name="student_prefix_eng"
+            id="student_prefix_eng"
+          >
+            <option value="">-เลือกข้อมูล-</option>
+            <option value="Mr.">Mr.</option>
+            <option value="Mrs.">Mrs.</option>
+            <option value="Miss">Miss</option>
+            <option value="Ms.">Ms.</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>ชื่อภาษาอังกฤษ</label> <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="student_firstname_eng"
+            name="student_firstname_eng"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>นามสกุลภาษาอังกฤษ</label> <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="student_lastname_eng"
+            name="student_lastname_eng"
+            required
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light-secondary" data-bs-dismiss="modal">
+          <i class="bx bx-check d-block d-sm-none"></i>
+          <span class="d-none d-sm-block">ปิด</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

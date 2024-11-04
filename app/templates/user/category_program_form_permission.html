@@ -1,0 +1,82 @@
+{% extends 'base.html' %} {% block content %} {% load humanize %}
+<script>
+  function setValueDeleteModal(id) {
+    document.getElementById("id_delete").value = id;
+  }
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3> กำหนดสิทธิ์กลุ่มผู้ใช้งาน : {{data.cm_name}}</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/user/category/list">กลุ่มผู้ใช้งาน</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          กำหนดสิทธิ์กลุ่มผู้ใช้งาน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        action="/user/category/clusterting/{{data.pk}}"
+        method="post"
+        autocomplete="off"
+      >
+        {% csrf_token %}
+        <table class="table table-bordered mb-0">
+          <thead>
+            <tr>
+              <th style="width: 10%">#</th>
+              <th>เมนู</th>
+              <th>หมวดหมู่</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for res in listMenu %}
+            <tr>
+              <td align="center">
+                {% if res.selectMenu == False %}
+                <input
+                  type="checkbox"
+                  name="page_route"
+                  value="{{res.value}}"
+                  style="height: 25px; width: 25px"
+                />
+                {% else %}
+                <input
+                  type="checkbox"
+                  name="page_route"
+                  value="{{res.value}}"
+                  style="height: 25px; width: 25px"
+                  checked
+                />
+                {% endif %}
+              </td>
+              <td>{{res.label}}</td>
+              <td>{{res.group_label}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-primary">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

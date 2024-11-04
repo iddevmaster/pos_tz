@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% block content %} {% load humanize %}
+<script>
+  function setValueDeleteModal(id) {
+    document.getElementById("id_delete").value = id;
+  }
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ครู - วิทยากร</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">ครู - วิทยากร</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-header">
+      <div align="right">
+        <div class="btn-group mb-3" role="group" aria-label="Basic example">
+          <button
+            class="btn btn-primary"
+            onclick="window.location.href='/teacher/form/create'"
+          >
+            <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>รูปประจำตัว</th>
+            <th>รหัสบัตร ปชช./ Passport</th>
+            <th>ชื่อนามสกุลภาษาไทย</th>
+            <th>ชื่อนามสกุลภาษาอังกฤษ</th>
+            <th>ประเภท</th>
+            <th>พร้อมทำงาน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td align="center"><img src="{{res.teacher_cover.url}}"  style="width:100px;height:100px"/> </td>
+            <td>{{res.teacher_identification_number}}</td>
+            <td>{{res.teacher_prefix_th}}{{res.teacher_firstname_th}} {{res.teacher_lastname_th}}</td>
+            <td>{{res.teacher_prefix_eng}}{{res.teacher_firstname_eng}} {{res.teacher_lastname_eng}}</td>
+            <td align="center">
+              {% if res.teacher_type == 1 %}
+              <font style="color: green">ครูหรือวิทยากรภายใน</font>
+              {% else %}
+              <font style="color: red">ครูหรือวิทยากรภายนอก</font>
+              {% endif %}
+            </td>
+            <td align="center">
+              {% if res.active == 1 %}
+              <font style="color: blue">เปิด</font>
+              {% else %}
+              <font style="color: red">ปิด</font>
+              {% endif %}
+            </td>
+            <td>
+              <div align="center">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  onclick="window.location.href='/teacher/form/update/{{res.teacher_id}}'"
+                >
+                  <i class="icon dripicons-document-edit"></i> แก้ไข
+                </button>
+                
+                <button
+                  type="button"
+                  onclick="setValueDeleteModal('{{res.teacher_id}}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteClick"
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  
+  {% comment %} Delete {% endcomment %}
+  <div class="modal fade" id="DeleteClick">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+        <form action="{% url 'teacher_form_delete' %}" method="post">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="id_delete" required />
+            <div align="center">
+              <h4>ยืนยันการลบข้อมูล</h4>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-light-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">ยกเลิก</span>
+              </button>
+              <button type="submit" class="btn btn-primary ml-1">
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">ยืนยันการลบ</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

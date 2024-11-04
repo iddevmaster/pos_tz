@@ -1,0 +1,61 @@
+{% extends 'base.html' %} {% block content %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+      locale: "th",
+      buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+      editable: false,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+        url: "/calendar_event_api/",
+        failure: function () {
+          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+        },
+      },
+    });
+
+    calendar.render();
+  });
+</script>
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตารางหลักสูตรอบรม</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางหลักสูตรอบรม
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <span id="msg" style="color: red"></span>
+      <div id="calendar"></div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

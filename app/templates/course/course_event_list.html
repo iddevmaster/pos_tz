@@ -1,0 +1,665 @@
+{% extends 'base.html' %} {% block content %} {% load humanize static %}
+
+<script>
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        $("#blah").attr("src", e.target.result);
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  function readURL2(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        $("#blah2").attr("src", e.target.result);
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function setValueUpdateModal(
+    ev_id,
+    ev_date_start,
+    ev_date_end,
+    ev_generation,
+    ev_remark,
+    ev_price,
+    ev_vat,
+    active,
+    course_id,
+    crt_date,
+    upd_date,
+    ev_expired_cer_quantity,
+    ev_logo
+  ) {
+    document.getElementById("datecrt").innerHTML =
+      "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
+    document.getElementById("ev_id_update").value = ev_id;
+    document.getElementById("ev_date_start_update").value = ev_date_start;
+    document.getElementById("ev_date_end_update").value = ev_date_end;
+    document.getElementById("ev_remark_update").value = ev_remark;
+    document.getElementById("ev_generation_update").value = ev_generation;
+    document.getElementById("ev_price_update").value = ev_price;
+    document.getElementById("ev_vat_update").value = ev_vat;
+    document.getElementById("ev_expired_cer_quantity_update").value =
+      ev_expired_cer_quantity;
+    document.getElementById("course_id_update").value = course_id;
+    document.getElementById("active_update").value = active;
+    $(".selectUpdate").val(course_id).select2({
+      placeholder: "เลือกข้อมูล",
+      allowClear: true,
+    });
+    if (ev_logo !== "") {
+      document.getElementById("blah2").src = ev_logo;
+    } else {
+      document.getElementById("blah2").src =
+        "{% static 'images/no-photo-available.png' %}";
+    }
+  }
+  function setValueDeleteModal(ev_id) {
+    document.getElementById("ev_id_delete").value = ev_id;
+  }
+
+  function default_date() {
+    const d = new Date();
+    let month = d.getMonth() + 1;
+
+    let year = d.getFullYear();
+    let formattedNumberMonth = month.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+
+    const url = new URL(location.href);
+    //alert(url.searchParams.get("qmonths"));
+    let qmonth = url.searchParams.get("qmonths");
+    let qyear = url.searchParams.get("qyear");
+    if (qmonth !== null && qyear !== null) {
+      document.getElementById("qmonths").value = qmonth;
+      document.getElementById("qyear").value = qyear;
+    } else {
+      document.getElementById("qmonths").value = formattedNumberMonth;
+      document.getElementById("qyear").value = year;
+    }
+  }
+
+  window.onload = default_date;
+</script>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>กำหนดวันอบรมและราคาอบรม</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          กำหนดวันอบรมและราคาอบรม
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-header">
+      <div align="right">
+        <div class="btn-group mb-3" role="group" aria-label="Basic example">
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#CreateClick"
+          >
+            <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <form method="get" action="/course/event" autocomplete="off">
+        <div class="row">
+          <div class="col-lg-3 col-md-6">
+            <select class="form-select" id="qmonths" name="qmonths">
+              <option value="01">มกราคม</option>
+              <option value="02">กุมภาพันธ์</option>
+              <option value="03">มีนาคม</option>
+              <option value="04">เมษายน</option>
+              <option value="05">พฤษภาคม</option>
+              <option value="06">มิถุนายน</option>
+              <option value="07">กรกฎาคม</option>
+              <option value="08">สิงหาคม</option>
+              <option value="09">กันยายน</option>
+              <option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option>
+              <option value="12">ธันวาคม</option>
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="number"
+              class="form-control"
+              id="qyear"
+              name="qyear"
+              required
+              placeholder="ปี (ค.ศ.)"
+            />
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <button type="submit" class="btn btn-success">
+              <i class="icon dripicons-experiment"></i>
+              กรอง
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>รหัสหลักสูตร</th>
+            <th>ชื่อหลักสูตร</th>
+            <th>ราคา (บาท)</th>
+            <th>รวม VAT</th>
+            <th>วันที่อบรม</th>
+            <th>รุ่น</th>
+            <th>วันหมดอายุใบรับรอง</th>
+            <th>ครู - วิทยากร</th>
+            <th>พร้อมทำงาน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{res.course.course_code}}</td>
+            <td>{{res.course.course_name}}</td>
+            <td align="right">{{ res.ev_price|floatformat:2|intcomma }}</td>
+            <td align="center">
+              {% if res.ev_vat == 1 %}
+              <font style="color: blue">ใช่</font>
+              {% else %}
+              <font style="color: red">ไม่ใช่</font>
+              {% endif %}
+            </td>
+
+            <td>
+              {{res.ev_date_start|date:"d/m/Y"}} ถึง
+              {{res.ev_date_end|date:"d/m/Y"}}
+            </td>
+            <td>{{res.ev_generation}}</td>
+            <td align="center">
+              {{res.ev_expired_cer_date|date:"d/m/Y"}}
+              ({{res.ev_expired_cer_quantity}} ปี)
+            </td>
+            <td>
+              <button
+                  type="button"
+                  class="btn btn-info"
+                  onclick="window.location.href='/course/event/teachers/list/{{res.ev_id}}'" 
+                >
+                <i class="icon dripicons-user"></i> จัดการ
+              </button>
+            </td>
+            <td align="center">
+              {% if res.active == 1 %}
+              <font style="color: blue">เปิด</font>
+              {% else %}
+              <font style="color: red">ปิด</font>
+              {% endif %}
+            </td>
+
+            <td>
+              <div align="center">
+                {% if res.ev_logo %}
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  data-bs-toggle="modal"
+                  data-bs-target="#UpdateClick"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
+                >
+                  <i class="icon dripicons-document-edit"></i> แก้ไข
+                </button>
+                {% else %}
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  data-bs-toggle="modal"
+                  data-bs-target="#UpdateClick"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
+                >
+                  <i class="icon dripicons-document-edit"></i> แก้ไข
+                </button>
+                {% endif %}
+                <button
+                  type="button"
+                  onclick="setValueDeleteModal('{{res.ev_id}}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteClick"
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% comment %} Create {% endcomment %}
+<div class="modal fade text-left" id="CreateClick">
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document"
+  >
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title white" id="myModalLabel160">เพิ่มข้อมูล</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form
+        action="{% url 'CreateCourseEvent' %}"
+        method="post"
+        autocomplete="off"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label>หลักสูตร</label> <label style="color: red">*</label>
+            <select
+              class="select2"
+              name="course_id"
+              id="course_id"
+              style="width: 100%"
+              required
+            >
+              <option value="">--เลือกหลักสูตร--</option>
+              {% for res in course_list %}
+              <option value="{{res.course_id}}">
+                {{res.course_code}} {{res.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control daterangesingle"
+              id="ev_date_start"
+              name="ev_date_start"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control daterangesingle"
+              id="ev_date_end"
+              name="ev_date_end"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>รุ่นที่</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ev_generation"
+              name="ev_generation"
+              required
+              pattern="[0-9]+"
+            />
+          </div>
+          <div class="form-group">
+            <label>ราคา (บาท)</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="ev_price"
+              name="ev_price"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
+            <select class="form-control" name="ev_vat" id="ev_vat" required>
+              <option value="">--เลือกข้อมูล--</option>
+              <option value="0">ไม่ใช่</option>
+              <option value="1">ใช่</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              pattern="[0-9]+"
+              class="form-control"
+              id="ev_expired_cer_quantity"
+              name="ev_expired_cer_quantity"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>หมายเหตุ</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ev_remark"
+              name="ev_remark"
+            />
+          </div>
+          <div class="form-group">
+            <label>LOGO Certificate (150 x 150)</label>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              onclick="imageupload.click()"
+            >
+              อัปโหลดรูป
+            </button>
+            <div>
+              <input
+                type="file"
+                name="ev_logo"
+                id="imageupload"
+                onchange="readURL(this);"
+                style="display: none"
+                accept=".png, .jpg, .jpeg"
+              />
+              <img
+                src="{% static 'images/no-photo-available.png' %}"
+                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
+                id="blah"
+                width="150"
+                height="150"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>เปิด-ปิด</label>
+            <select class="form-control" name="active" id="active" required>
+              <option value="0">ปิด</option>
+              <option value="1" selected>เปิด</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-light-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">บันทึก</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% comment %} Update {% endcomment %}
+<div class="modal fade text-left" id="UpdateClick">
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document"
+  >
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title white" id="myModalLabel160">แก้ไขข้อมูล</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form
+        action="{% url 'UpdateCourseEvent' %}"
+        method="post"
+        autocomplete="off"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <input type="hidden" id="ev_id_update" name="ev_id" required />
+        <div class="modal-body">
+          <div class="form-group">
+            <label>หลักสูตร</label> <label style="color: red">*</label>
+            <select
+              class="selectUpdate"
+              name="course_id"
+              id="course_id_update"
+              required
+              style="width: 100%"
+            >
+              <option value="">--เลือกหลักสูตร--</option>
+              {% for res in course_list %}
+              <option value="{{res.course_id}}">
+                {{res.course_code}} {{res.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control daterangesingle"
+              id="ev_date_start_update"
+              name="ev_date_start"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control daterangesingle"
+              id="ev_date_end_update"
+              name="ev_date_end"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>รุ่นที่</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ev_generation_update"
+              name="ev_generation"
+              required
+              pattern="[0-9]+"
+            />
+          </div>
+          <div class="form-group">
+            <label>ราคา (บาท)</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="ev_price_update"
+              name="ev_price"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
+            <select
+              class="form-control"
+              name="ev_vat"
+              id="ev_vat_update"
+              required
+            >
+              <option value="">--เลือกข้อมูล--</option>
+              <option value="0">ไม่ใช่</option>
+              <option value="1">ใช่</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              pattern="[0-9]+"
+              class="form-control"
+              id="ev_expired_cer_quantity_update"
+              name="ev_expired_cer_quantity"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>หมายเหตุ</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ev_remark_update"
+              name="ev_remark"
+            />
+          </div>
+          <div class="form-group">
+            <label>LOGO Certificate (150 x 150)</label>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              onclick="imageupload2.click()"
+            >
+              อัปโหลดรูป
+            </button>
+            <div>
+              <input
+                type="file"
+                name="ev_logo"
+                id="imageupload2"
+                onchange="readURL2(this);"
+                style="display: none"
+                accept=".png, .jpg, .jpeg"
+              />
+
+              <img
+                src="{% static 'images/no-photo-available.png' %}"
+                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
+                id="blah2"
+                width="150"
+                height="150"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>เปิด-ปิด</label>
+            <select
+              class="form-control"
+              name="active"
+              id="active_update"
+              required
+            >
+              <option value="0">ปิด</option>
+              <option value="1">เปิด</option>
+            </select>
+          </div>
+          <p id="datecrt"></p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-light-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">บันทึก</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% comment %} Delete {% endcomment %}
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form action="{% url 'DeleteCourseEvent' %}" method="post">
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="hidden" name="ev_id" id="ev_id_delete" required />
+          <div align="center">
+            <h4>ยืนยันการลบข้อมูล</h4>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1">
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยืนยันการลบ</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

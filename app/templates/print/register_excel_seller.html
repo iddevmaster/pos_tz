@@ -1,0 +1,180 @@
+{% load humanize %} {% comment %}
+https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel-using-JavaScript/
+{% endcomment %}
+<script
+  src="https://code.jquery.com/jquery-latest.min.js"
+  type="text/javascript"
+></script>
+<script type="text/javascript">
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
+</script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+  rel="stylesheet"
+/>
+
+<style type="text/css">
+  body {
+    font-family: "Sarabun", sans-serif;
+    font-size: 16px;
+  }
+  table {
+    font-size: 16px;
+  }
+  .green {
+    background-color: green;
+  }
+</style>
+
+<div style="padding-bottom: 65px">
+  <div style="float: left">
+    ทั้งหมด <strong>{{param.total_data}} </strong>รายการ
+  </div>
+  <div style="float: right">
+    <input
+      type="button"
+      onclick="tableToExcel('testTable', 'รายงานการขาย')"
+      value="Export to Excel"
+      style="height: 35px"
+    />
+  </div>
+</div>
+{% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
+<table
+  id="testTable"
+  summary="Code page support in different versions of MS Windows."
+  style="width: 100%; border-collapse: collapse"
+  border="1"
+>
+  <tbody>
+    <tr style="font-weight: bold">
+      <td colspan="2">{{param.range_param}}</td>
+      <td>จังหวัด : {{param.province_name}}</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr style="font-weight: bold">
+      <td>ประเภทการชำระเงิน : {{param.pay_type_param}}</td>
+      <td>สถานะการขาย : {{param.close_the_sale_param}}</td>
+      <td>หลักสูตร : {{param.course_param}}</td>
+      <td>รุ่น : {{param.generation_param}}</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr style="font-weight: bold">
+      <td>ชื่อผู้ขาย : {{param.seller_param}}</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr style="font-weight: bold">
+      <td>ชื่อลูกค้า</td>
+      <td>Tax ID</td>
+      <td>เบอร์โทร</td>
+      <td>ที่อยู่</td>
+      <td>ประเภทลูกค้า</td>
+      <td>ประเภทชำระเงิน</td>
+      <td>สถานะการขาย</td>
+      <td>ชื่อผู้ขาย</td>
+      <td>ราคาที่ปิดการขาย</td>
+      <td>วันที่เปิดการขาย</td>
+      <td>วันที่ปิดการขาย</td>
+    </tr>
+    {% for res in data %}
+    <tr>
+      <td>{{res.customer_list.customer_name}}</td>
+      <td>{{res.customer_list.customer_tax}}</td>
+      <td>{{res.customer_list.customer_phone}}</td>
+      <td>
+        {{res.customer_list.customer_address}} ตำแบล/แขวง
+        {{res.customer_list.location.district_name}} อำเภอ/เขต
+        {{res.customer_list.location.amphur_name}} จังหวัด
+        {{res.customer_list.location.province_name}}
+        {{res.customer_list.location.zipcode}}
+      </td>
+      <td align="center">
+        {% if res.customer_list.register.customer_type == 1 %}
+        <span>บุคคล</span>
+        {% else %}
+        <span>บริษัท</span>
+        {% endif %}
+      </td>
+      <td align="center">
+        {% if res.customer_list.register.pay_type == 1 %}
+        <span>เงินสด</span>
+        {% else %}
+        <span>เครดิต</span>
+        {% endif %}
+      </td>
+      <td align="center">
+        {% if res.customer_list.register.close_the_sale == 1 %}
+        <span>ปิดการขาย - ขายสำเร็จ</span>
+        {% elif res.customer_list.register.close_the_sale == 2 %}
+        <span>ปิดการขาย - ขายไม่สำเร็จ</span>
+        {% else %}
+        <span>กำลังขาย</span>
+        {% endif %}
+      </td>
+      <td>{{res.payment_list.rp.rp_name_seller}}</td>
+      <td align="right">
+        {{res.payment_list.rpi_price_result|floatformat:2|intcomma }}
+      </td>
+      <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
+      <td>{{res.customer_list.register.upd_date|date:"d/m/Y H:i"}}</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>รวม</td>
+      <td align="right">{{total_sum|floatformat:2|intcomma}}</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>

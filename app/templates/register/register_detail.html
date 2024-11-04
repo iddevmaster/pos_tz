@@ -1,0 +1,162 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายละเอียดการสมัคร</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/register/management">รายงาน</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          รายละเอียดการสมัคร
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">ข้อมูลการสมัคร</h5>
+
+      <div class="row">
+        <div class="col-lg-6 col-md-6">
+          <div class="form-group">
+            <label>หลักสูตร</label>
+            <h4>
+              {{content_course.course.course_code}}
+              {{content_course.course.course_name}}
+            </h4>
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+          <div class="form-group">
+            <label>วันอบรม</label>
+            <h4>
+              {{content_course.ev_date_start}} ถึง
+              {{content_course.ev_date_end}}
+            </h4>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>เลขใบสมัคร</label>
+            <h4>{{content_regist.register_number}}</h4>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>ประเภทลูกค้า</label>
+            {% if content_regist.customer_type == 1 %}
+
+            <h4>บุคคล</h4>
+            {% else %}
+            <h4>บริษัท</h4>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>ประเภทการชำระเงิน</label>
+            {% if content_regist.pay_type == 1 %}
+
+            <h4>เงินสด</h4>
+            {% else %}
+            <h4>เครดิต</h4>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>ปิดการขาย</label>
+            {% if content_regist.close_the_sale == 1 %}
+
+            <h4 style="color: blue">ปิดการขาย - ขายสำเร็จ</h4>
+            {% elif content_regist.close_the_sale == 2 %}
+
+            <h4 style="color: red">ปิดการขาย - ขายไม่สำเร็จ</h4>
+            {% else %}
+            <h4>กำลังขาย</h4>
+
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">ข้อมูลลูกค้า</h5>
+
+      <div class="row">
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>รหัสลูกค้า</label>
+            <h4>{{content_customer.customer_code}}</h4>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>ชื่อลูกค้า</label>
+            <h4>{{content_customer.customer_name}}</h4>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>TAX ID</label>
+            <h4>{{content_customer.customer_tax}}</h4>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>เบอร์โทร</label>
+            <h4>{{content_customer.customer_phone}}</h4>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group">
+            <label>อีเมล</label>
+            <h4>{{content_customer.customer_email}}</h4>
+          </div>
+        </div>
+
+        <div class="col-lg-9 col-md-6">
+          <div class="form-group">
+            <label>ที่อยู่</label>
+            <h5>
+              {{content_customer.customer_address}} ตำแบล/แขวง
+              {{content_customer.location.district_name}} อำเภอ/เขต
+              {{content_customer.location.amphur_name}} จังหวัด
+              {{content_customer.location.province_name}}
+              {{content_customer.location.zipcode}}
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <strong> วันที่ลงทะเบียน : {{content_regist.crt_date}}</strong>
+  </div>
+</section>
+
+{% endblock %}
