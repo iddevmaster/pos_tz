@@ -106,9 +106,10 @@ WSGI_APPLICATION = 'trainingzenter.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tz_db3',
+        'NAME': 'postz',
         'USER': 'root',
         'HOST': 'localhost',
+        'PASSWORD':'@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -147,7 +148,7 @@ USE_I18N = True
 
 USE_TZ = False
 
-
+DEBUG = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
