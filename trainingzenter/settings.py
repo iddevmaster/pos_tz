@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_-+e6v9umc#o7qjr498!hj!23g05=*$my2x-w!!=mefr9^9(k%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["pos.intnas.com"]
 
 
 # Application definition
@@ -65,9 +65,10 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'https://pos.intnas.com',
-]
+
+CSRF_TRUSTED_ORIGINS = ["https://pos.intnas.com"]
+CSRF_ALLOWED_ORIGINS = ["https://pos.intnas.com"]
+CORS_ORIGINS_WHITELIST = ["https://pos.intnas.com"]
 
 
 TEMPLATES = [
