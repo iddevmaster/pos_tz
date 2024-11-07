@@ -109,7 +109,6 @@ DATABASES = {
         'NAME': 'postz',
         'USER': 'root',
         'HOST': 'localhost',
-        'PASSWORD':'@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -155,7 +154,7 @@ DEBUG = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-STATIC_ROOT = '/home/itservices/golive/trainingzenter/app/static'
+STATIC_ROOT = '/trainingzenter/app/static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
