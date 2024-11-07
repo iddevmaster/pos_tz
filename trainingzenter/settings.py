@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_-+e6v9umc#o7qjr498!hj!23g05=*$my2x-w!!=mefr9^9(k%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'app',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,7 +109,7 @@ DATABASES = {
         'NAME': 'postz',
         'USER': 'root',
         'HOST': 'localhost',
-        'PASSWORD':'@P@SS.W0rd',
+        'PASSWORD': '@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -144,7 +148,7 @@ USE_I18N = True
 
 USE_TZ = False
 
-
+DEBUG = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
