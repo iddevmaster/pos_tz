@@ -16,6 +16,7 @@ def login(request):
 def login_check(request):
     username = request.POST['username']
     password = request.POST['password']
+    print("The original date is : " )
     user = auth.authenticate(username=username, password=password)
     if user is not None:
         auth.login(request, user)
