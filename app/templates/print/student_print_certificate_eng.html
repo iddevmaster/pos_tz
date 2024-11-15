@@ -120,11 +120,11 @@
         style="width: 400px; height: auto"
         class="black-ribbon stick-bottom stick-right"
       />
-      <img
+      {% comment %} <img
         src="{% static 'images/ID_Logo.png' %}"
         style="width: 95px; height: auto;padding-right: 40px;"
         class="black-ribbon logo-company"
-      />
+      /> {% endcomment %}
       <div class="black-ribbon qrcode" align="center">
         {% comment %}
         <img
@@ -139,7 +139,7 @@
           style="width: 80px; height: 80px"
         />
         <div>Certificate No. {{data.student_code}}</div>
-        <div>Expired Date. {{detail.ev_expired_cer_date|date:'d/m/Y'}}</div>
+        {% comment %} <div>Expired Date. {{detail.ev_expired_cer_date|date:'d/m/Y'}}</div> {% endcomment %}
       </div>
 
       <img

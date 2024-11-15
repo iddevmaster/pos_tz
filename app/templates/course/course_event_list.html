@@ -178,7 +178,7 @@
             <th>รวม VAT</th>
             <th>วันที่อบรม</th>
             <th>รุ่น</th>
-            <th>วันหมดอายุใบรับรอง</th>
+            {% comment %} <th>วันหมดอายุใบรับรอง</th> {% endcomment %}
             <th>ครู - วิทยากร</th>
             <th>พร้อมทำงาน</th>
             <th>#</th>
@@ -204,10 +204,10 @@
               {{res.ev_date_end|date:"d/m/Y"}}
             </td>
             <td>{{res.ev_generation}}</td>
-            <td align="center">
+            {% comment %} <td align="center">
               {{res.ev_expired_cer_date|date:"d/m/Y"}}
               ({{res.ev_expired_cer_quantity}} ปี)
-            </td>
+            </td> {% endcomment %}
             <td>
               <button
                   type="button"
@@ -340,6 +340,7 @@
               name="ev_generation"
               required
               pattern="[0-9]+"
+               maxlength="3"
             />
           </div>
           <div class="form-group">
@@ -361,18 +362,20 @@
               <option value="1">ใช่</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
-            <label style="color: red">*</label>
+ <div class="form-group">
+            {% comment %} <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
+            <label style="color: red">*</label> {% endcomment %}
             <input
-              type="text"
+              type="hidden"
               pattern="[0-9]+"
               class="form-control"
               id="ev_expired_cer_quantity"
               name="ev_expired_cer_quantity"
               required
+              value="0"
+             
             />
-          </div>
+          </div>  
           <div class="form-group">
             <label>หมายเหตุ</label>
             <input
@@ -538,10 +541,10 @@
           </div>
 
           <div class="form-group">
-            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
-            <label style="color: red">*</label>
+            {% comment %} <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
+            <label style="color: red">*</label> {% endcomment %}
             <input
-              type="text"
+              type="hidden"
               pattern="[0-9]+"
               class="form-control"
               id="ev_expired_cer_quantity_update"
