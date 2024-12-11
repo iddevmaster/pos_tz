@@ -222,6 +222,7 @@ class teacher(models.Model):
         upload_to=generate_unique_name('images/teacher'), default=None)
     teacher_type = models.IntegerField(default=1, blank=False)
     active = models.IntegerField(default=1, blank=False)
+    level = models.IntegerField(default=1, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
