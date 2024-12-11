@@ -71,6 +71,7 @@ def teacher_form_create(request):
         teacher_lastname_eng = request.POST['teacher_lastname_eng']
         teacher_type =  request.POST['teacher_type']
         active = request.POST['active']
+        level = request.POST['level']
         t = teacher.objects.filter(teacher_identification_number=teacher_identification_number).count()
         if t > 0:
             messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
@@ -86,6 +87,7 @@ def teacher_form_create(request):
             teacher_cover = teacher_cover,
             teacher_type = teacher_type,
             active = active,
+            level = level,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             module=m.module
