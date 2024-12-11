@@ -222,11 +222,12 @@ class teacher(models.Model):
         upload_to=generate_unique_name('images/teacher'), default=None)
     teacher_type = models.IntegerField(default=1, blank=False)
     active = models.IntegerField(default=1, blank=False)
-    level = models.IntegerField(default=1, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
+    level = models.CharField(
+        max_length=128, blank=True, default=None)
     def __str__(self):
         name = str(self.teacher_firstname_th) + " - " + str(self.teacher_lastname_th)
         return name
