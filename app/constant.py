@@ -71,6 +71,13 @@ activeChoices = (
     ('0', 'ปิด'),
 )
 
+Levelchoices = (
+    ('1', 'Basic'),
+    ('2', 'Level A'),
+    ('3', 'Level B'),
+    ('4', 'Level C'),
+)
+
 teacherTypeChoices = (
     ('1', 'ครูหรือวิทยากรภายใน'),
     ('2', 'ครูหรือวิทยากรภายนอก'),

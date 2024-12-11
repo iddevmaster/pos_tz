@@ -1,5 +1,5 @@
 from django import forms
-from ..constant import prefixEng,prefixThai,activeChoices,teacherTypeChoices,unitPayChoices
+from ..constant import prefixEng,prefixThai,activeChoices,teacherTypeChoices,unitPayChoices,Levelchoices
 from ..models import teacher,pay_item
 class teacherForm(forms.Form):
     teacher_cover = forms.ImageField(label="รูประจำตัวครู / วิทยากร")
@@ -17,6 +17,7 @@ class teacherForm(forms.Form):
         label="นามสกุลภาษาอังกฤษ", max_length=128, widget=forms.TextInput(attrs={'class': 'form-control'}))
     teacher_type = forms.ChoiceField(label="ประเภท", choices=teacherTypeChoices, widget=forms.Select(attrs={'class': 'form-control'}))
     active = forms.ChoiceField(label="Active", choices=activeChoices, widget=forms.Select(attrs={'class': 'form-control'}))
+    level = forms.ChoiceField(label="Level", choices=Levelchoices, widget=forms.Select(attrs={'class': 'form-control'}))
 
 
 class teacherIncomeSettingForm(forms.Form):
