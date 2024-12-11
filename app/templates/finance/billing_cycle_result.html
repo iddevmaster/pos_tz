@@ -45,6 +45,29 @@
       $(".select2").val(qteacher).trigger("change");
     }
   });
+
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
 </script>
 
 <div class="row">
@@ -108,22 +131,34 @@
   <div class="card">
     <div class="card-body">
       <div class="form-group row">
-        <div class="col-lg-6">
+        <div class="col-lg-2">
           <h3>{{r.month}}</h3>
         </div>
-        <div class="col-lg-6" align="right">
+        <div class="col-lg-1">
+          <input
+          type="button"
+          onclick="tableToExcel('content-{{r.month}}', 'รายงานการขาย')"
+          value="Export to Excel"
+          style="height: 35px"
+        />
+        </div>
+        <div class="col-lg-9" align="right">
           <button
             class="btn btn-light"
             onclick="tableDisplay('content-{{r.month}}')"
           >
             <h1>{{r.total_month_sum|floatformat:2|intcomma}}</h1>
           </button>
+          
         </div>
+    
       </div>
-      <div id="content-{{r.month}}" style="display: none">
+      <div id="content-{{r.month}}" style="display: none"> 
         <table class="table table-striped">
           <thead>
             <tr>
+
+              
               <th>รอบบิล</th>
               <th>ชื่อ-นามสกุล</th>
               <th>ตำแหน่ง</th>
