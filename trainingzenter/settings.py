@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_-+e6v9umc#o7qjr498!hj!23g05=*$my2x-w!!=mefr9^9(k%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["pos.intnas.com"]
+ALLOWED_HOSTS = ["pos.idclever.net"]
 
 
 # Application definition
@@ -66,9 +66,9 @@ REST_FRAMEWORK = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = ["https://pos.intnas.com"]
-CSRF_ALLOWED_ORIGINS = ["https://pos.intnas.com"]
-CORS_ORIGINS_WHITELIST = ["https://pos.intnas.com"]
+CSRF_TRUSTED_ORIGINS = ["http://pos.idclever.net"]
+CSRF_ALLOWED_ORIGINS = ["http://pos.idclever.net"]
+CORS_ORIGINS_WHITELIST = ["http://pos.idclever.net"]
 
 
 TEMPLATES = [
@@ -113,7 +113,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'postz',
         'USER': 'root',
-        'HOST': 'localhost',
+        'HOST': '27.254.149.247',
         'PASSWORD': '@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
