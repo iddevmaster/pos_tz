@@ -37,6 +37,7 @@
     crt_date,
     upd_date,
     ev_expired_cer_quantity,
+    ev_hour,
     ev_logo
   ) {
     document.getElementById("datecrt").innerHTML =
@@ -48,6 +49,7 @@
     document.getElementById("ev_generation_update").value = ev_generation;
     document.getElementById("ev_price_update").value = ev_price;
     document.getElementById("ev_vat_update").value = ev_vat;
+    document.getElementById("ev_hour").value = ev_hour;
     document.getElementById("ev_expired_cer_quantity_update").value =
       ev_expired_cer_quantity;
     document.getElementById("course_id_update").value = course_id;
@@ -331,6 +333,19 @@
               required
             />
           </div>
+
+          <div class="form-group">
+            <label>จำนวนชั่วโมง</label> <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ev_hour"
+              name="ev_hour"
+              required
+              pattern="[0-9]+"
+            />
+          </div>
+          
           <div class="form-group">
             <label>รุ่นที่</label> <label style="color: red">*</label>
             <input
@@ -498,6 +513,18 @@
               class="form-control daterangesingle"
               id="ev_date_end_update"
               name="ev_date_end"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>จำนวนชั่วโมง</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              pattern="[0-9]+"
+              class="form-control"
+              id="ev_hour"
+              name="ev_hour"
               required
             />
           </div>

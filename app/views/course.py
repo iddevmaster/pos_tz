@@ -119,6 +119,7 @@ def course_event_list(request):
     result = course_event.objects.select_related("course").filter(
         cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
     context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list}
+    
     return render(request, 'course/course_event_list.html', context)
 
 
@@ -140,6 +141,7 @@ def course_event_create(request):
     ev_expired_cer_quantity = request.POST['ev_expired_cer_quantity']
     ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
     active = request.POST['active']
+    ev_hour = request.POST['actev_hourive']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -159,7 +161,8 @@ def course_event_create(request):
         course_id=course_id,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
-        module=m.module
+        module=m.module,
+        ev_hour=ev_hour
     )
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
@@ -179,6 +182,7 @@ def course_event_update(request):
     ev_expired_cer_quantity = request.POST['ev_expired_cer_quantity']
     ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
     active = request.POST['active']
+    ev_hour = request.POST['ev_hour']
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -194,6 +198,7 @@ def course_event_update(request):
     content.ev_expired_cer_date = ev_expired_cer_date
     content.ev_logo = ev_logo
     content.active = active
+    content.ev_hour = ev_hour
     content.upd_date = dateTimeNow()
     content.course_id = course_id
     content.save()

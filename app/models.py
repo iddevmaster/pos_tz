@@ -79,6 +79,7 @@ class course_event(models.Model):
     ev_remark = models.CharField(max_length=256, blank=True, default=None)
     ev_price = models.FloatField(default=0, blank=False)
     ev_vat = models.IntegerField(default=0, blank=False)
+    ev_hour = models.IntegerField(default=0, blank=False)
     ev_expired_cer_quantity = models.IntegerField(default=0, blank=False)
     ev_expired_cer_date = models.DateField(blank=True, null=True)
     ev_logo = models.ImageField(
@@ -89,6 +90,7 @@ class course_event(models.Model):
     cancelled = models.IntegerField(default=1, blank=False)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
+    
    
     
 # customer_type  1  = บุคคล ,2 = บริษัท
