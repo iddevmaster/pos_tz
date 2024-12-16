@@ -141,7 +141,7 @@ def course_event_create(request):
     ev_expired_cer_quantity = request.POST['ev_expired_cer_quantity']
     ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
     active = request.POST['active']
-    ev_hour = request.POST['actev_hourive']
+    ev_hour = request.POST['ev_hour']
 
     try:
         ev_logo = request.FILES['ev_logo']
