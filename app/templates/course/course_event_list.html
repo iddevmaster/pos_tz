@@ -28,6 +28,7 @@
     ev_id,
     ev_date_start,
     ev_date_end,
+    ev_hour,
     ev_generation,
     ev_remark,
     ev_price,
@@ -37,7 +38,6 @@
     crt_date,
     upd_date,
     ev_expired_cer_quantity,
-    ev_hour,
     ev_logo
   ) {
     document.getElementById("datecrt").innerHTML =
@@ -45,11 +45,12 @@
     document.getElementById("ev_id_update").value = ev_id;
     document.getElementById("ev_date_start_update").value = ev_date_start;
     document.getElementById("ev_date_end_update").value = ev_date_end;
+    document.getElementById("ev_hour_update").value = ev_hour;
     document.getElementById("ev_remark_update").value = ev_remark;
     document.getElementById("ev_generation_update").value = ev_generation;
     document.getElementById("ev_price_update").value = ev_price;
     document.getElementById("ev_vat_update").value = ev_vat;
-    document.getElementById("ev_hour").value = ev_hour;
+    
     document.getElementById("ev_expired_cer_quantity_update").value =
       ev_expired_cer_quantity;
     document.getElementById("course_id_update").value = course_id;
@@ -205,6 +206,7 @@
               {{res.ev_date_start|date:"d/m/Y"}} ถึง
               {{res.ev_date_end|date:"d/m/Y"}}
             </td>
+            <td>{{res.ev_hour}}</td>
             <td>{{res.ev_generation}}</td>
             <td align="center">
               {{res.ev_expired_cer_date|date:"d/m/Y"}}
@@ -235,7 +237,7 @@
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -245,7 +247,7 @@
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -523,7 +525,7 @@
               type="text"
               pattern="[0-9]+"
               class="form-control"
-              id="ev_hour"
+              id="ev_hour_update"
               name="ev_hour"
               required
             />
