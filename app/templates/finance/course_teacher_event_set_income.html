@@ -2,7 +2,67 @@
 {% block content %} 
   {% load humanize static %}
   {% load ex_functions %}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+
+  function allowOnlyNumbers(event) {
+
+   
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+        event.key === "Backspace" || 
+        event.key === "Tab" || 
+        event.key === "ArrowLeft" || 
+        event.key === "ArrowRight" || 
+        event.key === "Delete"
+    ) {
+        return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+        event.preventDefault(); // Block other characters
+        return false; // Prevent default behavior
+    }
+
+
+
+
+
+  setTimeout(() => {
+   const it = document.getElementById("tis_quantity").value;
+    if (it.charAt(0) == "0") {
+      let result = removeFirstCharacter(it);
+      document.getElementById("tis_quantity").value = result 
+     // return it.slice(0); // Removes the first character
+    }
+
+  }, 20);
+
+}
+function removeFirstCharacter(str) {
+  return str.substring(1);
+}
+
+  function handleSelectChange(selectElement) {
+    const selectedValue = selectElement.value;
+ document.getElementById("teacher_id").value = selectedValue;
+  }
+
+  function Save() {
+   
+    Swal.fire({
+      title: 'Success!',
+      text: 'Your action was completed successfully.',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+
+    
+return false;
+  }
+
   function validate(evt) {
     var theEvent = evt || window.event;
 
@@ -69,6 +129,11 @@
   function setValueDeleteModal(id) {
     document.getElementById("id_delete").value = id;
   }
+
+
+  function SelectEmplo() {
+  
+  }
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -100,22 +165,101 @@
       <div align="center">
         <h3>
           หลักสูตร <u>{{main_data.course.course_name}} </u> วันที่
-          <u>{{main_data.ev_date_start}} - {{main_data.ev_date_end}} </u>
+          <u>{{main_data.ev_date_start}} - {{main_data.ev_date_end}} - {{main_data.ev_hour}} ชั่วโมง</u>  
         </h3>
       </div>
-      <form
+      <form onsubmit="return Save(event);"
         action="/course/event/teachers/form/create/{{main_data.ev_id}}"
         method="post"
         autocomplete="off"
       >
         {% csrf_token %}
-        <div class="row">
+        {% comment %} <div class="row">
           {% for field in form %}
           <div class="col-12 col-lg-6 col-md-6">
             {{field.label_tag }} <label style="color: red"> *</label> {{ field}}
           </div>
           {% endfor %}
+        </div> {% endcomment %}
+
+        <input type="text" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />
+        <div class="row">
+          <div class="col-12 col-lg-6 col-md-6">
+            ตำแหน่ง / หน้าที่ / รายการ: *   <label style="color: red"> *</label> 
+            <select class="form-select"  id="teacher" name="teacher">
+              {% for listpositions in listposition %}
+              <option value="{{ listpositions }}">
+                 {{ listpositions }}
+              </option>
+          {% endfor %}
+            </select>
         </div>
+        <div class="col-12 col-lg-6 col-md-6">
+          ค่าตอบแทน:   <label style="color: red"> *</label> 
+          <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="1" readonly />
+    
+      </div>
+
+      <div class="col-12 col-lg-6 col-md-6">
+        จำนวนต่อหน่วย *:   <label style="color: red"> *</label> 
+        <select class="form-select" onchange="handleSelectChange(this)" id="tis_unit" name="tis_unit">
+          <option value="hour">
+             ชั่วโมง
+          </option>
+        </select>
+  
+    </div>
+
+      <div class="col-12 col-lg-6 col-md-6">
+        หน่วย:   <label style="color: red"> *</label> 
+        <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" />
+    </div>
+
+
+
+  
+
+  <div class="col-12 col-lg-6 col-md-6">
+    รวม: *   <label style="color: red"> *</label> 
+    <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0"  readonly/>
+</div>
+
+
+<div class="col-12 col-lg-6 col-md-6">
+  ครู - วิทยากร:   <label style="color: red"> *</label> 
+<select class="select2" onchange="handleSelectChange(this)" id="teacher" name="teacher">
+  {% for teachers in teacher %}
+  <option value="">
+  เลือก
+ </option>
+  <option value="{{ teachers.teacher_id }}">
+     {{ teachers}}
+  </option>
+{% endfor %}
+</select>
+</div>
+        </div>
+
+     
+       
+
+
+   
+
+
+        {% comment %} <div class="row">
+          <div class="col-12 col-lg-6 col-md-6">
+            ครู - วิทยากร:   <label style="color: red"> *</label> 
+          <select class="select2" onchange="handleSelectChange(this)" id="teacher" name="teacher">
+            {% for teachers in teacher %}
+            <option value="{{ teachers.teacher_id }}">
+               {{ teachers}}
+            </option>
+        {% endfor %}
+          </select>
+        </div>
+        </div> {% endcomment %}
+        <input type="text" name="teacher_id" id="teacher_id" />
         <div style="padding-top: 25px" align="center">
           <button type="submit" class="btn btn-primary ml-1">
             <i class="bx bx-check d-block d-sm-none"></i>
@@ -220,7 +364,7 @@
                 <i class="bx bx-x d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">ยกเลิก</span>
               </button>
-              <button type="submit" class="btn btn-primary ml-1">
+              <button type="submit" class="btn btn-primary ml-1" >
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">ยืนยันการลบ</span>
               </button>

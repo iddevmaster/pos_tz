@@ -1,6 +1,84 @@
 {% extends 'base.html' %} {% block content %} {% load humanize static %}
 
 <script>
+
+  function allowOnlyNumbers(event) {
+
+   
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+        event.key === "Backspace" || 
+        event.key === "Tab" || 
+        event.key === "ArrowLeft" || 
+        event.key === "ArrowRight" || 
+        event.key === "Delete"
+    ) {
+        return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+        event.preventDefault(); // Block other characters
+        return false; // Prevent default behavior
+    }
+
+
+
+
+
+  setTimeout(() => {
+   const it = document.getElementById("ev_hour").value;
+    if (it.charAt(0) == "0") {
+      let result = removeFirstCharacter(it);
+      document.getElementById("ev_hour").value = result 
+     // return it.slice(0); // Removes the first character
+    }
+
+  }, 20);
+
+}
+
+function allowOnlyNumbersEdit(event) {
+
+   
+  // Allow: Backspace, Tab, Arrow keys, Delete
+  if (
+      event.key === "Backspace" || 
+      event.key === "Tab" || 
+      event.key === "ArrowLeft" || 
+      event.key === "ArrowRight" || 
+      event.key === "Delete"
+  ) {
+      return true; // Allow default behavior
+  }
+
+  // Allow only numbers (0-9)
+  if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+  }
+
+
+
+
+
+setTimeout(() => {
+ const it = document.getElementById("ev_hour_update").value;
+  if (it.charAt(0) == "0") {
+    let result = removeFirstCharacter(it);
+    document.getElementById("ev_hour_update").value = result 
+   // return it.slice(0); // Removes the first character
+  }
+
+}, 20);
+
+}
+
+
+function removeFirstCharacter(str) {
+  return str.substring(1);
+}
+
   function readURL(input) {
     if (input.files && input.files[0]) {
       var reader = new FileReader();
@@ -180,6 +258,7 @@
             <th>ราคา (บาท)</th>
             <th>รวม VAT</th>
             <th>วันที่อบรม</th>
+            <th>ชั่วโมง</th>
             <th>รุ่น</th>
             <th>วันหมดอายุใบรับรอง</th>
             <th>ครู - วิทยากร</th>
@@ -345,6 +424,7 @@
               name="ev_hour"
               required
               pattern="[0-9]+"
+               onkeydown="allowOnlyNumbers(event)"
             />
           </div>
           
@@ -527,6 +607,7 @@
               class="form-control"
               id="ev_hour_update"
               name="ev_hour"
+              onkeydown="allowOnlyNumbersEdit(event)"
               required
             />
           </div>

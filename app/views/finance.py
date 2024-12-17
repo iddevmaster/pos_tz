@@ -6,8 +6,8 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher
-from ..constant import defaultTitle, thai_months
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item
+from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
 from ..forms.teacher_form import teacherIncomeSettingForm
@@ -247,8 +247,12 @@ def course_teacher_event_set_income_form_create(request, ev_id):
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     # print(instance.ev_date_start.month)
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
+    listposition = pay_item.objects.filter(
+            cancelled=1, active=1)
+    list_teacher = teacher.objects.filter(
+        module=m.module, cancelled=1, active=1)
     context = {'title': title, 'main_data': instance,  'data': teacher_data,
-               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu}
+               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
 
