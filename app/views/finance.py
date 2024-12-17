@@ -6,11 +6,16 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
 from ..forms.teacher_form import teacherIncomeSettingForm
+from django.http import JsonResponse
+import json
+from django.http import JsonResponse
+from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 
 @login_required(login_url='/login')
@@ -268,3 +273,31 @@ def course_teacher_event_set_income_form_delete(request):
     instance.delete()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event/teachers/form/create/" + str(ev_id))
+
+
+
+@csrf_exempt
+def course_teacher_event_get_income_form_compo(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            teacher = data.get("teacher_id")
+            py = data.get("py")
+            
+            data = compensation.objects.filter(
+            py_id=py, teacher_id=teacher).values().first()
+           
+            # x = compensation.objects.all()
+          
+            # Simulate saving the item (replace with database save later)
+            if data:
+                return JsonResponse(data, status=201,safe=False)
+            else:
+                data = []
+                return JsonResponse(data, status=400,safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": data}, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)

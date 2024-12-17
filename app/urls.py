@@ -118,6 +118,7 @@ urlpatterns = [
          name="course_teacher_event_set_income_form_delete"),
     #     public
     path('public/form/certificate', report_and_print.public_form_print),
+    path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

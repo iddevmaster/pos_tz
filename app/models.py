@@ -231,7 +231,7 @@ class teacher(models.Model):
     level = models.CharField(
         max_length=128, blank=True, default=None)
     def __str__(self):
-        name = str(self.teacher_firstname_th) + " - " + str(self.teacher_lastname_th)
+        name = str(self.teacher_firstname_th) + "  - " + str(self.teacher_lastname_th)
         return name
     
 # ตั้งค่ายอดที่จะจ่ายให้กับครู - วิทยากร
@@ -287,3 +287,11 @@ class pos_machine(models.Model):
     pm_id_number = models.CharField(
         max_length=64, blank=True, default=None)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+class compensation(models.Model):
+    compensation = models.IntegerField(default=0 , blank=False)
+    teacher_id = models.CharField(max_length=100, blank=True, default=None)
+    status = models.CharField(max_length=1, blank=True ,default=None)
+    note = models.CharField(max_length=128, default=0 , blank=False)
+    compensation_group_id = models.CharField(max_length=1, blank=True ,default=None)
+    py_id = models.CharField(max_length=1, blank=True ,default=None)

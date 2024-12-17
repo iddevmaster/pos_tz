@@ -3,6 +3,7 @@
   {% load humanize static %}
   {% load ex_functions %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 
 
@@ -40,6 +41,14 @@
 
   }, 20);
 
+
+  setTimeout(() => {
+
+    getComposetaion()
+   }, 100);
+
+  
+
 }
 function removeFirstCharacter(str) {
   return str.substring(1);
@@ -47,17 +56,28 @@ function removeFirstCharacter(str) {
 
   function handleSelectChange(selectElement) {
     const selectedValue = selectElement.value;
+    console.log(selectElement);
  document.getElementById("teacher_id").value = selectedValue;
+
+ setTimeout(() => {
+  getComposetaion()
+ }, 100);
   }
 
   function handleSelectChangePy(selectElement) {
     const selectedValue = selectElement.value;
  document.getElementById("pi").value = selectedValue;
+
+ setTimeout(() => {
+  getComposetaion()
+ }, 100);
   }
   
 
   function Save() {
 
+   const checkUnit = document.getElementById("tis_quantity").value
+    let result = CheckHour(checkUnit);
    let te = document.getElementById("teacher_id").value
    if(te == ""){
     Swal.fire({
@@ -66,14 +86,44 @@ function removeFirstCharacter(str) {
       icon: 'success',
       confirmButtonText: 'OK'
     });
-    
    }
-    
-
-
-    
-
   }
+
+  function CheckHour(total) {
+    console.log(total);
+   }
+
+   function Caculate() {
+   
+   }
+
+   function getComposetaion() {
+   
+
+    const teacher_id = document.getElementById("teacher_id").value
+    const py = document.getElementById("pi").value
+    const csrftoken = "{{ csrf_token }}";
+
+
+  fetch('/api/get/compensation', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+        document.getElementById("tis_compensation").value = data.compensation
+
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+      
+    });
+   }
 
   function validate(evt) {
     var theEvent = evt || window.event;
@@ -112,32 +162,8 @@ function removeFirstCharacter(str) {
     document.getElementById("id_tis_sum").value = fix.toFixed(2);
     //alert(id_tis_compensation);
   }
-  document.addEventListener("DOMContentLoaded", function () {
-    const id_tis_compensation = document.getElementById("id_tis_compensation");
-    const id_tis_quantity = document.getElementById("id_tis_quantity");
-    id_tis_compensation.addEventListener("change", function () {
-      sumUnit();
-    });
-    id_tis_compensation.addEventListener("keydown", function () {
-      sumUnit();
-    });
-    id_tis_compensation.addEventListener("keyup", function () {
-      sumUnit();
-    });
-    id_tis_quantity.addEventListener("change", function () {
-      sumUnit();
-    });
-    id_tis_quantity.addEventListener("keydown", function () {
-      sumUnit();
-    });
-    id_tis_quantity.addEventListener("keyup", function () {
-      sumUnit();
-    });
-  });
-  window.onload = function () {
-    document.getElementById("id_tis_quantity").value = 1;
-    document.getElementById("id_tis_sum").value = 0;
-  };
+
+
   function setValueDeleteModal(id) {
     document.getElementById("id_delete").value = id;
   }
@@ -225,17 +251,12 @@ function removeFirstCharacter(str) {
              ชั่วโมง
           </option>
         </select>
-  
     </div>
 
       <div class="col-12 col-lg-6 col-md-6">
         หน่วย:   <label style="color: red"> *</label> 
         <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" />
     </div>
-
-
-
-  
 
   <div class="col-12 col-lg-6 col-md-6">
     รวม: *   <label style="color: red"> *</label> 
@@ -255,11 +276,13 @@ function removeFirstCharacter(str) {
   </option>
 {% endfor %}
 </select>
+</div>  
 </div>
-        </div>
 
      
-       
+{% for teachers in teacher %}
+{{ teachers.teacher_id }}
+{% endfor %}
 
 
    
