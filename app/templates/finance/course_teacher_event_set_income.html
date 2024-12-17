@@ -50,17 +50,29 @@ function removeFirstCharacter(str) {
  document.getElementById("teacher_id").value = selectedValue;
   }
 
+  function handleSelectChangePy(selectElement) {
+    const selectedValue = selectElement.value;
+ document.getElementById("pi").value = selectedValue;
+  }
+  
+
   function Save() {
-   
+
+   let te = document.getElementById("teacher_id").value
+   if(te == ""){
     Swal.fire({
       title: 'Success!',
       text: 'Your action was completed successfully.',
       icon: 'success',
       confirmButtonText: 'OK'
     });
+    
+   }
+    
+
 
     
-return false;
+
   }
 
   function validate(evt) {
@@ -182,13 +194,19 @@ return false;
           {% endfor %}
         </div> {% endcomment %}
 
+        <input type="text" class="form-control" name="ev_id" id="ev_id"  value="{{main_data.course_id}}"/>
+
+        <input type="text" class="form-control" name="pi" id="pi"  value="1"/>
         <input type="text" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />
         <div class="row">
           <div class="col-12 col-lg-6 col-md-6">
             ตำแหน่ง / หน้าที่ / รายการ: *   <label style="color: red"> *</label> 
-            <select class="form-select"  id="teacher" name="teacher">
+            <select class="form-select"  id="py" name="py" onchange="handleSelectChangePy(this)">
+              <option value="" disabled>
+                เลือก
+               </option>
               {% for listpositions in listposition %}
-              <option value="{{ listpositions }}">
+              <option value="{{ listpositions.id }}">
                  {{ listpositions }}
               </option>
           {% endfor %}
