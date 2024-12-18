@@ -59,7 +59,7 @@ function removeFirstCharacter(str) {
 
   function handleSelectChange(selectElement) {
     const selectedValue = selectElement.value;
-    console.log(selectElement);
+
 
     let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
  document.getElementById("teacher_id").value = result;
@@ -94,7 +94,19 @@ function removeFirstCharacter(str) {
    const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
    const pi = document.getElementById("pi").value
    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
+
    
+   let te = document.getElementById("teacher_id").value
+   if(te == ""){
+    Swal.fire({
+      title: 'กรุณาเลือกรายชื่อ ครู - วิทยากร!',
+      text: 'กรุณาเลือกรายชื่อ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+    return false
+   }
 
    if(pi == 3){
     let ch = CheckHour(count_hour_pi,checkUnit,hour);
@@ -107,7 +119,6 @@ function removeFirstCharacter(str) {
       icon: 'error',
       confirmButtonText: 'OK'
     });
-
    }else {
     let ch = CheckHour(count_hour_wi,checkUnit,hour);
     if(ch == true){
@@ -121,17 +132,9 @@ function removeFirstCharacter(str) {
     });
    }
 
-   return false;
  
-   let te = document.getElementById("teacher_id").value
-   if(te == ""){
-    Swal.fire({
-      title: 'Success!',
-      text: 'Your action was completed successfully.',
-      icon: 'success',
-      confirmButtonText: 'OK'
-    });
-   }
+ 
+
   }
 
   function CheckHour(count_hour,checkUnit,Hour) {
