@@ -43,9 +43,12 @@
 
 
   setTimeout(() => {
-
     getComposetaion()
    }, 100);
+
+   setTimeout(() => {
+    Caculate()
+   }, 200);
 
   
 
@@ -57,11 +60,17 @@ function removeFirstCharacter(str) {
   function handleSelectChange(selectElement) {
     const selectedValue = selectElement.value;
     console.log(selectElement);
- document.getElementById("teacher_id").value = selectedValue;
+
+    let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
+ document.getElementById("teacher_id").value = result;
 
  setTimeout(() => {
   getComposetaion()
- }, 100);
+ }, 50);
+
+ setTimeout(() => {
+  Caculate()
+ }, 200);
   }
 
   function handleSelectChangePy(selectElement) {
@@ -70,14 +79,50 @@ function removeFirstCharacter(str) {
 
  setTimeout(() => {
   getComposetaion()
- }, 100);
+ }, 50);
+
+ setTimeout(() => {
+  Caculate()
+ }, 200);
   }
   
 
   function Save() {
 
-   const checkUnit = document.getElementById("tis_quantity").value
-    let result = CheckHour(checkUnit);
+   const checkUnit = document.getElementById("tis_quantity").value  ////Unit ที่เลือก
+   const count_hour_wi = document.getElementById("count_hour_wi").value ////ชั่วโมงที่เลือกไปแล้ว ของ วิทยากร กับ ครูฝึก
+   const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
+   const pi = document.getElementById("pi").value
+   const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
+   
+
+   if(pi == 3){
+    let ch = CheckHour(count_hour_pi,checkUnit,hour);
+    if(ch == true){
+      return true;
+    }
+    Swal.fire({
+      title: 'ไม่สามารถบันทึกได้!',
+      text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+   }else {
+    let ch = CheckHour(count_hour_wi,checkUnit,hour);
+    if(ch == true){
+      return true;
+    }
+    Swal.fire({
+      title: 'ไม่สามารถบันทึกได้!',
+      text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+   }
+
+   return false;
+ 
    let te = document.getElementById("teacher_id").value
    if(te == ""){
     Swal.fire({
@@ -89,22 +134,31 @@ function removeFirstCharacter(str) {
    }
   }
 
-  function CheckHour(total) {
-    console.log(total);
+  function CheckHour(count_hour,checkUnit,Hour) {
+    if(Hour >= checkUnit){
+const total = parseInt(count_hour) + parseInt(checkUnit)
+if(Hour >= total){
+  return true
+}
+return false
+    }else {
+      return false;
+    } 
    }
 
    function Caculate() {
-   
+    const aaaa = document.getElementById("tis_compensation").value;
+    const tis_quantity = document.getElementById("tis_quantity").value;
+
+   document.getElementById("tis_sum").value = aaaa * tis_quantity;
+
    }
 
-   function getComposetaion() {
    
-
+   function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
     const csrftoken = "{{ csrf_token }}";
-
-
   fetch('/api/get/compensation', {
     method: 'POST',
     headers: {
@@ -115,6 +169,11 @@ function removeFirstCharacter(str) {
     .then(response => response.json())
     .then(data => {
         // Display response
+        
+        if(data.length == 0){
+          document.getElementById("tis_compensation").value = 0
+          return false;
+        }
         document.getElementById("tis_compensation").value = data.compensation
 
 
@@ -219,11 +278,13 @@ function removeFirstCharacter(str) {
           </div>
           {% endfor %}
         </div> {% endcomment %}
+        
+        <input type="hidden" class="form-control" name="count_hour_wi" id="count_hour_wi"  value="{{hour_wi}}"/>
+        <input type="hidden" class="form-control" name="count_hour_pi" id="count_hour_pi"  value="{{hour_pi}}"/>
+        <input type="hidden" class="form-control" name="ev_id" id="ev_id"  value="{{main_data.course_id}}"/>
 
-        <input type="text" class="form-control" name="ev_id" id="ev_id"  value="{{main_data.course_id}}"/>
-
-        <input type="text" class="form-control" name="pi" id="pi"  value="1"/>
-        <input type="text" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />
+        <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
+        <input type="hidden" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />
         <div class="row">
           <div class="col-12 col-lg-6 col-md-6">
             ตำแหน่ง / หน้าที่ / รายการ: *   <label style="color: red"> *</label> 
@@ -240,7 +301,7 @@ function removeFirstCharacter(str) {
         </div>
         <div class="col-12 col-lg-6 col-md-6">
           ค่าตอบแทน:   <label style="color: red"> *</label> 
-          <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="1" readonly />
+          <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
     
       </div>
 
@@ -255,7 +316,7 @@ function removeFirstCharacter(str) {
 
       <div class="col-12 col-lg-6 col-md-6">
         หน่วย:   <label style="color: red"> *</label> 
-        <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" />
+        <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" required />
     </div>
 
   <div class="col-12 col-lg-6 col-md-6">
@@ -280,9 +341,6 @@ function removeFirstCharacter(str) {
 </div>
 
      
-{% for teachers in teacher %}
-{{ teachers.teacher_id }}
-{% endfor %}
 
 
    
@@ -300,7 +358,7 @@ function removeFirstCharacter(str) {
           </select>
         </div>
         </div> {% endcomment %}
-        <input type="text" name="teacher_id" id="teacher_id" />
+        <input type="hidden" name="teacher_id" id="teacher_id" required />
         <div style="padding-top: 25px" align="center">
           <button type="submit" class="btn btn-primary ml-1">
             <i class="bx bx-check d-block d-sm-none"></i>

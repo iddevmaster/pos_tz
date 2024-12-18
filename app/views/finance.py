@@ -252,12 +252,17 @@ def course_teacher_event_set_income_form_create(request, ev_id):
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     # print(instance.ev_date_start.month)
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
+    ids = [1, 2]
+    count_hour_wi = teacher_income_setting.objects.filter(ev=ev_id,pi__in=ids).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
+    count_hour_pi = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
     listposition = pay_item.objects.filter(
             cancelled=1, active=1)
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
+    print("Debugging Value:", count_hour_pi)  # Prints to the console
+    
     context = {'title': title, 'main_data': instance,  'data': teacher_data,
-               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition}
+               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
 
@@ -295,7 +300,7 @@ def course_teacher_event_get_income_form_compo(request):
                 return JsonResponse(data, status=201,safe=False)
             else:
                 data = []
-                return JsonResponse(data, status=400,safe=False)
+                return JsonResponse(data, status=201,safe=False)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": data}, status=400,safe=False)
