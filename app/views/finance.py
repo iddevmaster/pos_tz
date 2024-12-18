@@ -300,7 +300,7 @@ def course_teacher_event_get_income_form_compo(request):
                 return JsonResponse(data, status=201,safe=False)
             else:
                 data = []
-                return JsonResponse(data, status=201,safe=False)
+                return JsonResponse(data, status=200,safe=False)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": data}, status=400,safe=False)

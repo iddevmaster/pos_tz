@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from ..models import teacher,user_group,category_program_permission,user_detail
+from ..models import teacher,user_group,category_program_permission,user_detail,compensation
 from ..constant import defaultTitle
 from ..forms.teacher_form import  teacherForm
 from ..functions import  dateTimeNow
@@ -71,7 +71,22 @@ def teacher_form_create(request):
         teacher_lastname_eng = request.POST['teacher_lastname_eng']
         teacher_type =  request.POST['teacher_type']
         active = request.POST['active']
-        level = request.POST['level']
+
+
+        count_hour_wi = request.POST['count_hour_wi']
+        count_hour_pi = request.POST['count_hour_pi']
+        count_hour_help = request.POST['count_hour_help']
+
+        note_wi = request.POST['note_wi']
+        note_pi = request.POST['note_pi']
+        note_help = request.POST['note_help']
+
+        py_wi = request.POST['py_wi']
+        py_pi = request.POST['py_pi']
+        py_help = request.POST['py_help']
+
+
+       
         t = teacher.objects.filter(teacher_identification_number=teacher_identification_number).count()
         if t > 0:
             messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
@@ -87,14 +102,53 @@ def teacher_form_create(request):
             teacher_cover = teacher_cover,
             teacher_type = teacher_type,
             active = active,
-            level = level,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             module=m.module
         )
         content.save()
-        messages.success(request, "ทำรายการสำเร็จ !")
-        return redirect("/teachers")
+
+        t1 = teacher.objects.filter(teacher_identification_number=teacher_identification_number).values('teacher_id').first()
+
+      
+        # new_text = t1['teacher_id'].replace("-", "")  # ลบ "-"
+
+        old_uuid = str(t1['teacher_id'])
+        new_uuid_str = old_uuid.replace("-", "")
+    
+        x1 = compensation(
+            compensation = count_hour_wi,
+            teacher_id = new_uuid_str,
+            status = 'Y',
+            note = note_wi,
+            compensation_group_id = py_wi,
+            py_id = 1
+        )
+        x2 = compensation(
+            compensation = count_hour_pi,
+            teacher_id = new_uuid_str,
+            status = 'Y',
+            note = note_pi,
+            compensation_group_id = py_pi,
+            py_id = 2
+        )
+
+        x3 = compensation(
+            compensation = count_hour_help,
+            teacher_id = new_uuid_str,
+            status = 'Y',
+            note = note_help,
+            compensation_group_id = py_help,
+            py_id = 3
+        )
+
+        x1.save()
+        x2.save()
+        x3.save()
+    
+      
+        # messages.success(request, "ทำรายการสำเร็จ !")
+        # return redirect("/teachers")
     title = defaultTitle
     context = {'title': title, 'form':teacherForm(),'listMenuPermission': objMenu}
     return render(request, 'teacher/teacher_form_create.html', context)
@@ -102,6 +156,8 @@ def teacher_form_create(request):
 @login_required(login_url='/login')
 def teacher_form_update(request,teacher_id):
     user_id = request.user.id
+
+
      # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -118,6 +174,13 @@ def teacher_form_update(request,teacher_id):
         objMenu.append(r)
     try:
         instance = teacher.objects.get(teacher_id=teacher_id)
+        
+        old_uuid = str(teacher_id)
+        new_uuid_str = old_uuid.replace("-", "")
+        data1 = compensation.objects.filter(teacher_id=new_uuid_str,py_id=1).first()
+        data2 = compensation.objects.filter(teacher_id=new_uuid_str,py_id=2).first()
+        data3 = compensation.objects.filter(teacher_id=new_uuid_str,py_id=3).first()
+      
     except (teacher.DoesNotExist,AttributeError, ValueError,ValidationError):
         instance = None
         return redirect("/teachers")
@@ -135,18 +198,40 @@ def teacher_form_update(request,teacher_id):
         instance.teacher_lastname_eng = request.POST['teacher_lastname_eng']
         instance.teacher_type =  request.POST['teacher_type']
         instance.active = request.POST['active']
+        data1.compensation_group_id = request.POST['py_wi']
+        data1.compensation = request.POST['count_hour_wi']
+        data1.note = request.POST['note_wi']
+
+        data2.compensation_group_id = request.POST['py_pi']
+        data2.compensation = request.POST['count_hour_pi']
+        data2.note = request.POST['note_pi']
+
+        data3.compensation_group_id = request.POST['py_help']
+        data3.compensation = request.POST['count_hour_help']
+        data3.note = request.POST['note_help']
+
+        print( request.POST['count_hour_wi'])
         t = teacher.objects.filter(teacher_identification_number=request.POST['teacher_identification_number']).exclude(teacher_id=teacher_id).count()
         if t > 0:
             messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
             return redirect("/teacher/form/create")
         instance.save()
+        data1.save()
+        data2.save()
+        data3.save()
         messages.success(request, "ทำรายการสำเร็จ !")
         return redirect("/teachers")
     initial = {'teacher_identification_number':instance.teacher_identification_number,'teacher_prefix_th':instance.teacher_prefix_th,'teacher_firstname_th': instance.teacher_firstname_th,
                'teacher_lastname_th':instance.teacher_lastname_th,'teacher_prefix_eng':instance.teacher_prefix_eng,'teacher_firstname_eng': instance.teacher_firstname_eng,
                'teacher_lastname_eng':instance.teacher_lastname_eng,'teacher_cover':instance.teacher_cover,'teacher_type':instance.teacher_type,'active':instance.active}
+
+    compo1 = {'id':data1.id,'compensation':data1.compensation,'teacher_id': data1.teacher_id,'py_id':data1.py_id,'note':data1.note,'compensation_group_id':data1.compensation_group_id}
+    compo2 = {'id':data2.id,'compensation':data2.compensation,'teacher_id': data2.teacher_id,'py_id':data2.py_id,'note':data2.note,'compensation_group_id':data2.compensation_group_id}
+    compo3 = {'id':data3.id,'compensation':data3.compensation,'teacher_id': data3.teacher_id,'py_id':data3.py_id,'note':data3.note,'compensation_group_id':data3.compensation_group_id}
+
+
     title = defaultTitle
-    context = {'title': title,'image_path':instance.teacher_cover, 'form':teacherForm(initial=initial),'id':instance.teacher_id,'listMenuPermission': objMenu}
+    context = {'title': title,'image_path':instance.teacher_cover, 'form':teacherForm(initial=initial),'id':instance.teacher_id,'listMenuPermission': objMenu,'data1':compo1,'data2':compo2,'data3':compo3}
     return render(request, 'teacher/teacher_form_update.html', context)
 
 @login_required(login_url='/login')

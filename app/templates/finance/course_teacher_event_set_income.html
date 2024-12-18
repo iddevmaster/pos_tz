@@ -99,7 +99,7 @@ function removeFirstCharacter(str) {
    let te = document.getElementById("teacher_id").value
    if(te == ""){
     Swal.fire({
-      title: 'กรุณาเลือกรายชื่อ ครู - วิทยากร!',
+      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
       text: 'กรุณาเลือกรายชื่อ',
       icon: 'error',
       confirmButtonText: 'OK'
@@ -119,6 +119,7 @@ function removeFirstCharacter(str) {
       icon: 'error',
       confirmButtonText: 'OK'
     });
+
    }else {
     let ch = CheckHour(count_hour_wi,checkUnit,hour);
     if(ch == true){

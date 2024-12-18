@@ -47,6 +47,101 @@
                 {{field.label_tag }} <label style="color: red"> *</label> {{field }}
                 </div>
             {% endfor %}
+
+
+            <div class="row">
+              <input type="hidden" class="form-control" name="pi1_id" id="pi1_id"  value="{{data1.id}}" required/>
+              <div class="col-4 col-lg-4 col-md-4">
+                Level วิทยากร<label style="color: red"> *</label>
+                <select class="form-select" id="py_wi" name="py_wi">
+                  <option value="1" {% if data1.compensation_group_id == '1' %}selected{% endif %}>
+                     Basic
+                  </option>
+                  <option value="2" {% if data1.compensation_group_id == '2' %}selected{% endif %}>
+                    A
+                  </option>
+                  <option value="3" {% if data1.compensation_group_id == '3' %}selected{% endif %}>
+                    B
+                  </option>
+                  <option value="4" {% if data1.compensation_group_id == '4' %}selected{% endif %}>
+                    C
+                  </option>
+                </select>
+              </div>
+    
+              <div class="col-4 col-lg-4 col-md-4">
+                ค่าตอบแทน  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="count_hour_wi" id="count_hour_wi"    onkeydown="allowOnlyNumbers(event)" value="{{data1.compensation}}" required/>
+              </div>
+              <div class="col-4 col-lg-4 col-md-4">
+                รายละเอียด  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="note_wi" id="note_wi"  value="{{data1.note}}" required/>
+              </div>
+            </div>
+    
+            <div class="row">
+              <input type="hidden" class="form-control" name="pi2_id" id="pi2_id"  value="{{data2.id}}" required/>
+              <div class="col-4 col-lg-4 col-md-4">
+                Level  ครูฝึก<label style="color: red"> *</label>
+                <select class="form-select" onchange="handleSelectChange(this)" id="py_pi" name="py_pi">
+                  <option value="1" {% if data2.compensation_group_id == '1' %}selected{% endif %}>
+                     Basic
+                  </option>
+                  <option value="2" {% if data2.compensation_group_id == '2' %}selected{% endif %}>
+                    A
+                  </option>
+                  <option value="3" {% if data2.compensation_group_id == '3' %}selected{% endif %}>
+                    B
+                  </option>
+                  <option value="4" {% if data2.compensation_group_id == '4' %}selected{% endif %}>
+                    C
+                  </option>
+                </select>
+              </div>
+    
+              <div class="col-4 col-lg-4 col-md-4">
+                ค่าตอบแทน  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="count_hour_pi" id="count_hour_pi"    onkeydown="allowOnlyNumbers2(event)" value="{{data2.compensation}}"  required/>
+              </div>
+    
+              <div class="col-4 col-lg-4 col-md-4">
+                รายละเอียด  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="note_pi" id="note_pi"  value="{{data2.note}}" required/>
+              </div>
+            </div>
+    
+    
+            <div class="row">
+              <input type="hidden" class="form-control" name="pi3_id" id="pi3_id"  value="{{data3.id}}" required/>
+              <div class="col-4 col-lg-4 col-md-4">
+                Level  ผู้ช่วยวิทยากร<label style="color: red"> *</label>
+                <select class="form-select" onchange="handleSelectChange(this)" id="py_help" name="py_help">
+                  <option value="1" {% if data3.compensation_group_id == '1' %}selected{% endif %}>
+                     Basic
+                  </option>
+                  <option value="2"  {% if data3.compensation_group_id == '2' %}selected{% endif %}>
+                    A
+                  </option>
+                  <option value="3"  {% if data3.compensation_group_id == '3' %}selected{% endif %}>
+                    B
+                  </option>
+                  <option value="4"  {% if data3.compensation_group_id == '4' %}selected{% endif %}>
+                    C
+                  </option>
+                </select>
+              </div>
+    
+              <div class="col-4 col-lg-4 col-md-4">
+                ค่าตอบแทน  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="count_hour_help" id="count_hour_help"    onkeydown="allowOnlyNumbers3(event)" value="{{data3.compensation}}"  required/>
+              </div>
+    
+              <div class="col-4 col-lg-4 col-md-4">
+               รายละเอียด  <label style="color: red"> *</label>
+                <input type="text" class="form-control" name="note_help" id="note_help" value="{{data3.note}}"  required/>
+              </div>
+            </div>
+    
         <div style="padding-top: 25px" align="center">
           <button type="submit" class="btn btn-primary ml-1">
             <i class="bx bx-check d-block d-sm-none"></i>
@@ -76,6 +171,119 @@
       }
     });
   });
+
+
+  
+  function allowOnlyNumbers(event) {
+
+   
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+        event.key === "Backspace" || 
+        event.key === "Tab" || 
+        event.key === "ArrowLeft" || 
+        event.key === "ArrowRight" || 
+        event.key === "Delete"
+    ) {
+        return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+        event.preventDefault(); // Block other characters
+        return false; // Prevent default behavior
+    }
+
+
+
+  setTimeout(() => {
+   const it = document.getElementById("count_hour_wi").value;
+    if (it.charAt(0) == "0") {
+      let result = removeFirstCharacter(it);
+      document.getElementById("count_hour_wi").value = result 
+     // return it.slice(0); // Removes the first character
+    }
+
+  }, 20);
+
+}
+
+function allowOnlyNumbers2(event) {
+
+   
+  // Allow: Backspace, Tab, Arrow keys, Delete
+  if (
+      event.key === "Backspace" || 
+      event.key === "Tab" || 
+      event.key === "ArrowLeft" || 
+      event.key === "ArrowRight" || 
+      event.key === "Delete"
+  ) {
+      return true; // Allow default behavior
+  }
+
+  // Allow only numbers (0-9)
+  if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+  }
+
+
+
+
+
+setTimeout(() => {
+ const it = document.getElementById("count_hour_pi").value;
+  if (it.charAt(0) == "0") {
+    let result = removeFirstCharacter(it);
+    document.getElementById("count_hour_pi").value = result 
+   // return it.slice(0); // Removes the first character
+  }
+
+}, 20);
+
+}
+
+
+function allowOnlyNumbers3(event) {
+
+   
+  // Allow: Backspace, Tab, Arrow keys, Delete
+  if (
+      event.key === "Backspace" || 
+      event.key === "Tab" || 
+      event.key === "ArrowLeft" || 
+      event.key === "ArrowRight" || 
+      event.key === "Delete"
+  ) {
+      return true; // Allow default behavior
+  }
+
+  // Allow only numbers (0-9)
+  if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+  }
+
+
+
+
+
+setTimeout(() => {
+ const it = document.getElementById("count_hour_help").value;
+  if (it.charAt(0) == "0") {
+    let result = removeFirstCharacter(it);
+    document.getElementById("count_hour_help").value = result 
+   // return it.slice(0); // Removes the first character
+  }
+
+}, 20);
+
+}
+
+function removeFirstCharacter(str) {
+  return str.substring(1);
+}
 </script>
 
 {% endblock %}

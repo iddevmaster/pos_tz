@@ -17,9 +17,7 @@ class teacherForm(forms.Form):
         label="นามสกุลภาษาอังกฤษ", max_length=128, widget=forms.TextInput(attrs={'class': 'form-control'}))
     teacher_type = forms.ChoiceField(label="ประเภท", choices=teacherTypeChoices, widget=forms.Select(attrs={'class': 'form-control'}))
     active = forms.ChoiceField(label="Active", choices=activeChoices, widget=forms.Select(attrs={'class': 'form-control'}))
-    level = forms.ChoiceField(label="Level", choices=Levelchoices, widget=forms.Select(attrs={'class': 'form-control'}))
-
-
+   
 class teacherIncomeSettingForm(forms.Form):
     pi = forms.ModelChoiceField(
         queryset=pay_item.objects.filter(
