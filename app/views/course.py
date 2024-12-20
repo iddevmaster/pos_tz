@@ -240,6 +240,7 @@ def calendar_event(request):
 
 def calendar_event_api(request):
     user_id = request.user.id
+    print (request.GET)
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
@@ -272,7 +273,20 @@ def calendar_event_api(request):
     return JsonResponse(obj, safe=False)
 
 
+def calendar_event_api2(request,id):
+    user_id = request.user.id
+    sss = id
+   
+   
 
+    content = teacher_income_setting.objects.select_related("course_event").values()
+
+    obj = []
+    for r in content:
+        
+        obj.append(r)
+        
+    return JsonResponse(obj, safe=False)
 
 @login_required(login_url='/login')
 def course_teacher_event_list(request,ev_id):

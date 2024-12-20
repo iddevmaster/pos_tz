@@ -6,6 +6,34 @@
 
 <script>
 
+document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+      locale: "th",
+      buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+      editable: false,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+        url: "/calendar_event_api2/12",
+        failure: function () {
+        
+          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+        },
+      },
+    });
+
+    calendar.render();
+  });
+
 
   function allowOnlyNumbers(event) {
 
@@ -133,8 +161,6 @@ function removeFirstCharacter(str) {
     });
    }
 
- 
- 
 
    return false
   }
@@ -156,7 +182,6 @@ return false
     const tis_quantity = document.getElementById("tis_quantity").value;
 
    document.getElementById("tis_sum").value = aaaa * tis_quantity;
-
    }
 
    
@@ -426,6 +451,16 @@ return false
       </table>
     </div>
   </div>
+
+
+  <section class="section">
+    <div class="card">
+      <div class="card-body">
+        <span id="msg" style="color: red"></span>
+        <div id="calendar"></div>
+      </div>
+    </div>
+  </section>
 
   {% comment %} Delete {% endcomment %}
   <div class="modal fade" id="DeleteClick">
