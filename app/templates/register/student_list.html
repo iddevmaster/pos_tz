@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block content %} {% load humanize %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
   function setValueDeleteModal(student_id) {
     document.getElementById("student_id_delete").value = student_id;
@@ -28,6 +29,57 @@
     document.getElementById("result_id_card").value = data;
     document.getElementById("read_id_card").submit();
   }
+
+  
+
+  var tableToExcel = (function () {
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })
+
+
+  function exportTableToExcel(tableID, filename = 'excel_data') {
+            // Get the table element
+            let table = document.getElementById(tableID);
+
+            // Convert the table to a workbook
+            let workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+            // Access the worksheet
+            let worksheet = workbook.Sheets["Sheet1"];
+
+            // Define columns to hide (e.g., 1st column, which corresponds to "A" in Excel)
+            worksheet["!cols"] = [
+                { },
+                { },
+                { },
+                { },
+                { },
+                { },
+                { },
+            
+            ];
+
+            // Export the workbook as an Excel file
+            XLSX.writeFile(workbook, `${filename}.xlsx`);
+        }
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -86,6 +138,14 @@
                 <i class="icon dripicons-card" aria-hidden="true"></i>
                 เครื่องอ่านบัตร
               </button>
+
+              <input
+              type="button"
+              onclick="exportTableToExcel('myTable', 'รายชื่อผู้เข้าอบรมหลักสูตร')"
+              value="Export to Excel"
+              style="height: 35px"
+            />
+         
             </div>
           </div>
         </div>
@@ -111,8 +171,8 @@
       {% if main.pay_type == 2 and main.customer_type == 2 %}
       <div align="center">รหัสลูกค้า <strong>{{ref_data.ref}}</strong></div>
       {% endif %}
-
-      <table class="table table-striped" id="table1">
+      <div> 
+      <table class="table table-striped" id="myTable">
         <thead>
           <tr>
             <th>ลำดับ</th>
@@ -121,7 +181,16 @@
             <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
             <th>ใบรับรอง (Certificate)</th>
             <th>วันที่ทำรายการ</th>
+           
             <th>#</th>
+            <th hidden>รหัสบัตร ปชช./ Passport</th>
+            <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
+            <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+            <th hidden>รหัสหลักสูตร</th>
+            <th hidden>ชื่อหลักสูตร</th>
+            <th hidden>วันที่เริ่มต้น</th>
+            <th hidden>วันที่สิ้นสุด</th>
+            <th hidden>ลายเซ็น</th>
           </tr>
         </thead>
         <tbody>
@@ -168,7 +237,8 @@
               <div>สร้าง : {{res.crt_date}}</div>
               <div>แก้ไข : {{res.upd_date}}</div>
             </td>
-            <td>
+        
+            <td class="hidden-id">
               <div align="center">
                 {% if res.student_learning_status == 0 %}
                 <button
@@ -197,10 +267,25 @@
                 {% endif %}
               </div>
             </td>
+
+     
+            <td hidden>{{res.student_identification_number}}</td>
+            <td hidden> {{res.student_prefix_th}}{{res.student_firstname_th}}
+              {{res.student_lastname_th}}</td>
+              <td hidden>
+                {{res.student_prefix_eng}} {{res.student_firstname_eng}}
+                {{res.student_lastname_eng}}
+              </td>
+            <td hidden>{{detail.course.course_code}}</td>
+            <td hidden>{{detail.course.course_name}}</td>
+            <td hidden>{{detail.ev_date_start |date:"d/m/Y"}}</td>
+            <td hidden>{{detail.ev_date_end|date:"d/m/Y"}}</td>
+       
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </section>

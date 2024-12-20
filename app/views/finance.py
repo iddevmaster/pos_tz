@@ -142,6 +142,7 @@ def billing_cycle_result(request):
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
+  
     for r1 in start_content:
         total_month_sum = r1['order_sum']
         defaultdata = r1['month']  # y-m-d
@@ -149,6 +150,8 @@ def billing_cycle_result(request):
         get_last_day = last_day_of_month(
             datetime.date(int(year_current), month, 1))
         last_day = get_last_day.day
+
+        
         # print(thai_months[i-1])
         # เช็คและตัดรอบบิล
 
