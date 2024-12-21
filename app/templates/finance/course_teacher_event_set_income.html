@@ -6,9 +6,11 @@
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-    var calendarEl = document.getElementById("calendar");
 
+
+  function calen() {
+    var calendarEl = document.getElementById("calendar");
+    let wi = document.getElementById("teacher_id").value;
     var calendar = new FullCalendar.Calendar(calendarEl, {
       headerToolbar: {
         left: "prev,next today",
@@ -23,17 +25,15 @@ document.addEventListener("DOMContentLoaded", function () {
       editable: false,
       dayMaxEvents: true, // allow "more" link when too many events
       events: {
-        url: "/calendar_event_api2/12",
+        url: "/api/calendar_event_api2/"+wi,
         failure: function () {
         
           document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
         },
       },
     });
-
     calendar.render();
-  });
-
+  }
 
   function allowOnlyNumbers(event) {
 
@@ -91,6 +91,9 @@ function removeFirstCharacter(str) {
 
     let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
  document.getElementById("teacher_id").value = result;
+
+ calen()
+
 
  setTimeout(() => {
   getComposetaion()

@@ -61,6 +61,7 @@ urlpatterns = [
     path('calendar_event/', course.calendar_event),
     path('calendar_event_api/', course.calendar_event_api),
 
+
     #     teacher
     path('teachers/', teacher.teacher_list),
     path('teacher/form/create', teacher.teacher_form_create,
@@ -119,6 +120,7 @@ urlpatterns = [
     #     public
     path('public/form/certificate', report_and_print.public_form_print),
     path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),
+    path('api/calendar_event_api2/<slug:id>/', course.calendar_event_api2),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

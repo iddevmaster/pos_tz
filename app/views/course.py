@@ -267,6 +267,7 @@ def calendar_event_api(request):
         end = str(r.ev_date_end)
         y, m, d = end.split("-")
         nextdayend = addDay(1, int(y), int(m), int(d))
+        
         res = {'title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",
                'start': r.ev_date_start, 'end': dmytoymd(nextdayend)}
         obj.append(res)
@@ -276,16 +277,22 @@ def calendar_event_api(request):
 def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
-   
+    print(sss)
    
 
-    content = teacher_income_setting.objects.select_related("course_event").values()
-
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
+   
     obj = []
-    for r in content:
-        
-        obj.append(r)
-        
+    for r in content:  
+       
+       end = str(r.ev.ev_date_end)
+       y, m, d = end.split("-")
+       nextdayend = addDay(1, int(y), int(m), int(d))
+       result = course.objects.filter(course_id=r.ev.course_id).first()
+       print(result.course_name)
+       res = {'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")"}
+
+       obj.append(res)        
     return JsonResponse(obj, safe=False)
 
 @login_required(login_url='/login')
