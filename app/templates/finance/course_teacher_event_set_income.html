@@ -2,6 +2,23 @@
 {% block content %} 
   {% load humanize static %}
   {% load ex_functions %}
+  <style>
+    .fc-event .event-button {
+      margin-top: 5px;
+      display: block;
+      text-align: center;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .fc-event .event-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -31,6 +48,27 @@
           document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
         },
       },
+      eventClick: function(info) {
+        console.log(info.event.extendedProps.course_id);
+      // Populate modal with event data
+      const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+      eventModal.show();
+    },
+    // eventDidMount: function(info) {
+    //   // Create a button element
+    //   const button = document.createElement('button');
+    //   button.innerText = 'รับงาน';
+    //   button.className = 'event-button';
+    //   button.addEventListener('click', function(e) {
+    //     e.stopPropagation(); // Prevent eventClick from firing
+    //     const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    //     eventModal.show();
+    //   });
+
+    //   // Append the button to the event element
+    //   info.el.appendChild(button);
+    // }
+    
     });
     calendar.render();
   }
@@ -264,6 +302,8 @@ return false
   function SelectEmplo() {
   
   }
+
+  
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -513,6 +553,25 @@ return false
             </div>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Title:</strong> <span id="modalTitle"></span></p>
+          <p><strong>Start:</strong> <span id="modalStart"></span></p>
+          <p><strong>End:</strong> <span id="modalEnd"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>

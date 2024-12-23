@@ -142,6 +142,8 @@ def course_event_create(request):
     ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
     active = request.POST['active']
     ev_hour = request.POST['ev_hour']
+    ev_hour_two = request.POST['ev_hour_two']
+    ev_hour_three = request.POST['ev_hour_three']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -161,8 +163,10 @@ def course_event_create(request):
         course_id=course_id,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
+        ev_hour=ev_hour,
+        ev_hour_two=ev_hour_two,
+        ev_hour_three=ev_hour_three,
         module=m.module,
-        ev_hour=ev_hour
     )
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
@@ -183,6 +187,8 @@ def course_event_update(request):
     ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
     active = request.POST['active']
     ev_hour = request.POST['ev_hour']
+    ev_hour_two = request.POST['ev_hour_two']
+    ev_hour_three = request.POST['ev_hour_three']
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -199,6 +205,8 @@ def course_event_update(request):
     content.ev_logo = ev_logo
     content.active = active
     content.ev_hour = ev_hour
+    content.ev_hour_two = ev_hour_two
+    content.ev_hour_three = ev_hour_three
     content.upd_date = dateTimeNow()
     content.course_id = course_id
     content.save()
@@ -290,7 +298,7 @@ def calendar_event_api2(request,id):
        nextdayend = addDay(1, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
        print(result.course_name)
-       res = {'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")"}
+       res = {'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'backgroundColor':'#28a745','borderColor':'#1e7e34','textColor':'#ffffff'}
 
        obj.append(res)        
     return JsonResponse(obj, safe=False)
