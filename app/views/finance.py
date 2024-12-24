@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
 from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation
 from ..constant import defaultTitle, thai_months,unitPayChoices
@@ -16,6 +16,7 @@ import json
 from django.http import JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import Coalesce
 
 
 @login_required(login_url='/login')
@@ -309,3 +310,51 @@ def course_teacher_event_get_income_form_compo(request):
             return JsonResponse({"error": data}, status=400,safe=False)
 
         return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+
+@csrf_exempt
+def checkhours(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+       
+            pi = data.get("pi")
+            tis_quantity = data.get("tis_quantity")
+            ev_id = data.get("ev_id")
+            instance = course_event.objects.filter(pk=ev_id).values().first()
+            
+            data['status'] = True
+            if pi == '1' :
+               
+                hour = instance['ev_hour'] or 0
+            elif  pi == '2' :
+              
+                hour = instance['ev_hour_two'] or 0
+            elif  pi == '3' :
+             
+                hour = instance['ev_hour_three'] or 0
+
+            
+      
+            content = teacher_income_setting.objects.filter(ev_id=ev_id,status='Y').aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
+       
+          
+            total = content['total'] + tis_quantity
+            
+            if hour < total :
+                data['status'] = False
+         
+            
+            
+            if data:
+                datas = {'status': data['status']}
+              
+                return JsonResponse(datas, status=201,safe=False)
+            else:
+                datas = {'status': data['status']}
+                return JsonResponse(datas, status=200,safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": instance}, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)        

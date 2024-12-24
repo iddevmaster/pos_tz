@@ -153,18 +153,67 @@ function removeFirstCharacter(str) {
   Caculate()
  }, 200);
   }
+
+  function firstFunction() {
+  console.log('Function แรกทำงานเสร็จแล้ว');
+}
+
+function secondFunction() {
+  console.log('Function ถัดไปทำงาน');
+}
   
+  function SaveStep2() {
 
-  function Save() {
+  
+   const status = document.getElementById("status").value 
+   if(status == 'true') {
+    return true
+   }else {
+    return false
+   }
 
-   const checkUnit = document.getElementById("tis_quantity").value  ////Unit ที่เลือก
+  }
+
+  function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+function Save2() {
+  return true
+}
+   function Save() {
+
+   let data = this.CheckHourbeforeSave()
+
+
+   
+   setTimeout(() => {
+    const checkUnit = document.getElementById("tis_quantity").value  ////Unit ที่เลือก
    const count_hour_wi = document.getElementById("count_hour_wi").value ////ชั่วโมงที่เลือกไปแล้ว ของ วิทยากร กับ ครูฝึก
    const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
    const pi = document.getElementById("pi").value
    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
-let check = this.CheckHourbeforeSave();
-console.log(check);
-   
+   let te = document.getElementById("teacher_id").value
+    if(te == ""){
+    Swal.fire({
+      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
+      text: 'กรุณาเลือกรายชื่อ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+    return false
+   }
+
+return true
+  }, 20);
+
+
+
+
+
+const status = document.getElementById("status").value 
+console.log(status);
+
   //  let te = document.getElementById("teacher_id").value
   //  if(te == ""){
   //   Swal.fire({
@@ -202,8 +251,9 @@ console.log(check);
   //   });
   //  }
 
+  return false
 
-   return false
+  
   }
 
   function CheckHour(count_hour,checkUnit,Hour) {
@@ -225,31 +275,40 @@ return false
    document.getElementById("tis_sum").value = aaaa * tis_quantity;
    }
 
-   function CheckHourbeforeSave() {
+  async function CheckHourbeforeSave() {
 
 
-    const csrftoken = "{{ csrf_token }}";
-  fetch('/api/checkhours', {
+    const ev_id = document.getElementById("ev_id").value;
+    const pi = document.getElementById("pi").value
+    const tis_quantity = document.getElementById("tis_quantity").value;
+
+
+ let data = await fetch('/api/checkhours', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify({'pi':"1",'ev_hour':5,'ev_id':473})
+    body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id)})
 })
     .then(response => response.json())
     .then(data => {
         // Display response
-        console.log(data);
+        console.log('Function แรกทำงานเสร็จแล้ว');
+        document.getElementById("status").value = data.status;
+        return data.status
 
 
 
     })
     .catch(error => {
-        console.error('Error:', error);
+       
       
     });
-return false
+   
+return data
    }
+
+   
    function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
@@ -375,10 +434,13 @@ return false
           </div>
           {% endfor %}
         </div> {% endcomment %}
+
+
+        <input type="text" class="form-control" name="status" id="status"  value=""/>
         
         <input type="hidden" class="form-control" name="count_hour_wi" id="count_hour_wi"  value="{{hour_wi}}"/>
         <input type="hidden" class="form-control" name="count_hour_pi" id="count_hour_pi"  value="{{hour_pi}}"/>
-        <input type="hidden" class="form-control" name="ev_id" id="ev_id"  value="{{main_data.course_id}}"/>
+        <input type="text" class="form-control" name="course_id" id="course_id"  value="{{main_data.course_id}}"/>
 
         <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
         <input type="hidden" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />

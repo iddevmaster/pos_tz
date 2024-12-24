@@ -144,6 +144,9 @@ def course_event_create(request):
     ev_hour = request.POST['ev_hour']
     ev_hour_two = request.POST['ev_hour_two']
     ev_hour_three = request.POST['ev_hour_three']
+    ev_people = request.POST['ev_people']
+    ev_people_two = request.POST['ev_people_two']
+    ev_people_three = request.POST['ev_people_three']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -166,6 +169,9 @@ def course_event_create(request):
         ev_hour=ev_hour,
         ev_hour_two=ev_hour_two,
         ev_hour_three=ev_hour_three,
+        ev_people=ev_people,
+        ev_people_two=ev_people_two,
+        ev_people_three=ev_people_three,
         module=m.module,
     )
     content.save()
@@ -175,6 +181,7 @@ def course_event_create(request):
 
 @login_required(login_url='/login')
 def course_event_update(request):
+    print(request.POST['ev_hour'])
     ev_id = request.POST['ev_id']
     course_id = request.POST['course_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
@@ -189,6 +196,9 @@ def course_event_update(request):
     ev_hour = request.POST['ev_hour']
     ev_hour_two = request.POST['ev_hour_two']
     ev_hour_three = request.POST['ev_hour_three']
+    ev_people = request.POST['ev_people_update']
+    ev_people_two = request.POST['ev_people_two_update']
+    ev_people_three = request.POST['ev_people_three_update']
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -207,6 +217,9 @@ def course_event_update(request):
     content.ev_hour = ev_hour
     content.ev_hour_two = ev_hour_two
     content.ev_hour_three = ev_hour_three
+    content.ev_people = ev_people
+    content.ev_people_two = ev_people_two
+    content.ev_people_three = ev_people_three
     content.upd_date = dateTimeNow()
     content.course_id = course_id
     content.save()
