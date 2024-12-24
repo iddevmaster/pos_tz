@@ -44,7 +44,6 @@
       events: {
         url: "/api/calendar_event_api2/"+wi,
         failure: function () {
-        
           document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
         },
       },
@@ -163,44 +162,45 @@ function removeFirstCharacter(str) {
    const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
    const pi = document.getElementById("pi").value
    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
-
+let check = this.CheckHourbeforeSave();
+console.log(check);
    
-   let te = document.getElementById("teacher_id").value
-   if(te == ""){
-    Swal.fire({
-      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-      text: 'กรุณาเลือกรายชื่อ',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
+  //  let te = document.getElementById("teacher_id").value
+  //  if(te == ""){
+  //   Swal.fire({
+  //     title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
+  //     text: 'กรุณาเลือกรายชื่อ',
+  //     icon: 'error',
+  //     confirmButtonText: 'OK'
+  //   });
 
-    return false
-   }
+  //   return false
+  //  }
 
-   if(pi == 3){
-    let ch = CheckHour(count_hour_pi,checkUnit,hour);
-    if(ch == true){
-      return true;
-    }
-    Swal.fire({
-      title: 'ไม่สามารถบันทึกได้!',
-      text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
+  //  if(pi == 3){
+  //   let ch = CheckHour(count_hour_pi,checkUnit,hour);
+  //   if(ch == true){
+  //     return true;
+  //   }
+  //   Swal.fire({
+  //     title: 'ไม่สามารถบันทึกได้!',
+  //     text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
+  //     icon: 'error',
+  //     confirmButtonText: 'OK'
+  //   });
 
-   }else {
-    let ch = CheckHour(count_hour_wi,checkUnit,hour);
-    if(ch == true){
-      return true;
-    }
-    Swal.fire({
-      title: 'ไม่สามารถบันทึกได้!',
-      text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-   }
+  //  }else {
+  //   let ch = CheckHour(count_hour_wi,checkUnit,hour);
+  //   if(ch == true){
+  //     return true;
+  //   }
+  //   Swal.fire({
+  //     title: 'ไม่สามารถบันทึกได้!',
+  //     text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
+  //     icon: 'error',
+  //     confirmButtonText: 'OK'
+  //   });
+  //  }
 
 
    return false
@@ -225,7 +225,31 @@ return false
    document.getElementById("tis_sum").value = aaaa * tis_quantity;
    }
 
-   
+   function CheckHourbeforeSave() {
+
+
+    const csrftoken = "{{ csrf_token }}";
+  fetch('/api/checkhours', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'pi':"1",'ev_hour':5,'ev_id':473})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+        console.log(data);
+
+
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+      
+    });
+return false
+   }
    function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
@@ -240,7 +264,7 @@ return false
     .then(response => response.json())
     .then(data => {
         // Display response
-        
+     
         if(data.length == 0){
           document.getElementById("tis_compensation").value = 0
           return false;
@@ -335,7 +359,7 @@ return false
       <div align="center">
         <h3>
           หลักสูตร <u>{{main_data.course.course_name}} </u> วันที่
-          <u>{{main_data.ev_date_start}} - {{main_data.ev_date_end}} - {{main_data.ev_hour}} ชั่วโมง</u>  
+          <u>{{main_data.ev_date_start}} - {{main_data.ev_date_end}}</u>  
         </h3>
       </div>
       <form onsubmit="return Save(event);"
@@ -398,7 +422,7 @@ return false
 </div>
 
 
-<div class="col-12 col-lg-6 col-md-6">
+<div class="col-6 col-lg-6 col-md-6">
   ครู - วิทยากร:   <label style="color: red"> *</label> 
 <select class="select2" onchange="handleSelectChange(this)" id="teacher" name="teacher">
   {% for teachers in teacher %}
@@ -413,9 +437,22 @@ return false
 </div>  
 </div>
 
-     
+{{main_data.ev_hour}} ชั่วโมง
+{{main_data.ev_hour_two}} ชั่วโมง
+{{main_data.ev_hour_three}} ชั่วโมง
 
-
+<div class="col-12 col-lg-12 col-md-12">
+   <label style="color: red">หมายเหตุ *</label> 
+</div>
+<div class="col-12 col-lg-12 col-md-12">
+  <label style="color: red">จำนวนชั่วโมงวิทยากร {{main_data.ev_hour}} ชั่วโมง </label> 
+</div>
+<div class="col-12 col-lg-12 col-md-12">
+  <label style="color: red">จำนวนชั่วโมงครูฝึก {{main_data.ev_hour_two}} ชั่วโมง</label> 
+</div>
+<div class="col-12 col-lg-12 col-md-12">
+  <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร {{main_data.ev_hour_three}} ชั่วโมง</label> 
+</div>
    
 
 
