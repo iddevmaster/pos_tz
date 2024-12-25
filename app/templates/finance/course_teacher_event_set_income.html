@@ -108,11 +108,14 @@
 
 
   setTimeout(() => {
+  
     getComposetaion()
    }, 100);
 
    setTimeout(() => {
+    
     Caculate()
+    CheckHourbeforeSave()
    }, 200);
 
   
@@ -130,6 +133,7 @@ function removeFirstCharacter(str) {
  document.getElementById("teacher_id").value = result;
 
  calen()
+ 
 
 
  setTimeout(() => {
@@ -138,6 +142,7 @@ function removeFirstCharacter(str) {
 
  setTimeout(() => {
   Caculate()
+  CheckHourbeforeSave()
  }, 200);
   }
 
@@ -146,21 +151,17 @@ function removeFirstCharacter(str) {
  document.getElementById("pi").value = selectedValue;
 
  setTimeout(() => {
+  CheckHourbeforeSave()
   getComposetaion()
  }, 50);
 
  setTimeout(() => {
+ 
   Caculate()
  }, 200);
   }
 
-  function firstFunction() {
-  console.log('Function แรกทำงานเสร็จแล้ว');
-}
 
-function secondFunction() {
-  console.log('Function ถัดไปทำงาน');
-}
   
   function SaveStep2() {
 
@@ -177,16 +178,9 @@ function secondFunction() {
   function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-function Save2() {
-  return true
-}
+
    function Save() {
 
-   let data = this.CheckHourbeforeSave()
-
-
-   
-   setTimeout(() => {
     const checkUnit = document.getElementById("tis_quantity").value  ////Unit ที่เลือก
    const count_hour_wi = document.getElementById("count_hour_wi").value ////ชั่วโมงที่เลือกไปแล้ว ของ วิทยากร กับ ครูฝึก
    const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
@@ -204,52 +198,42 @@ function Save2() {
     return false
    }
 
+   
+const status_hour = document.getElementById("status_hour").value 
+   
+const status_people = document.getElementById("status_people").value 
+
+
+
+
+   if(status_hour == 'false'){
+    Swal.fire({
+      title: 'จำนวนชั่วโมงไม่เพียงพอ',
+      text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+   }
+   if(status_people == 'false'){
+    Swal.fire({
+      title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
+      text: 'กรุณาตรวจสอบให้ถูกต้อง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+
+}
+
+if((status_hour == 'true') && (status_people == 'true')){
 return true
-  }, 20);
+   }
 
 
 
 
-
-const status = document.getElementById("status").value 
-console.log(status);
-
-  //  let te = document.getElementById("teacher_id").value
-  //  if(te == ""){
-  //   Swal.fire({
-  //     title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-  //     text: 'กรุณาเลือกรายชื่อ',
-  //     icon: 'error',
-  //     confirmButtonText: 'OK'
-  //   });
-
-  //   return false
-  //  }
-
-  //  if(pi == 3){
-  //   let ch = CheckHour(count_hour_pi,checkUnit,hour);
-  //   if(ch == true){
-  //     return true;
-  //   }
-  //   Swal.fire({
-  //     title: 'ไม่สามารถบันทึกได้!',
-  //     text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
-  //     icon: 'error',
-  //     confirmButtonText: 'OK'
-  //   });
-
-  //  }else {
-  //   let ch = CheckHour(count_hour_wi,checkUnit,hour);
-  //   if(ch == true){
-  //     return true;
-  //   }
-  //   Swal.fire({
-  //     title: 'ไม่สามารถบันทึกได้!',
-  //     text: 'จำนวนชั่วโมงมากกว่าที่ตั้งไว้',
-  //     icon: 'error',
-  //     confirmButtonText: 'OK'
-  //   });
-  //  }
+  
 
   return false
 
@@ -293,9 +277,10 @@ return false
     .then(response => response.json())
     .then(data => {
         // Display response
-        console.log('Function แรกทำงานเสร็จแล้ว');
-        document.getElementById("status").value = data.status;
-        return data.status
+       
+        document.getElementById("status_hour").value = data.status_hour;
+        document.getElementById("status_people").value = data.status_people;
+    //    return data.status
 
 
 
@@ -436,8 +421,8 @@ return data
         </div> {% endcomment %}
 
 
-        <input type="text" class="form-control" name="status" id="status"  value=""/>
-        
+        <input type="text" class="form-control" name="status_hour" id="status_hour"  value=""/>
+        <input type="text" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="count_hour_wi" id="count_hour_wi"  value="{{hour_wi}}"/>
         <input type="hidden" class="form-control" name="count_hour_pi" id="count_hour_pi"  value="{{hour_pi}}"/>
         <input type="text" class="form-control" name="course_id" id="course_id"  value="{{main_data.course_id}}"/>
@@ -507,13 +492,13 @@ return data
    <label style="color: red">หมายเหตุ *</label> 
 </div>
 <div class="col-12 col-lg-12 col-md-12">
-  <label style="color: red">จำนวนชั่วโมงวิทยากร {{main_data.ev_hour}} ชั่วโมง </label> 
+  <label style="color: red">จำนวนชั่วโมงวิทยากร {{main_data.ev_hour}} ชั่วโมง </label>    <label style="color: red">จำนวนวิทยากร {{main_data.ev_people}} คน </label> 
 </div>
 <div class="col-12 col-lg-12 col-md-12">
-  <label style="color: red">จำนวนชั่วโมงครูฝึก {{main_data.ev_hour_two}} ชั่วโมง</label> 
+  <label style="color: red">จำนวนชั่วโมงครูฝึก {{main_data.ev_hour_two}} ชั่วโมง</label>  <label style="color: red">จำนวนวิทยากร {{main_data.ev_people_two}} คน </label> 
 </div>
 <div class="col-12 col-lg-12 col-md-12">
-  <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร {{main_data.ev_hour_three}} ชั่วโมง</label> 
+  <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร {{main_data.ev_hour_three}} ชั่วโมง</label>  <label style="color: red">จำนวนวิทยากร {{main_data.ev_people_three}} คน </label> 
 </div>
    
 

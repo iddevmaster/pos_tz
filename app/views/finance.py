@@ -249,7 +249,8 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             teacher_id=teacher_id,
             pi_id=pi,
             crt_date=dateTimeNow(),
-            upd_date=dateTimeNow()
+            upd_date=dateTimeNow(),
+            status='W'
         )
         content.save()
         messages.success(request, "ทำรายการสำเร็จ !")
@@ -323,35 +324,44 @@ def checkhours(request):
             ev_id = data.get("ev_id")
             instance = course_event.objects.filter(pk=ev_id).values().first()
             
-            data['status'] = True
+            data['status_hour'] = True
+            data['status_people'] = True
             if pi == '1' :
                
                 hour = instance['ev_hour'] or 0
+                people = instance['ev_people'] or 0
             elif  pi == '2' :
               
                 hour = instance['ev_hour_two'] or 0
+                people = instance['ev_people_two'] or 0
             elif  pi == '3' :
              
                 hour = instance['ev_hour_three'] or 0
+                people = instance['ev_people_three'] or 0
 
-            
+            st =['Y','W']
       
-            content = teacher_income_setting.objects.filter(ev_id=ev_id,status='Y').aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
-       
-          
+            content = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
+            tttt = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).values('pi').annotate(total=Count('pi')) 
+            # จำนวนคนที่อยู่ใน ตาราง
+            totalp = 0
             total = content['total'] + tis_quantity
+            for author in tttt:
+                totalp = author['total']
             
             if hour < total :
-                data['status'] = False
+                data['status_hour'] = False
+            if people <= totalp:
+                data['status_people'] = False    
          
-            
-            
             if data:
-                datas = {'status': data['status']}
+                datas = {'status_hour': data['status_hour'],'status_people': data['status_people']}
+      
               
                 return JsonResponse(datas, status=201,safe=False)
             else:
-                datas = {'status': data['status']}
+                datas = {'status_hour': data['status_hour'],'status_people': data['status_people']}
+         
                 return JsonResponse(datas, status=200,safe=False)
 
         except json.JSONDecodeError:
