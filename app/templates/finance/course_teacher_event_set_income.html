@@ -421,11 +421,11 @@ return data
         </div> {% endcomment %}
 
 
-        <input type="text" class="form-control" name="status_hour" id="status_hour"  value=""/>
-        <input type="text" class="form-control" name="status_people" id="status_people"  value=""/>
+        <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
+        <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="count_hour_wi" id="count_hour_wi"  value="{{hour_wi}}"/>
         <input type="hidden" class="form-control" name="count_hour_pi" id="count_hour_pi"  value="{{hour_pi}}"/>
-        <input type="text" class="form-control" name="course_id" id="course_id"  value="{{main_data.course_id}}"/>
+        <input type="hidden" class="form-control" name="course_id" id="course_id"  value="{{main_data.course_id}}"/>
 
         <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
         <input type="hidden" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />

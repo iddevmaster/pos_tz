@@ -864,6 +864,31 @@ function removeFirstCharacter(str) {
               required
             />
           </div>
+
+          <!-- <div class="row">
+            <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์ <span style="color: red;">*</span></label>
+            <div class="col-12 col-sm-12">
+         
+              <select
+              class="form-select"
+              required
+              name="location_id"
+              id="selLocations"
+              style="width: 100%;"
+              required
+            >
+           
+            {% if location != None %}
+            <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
+            {% endif %}
+
+              <option value="">-เลือกข้อมูล-</option>
+            </select>
+            </div>
+
+          </div>
+   -->
+       
           <div class="form-group">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select class="form-control" name="ev_vat" id="ev_vat" required>

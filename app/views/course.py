@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 
@@ -98,9 +98,13 @@ def course_event_list(request):
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
     except user_detail.DoesNotExist:
+
+       
         cm_id = 0
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
+
+        
     for rs in list(listMenuPermission):
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
@@ -109,16 +113,33 @@ def course_event_list(request):
         objMenu.append(r)
     try:
         m = user_group.objects.get(user=user_id)
+    
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
+
+    
+
+    Province = None
+    Amphur = None
+    Tumbol = None   
     course_list = course.objects.filter(
-        cancelled=1, active=1).order_by("-course_id")
+            cancelled=1, active=1).order_by("-course_id")
+    
+    if Province is not None:
+        try:
+            _location = location_thai.objects.get(
+                province_name__icontains=Province, amphur_name__icontains=Amphur, district_name__icontains=Tumbol)
+        except location_thai.DoesNotExist:
+            _location = None
+    else:
+        _location = None 
+        
     result = course_event.objects.select_related("course").filter(
-        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list}
+            cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location}
     
     return render(request, 'course/course_event_list.html', context)
 
@@ -298,9 +319,8 @@ def calendar_event_api(request):
 def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
-    print(sss)
    
-
+   
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
    
     obj = []
@@ -310,7 +330,7 @@ def calendar_event_api2(request,id):
        y, m, d = end.split("-")
        nextdayend = addDay(1, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
-       print(result.course_name)
+     
        res = {'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'backgroundColor':'#28a745','borderColor':'#1e7e34','textColor':'#ffffff'}
 
        obj.append(res)        
