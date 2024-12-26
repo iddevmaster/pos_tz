@@ -48,7 +48,9 @@
         },
       },
       eventClick: function(info) {
-        console.log(info.event.extendedProps.course_id);
+    
+
+        document.getElementById("evs_id").value = info.event.extendedProps.evs_id
       // Populate modal with event data
       const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
       eventModal.show();
@@ -120,6 +122,9 @@
 
   
 
+}
+function confirm() {
+alert('ok');
 }
 function removeFirstCharacter(str) {
   return str.substring(1);
@@ -202,6 +207,8 @@ function removeFirstCharacter(str) {
 const status_hour = document.getElementById("status_hour").value 
    
 const status_people = document.getElementById("status_people").value 
+const status_teacher = document.getElementById("status_teacher").value 
+
 
 
 
@@ -223,8 +230,16 @@ const status_people = document.getElementById("status_people").value
       confirmButtonText: 'OK'
     });
     return false
-
-}
+  }
+  if(status_teacher == 'false'){
+    Swal.fire({
+      title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
+      text: 'กรุณาเลือกรายชื่ออื่น',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+   }
 
 if((status_hour == 'true') && (status_people == 'true')){
 return true
@@ -265,6 +280,7 @@ return false
     const ev_id = document.getElementById("ev_id").value;
     const pi = document.getElementById("pi").value
     const tis_quantity = document.getElementById("tis_quantity").value;
+    const teacher_id = document.getElementById("teacher_id").value
 
 
  let data = await fetch('/api/checkhours', {
@@ -272,7 +288,7 @@ return false
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id)})
+    body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id),'teacher_id':teacher_id})
 })
     .then(response => response.json())
     .then(data => {
@@ -280,6 +296,7 @@ return false
        
         document.getElementById("status_hour").value = data.status_hour;
         document.getElementById("status_people").value = data.status_people;
+        document.getElementById("status_teacher").value = data.status_teacher;
     //    return data.status
 
 
@@ -421,8 +438,9 @@ return data
         </div> {% endcomment %}
 
 
-        <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
-        <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
+        <input type="text" class="form-control" name="status_hour" id="status_hour"  value=""/>
+        <input type="text" class="form-control" name="status_people" id="status_people"  value=""/>
+        <input type="text" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
         <input type="hidden" class="form-control" name="count_hour_wi" id="count_hour_wi"  value="{{hour_wi}}"/>
         <input type="hidden" class="form-control" name="count_hour_pi" id="count_hour_pi"  value="{{hour_pi}}"/>
         <input type="hidden" class="form-control" name="course_id" id="course_id"  value="{{main_data.course_id}}"/>
@@ -649,12 +667,13 @@ return data
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <input type="text" class="form-control" name="evs_id" id="evs_id"  value=""/>
           <p><strong>Title:</strong> <span id="modalTitle"></span></p>
           <p><strong>Start:</strong> <span id="modalStart"></span></p>
           <p><strong>End:</strong> <span id="modalEnd"></span></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
         </div>
       </div>
     </div>
