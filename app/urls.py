@@ -122,6 +122,7 @@ urlpatterns = [
     path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),
     path('api/calendar_event_api2/<slug:id>/', course.calendar_event_api2),
     path('api/checkhours', finance.checkhours),
+    path('api/updateeve', course.updateeve),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

@@ -26,6 +26,7 @@
 
 
   function calen() {
+    console.log('ok');
     var calendarEl = document.getElementById("calendar");
     let wi = document.getElementById("teacher_id").value;
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -124,7 +125,7 @@
 
 }
 function confirm() {
-alert('ok');
+  calen()
 }
 function removeFirstCharacter(str) {
   return str.substring(1);
