@@ -26,7 +26,7 @@
 
 
   function calen() {
-    console.log('ok');
+
     var calendarEl = document.getElementById("calendar");
     let wi = document.getElementById("teacher_id").value;
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -52,6 +52,14 @@
     
 
         document.getElementById("evs_id").value = info.event.extendedProps.evs_id
+        document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+      
+        if(info.event.extendedProps.evs_status == 'Y'){
+          document.getElementById('bt_confirm').style.display = 'none';
+        }
+        if(info.event.extendedProps.evs_status == 'W'){
+          document.getElementById('bt_confirm').style.display = 'block';
+        }
       // Populate modal with event data
       const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
       eventModal.show();
@@ -125,6 +133,23 @@
 
 }
 function confirm() {
+
+  const it = document.getElementById("evs_id").value;
+  fetch('/api/updateeve', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'evs_id':it})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+  
+    })
+    .catch(error => {
+        console.error('Error:', error); 
+    });
   calen()
 }
 function removeFirstCharacter(str) {
@@ -669,12 +694,13 @@ return data
         </div>
         <div class="modal-body">
           <input type="text" class="form-control" name="evs_id" id="evs_id"  value=""/>
+          <input type="text" class="form-control" name="evs_status" id="evs_status"  value=""/>
           <p><strong>Title:</strong> <span id="modalTitle"></span></p>
           <p><strong>Start:</strong> <span id="modalStart"></span></p>
           <p><strong>End:</strong> <span id="modalEnd"></span></p>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
+        <div class="modal-footer"  id="bt_confirm" >
+          <button type="button"class="btn btn-secondary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
         </div>
       </div>
     </div>
