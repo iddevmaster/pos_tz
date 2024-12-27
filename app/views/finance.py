@@ -322,10 +322,12 @@ def checkhours(request):
             pi = data.get("pi")
             tis_quantity = data.get("tis_quantity")
             ev_id = data.get("ev_id")
+            teacher_id = data.get("teacher_id")
             instance = course_event.objects.filter(pk=ev_id).values().first()
-            
+            print(teacher_id)
             data['status_hour'] = True
             data['status_people'] = True
+            data['status_teacher'] = True
             if pi == '1' :
                
                 hour = instance['ev_hour'] or 0
@@ -343,8 +345,11 @@ def checkhours(request):
       
             content = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
             tttt = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).values('pi').annotate(total=Count('pi')) 
-            # จำนวนคนที่อยู่ใน ตาราง
+            teacher = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi,teacher_id=teacher_id).count() or 0
+            # เช็คว่า มีครูฝึกคนนี้รึยัง
+            
             totalp = 0
+    
             total = content['total'] + tis_quantity
             for author in tttt:
                 totalp = author['total']
@@ -353,14 +358,15 @@ def checkhours(request):
                 data['status_hour'] = False
             if people <= totalp:
                 data['status_people'] = False    
-         
+            if teacher > 0:
+                data['status_teacher'] = False
             if data:
-                datas = {'status_hour': data['status_hour'],'status_people': data['status_people']}
+                datas = {'status_hour': data['status_hour'],'status_people': data['status_people'],'status_teacher': data['status_teacher']}
       
               
                 return JsonResponse(datas, status=201,safe=False)
             else:
-                datas = {'status_hour': data['status_hour'],'status_people': data['status_people']}
+                datas = {'status_hour': data['status_hour'],'status_people': data['status_people'],'status_teacher': data['status_teacher']}
          
                 return JsonResponse(datas, status=200,safe=False)
 

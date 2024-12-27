@@ -80,6 +80,11 @@ class course_event(models.Model):
     ev_price = models.FloatField(default=0, blank=False)
     ev_vat = models.IntegerField(default=0, blank=False)
     ev_hour = models.IntegerField(default=0, blank=False)
+    ev_hour_two = models.IntegerField(default=0, blank=False)
+    ev_hour_three = models.IntegerField(default=0, blank=False)
+    ev_people = models.IntegerField(default=0, blank=False)
+    ev_people_two = models.IntegerField(default=0, blank=False)
+    ev_people_three = models.IntegerField(default=0, blank=False)
     ev_expired_cer_quantity = models.IntegerField(default=0, blank=False)
     ev_expired_cer_date = models.DateField(blank=True, null=True)
     ev_logo = models.ImageField(
@@ -246,9 +251,10 @@ class teacher_income_setting(models.Model):
     active = models.IntegerField(default=0, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
-    ev = models.ForeignKey(course_event, on_delete=models.CASCADE)
+    ev = models.ForeignKey(course_event, on_delete=models.CASCADE )
     teacher = models.ForeignKey(teacher, on_delete=models.CASCADE)
     pi = models.ForeignKey(pay_item, on_delete=models.CASCADE)
+    status = models.CharField(blank=True, null=True, max_length=1)
 
 class billing_cycle_setting(models.Model):
     bcs_start_day = models.IntegerField(default=0, blank=False)

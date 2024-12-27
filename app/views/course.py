@@ -4,9 +4,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+
 
 @login_required(login_url='/login')
 def course_list(request):
@@ -322,7 +326,7 @@ def calendar_event_api2(request,id):
    
    
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
-   
+    print(content)
     obj = []
     for r in content:  
        
@@ -330,10 +334,18 @@ def calendar_event_api2(request,id):
        y, m, d = end.split("-")
        nextdayend = addDay(1, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
-     
-       res = {'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'backgroundColor':'#28a745','borderColor':'#1e7e34','textColor':'#ffffff'}
+       
+       pay = pay_item.objects.filter(id=r.pi_id).first()
+       print(r.id)
+       col = r.status
+       if col == 'W' :
+        t = '#e0ce1b'
+       else:
+        t = '#4be01b'
+       res = {'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff'}
 
-       obj.append(res)        
+       obj.append(res)      
+       
     return JsonResponse(obj, safe=False)
 
 @login_required(login_url='/login')
@@ -363,3 +375,25 @@ def course_teacher_event_list(request,ev_id):
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
     context = {'title': defaultTitle, 'main_data': instance,  'data': teacher_data,'listMenuPermission': objMenu}
     return render(request, 'course/course_teacher_event_list.html', context)
+
+
+
+@csrf_exempt
+def updateeve(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            evs_id = data.get("evs_id")
+           
+
+            content = teacher_income_setting.objects.get(id=evs_id)
+            content.status = "Y"
+            content.save()
+    
+            return JsonResponse(data, status=200,safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": 'x'}, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)            
