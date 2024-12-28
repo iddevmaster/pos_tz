@@ -127,7 +127,24 @@ listMenu = [
         "group_value": "5lgafI",
         "group_label": "ครู - วิทยากร",
     },
-
+      {
+        "value": "teachers/cale",
+        "label": "กำหนดวันอบรมและราคาอบรม",
+        "group_value": "5lgafI",
+        "group_label": "ครู - วิทยากร",
+    },
+    {
+        "value": "teachers/licen",
+        "label": "ใบอนุญาติขับรถ",
+        "group_value": "5lgafI",
+        "group_label": "ครู - วิทยากร",
+    },
+      {
+        "value": "teachers/approv",
+        "label": "อนุมัติใบอนุญาติขับรถ",
+        "group_value": "5lgafI",
+        "group_label": "ครู - วิทยากร",
+    },
     {
         "value": "approve/update/payment",
         "label": "แก้ไขใบเสร็จ - ใบเสนอราคา",
