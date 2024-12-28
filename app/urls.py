@@ -70,7 +70,9 @@ urlpatterns = [
          teacher.teacher_form_update, name="teacher_form_update"),
     path('teacher/form/delete', teacher.teacher_form_delete,
          name="teacher_form_delete"),
-
+    path('teachers/cale', teacher.teacher_list_cale),
+    path('teachers/approv', teacher.teacher_list_cale),
+    path('teachers/licen', teacher.teacher_list_cale),
     # Master Data
     path('locationthai/', master_data.get_locationThai),
 
