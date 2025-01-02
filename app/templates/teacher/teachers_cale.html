@@ -1,148 +1,360 @@
-{% extends 'base.html' %} {% block content %} {% load humanize %}
+{% extends 'base.html' %} {% block content %}
+<style>
+  .center-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 130px;
+    background-color: #f0f0f0;
+    /* Light gray background */
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    /* Blue color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+  }
+</style>
 <script>
-  function setValueDeleteModal(id) {
-    document.getElementById("id_delete").value = id;
+
+
+  function calen() {
+
+    var calendarEl = document.getElementById("calendar");
+
+    var teacher = document.getElementById("teacher_id").value;
+
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+  locale: "th",
+    buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+        navLinks: true, // can click day/week names to navigate views
+          editable: false,
+            dayMaxEvents: true, // allow "more" link when too many events
+              events: {
+
+    url: "/api/calendar_event_api2/" + teacher,
+    success: function (response) {
+      console.log(response);
+      $('#cardContainer').empty(); // Clear previous cards
+      $.each(response, function (index, card) {
+
+if(card.evs_status == 'Y'){
+  $('#cardContainer').append(`
+                        <div class="col-12 col-md-6 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card mb-3">
+  <div class="row g-0">
+     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style="
+      padding: 15px;
+      border-right: 3px solid #f5ecea;
+  ">
+       <p class="card-text" style="text-align: center;">ศ</p>
+       <p class="card-text" style="text-align: center;">1</p>
+      </div>
+      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
+        <div class="card-body">
+          
+          <span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>
+          <p>${card.title} </p>
+        </div>
+      </div>
+      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;
+      display: grid
+  ;">
+   
+       
+      </div>
+   
+    </div>
+  </div>
+</div>
+                            `);
+
+}
+ 
+      });
+    },
+      failure: function () {
+        document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
+      },
+  },
+  eventClick: function(info) {
+
+
+    document.getElementById("evs_id").value = info.event.extendedProps.evs_id
+    document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+
+    if (info.event.extendedProps.evs_status == 'Y') {
+      document.getElementById('bt_confirm').style.display = 'none';
+    }
+    if (info.event.extendedProps.evs_status == 'W') {
+      const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+      eventModal.show();
+      document.getElementById('bt_confirm').style.display = 'block';
+    }
+    // Populate modal with event data
+
+  },
+    });
+
+  calendar.render();
+}
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var teacher = document.getElementById("teacher_id").value;
+
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+    locale: "th",
+    buttonIcons: false, // show the prev/next text
+    weekNumbers: true,
+    navLinks: true, // can click day/week names to navigate views
+    editable: false,
+    dayMaxEvents: true, // allow "more" link when too many events
+
+    events: {
+
+    url: "/api/calendar_event_api2/" + teacher,
+    success: function (response) {
+      
+     
+      $('#cardContainer').empty(); // Clear previous cards
+      $.each(response, function (index, card) {
+       
+if(card.evs_status == 'Y'){
+  
+  if(card.show == 1){
+    console.log(card.teach)
+    $.each(card.teach, function (i, item) {
+      $('#tss').empty(); // Clear previous cards
+        
+                            $('#tss').append(`<div class="item">
+                                        ${item.fname}  ${item.lname} - ${item.pay_name} - ${item.status} 
+                                    </div>`);
+                            });
+    $('#cardContainer').append(`
+                        <div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card mb-3">
+  <div class="row g-0">
+     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style="
+      padding: 15px;
+      border-right: 3px solid #f5ecea;
+  ">
+       <p class="card-text" style="text-align: center;">${card.day}</p>
+       <p class="card-text" style="text-align: center;">${card.daynum}</p>
+      </div>
+      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
+        <div class="card-body">
+          
+          <span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>
+          <p>${card.title} </p>
+
+           <p class="card-text" id='tss'></p>
+        </div>
+      </div>
+      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;
+      display: grid
+  ;">
+   
+       
+      </div>
+   
+    </div>
+  </div>
+</div>
+</div>
+                            `);
+  }
+
+  if(card.show == 0){
+    $('#cardContainer').append(`
+                        <div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card mb-3">
+  <div class="row g-0">
+     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style="
+      padding: 15px;
+      border-right: 3px solid #f5ecea;
+  ">
+       <p class="card-text" style="text-align: center;">${card.day}</p>
+       <p class="card-text" style="text-align: center;">${card.daynum}</p>
+      </div>
+      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
+        <div class="card-body">
+          
+          <span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>
+          <p>${card.title} </p>
+        </div>
+      </div>
+      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;
+      display: grid
+  ;">
+   
+       
+      </div>
+   
+    </div>
+  </div>
+</div>
+</div>
+                            `);
+  }
+  
+
+
+}
+ 
+      });
+    },
+    failure: function () {
+      document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
+    },
+  },
+    eventClick: function (info) {
+ 
+
+      document.getElementById("evs_id").value = info.event.extendedProps.evs_id
+      document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+
+      if (info.event.extendedProps.evs_status == 'Y') {
+        document.getElementById('bt_confirm').style.display = 'none';
+      }
+      if (info.event.extendedProps.evs_status == 'W') {
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        eventModal.show();
+        document.getElementById('bt_confirm').style.display = 'block';
+      }
+      // Populate modal with event data
+
+    },
+    });
+  calendar.render();
+  });
+
+  function showAlert() {
+    alert('Button clicked!');
+  }
+
+  async function ConfirmJob() {
+    const it = document.getElementById("evs_id").value;
+    fetch('/api/updateeve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'evs_id': it })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
+        calendar.render();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+
+  }
+
+  function confirm() {
+
+    const it = document.getElementById("evs_id").value;
+    fetch('/api/updateeve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'evs_id': it })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+   
+    setTimeout(calen(), 1000); // Executes after 3 seconds
   }
 </script>
+
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>ครู - วิทยากร</h3>
+    <h3>ตารางหลักสูตรอบรม</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">หน้าหลัก</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">ครู - วิทยากร</li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางหลักสูตรอบรม
+        </li>
       </ol>
     </nav>
   </div>
 </div>
-
+<input type="text" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
 <section class="section">
   <div class="card">
-    <div class="card-header">
-      <div align="right">
-        <div class="btn-group mb-3" role="group" aria-label="Basic example">
-          <button
-            class="btn btn-primary"
-            onclick="window.location.href='/teacher/form/create'"
-          >
-            <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
-          </button>
-        </div>
-      </div>
-    </div>
     <div class="card-body">
-      <table class="table table-striped" id="table1">
-        <thead>
-          <tr>
-            <th>ลำดับ</th>
-            <th>รูปประจำตัว</th>
-            <th>รหัสบัตร ปชช./ Passport</th>
-            <th>ชื่อนามสกุลภาษาไทย</th>
-            <th>ชื่อนามสกุลภาษาอังกฤษ</th>
-            <th>ประเภท</th>
-            <th>พร้อมทำงาน</th>
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for res in data %}
-          <tr>
-            <td align="center">{{ forloop.counter }}</td>
-            <td align="center"><img src="{{res.teacher_cover.url}}"  style="width:100px;height:100px"/> </td>
-            <td>{{res.teacher_identification_number}}</td>
-            <td>{{res.teacher_prefix_th}}{{res.teacher_firstname_th}} {{res.teacher_lastname_th}}</td>
-            <td>{{res.teacher_prefix_eng}}{{res.teacher_firstname_eng}} {{res.teacher_lastname_eng}}</td>
-            <td align="center">
-              {% if res.teacher_type == 1 %}
-              <font style="color: green">ครูหรือวิทยากรภายใน</font>
-              {% else %}
-              <font style="color: red">ครูหรือวิทยากรภายนอก</font>
-              {% endif %}
-            </td>
-            <td align="center">
-              {% if res.active == 1 %}
-              <font style="color: blue">เปิด</font>
-              {% else %}
-              <font style="color: red">ปิด</font>
-              {% endif %}
-            </td>
-            <td>
-              <div align="center">
-                <button
-                  type="button"
-                  class="btn btn-warning"
-                  onclick="window.location.href='/teacher/form/update/{{res.teacher_id}}'"
-                >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
-                </button>
-                
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.teacher_id}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
-                  <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
-                </button>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  
-  {% comment %} Delete {% endcomment %}
-  <div class="modal fade" id="DeleteClick">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-header bg-danger">
-          <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-          <button
-            type="button"
-            class="close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            <i data-feather="x"></i>
-          </button>
-        </div>
-        <form action="{% url 'teacher_form_delete' %}" method="post">
-          <div class="modal-body">
-            {% csrf_token %}
-            <input type="hidden" name="id" id="id_delete" required />
-            <div align="center">
-              <h4>ยืนยันการลบข้อมูล</h4>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-light-secondary"
-                data-bs-dismiss="modal"
-              >
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">ยกเลิก</span>
-              </button>
-              <button type="submit" class="btn btn-primary ml-1">
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">ยืนยันการลบ</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      <span id="msg" style="color: red"></span>
+      <div id="calendar"></div>
     </div>
   </div>
 </section>
+<div class="row"  id="cardContainer">
+
+
+
+</div>
+
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" name="evs_id" id="evs_id" value="" />
+        <input type="text" class="form-control" name="evs_status" id="evs_status" value="" />
+
+        <p><strong>Title:</strong> <span id="modalTitle"></span></p>
+        <p><strong>Start:</strong> <span id="modalStart"></span></p>
+        <p><strong>End:</strong> <span id="modalEnd"></span></p>
+      </div>
+      <div class="modal-footer" id="bt_confirm">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -121,6 +121,7 @@ listMenu = [
         "group_value": "pRem5",
         "group_label": "หลักสูตร",
     },
+     
     {
         "value": "teachers",
         "label": "ครู - วิทยากร",
@@ -128,20 +129,26 @@ listMenu = [
         "group_label": "ครู - วิทยากร",
     },
       {
-        "value": "teachers/cale",
+        "value": "calendarteachers",
         "label": "กำหนดวันอบรมและราคาอบรม",
         "group_value": "5lgafI",
         "group_label": "ครู - วิทยากร",
     },
     {
-        "value": "teachers/licen",
+        "value": "licenteachers",
         "label": "ใบอนุญาติขับรถ",
         "group_value": "5lgafI",
         "group_label": "ครู - วิทยากร",
     },
       {
-        "value": "teachers/approv",
+        "value": "approvlicen",
         "label": "อนุมัติใบอนุญาติขับรถ",
+        "group_value": "5lgafI",
+        "group_label": "ครู - วิทยากร",
+    },
+    {
+        "value": "teachersoutsource",
+        "label": "Outsource",
         "group_value": "5lgafI",
         "group_label": "ครู - วิทยากร",
     },

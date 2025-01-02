@@ -64,15 +64,23 @@ urlpatterns = [
 
     #     teacher
     path('teachers/', teacher.teacher_list),
+    path('teachersoutsource/', teacher.teacher_list),
     path('teacher/form/create', teacher.teacher_form_create,
          name="teacher_form_create"),
     path('teacher/form/update/<slug:teacher_id>',
          teacher.teacher_form_update, name="teacher_form_update"),
     path('teacher/form/delete', teacher.teacher_form_delete,
          name="teacher_form_delete"),
-    path('teachers/cale', teacher.teacher_list_cale),
-    path('teachers/approv', teacher.teacher_list_cale),
-    path('teachers/licen', teacher.teacher_list_cale),
+    path('calendarteachers', teacher.teacher_list_cale),
+    path('licenteachers', teacher.teacher_list_licen),
+    path('licenteachers/form/create', teacher.teacher_formlicen_create,
+         name="teacher_formlicen_create"),
+    path('approvlicen', teacher.teacher_list_appv),
+    path('approvlicen/form/delete', teacher.teacher_appv_delete,
+         name="approvlicen_form_delete"),
+    path('approvlicen/form/de', teacher.teacher_appv_de,
+         name="approvlicen_form_de"),
+    
     # Master Data
     path('locationthai/', master_data.get_locationThai),
 

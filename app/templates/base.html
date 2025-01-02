@@ -235,6 +235,7 @@
                   class="{% if request.path|contains_parent == rs.group_value %} submenu active {% else %} submenu {% endif %}"
                 >
                   {% for rsc in rs.children %}
+                  
                   <li
                     class="{% if request.path|contains:rsc.page_route %} submenu-item active {% else %} submenu-item {% endif %}"
                   >

@@ -4,11 +4,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+
 import json
 
 
@@ -283,6 +284,8 @@ def calendar_event(request):
     context = {'title': title,'listMenuPermission': objMenu}
     return render(request, 'course/calendar_event.html', context)
 
+    
+
 
 def calendar_event_api(request):
     user_id = request.user.id
@@ -323,26 +326,74 @@ def calendar_event_api(request):
 def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
+    
    
    
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
-    print(content)
+  
+    
     obj = []
+    
     for r in content:  
-       
+       start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        y, m, d = end.split("-")
+       Y, mM, dD = start.split("-")
+       te = []
+       teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
+       evte = course_event.objects.get(ev_id=r.ev_id)
+    
+       for x in teach: 
+        
+        a = teacher.objects.get(teacher_id=x.teacher_id)
+        pa = pay_item.objects.filter(id=x.pi_id).first()
+       
+        fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa)}
+        
+        te.append(fs)  
+        
+        
        nextdayend = addDay(1, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
        
+       
        pay = pay_item.objects.filter(id=r.pi_id).first()
-       print(r.id)
+       
+        
+    
+       day_of_week = r.ev.ev_date_start.weekday()
+
+       if day_of_week:
+            try:
+                
+                if day_of_week == 0:
+                    dt = "จ"
+                elif day_of_week == 1: 
+                    dt = "อ"  
+                elif day_of_week == 2:
+                    dt = "พ"  
+                elif day_of_week == 3: 
+                    dt = "พฤ" 
+                elif day_of_week == 4: 
+                    dt = "ศ"
+                elif day_of_week == 5:
+                    dt = "ส"
+                elif day_of_week == 6:   
+                    dt = "อา"           
+            except ValueError:
+                dt = "-"
+       else:
+            dt = "-"
+     
+   
+    
        col = r.status
        if col == 'W' :
         t = '#e0ce1b'
        else:
         t = '#4be01b'
-       res = {'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff'}
+
+       res = {'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show}
 
        obj.append(res)      
        

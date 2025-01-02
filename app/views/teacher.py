@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from ..models import teacher,user_group,category_program_permission,user_detail,compensation
+from ..models import teacher,user_group,category_program_permission,user_detail,compensation,user_lic,fact_teacher_user,teacher_income_setting
 from ..constant import defaultTitle
 from ..forms.teacher_form import  teacherForm
 from ..functions import  dateTimeNow
@@ -33,6 +33,31 @@ def teacher_list(request):
     result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
     context = {'title': title,  'data': result,'listMenuPermission': objMenu}
     return render(request, 'teacher/teachers.html', context)
+
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+    title = defaultTitle
+    result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
+    context = {'title': title,  'data': result,'listMenuPermission': objMenu}
+    return render(request, 'teacher/teachersoutsource.html', context)
 
 @login_required(login_url='/login')
 def teacher_form_create(request):
@@ -210,7 +235,7 @@ def teacher_form_update(request,teacher_id):
         data3.compensation = request.POST['count_hour_help']
         data3.note = request.POST['note_help']
 
-        print( request.POST['count_hour_wi'])
+
         t = teacher.objects.filter(teacher_identification_number=request.POST['teacher_identification_number']).exclude(teacher_id=teacher_id).count()
         if t > 0:
             messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
@@ -275,6 +300,50 @@ def teacher_manage_income(request,teacher_id):
     return render(request, 'teacher/teacher_manage_income.html', context)
 def teacher_list_cale(request):
     user_id = request.user.id
+    
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+     
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+
+    try:
+        a = fact_teacher_user.objects.get(user_id=user_id)
+        
+        
+    except fact_teacher_user.DoesNotExist:
+        a = None    
+    title = defaultTitle
+    result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
+  
+
+
+
+    teacher_data = teacher_income_setting.objects.select_related('ev').filter(status='Y',teacher_id=a.teacher_id)
+    print(teacher_data)
+    obj = []
+    for r in teacher_data: 
+        print(r)
+    
+    context = {'title': title,  'data': result,'listMenuPermission': objMenu,'teacher_id':a.teacher_id,'datas':teacher_data}
+    return render(request, 'teacher/teachers_cale.html', context)
+def teacher_list_licen(request):
+    user_id = request.user.id
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -295,6 +364,108 @@ def teacher_list_cale(request):
         m = None
         return render(request, '404.html') 
     title = defaultTitle
-    result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
+    result = user_lic.objects.filter(cancelled=1,status='W')
+    
     context = {'title': title,  'data': result,'listMenuPermission': objMenu}
-    return render(request, 'teacher/teachers _cale.html', context)
+    return render(request, 'teacher/teachers_lic.html', context) 
+
+
+
+def teacher_list_appv(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+    title = defaultTitle
+    result = user_lic.objects.filter(cancelled=1,status='W')
+    
+    context = {'title': title,  'data': result,'listMenuPermission': objMenu}
+    return render(request, 'teacher/teachers_appv.html', context) 
+
+    
+@login_required(login_url='/login')
+def teacher_appv_delete(request):
+    id = request.POST['id']
+    
+    try:
+        instance = user_lic.objects.get(pk=id)
+        
+    except user_lic.DoesNotExist:
+        instance = None
+        return redirect("/approvlicen")
+  
+    instance.status = 'D'
+    instance.save()
+    messages.success(request, "ทำรายการสำเร็จ !")
+
+    return redirect("/approvlicen")
+
+
+@login_required(login_url='/login')
+def teacher_appv_de(request):
+    id = request.POST['ids']
+    
+    try:
+        instance = user_lic.objects.get(pk=id)
+        
+    except user_lic.DoesNotExist:
+        instance = None
+        return redirect("/approvlicen")
+  
+    instance.status = 'Y'
+    instance.save()
+    messages.success(request, "ทำรายการสำเร็จ !")
+
+    return redirect("/approvlicen")
+@login_required(login_url='/login')
+def teacher_formlicen_create(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+       # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    if request.method == 'POST':
+        try:
+            teacher_cover = request.FILES['teacher_cover']
+        except KeyError:
+            teacher_cover = None
+ 
+    
+      
+        # messages.success(request, "ทำรายการสำเร็จ !")
+        # return redirect("/teachers")
+    title = defaultTitle
+    context = {'title': title, 'form':teacherForm(),'listMenuPermission': objMenu}
+    return render(request, 'teacher/teacher_formlicen_create.html', context)    

@@ -25,6 +25,11 @@ class pay_item(models.Model):
     def __str__(self):
         return self.pi_name
  # End Master Data   
+class fact_teacher_user(models.Model):
+    user_id = models.IntegerField(blank=True ,default=None)
+    teacher_id = models.CharField(max_length=32, editable=False)
+ 
+
 class user_group(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE,related_name="user_group_ref")
@@ -87,6 +92,7 @@ class course_event(models.Model):
     ev_people_three = models.IntegerField(default=0, blank=False)
     ev_expired_cer_quantity = models.IntegerField(default=0, blank=False)
     ev_expired_cer_date = models.DateField(blank=True, null=True)
+    is_show = models.IntegerField(default=1, blank=False)
     ev_logo = models.ImageField(
         upload_to=generate_unique_name('images/logo'), default=None)
     active = models.IntegerField(default=1, blank=False)
@@ -301,3 +307,14 @@ class compensation(models.Model):
     note = models.CharField(max_length=128, default=0 , blank=False)
     compensation_group_id = models.CharField(max_length=1, blank=True ,default=None)
     py_id = models.CharField(max_length=1, blank=True ,default=None)
+
+class user_lic(models.Model):
+    lic_id = models.AutoField(primary_key=True)
+    number_lic = models.CharField(max_length=100, blank=True, default=None)
+    picture = models.CharField(max_length=128, default=0 , blank=False)
+    teacher_id = models.CharField(max_length=100, blank=True, default=None)
+    status = models.CharField(max_length=1, blank=True ,default=None)
+    issue_date = models.DateField(blank=True, null=True)
+    expire_date = models.DateField(blank=True, null=True)
+    type = models.CharField(max_length=1, default=0 , blank=False)
+    cancelled = models.IntegerField(default=1, blank=False)
