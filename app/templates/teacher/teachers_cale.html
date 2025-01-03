@@ -52,7 +52,7 @@
 
     url: "/api/calendar_event_api2/" + teacher,
     success: function (response) {
-      console.log(response);
+     
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
 
@@ -148,46 +148,38 @@ if(card.evs_status == 'Y'){
 if(card.evs_status == 'Y'){
   
   if(card.show == 1){
-    console.log(card.teach)
-    $.each(card.teach, function (i, item) {
-      $('#tss').empty(); // Clear previous cards
-        
-                            $('#tss').append(`<div class="item">
-                                        ${item.fname}  ${item.lname} - ${item.pay_name} - ${item.status} 
-                                    </div>`);
-                            });
-    $('#cardContainer').append(`
-                        <div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
-  <div class="card mb-3">
-  <div class="row g-0">
-     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style="
-      padding: 15px;
-      border-right: 3px solid #f5ecea;
-  ">
-       <p class="card-text" style="text-align: center;">${card.day}</p>
-       <p class="card-text" style="text-align: center;">${card.daynum}</p>
-      </div>
-      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
-        <div class="card-body">
-          
-          <span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>
-          <p>${card.title} </p>
+    var $mainCard1 = $('<div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;"></div>')
+    var $mainCard2 = $('<div class="card mb-3"></div>')
+    var $mainCard3 = $('<div class="row g-0"></div>')
+    var $mainCard4 = $('<div class="col-1 col-md-1 col-sm-1 col-xs-1" style="padding: 15px;border-right: 3px solid #f5ecea;"></div>')
+    $mainCard4.append(`<p class="card-text" style="text-align: center;">${card.day}</p>`);
+    $mainCard4.append(`<p class="card-text" style="text-align: center;">${card.daynum}</p>`);
 
-           <p class="card-text" id='tss'></p>
-        </div>
-      </div>
-      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;
-      display: grid
-  ;">
-   
-       
-      </div>
-   
-    </div>
-  </div>
-</div>
-</div>
-                            `);
+    var $mainCard5 = $('<div class="col-9 col-md-9 col-sm-9 col-xs-9"></div>')
+    var $mainCard6 = $('<div class="card-body"></div>')
+    $mainCard6.append(`<span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>`);
+    $mainCard6.append(`<p>${card.title} </p>`);
+  
+    $mainCard5.append($mainCard6);
+    $mainCard3.append($mainCard4);
+    $mainCard3.append($mainCard5);
+    $mainCard2.append($mainCard3);
+    $mainCard1.append($mainCard2);
+
+    $.each(card.teach, function (i, item) {
+      if(item.status == 'W'){
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style= 'color:#e2360c'> รอยันยัน</span></p>");
+      }
+      if(item.status == 'Y'){
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+      }
+  
+    });
+
+    $("#cardContainer").append($mainCard1);
+
+ 
+ 
   }
 
   if(card.show == 0){

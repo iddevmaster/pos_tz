@@ -1,8 +1,27 @@
 {% extends 'base.html' %} {% block content %} {% load humanize static %}
 
 <script>
+function updateStatus(itemId, isChecked) {
+  const status = isChecked ? '1' : '0';
 
 
+  fetch('/api/updatstatusev', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'is_show':status,'ev_id':itemId})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+  
+    })
+    .catch(error => {
+        console.error('Error:', error); 
+    });
+ 
+}
 
 
   function allowOnlyNumbersPeople(event) {
@@ -450,6 +469,7 @@ function removeFirstCharacter(str) {
     ev_price,
     ev_vat,
     active,
+    project_id,
     course_id,
     crt_date,
     upd_date,
@@ -474,12 +494,20 @@ function removeFirstCharacter(str) {
     
     document.getElementById("ev_expired_cer_quantity_update").value =
       ev_expired_cer_quantity;
+    document.getElementById("project_id_update").value = project_id;
     document.getElementById("course_id_update").value = course_id;
+    
     document.getElementById("active_update").value = active;
     $(".selectUpdate").val(course_id).select2({
       placeholder: "เลือกข้อมูล",
       allowClear: true,
     });
+    $(".selectUpdatePr").val(project_id).select2({
+      placeholder: "เลือกข้อมูล",
+      allowClear: true,
+    });
+
+    
     if (ev_logo !== "") {
       document.getElementById("blah2").src = ev_logo;
     } else {
@@ -608,12 +636,15 @@ function removeFirstCharacter(str) {
             <th>วันหมดอายุใบรับรอง</th>
             <th>ครู - วิทยากร</th>
             <th>พร้อมทำงาน</th>
+            <th>แสดงทีมงาน</th>
             <th>#</th>
           </tr>
         </thead>
         <tbody>
+          
           {% for res in data %}
           <tr>
+           
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.course.course_code}}</td>
             <td>{{res.course.course_name}}</td>
@@ -653,6 +684,19 @@ function removeFirstCharacter(str) {
               {% endif %}
             </td>
 
+            <td align="center">
+
+    <label class="switch">
+      {% if res.is_show == 1 %}
+        <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)"  checked >
+        <span class="slider"></span>
+      {% else %}
+      <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)">
+      <span class="slider"></span>
+      {% endif %}
+  </label>
+            </td>
+
             <td>
               <div align="center">
                 {% if res.ev_logo %}
@@ -661,7 +705,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -671,7 +715,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -722,6 +766,23 @@ function removeFirstCharacter(str) {
       >
         {% csrf_token %}
         <div class="modal-body">
+          <div class="form-group">
+            <label>Project Code</label> <label style="color: red">*</label>
+            <select
+              class="select2"
+              name="project_id"
+              id="project_id"
+              style="width: 100%"
+              required
+            >
+              <option value="">--เลือกหลักสูตร--</option>
+              {% for res in project_list %}
+              <option value="{{res.project_id}}">
+                {{res.project_code}} {{res.name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
           <div class="form-group">
             <label>หลักสูตร</label> <label style="color: red">*</label>
             <select
@@ -1000,6 +1061,24 @@ function removeFirstCharacter(str) {
         {% csrf_token %}
         <input type="hidden" id="ev_id_update" name="ev_id" required />
         <div class="modal-body">
+          <div class="form-group">
+            <label>Project Code</label> <label style="color: red">*</label>
+            <select
+              class="selectUpdatePr"
+              name="project_id"
+              id="project_id_update"
+              style="width: 100%"
+              required
+            >
+            
+              <option value="">--เลือกหลักสูตร--</option>
+              {% for res in project_list %}
+              <option value="{{res.project_id}}">
+                {{res.project_code}} {{res.name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
           <div class="form-group">
             <label>หลักสูตร</label> <label style="color: red">*</label>
             <select
@@ -1284,5 +1363,56 @@ function removeFirstCharacter(str) {
     </div>
   </div>
 </div>
+<style>
 
+.slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background-color: white;
+            top: 3px;
+            left: 3px;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+      
+
+    
+
+        /* Switch styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+</style>
 {% endblock %}

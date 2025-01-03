@@ -454,4 +454,24 @@ def updateeve(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": 'x'}, status=400,safe=False)
 
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)            
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)       
+
+@csrf_exempt
+def updatstatusev(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            ev_id = data.get("ev_id")
+            show = data.get("is_show")
+           
+            content = course_event.objects.get(ev_id=ev_id)
+            content.is_show = show
+            content.save()
+    
+            return JsonResponse(data, status=200,safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": 'x'}, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)                   
