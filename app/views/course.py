@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -132,6 +132,8 @@ def course_event_list(request):
     Tumbol = None   
     course_list = course.objects.filter(
             cancelled=1, active=1).order_by("-course_id")
+    project_list = project_code.objects.filter(
+            status='Y')      
     
     if Province is not None:
         try:
@@ -144,7 +146,8 @@ def course_event_list(request):
         
     result = course_event.objects.select_related("course").filter(
             cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location}
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location,'project_list':project_list}
     
     return render(request, 'course/course_event_list.html', context)
 
@@ -158,6 +161,7 @@ def course_event_create(request):
         m = None
         return render(request, '404.html')
     course_id = request.POST['course_id']
+    project_id = request.POST['project_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
     ev_date_end = dmytoymd(request.POST['ev_date_end'])
     ev_generation = request.POST['ev_generation']
@@ -190,6 +194,7 @@ def course_event_create(request):
         ev_logo=ev_logo,
         active=active,
         course_id=course_id,
+        project_id=project_id,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         ev_hour=ev_hour,
@@ -207,9 +212,10 @@ def course_event_create(request):
 
 @login_required(login_url='/login')
 def course_event_update(request):
-    print(request.POST['ev_hour'])
+    
     ev_id = request.POST['ev_id']
     course_id = request.POST['course_id']
+    project_id = request.POST['project_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
     ev_date_end = dmytoymd(request.POST['ev_date_end'])
     ev_generation = request.POST['ev_generation']
@@ -248,6 +254,7 @@ def course_event_update(request):
     content.ev_people_three = ev_people_three
     content.upd_date = dateTimeNow()
     content.course_id = course_id
+    content.project_id = project_id
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")

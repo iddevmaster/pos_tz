@@ -100,8 +100,9 @@ class course_event(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
+    project = models.ForeignKey('app.project_code', on_delete=models.CASCADE)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
-    
+   
    
     
 # customer_type  1  = บุคคล ,2 = บริษัท
@@ -318,3 +319,11 @@ class user_lic(models.Model):
     expire_date = models.DateField(blank=True, null=True)
     type = models.CharField(max_length=1, default=0 , blank=False)
     cancelled = models.IntegerField(default=1, blank=False)
+
+class project_code(models.Model):
+    project_id = models.AutoField(primary_key=True)
+    project_code = models.CharField(max_length=100, blank=True, default=None)
+    name = models.CharField(max_length=128, default=0 , blank=False)
+    status = models.CharField(max_length=100, blank=True, default=None)
+    crt_date = models.DateTimeField(blank=True, null=True)
+
