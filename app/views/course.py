@@ -9,7 +9,7 @@ from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
+import datetime
 import json
 
 
@@ -336,7 +336,7 @@ def calendar_event_api2(request,id):
     
    
    
-    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
   
     
     obj = []
@@ -349,7 +349,7 @@ def calendar_event_api2(request,id):
        te = []
        teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
        evte = course_event.objects.get(ev_id=r.ev_id)
-    
+     
        for x in teach: 
         
         a = teacher.objects.get(teacher_id=x.teacher_id)
