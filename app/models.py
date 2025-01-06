@@ -100,6 +100,7 @@ class course_event(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
+    status = models.CharField(blank=True, null=True, max_length=1)
     project = models.ForeignKey('app.project_code', on_delete=models.CASCADE)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
    

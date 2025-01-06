@@ -203,6 +203,7 @@ def course_event_create(request):
         ev_people=ev_people,
         ev_people_two=ev_people_two,
         ev_people_three=ev_people_three,
+        status='N',
         module=m.module,
     )
     content.save()
@@ -323,8 +324,16 @@ def calendar_event_api(request):
         end = str(r.ev_date_end)
         y, m, d = end.split("-")
         nextdayend = addDay(1, int(y), int(m), int(d))
+
+        col = r.status
+        if col == 'W' :
+         t = '#e0ce1b'
+        elif col == 'N': 
+         t = '#eb2509'   
+        else:
+         t = '#4be01b'
         
-        res = {'title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",
                'start': r.ev_date_start, 'end': dmytoymd(nextdayend)}
         obj.append(res)
     return JsonResponse(obj, safe=False)
@@ -334,11 +343,8 @@ def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
     
-   
-   
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
   
-    
     obj = []
     
     for r in content:  
@@ -392,8 +398,7 @@ def calendar_event_api2(request,id):
        else:
             dt = "-"
      
-   
-    
+
        col = r.status
        if col == 'W' :
         t = '#e0ce1b'

@@ -94,6 +94,29 @@
         event.key === "ArrowRight" || 
         event.key === "Delete"
     ) {
+
+      setTimeout(() => {
+   const it = document.getElementById("tis_quantity").value;
+    if (it.charAt(0) == "0") {
+      let result = removeFirstCharacter(it);
+      document.getElementById("tis_quantity").value = result 
+     // return it.slice(0); // Removes the first character
+    }
+
+  }, 20);
+
+
+  setTimeout(() => {
+  
+    getComposetaion()
+   }, 100);
+
+   setTimeout(() => {
+    
+    Caculate()
+    CheckHourbeforeSave()
+   }, 200);
+
         return true; // Allow default behavior
     }
 
@@ -168,13 +191,12 @@ function removeFirstCharacter(str) {
 
 
  setTimeout(() => {
+  CheckHourbeforeSave()
   getComposetaion()
+  
  }, 50);
 
- setTimeout(() => {
-  Caculate()
-  CheckHourbeforeSave()
- }, 200);
+
   }
 
   function handleSelectChangePy(selectElement) {
@@ -184,6 +206,7 @@ function removeFirstCharacter(str) {
  setTimeout(() => {
   CheckHourbeforeSave()
   getComposetaion()
+
  }, 50);
 
  setTimeout(() => {
@@ -281,6 +304,37 @@ return true
   
   }
 
+  function getComposetaion() {
+    const teacher_id = document.getElementById("teacher_id").value
+    const py = document.getElementById("pi").value
+    const csrftoken = "{{ csrf_token }}";
+  fetch('/api/get/compensation', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+     console.log(data);
+        if(data.length == 0){
+          document.getElementById("tis_compensation").value = 0
+          return false;
+        }
+        document.getElementById("tis_compensation").value = data.compensation
+        Caculate()
+
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+      
+    });
+   }
+
+
   function CheckHour(count_hour,checkUnit,Hour) {
     if(Hour >= checkUnit){
 const total = parseInt(count_hour) + parseInt(checkUnit)
@@ -296,7 +350,8 @@ return false
    function Caculate() {
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
-
+console.log('cal',aaaa);
+console.log('cal',tis_quantity);
    document.getElementById("tis_sum").value = aaaa * tis_quantity;
    }
 
@@ -337,34 +392,6 @@ return data
    }
 
    
-   function getComposetaion() {
-    const teacher_id = document.getElementById("teacher_id").value
-    const py = document.getElementById("pi").value
-    const csrftoken = "{{ csrf_token }}";
-  fetch('/api/get/compensation', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
-})
-    .then(response => response.json())
-    .then(data => {
-        // Display response
-     
-        if(data.length == 0){
-          document.getElementById("tis_compensation").value = 0
-          return false;
-        }
-        document.getElementById("tis_compensation").value = data.compensation
-
-
-    })
-    .catch(error => {
-        console.error('Error:', error);
-      
-    });
-   }
 
   function validate(evt) {
     var theEvent = evt || window.event;
@@ -495,7 +522,7 @@ return data
 
       <div class="col-12 col-lg-6 col-md-6">
         จำนวนต่อหน่วย *:   <label style="color: red"> *</label> 
-        <select class="form-select" onchange="handleSelectChange(this)" id="tis_unit" name="tis_unit">
+        <select class="form-select" id="tis_unit" name="tis_unit">
           <option value="hour">
              ชั่วโมง
           </option>

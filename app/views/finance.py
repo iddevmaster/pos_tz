@@ -228,6 +228,7 @@ def course_teacher_event_set_income_form_create(request, ev_id):
     title = defaultTitle
     try:
         instance = course_event.objects.get(pk=ev_id)
+        
     except course_event.DoesNotExist:
         instance = None
         return redirect("/finance/billing/setting")
@@ -253,6 +254,10 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             status='W'
         )
         content.save()
+        x = course_event.objects.get(pk=ev_id)
+        x.status = "W"
+        x.save()
+
         messages.success(request, "ทำรายการสำเร็จ !")
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     # print(instance.ev_date_start.month)
@@ -281,6 +286,14 @@ def course_teacher_event_set_income_form_delete(request):
         instance = None
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     instance.delete()
+
+    x = course_event.objects.get(pk=ev_id)
+
+   
+    if teacher_income_setting.objects.filter(ev_id=ev_id).count() == 0:
+         x.status = "N"
+         x.save()
+   
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event/teachers/form/create/" + str(ev_id))
 
