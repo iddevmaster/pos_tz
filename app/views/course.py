@@ -3,7 +3,7 @@ from django.http.response import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
-from django.db.models import Count
+from django.db.models import Count, Sum, Value
 from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import datetime
 import json
-
+from django.core import serializers
 
 @login_required(login_url='/login')
 def course_list(request):
@@ -289,7 +289,10 @@ def calendar_event(request):
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
     title = defaultTitle
-    context = {'title': title,'listMenuPermission': objMenu}
+    listposition = pay_item.objects.filter(
+            cancelled=1, active=1)
+    list_teacher = teacher.objects.filter(cancelled=1, active=1)
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition}
     return render(request, 'course/calendar_event.html', context)
 
     
@@ -319,11 +322,15 @@ def calendar_event_api(request):
     # print(len(content))
 
     obj = []
-
+    
     for r in content:
+        
+        instance = course_event.objects.get(pk=r.ev_id)
+        
         end = str(r.ev_date_end)
         y, m, d = end.split("-")
         nextdayend = addDay(1, int(y), int(m), int(d))
+            
 
         col = r.status
         if col == 'W' :
@@ -332,9 +339,22 @@ def calendar_event_api(request):
          t = '#eb2509'   
         else:
          t = '#4be01b'
+        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
+        sff = [
+        {
+            "teacher_prefix_th": x.teacher.teacher_prefix_th,
+            "teacher_firstname_th": x.teacher.teacher_firstname_th,
+            "teacher_lastname_th": x.teacher.teacher_lastname_th,
+            "tis_quantity": x.tis_quantity,
+            "tis_unit": x.tis_unit,
+            "id": x.id,
+            "tis_sum": x.tis_sum
+        }
+        for x in teacher_data
+    ]
         
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",
-               'start': r.ev_date_start, 'end': dmytoymd(nextdayend)}
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'data':sff,
+               'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_three,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
         obj.append(res)
     return JsonResponse(obj, safe=False)
 

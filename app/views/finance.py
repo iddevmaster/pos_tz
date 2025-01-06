@@ -269,7 +269,7 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             cancelled=1, active=1)
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
-    print("Debugging Value:", count_hour_pi)  # Prints to the console
+    
     
     context = {'title': title, 'main_data': instance,  'data': teacher_data,
                'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi}
