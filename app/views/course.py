@@ -348,6 +348,7 @@ def calendar_event_api2(request,id):
     obj = []
     
     for r in content:  
+       print(r)
        start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        y, m, d = end.split("-")
@@ -451,15 +452,30 @@ def updateeve(request):
            
 
             content = teacher_income_setting.objects.get(id=evs_id)
+            
             content.status = "Y"
             content.save()
+
+          
+            
+        
+
     
-            return JsonResponse(data, status=200,safe=False)
+          
 
         except json.JSONDecodeError:
             return JsonResponse({"error": 'x'}, status=400,safe=False)
 
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)       
+        content = teacher_income_setting.objects.get(id=evs_id)
+    
+        teach = teacher_income_setting.objects.filter(ev_id=content.ev_id)
+        all_passed = all(record.status == 'Y' for record in teach)
+        if all_passed:
+         
+            content = course_event.objects.get(ev_id=content.ev_id)
+            content.status = 'Y'
+            content.save()
+        return JsonResponse({"status": "ok"}, status=200)       
 
 @csrf_exempt
 def updatstatusev(request):

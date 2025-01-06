@@ -336,12 +336,10 @@ def teacher_list_cale(request):
 
     teacher_data = teacher_income_setting.objects.select_related('ev').filter(status='Y',teacher_id=a.teacher_id)
     
-    obj = []
-    for r in teacher_data: 
-        
-    
-        context = {'title': title,  'data': result,'listMenuPermission': objMenu,'teacher_id':a.teacher_id,'datas':teacher_data}
+    context = {'title': title,  'data': result,'listMenuPermission': objMenu,'teacher_id':a.teacher_id,'datas':teacher_data}
     return render(request, 'teacher/teachers_cale.html', context)
+        
+
 def teacher_list_licen(request):
     user_id = request.user.id
     # Menu

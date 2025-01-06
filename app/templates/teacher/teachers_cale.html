@@ -56,17 +56,54 @@
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
 
-if(card.evs_status == 'Y'){
-  $('#cardContainer').append(`
-                        <div class="col-12 col-md-6 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+        if(card.evs_status == 'Y'){
+  
+  if(card.show == 1){
+    var $mainCard1 = $('<div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;"></div>')
+    var $mainCard2 = $('<div class="card mb-3"></div>')
+    var $mainCard3 = $('<div class="row g-0"></div>')
+    var $mainCard4 = $('<div class="col-1 col-md-1 col-sm-1 col-xs-1" style="padding: 15px;border-right: 3px solid #f5ecea;"></div>')
+    $mainCard4.append(`<p class="card-text" style="text-align: center;">${card.day}</p>`);
+    $mainCard4.append(`<p class="card-text" style="text-align: center;">${card.daynum}</p>`);
+
+    var $mainCard5 = $('<div class="col-9 col-md-9 col-sm-9 col-xs-9"></div>')
+    var $mainCard6 = $('<div class="card-body"></div>')
+    $mainCard6.append(`<span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>`);
+    $mainCard6.append(`<p>${card.title} </p>`);
+  
+    $mainCard5.append($mainCard6);
+    $mainCard3.append($mainCard4);
+    $mainCard3.append($mainCard5);
+    $mainCard2.append($mainCard3);
+    $mainCard1.append($mainCard2);
+
+    $.each(card.teach, function (i, item) {
+      if(item.status == 'W'){
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style= 'color:#e2360c'> รอยันยัน</span></p>");
+      }
+      if(item.status == 'Y'){
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+      }
+  
+    });
+
+    $("#cardContainer").append($mainCard1);
+
+ 
+ 
+  }
+
+  if(card.show == 0){
+    $('#cardContainer').append(`
+                        <div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
   <div class="card mb-3">
   <div class="row g-0">
      <div class="col-1 col-md-1 col-sm-1 col-xs-1" style="
       padding: 15px;
       border-right: 3px solid #f5ecea;
   ">
-       <p class="card-text" style="text-align: center;">ศ</p>
-       <p class="card-text" style="text-align: center;">1</p>
+       <p class="card-text" style="text-align: center;">${card.day}</p>
+       <p class="card-text" style="text-align: center;">${card.daynum}</p>
       </div>
       <div class="col-9 col-md-9 col-sm-9 col-xs-9">
         <div class="card-body">
@@ -85,7 +122,11 @@ if(card.evs_status == 'Y'){
     </div>
   </div>
 </div>
+</div>
                             `);
+  }
+  
+
 
 }
  
@@ -96,7 +137,7 @@ if(card.evs_status == 'Y'){
       },
   },
   eventClick: function(info) {
-
+    document.getElementById('eventModalLabel').innerText = info.event.title;
 
     document.getElementById("evs_id").value = info.event.extendedProps.evs_id
     document.getElementById("evs_status").value = info.event.extendedProps.evs_status
@@ -140,7 +181,7 @@ if(card.evs_status == 'Y'){
 
     url: "/api/calendar_event_api2/" + teacher,
     success: function (response) {
-      
+      console.log(response);
      
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
@@ -228,6 +269,7 @@ if(card.evs_status == 'Y'){
     eventClick: function (info) {
  
 
+      document.getElementById('eventModalLabel').innerText = info.event.title;
       document.getElementById("evs_id").value = info.event.extendedProps.evs_id
       document.getElementById("evs_status").value = info.event.extendedProps.evs_status
 
@@ -284,7 +326,8 @@ if(card.evs_status == 'Y'){
       .then(response => response.json())
       .then(data => {
         // Display response
-
+        console.log(data);
+        setTimeout(calen(), 1000); // Executes after 3 seconds
       })
       .catch(error => {
         console.error('Error:', error);
@@ -311,7 +354,7 @@ if(card.evs_status == 'Y'){
     </nav>
   </div>
 </div>
-<input type="text" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
+<input type="hidden" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
 <section class="section">
   <div class="card">
     <div class="card-body">
@@ -331,19 +374,21 @@ if(card.evs_status == 'Y'){
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+        <h5 class="modal-title" id="eventModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <input type="text" class="form-control" name="evs_id" id="evs_id" value="" />
-        <input type="text" class="form-control" name="evs_status" id="evs_status" value="" />
+      <input type="hidden" class="form-control" name="evs_id" id="evs_id" value="" />
+      <input type="hidden" class="form-control" name="evs_status" id="evs_status" value="" />
+      <!-- <div class="modal-body">
+        <input type="hidden" class="form-control" name="evs_id" id="evs_id" value="" />
+        <input type="hidden" class="form-control" name="evs_status" id="evs_status" value="" />
 
         <p><strong>Title:</strong> <span id="modalTitle"></span></p>
         <p><strong>Start:</strong> <span id="modalStart"></span></p>
         <p><strong>End:</strong> <span id="modalEnd"></span></p>
-      </div>
+      </div> -->
       <div class="modal-footer" id="bt_confirm">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
       </div>
     </div>
   </div>
