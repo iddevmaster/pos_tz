@@ -98,6 +98,12 @@ unitPayChoices = (
 
 listMenu = [
     {
+        "value": "projectlist",
+        "label": "ProjectCode",
+        "group_value": "pRem5",
+        "group_label": "หลักสูตร",
+    },
+    {
         "value": "course",
         "label": "หลักสูตร",
         "group_value": "pRem5",

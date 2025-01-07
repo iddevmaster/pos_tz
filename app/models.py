@@ -325,6 +325,7 @@ class project_code(models.Model):
     project_id = models.AutoField(primary_key=True)
     project_code = models.CharField(max_length=100, blank=True, default=None)
     name = models.CharField(max_length=128, default=0 , blank=False)
-    status = models.CharField(max_length=100, blank=True, default=None)
+    status = models.IntegerField(default=1, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
+    cancelled = models.IntegerField(default=1, blank=False)
 

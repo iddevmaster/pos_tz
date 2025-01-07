@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project
 
 urlpatterns = [
     # Register
@@ -80,6 +80,11 @@ urlpatterns = [
          name="approvlicen_form_delete"),
     path('approvlicen/form/de', teacher.teacher_appv_de,
          name="approvlicen_form_de"),
+
+
+    path('projectlist/', project.project_list),
+    path('projectlist/event/delete/', project.project_event_delete,
+         name="DeleteProjectEvent"),
     
     # Master Data
     path('locationthai/', master_data.get_locationThai),
@@ -135,6 +140,7 @@ urlpatterns = [
     path('api/updateeve', course.updateeve),
     path('api/updatstatusev', course.updatstatusev),
     path('api/getgen', course.getgen),
+    path('api/updatestatusproject', project.updatestatus),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

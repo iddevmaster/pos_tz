@@ -17,7 +17,7 @@ function handleCategoryChange(select) {
       .then(response => response.json())
       .then(data => {
         // Display response
-    console.log(data);
+   
        document.getElementById("ev_generation").value = data;
       })
       .catch(error => {
@@ -32,12 +32,12 @@ function updateStatus(itemId, isChecked) {
   const status = isChecked ? '1' : '0';
 
 
-  fetch('/api/updatstatusev', {
+  fetch('/api/updatestatusproject', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify({'is_show':status,'ev_id':itemId})
+    body: JSON.stringify({'status':status,'project_id':itemId})
 })
     .then(response => response.json())
     .then(data => {
@@ -542,8 +542,9 @@ function removeFirstCharacter(str) {
         "{% static 'images/no-photo-available.png' %}";
     }
   }
-  function setValueDeleteModal(ev_id) {
-    document.getElementById("ev_id_delete").value = ev_id;
+  function setValueDeleteModal(project_id) {
+ 
+    document.getElementById("id").value = project_id;
   }
 
   function default_date() {
@@ -653,17 +654,8 @@ function removeFirstCharacter(str) {
         <thead>
           <tr>
             <th>ลำดับ</th>
-            <th>รหัสหลักสูตร</th>
-            <th>ชื่อหลักสูตร</th>
-            <th>ราคา (บาท)</th>
-            <th>รวม VAT</th>
-            <th>วันที่อบรม</th>
-            <th>ชั่วโมง</th>
-            <th>รุ่น</th>
-            <th>วันหมดอายุใบรับรอง</th>
-            <th>ครู - วิทยากร</th>
-            <th>พร้อมทำงาน</th>
-            <th>แสดงทีมงาน</th>
+            <th>ProjectCode</th>
+            <th>Status</th>
             <th>#</th>
           </tr>
         </thead>
@@ -671,54 +663,16 @@ function removeFirstCharacter(str) {
           
           {% for res in data %}
           <tr>
-           
+         
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.course.course_code}}</td>
-            <td>{{res.course.course_name}}</td>
-            <td align="right">{{ res.ev_price|floatformat:2|intcomma }}</td>
+            <td>{{res.project_code}}</td>
             <td align="center">
-              {% if res.ev_vat == 1 %}
-              <font style="color: blue">ใช่</font>
-              {% else %}
-              <font style="color: red">ไม่ใช่</font>
-              {% endif %}
-            </td>
-
-            <td>
-              {{res.ev_date_start|date:"d/m/Y"}} ถึง
-              {{res.ev_date_end|date:"d/m/Y"}}
-            </td>
-            <td>{{res.ev_hour}}</td>
-            <td>{{res.ev_generation}}</td>
-            <td align="center">
-              {{res.ev_expired_cer_date|date:"d/m/Y"}}
-              ({{res.ev_expired_cer_quantity}} ปี)
-            </td>
-            <td>
-              <button
-                  type="button"
-                  class="btn btn-info"
-                  onclick="window.location.href='/course/event/teachers/list/{{res.ev_id}}'" 
-                >
-                <i class="icon dripicons-user"></i> จัดการ
-              </button>
-            </td>
-            <td align="center">
-              {% if res.active == 1 %}
-              <font style="color: blue">เปิด</font>
-              {% else %}
-              <font style="color: red">ปิด</font>
-              {% endif %}
-            </td>
-
-            <td align="center">
-
     <label class="switch">
-      {% if res.is_show == 1 %}
-        <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)"  checked >
+      {% if res.status == 1 %}
+        <input type="checkbox" role="switch" onclick="updateStatus('{{res.project_id}}', this.checked)"  checked >
         <span class="slider"></span>
       {% else %}
-      <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)">
+      <input type="checkbox" role="switch" onclick="updateStatus('{{res.project_id}}', this.checked)">
       <span class="slider"></span>
       {% endif %}
   </label>
@@ -726,30 +680,20 @@ function removeFirstCharacter(str) {
 
             <td>
               <div align="center">
-                {% if res.ev_logo %}
+              
                 <button
                   type="button"
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.id}}','{{res.project_id}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
-                {% else %}
+             
                 <button
                   type="button"
-                  class="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
-                >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
-                </button>
-                {% endif %}
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.ev_id}}')"
+                  onclick="setValueDeleteModal('{{res.project_id}}')"
                   class="btn btn-danger"
                   data-bs-toggle="modal"
                   data-bs-target="#DeleteClick"
@@ -957,29 +901,7 @@ function removeFirstCharacter(str) {
             />
           </div>
 
-          <!-- <div class="row">
-            <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์ <span style="color: red;">*</span></label>
-            <div class="col-12 col-sm-12">
-         
-              <select
-              class="form-select"
-              required
-              name="location_id"
-              id="selLocations"
-              style="width: 100%;"
-              required
-            >
-           
-            {% if location != None %}
-            <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
-            {% endif %}
-
-              <option value="">-เลือกข้อมูล-</option>
-            </select>
-            </div>
-
-          </div>
-   -->
+  
        
           <div class="form-group">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
@@ -1370,10 +1292,10 @@ function removeFirstCharacter(str) {
           <i data-feather="x"></i>
         </button>
       </div>
-      <form action="{% url 'DeleteCourseEvent' %}" method="post">
+      <form action="{% url 'DeleteProjectEvent' %}" method="post">
         <div class="modal-body">
           {% csrf_token %}
-          <input type="hidden" name="ev_id" id="ev_id_delete" required />
+          <input type="text" name="id" id="id" required />
           <div align="center">
             <h4>ยืนยันการลบข้อมูล</h4>
           </div>
