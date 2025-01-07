@@ -27,11 +27,33 @@ function setValueDeleteModal(id) {
     eventModal.show();
   }
 
-  function delel(id) {
+  async function delel() {
+
+
+    let data = await fetch('/api/evenetdel', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'id':document.getElementById("id_delete").value})
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+
+console.log(data)
+
+// this.calen();
+// window.location.reload();
+//    return data.status
+
+// setTimeout(() => {
+//       window.location.reload();
+//  }, 100);
+
+})
   
-    setTimeout(() => {
-      window.location.reload();
- }, 100);
+
   }
 
   
@@ -710,9 +732,7 @@ CheckHourbeforeSave()
           <i data-feather="x"></i>
         </button>
       </div>
-      <form
-       
-      >
+   
         <div class="modal-body">
           {% csrf_token %}
           <input type="text" name="id" id="id_delete" required />
@@ -741,7 +761,7 @@ CheckHourbeforeSave()
             </button>
           </div>
         </div>
-      </form>
+      
     </div>
   </div>
 </div>

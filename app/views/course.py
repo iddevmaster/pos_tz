@@ -541,7 +541,7 @@ def getgen(request):
                     return JsonResponse(content.ev_generation + 1, status=200,safe=False)
             else:
                     print("No active product found.")
-                    return JsonResponse(content.ev_generation, status=200,safe=False)
+                    return JsonResponse(1, status=200,safe=False)
         except course_event.DoesNotExist:
             
             return JsonResponse({'error': 'not found'}, status=405)               

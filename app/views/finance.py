@@ -431,5 +431,31 @@ def saveeventadmin(request):
             datas = {'status':400}
             return JsonResponse(datas, status=400,safe=False)
 
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)   
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)  
+
+
+
+@csrf_exempt
+def evenetdel(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            ev_id = data.get("id")
+           
+
+            instance = teacher_income_setting.objects.filter(id=ev_id).count()
+         
+
+    
+            datas = {'status':200,'s':instance}
+            return JsonResponse(datas, status=200,safe=False)
+
+        except json.JSONDecodeError:
+            datas = {'status':400}
+            return JsonResponse(datas, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405) 
+
+
 
