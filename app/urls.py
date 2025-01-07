@@ -141,6 +141,7 @@ urlpatterns = [
     path('api/updatstatusev', course.updatstatusev),
     path('api/getgen', course.getgen),
     path('api/updatestatusproject', project.updatestatus),
+    path('api/saveevenet', finance.saveeventadmin),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -133,7 +133,7 @@ def course_event_list(request):
     course_list = course.objects.filter(
             cancelled=1, active=1).order_by("-course_id")
     project_list = project_code.objects.filter(
-            status='Y')      
+            status=1)      
     
     if Province is not None:
         try:
@@ -340,18 +340,27 @@ def calendar_event_api(request):
         else:
          t = '#4be01b'
         teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
+        
         sff = [
+        
         {
             "teacher_prefix_th": x.teacher.teacher_prefix_th,
             "teacher_firstname_th": x.teacher.teacher_firstname_th,
             "teacher_lastname_th": x.teacher.teacher_lastname_th,
+            "pi_id":x.pi_id,
+            "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
             "tis_quantity": x.tis_quantity,
             "tis_unit": x.tis_unit,
-            "id": x.id,
+            "compensation": compensation.objects.filter(py_id=x.pi_id,teacher_id=x.teacher_id).values_list('compensation').first(),
+            "id":x.id,
+            "teacher_id": x.teacher_id,
             "tis_sum": x.tis_sum
         }
+          
         for x in teacher_data
+        
     ]
+   
         
         res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'data':sff,
                'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_three,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}

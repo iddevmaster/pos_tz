@@ -387,3 +387,45 @@ def checkhours(request):
             return JsonResponse({"error": instance}, status=400,safe=False)
 
         return JsonResponse({"error": "Only POST method is allowed"}, status=405)        
+
+@csrf_exempt
+def saveeventadmin(request):
+ if request.method == "POST":
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            ev_id = data.get("ev_id")
+            pi = data.get("pi")
+            teacher_id = data.get("teacher_id")
+            tis_compensation = data.get("tis_compensation")
+            tis_quantity = data.get("tis_quantity")
+            tis_sum = data.get("tis_sum")
+            tis_unit = data.get("tis_unit")
+
+            instance = course_event.objects.filter(pk=ev_id).first()
+            print(instance.ev_date_start)
+
+            content = teacher_income_setting(
+                tis_compensation=tis_compensation,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=tis_sum,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W'
+                )
+            content.save()
+   
+         
+            return JsonResponse(data, status=200,safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": 'x'}, status=400,safe=False)
+
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)   
+
