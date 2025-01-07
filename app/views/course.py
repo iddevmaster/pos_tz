@@ -515,4 +515,23 @@ def updatstatusev(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": 'x'}, status=400,safe=False)
 
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)                   
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)    
+
+@csrf_exempt
+def getgen(request):
+ if request.method == "POST":
+
+        try:
+            data = json.loads(request.body)
+            ev_id = data.get("ev_id")
+            content = course_event.objects.filter(course_id=ev_id,cancelled=1).last()
+
+            if content:
+                    print(content.ev_generation + 1)
+                    return JsonResponse(content.ev_generation + 1, status=200,safe=False)
+            else:
+                    print("No active product found.")
+                    return JsonResponse(content.ev_generation, status=200,safe=False)
+        except course_event.DoesNotExist:
+            
+            return JsonResponse({'error': 'not found'}, status=405)               

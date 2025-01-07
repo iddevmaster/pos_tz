@@ -1,6 +1,33 @@
 {% extends 'base.html' %} {% block content %} {% load humanize static %}
 
 <script>
+
+
+function handleCategoryChange(select) {
+        const selectedValue = select.value;
+        if (selectedValue) {
+         
+        fetch('/api/getgen', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'ev_id': selectedValue })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
+    console.log(data);
+       document.getElementById("ev_generation").value = data;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+
+        }
+    }
+
 function updateStatus(itemId, isChecked) {
   const status = isChecked ? '1' : '0';
 
@@ -791,6 +818,7 @@ function removeFirstCharacter(str) {
               id="course_id"
               style="width: 100%"
               required
+              onchange="handleCategoryChange(this)"
             >
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in course_list %}
@@ -912,6 +940,7 @@ function removeFirstCharacter(str) {
               name="ev_generation"
               required
               pattern="[0-9]+"
+              readonly
             />
           </div>
           <div class="form-group">
@@ -1086,7 +1115,8 @@ function removeFirstCharacter(str) {
               name="course_id"
               id="course_id_update"
               required
-              style="width: 100%"
+              style="width: 100%" onchange="handleCategoryChange(this)"
+
             >
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in course_list %}
@@ -1212,6 +1242,7 @@ function removeFirstCharacter(str) {
               name="ev_generation"
               required
               pattern="[0-9]+"
+              readonly
             />
           </div>
           <div class="form-group">

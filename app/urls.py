@@ -134,6 +134,7 @@ urlpatterns = [
     path('api/checkhours', finance.checkhours),
     path('api/updateeve', course.updateeve),
     path('api/updatstatusev', course.updatstatusev),
+    path('api/getgen', course.getgen),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
