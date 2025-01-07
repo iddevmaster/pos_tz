@@ -353,6 +353,7 @@ def calendar_event_api(request):
             "tis_unit": x.tis_unit,
             "compensation": compensation.objects.filter(py_id=x.pi_id,teacher_id=x.teacher_id).values_list('compensation').first(),
             "id":x.id,
+            "status":x.status,
             "teacher_id": x.teacher_id,
             "tis_sum": x.tis_sum
         }

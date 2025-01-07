@@ -18,6 +18,24 @@ $(document).ready(function () {
     });
 });
 
+function setValueDeleteModal(id) {
+  
+
+    document.getElementById("id_delete").value = id;
+
+    const eventModal = new bootstrap.Modal(document.getElementById('DeleteClick'));
+    eventModal.show();
+  }
+
+  function delel(id) {
+  
+    setTimeout(() => {
+      window.location.reload();
+ }, 100);
+  }
+
+  
+
 function calen() {
 
     var calendarEl = document.getElementById("calendar");
@@ -42,7 +60,7 @@ function calen() {
         },
       },
       eventClick: function (info) {
-    console.log(info.event.extendedProps.data);
+
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
 
@@ -119,6 +137,7 @@ function calen() {
         },
       },
       eventClick: function (info) {
+        
   
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
@@ -141,20 +160,57 @@ function calen() {
 
     let jsonData = info.event.extendedProps.data
     const tableBody = document.getElementById('json-table-body');
+    tableBody.innerHTML = ''; // Clears all rows
             jsonData.forEach((item,index) => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
+                if(item.status == 'W'){
+                  row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
                   <td>${item.compensation} / ชั่วโมง</td>
                     <td>${item.tis_quantity} </td>  
                     <td>${item.tis_sum}</td>
-                    <td>#</td>  
+                      <td><span style="color:#ea7731">รอการยืนยัน</span></td>
+                    <td>         <button
+                  type="button"
+                    onclick="setValueDeleteModal('${item.id}')"
+                  class="btn btn-danger"
+              
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button></td>  
                 `;
+
+                }
+                if(item.status == 'Y'){
+
+                  row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
+                    <td>${item.pi_name}</td>
+                  <td>${item.compensation} / ชั่วโมง</td>
+                    <td>${item.tis_quantity} </td>  
+                    <td>${item.tis_sum}</td>
+                      <td><span style="color:#0ba252">ยืนยัน</span></td>
+                    <td>         <button
+                  type="button"
+                    onclick="setValueDeleteModal('${item.id}')"
+                  class="btn btn-danger"
+              
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button></td>  
+                `;
+
+                }
+           
                 tableBody.appendChild(row);
             });
 
+            
             // Add new JSON data dynamically
             // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
 
@@ -240,8 +296,26 @@ body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,
 .then(data => {
     // Display response
 
+if(data.status == 200){
+  Swal.fire({
+      title: 'บันทึกสำเร็จ',
+      text: 'บันทึกสำเร็จ',
+      icon: 'success',
+    });
 
-console.log(data)
+    setTimeout(() => {
+      window.location.reload();
+ }, 100);
+
+    
+}else {
+  Swal.fire({
+      title: 'บันทึกไม่สำเร็จ',
+      text: 'บันทึกไม่สำเร็จ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+}
 
 // this.calen();
 // window.location.reload();
@@ -510,7 +584,7 @@ CheckHourbeforeSave()
             <h5 class="modal-title" id="eventModalLabel"></h5>
 
               <input
-              type="text"
+              type="hidden"
               name="ev_id"
               id="ev_id"
               required
@@ -518,9 +592,9 @@ CheckHourbeforeSave()
             />
 
             
-        <input type="text" class="form-control" name="status_hour" id="status_hour"  value=""/>
-        <input type="text" class="form-control" name="status_people" id="status_people"  value=""/>
-        <input type="text" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
+        <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
+        <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
+        <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -579,8 +653,8 @@ CheckHourbeforeSave()
     </div> 
 
           </div>
-          <input type="text" class="form-control" name="pi" id="pi"  value="1"/>
-          <input type="text" name="teacher_id" id="teacher_id" required />
+          <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
+          <input type="hidden" name="teacher_id" id="teacher_id" required />
 
 
           <div class="col-12 col-lg-12 col-md-12">
@@ -606,6 +680,7 @@ CheckHourbeforeSave()
                 <th>ค่าตอบแทน</th>
                 <th>จำนวนหน่วย</th>
                 <th>รายได้สุทธิ</th>
+                <th>สถานะ</th>
                 <th>#</th>
             </tr>
         </thead>
@@ -613,12 +688,61 @@ CheckHourbeforeSave()
     </table>
         </div>
           <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" onclick="save()">Save</button>
+            
+              <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button>
           </div>
       </div>
   </div>
 </div>
 
 
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form
+       
+      >
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="text" name="id" id="id_delete" required />
+          <input
+            type="hidden"
+            name="ev_id"
+            id="ev_id"
+            required
+            value="{{main_data.ev_id}}"
+          />
+          <div align="center">
+            <h4>ยืนยันการลบข้อมูล</h4>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1" >
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}

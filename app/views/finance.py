@@ -420,12 +420,16 @@ def saveeventadmin(request):
                 status='W'
                 )
             content.save()
-   
-         
-            return JsonResponse(data, status=200,safe=False)
+
+            instance.status = 'W'
+            instance.save()
+            
+            datas = {'status':200}
+            return JsonResponse(datas, status=200,safe=False)
 
         except json.JSONDecodeError:
-            return JsonResponse({"error": 'x'}, status=400,safe=False)
+            datas = {'status':400}
+            return JsonResponse(datas, status=400,safe=False)
 
         return JsonResponse({"error": "Only POST method is allowed"}, status=405)   
 
