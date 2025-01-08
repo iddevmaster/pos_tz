@@ -10,8 +10,13 @@ from dateutil import rrule
 import json
 from datetime import datetime
 from ..forms.student_form import studentForm
+from ..form import ExcelUploadForm
+from django.http import JsonResponse
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail
+from django.shortcuts import render
+import openpyxl
+from django.views.decorators.csrf import csrf_exempt
+from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -609,6 +614,7 @@ def register_approve_create(request):
 def student_list(request, register_id):
     title = defaultTitle
     user_id = request.user.id
+    
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -650,8 +656,9 @@ def student_list(request, register_id):
         rp_quota = payment_data.rp_quota
     else:
         rp_quota = content.count()
+        
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,
-               'main': main, 'detail': detail, 'rp_quota': rp_quota, 'total_student': content.count(), 'ref_data': ref_data, 'api_id_card': api_id_card}
+               'main': main, 'detail': detail, 'rp_quota': rp_quota, 'total_student': content.count(), 'ref_data': ref_data, 'api_id_card': api_id_card,'register_id':register_id}
     # ต้องระบุเลข SQ ก่อนถึงจะให้เพิ่มนักเรียนได้
     if not ref_data and main.customer_type == 2 and main.pay_type == 2:
         return render(request, 'register/student_form_confirm.html', context)
@@ -1081,3 +1088,112 @@ def approve_update_status(request):
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/payment")
+
+
+# def upload_excel(request):
+#     if request.method == 'POST':
+#         form = ExcelUploadForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             excel_file = request.FILES['file']
+#             workbook = openpyxl.load_workbook(excel_file)
+#             worksheet = workbook.active
+
+#             for row in worksheet.iter_rows(min_row=2, values_only=True):
+#                 if row[0]:  # Assuming the first column is not empty
+#                     ExcelData.objects.create(
+#                         name=row[0],
+#                         age=row[1],
+#                         email=row[2]
+#                     )
+#             return redirect('data_list')
+#     else:
+#         form = ExcelUploadForm()
+#     return render(request, 'upload_excel.html', {'form': form})    
+
+
+def upload_excel(request):
+
+  code = request.POST.get('register')  # Get text input from FormData
+  
+  totaldata = student.objects.filter(
+        register_id=code).order_by('-crt_date')
+  rp_quota = totaldata.count()  
+   
+  if request.method == "POST" and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+        try:
+            # Parse JSON data from the request body
+            workbook = openpyxl.load_workbook(excel_file)
+            worksheet = workbook.active
+
+            month_current = request.GET.get('qmonths', date.today().month)
+            year_current = request.GET.get('qyear', date.today().year)
+            payment_data = register_payment.objects.filter(register_id=code, active=1).order_by('-crt_date').first()   # โค๊วตา
+            totaldata = student.objects.filter(register_id=code).order_by('-crt_date')
+            rp_quota = totaldata.count()  
+       
+
+            row_count = sum(1 for row in worksheet.iter_rows()) # count data จาก excel
+            excel_data = []
+          
+            total = rp_quota + row_count
+            print(payment_data.rp_quota)
+            print(total)
+            if payment_data.rp_quota >= total:
+               
+                for row in worksheet.iter_rows(values_only=True):
+                    if row[0]:  # Assuming the first column is not empty
+                        res = {'ลำดับ':row[0],'ชื่อ':row[1],'นามสกุล':row[2]}
+                        excel_data.append(res) 
+               
+                        totaldata = student.objects.filter(crt_date__month=month_current, crt_date__year=year_current).count()
+                        running_number = treeDigit(totaldata + 1)
+                        student_code = "TZ" + str(twoDigit(month_current)) + \
+                        str(running_number) + "/" + str(year_current)
+              
+                        student.objects.create(
+                        student_identification_number=row[0],
+                        student_prefix_th=row[1],
+                        student_firstname_th=row[2],
+                        student_lastname_th=row[3],
+                        student_prefix_eng=row[4],
+                        student_firstname_eng=row[5],
+                        student_lastname_eng=row[6],
+                        student_code=student_code,
+                        crt_date=dateTimeNow(),
+                        upd_date=dateTimeNow(),
+                        register_id=code
+                    )   
+                datas= {'status':'success'}
+                return JsonResponse(datas, status=200,safe=False)
+            else:
+                datas= {'status':'fail','text':'โค๊วต้าเกินกว่ากำหนด'}
+                return JsonResponse(datas, status=200,safe=False)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": 'x'}, status=400,safe=False)
+
+  return JsonResponse({"error": "Only POST method is allowed"}, status=405)  
+@csrf_exempt
+def listdata(request):
+
+    data = json.loads(request.body)
+    register_id = data.get("register_id")
+    te = []
+    totaldata = student.objects.filter(register_id=register_id)
+    for rs in list(totaldata):
+        main = register_main.objects.select_related("ev").get(register_id=register_id)
+        mainev = course_event.objects.get(ev_id=main.ev_id)
+        maincou = course.objects.get(course_id=mainev.course_id)  
+        r = {'item_code':maincou.course_code,'course_name':maincou.course_name,'ev_generation':mainev.ev_generation,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th
+        }
+        te.append(r)
+
+
+    return JsonResponse(te, status=200,safe=False)
+@csrf_exempt
+def tests(request):
+
+    data = json.loads(request.body)
+    test = data.get("form")
+
+    return JsonResponse(test, status=200,safe=False)
