@@ -454,7 +454,7 @@ if (it.charAt(0) == "0") {
 
 
 function removeFirstCharacter(str) {
-  console.log(str);
+
   return str.substring(1);
 }
 
@@ -574,7 +574,7 @@ function removeFirstCharacter(str) {
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>กำหนดวันอบรมและราคาอบรม</h3>
+    <h3>Project Code</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
     <nav
@@ -586,7 +586,7 @@ function removeFirstCharacter(str) {
           <a href="/">หน้าหลัก</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-          กำหนดวันอบรมและราคาอบรม
+          Project Code
         </li>
       </ol>
     </nav>
@@ -612,49 +612,14 @@ function removeFirstCharacter(str) {
       </div>
     </div>
     <div class="card-body">
-      <form method="get" action="/course/event" autocomplete="off">
-        <div class="row">
-          <div class="col-lg-3 col-md-6">
-            <select class="form-select" id="qmonths" name="qmonths">
-              <option value="01">มกราคม</option>
-              <option value="02">กุมภาพันธ์</option>
-              <option value="03">มีนาคม</option>
-              <option value="04">เมษายน</option>
-              <option value="05">พฤษภาคม</option>
-              <option value="06">มิถุนายน</option>
-              <option value="07">กรกฎาคม</option>
-              <option value="08">สิงหาคม</option>
-              <option value="09">กันยายน</option>
-              <option value="10">ตุลาคม</option>
-              <option value="11">พฤศจิกายน</option>
-              <option value="12">ธันวาคม</option>
-            </select>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <input
-              type="number"
-              class="form-control"
-              id="qyear"
-              name="qyear"
-              required
-              placeholder="ปี (ค.ศ.)"
-            />
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <button type="submit" class="btn btn-success">
-              <i class="icon dripicons-experiment"></i>
-              กรอง
-            </button>
-          </div>
-        </div>
-      </form>
+    
 
       <table class="table table-striped" id="table1">
         <thead>
           <tr>
             <th>ลำดับ</th>
             <th>ProjectCode</th>
+            <th>Name</th>
             <th>Status</th>
             <th>#</th>
           </tr>
@@ -666,6 +631,7 @@ function removeFirstCharacter(str) {
          
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.project_code}}</td>
+            <td>{{res.name}}</td>
             <td align="center">
     <label class="switch">
       {% if res.status == 1 %}
