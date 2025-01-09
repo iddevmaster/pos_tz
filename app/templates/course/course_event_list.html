@@ -805,7 +805,7 @@ function removeFirstCharacter(str) {
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in project_list %}
               <option value="{{res.project_id}}">
-                {{res.project_code}}
+                {{res.project_code}}  {{res.name}}
               </option>
               {% endfor %}
             </select>
@@ -1105,7 +1105,7 @@ function removeFirstCharacter(str) {
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in project_list %}
               <option value="{{res.project_id}}">
-                {{res.project_code}}
+                {{res.project_code}}  {{res.name}}
               </option>
               {% endfor %}
             </select>

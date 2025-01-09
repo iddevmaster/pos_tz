@@ -41,6 +41,8 @@ urlpatterns = [
     path('register/approve/create',
          register.register_approve_create, name="RegisterApproveCreate"),
 
+        
+
     # Approve
     path('approve/update/payment', register.approve_list),
     path('approve/update/set', register.approve_update_status,
@@ -143,7 +145,11 @@ urlpatterns = [
     path('api/updatestatusproject', project.updatestatus),
     path('api/saveevenet', finance.saveeventadmin),
     path('api/evenetdel', finance.evenetdel),
-
+    path('api/upload/uploadfilestu', register.upload_excel),
+    path('api/studentlist', register.listdata),
+    path('api/tests', register.tests),
+    path('api/data', register.testsdata),
+   
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.MEDIA_ROOT)
