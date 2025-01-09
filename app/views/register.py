@@ -1197,3 +1197,12 @@ def tests(request):
     test = data.get("form")
 
     return JsonResponse(test, status=200,safe=False)
+
+def testsdata(request):
+
+    data = []
+    
+
+    return JsonResponse(data, status=20,safe=False)
+
+

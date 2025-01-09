@@ -9,6 +9,7 @@ from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+import requests
 import datetime
 import json
 from django.core import serializers
@@ -97,6 +98,7 @@ def course_delete(request):
 
 @login_required(login_url='/login')
 def course_event_list(request):
+
     user_id = request.user.id
      # Menu
     try:
@@ -207,6 +209,31 @@ def course_event_create(request):
         module=m.module,
     )
     content.save()
+
+    conu = course.objects.get(pk=course_id)
+    api_url = "http://127.0.0.1:8000/api/data"
+
+    # Optional: Add headers or parameters
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    start = str(content.crt_date)
+  
+    params = {
+        "item_code": conu.course_code,
+        "course_id": course_id,
+        "course_name": conu.course_name,
+        "course_name_eng": conu.course_name_eng,
+        "ev_generation": ev_generation,
+        "create_at": start,
+        "cancelled":1
+    }
+    # response = requests.get(api_url, headers=headers, params=params)
+    print(params)
+
+
+
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
 
@@ -267,6 +294,30 @@ def course_event_delete(request):
     content = course_event.objects.get(pk=ev_id)
     content.cancelled = 0
     content.save()
+
+
+
+    conu = course.objects.get(pk=content.course_id)
+    api_url = "http://127.0.0.1:8000/api/data"
+
+    # Optional: Add headers or parameters
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    start = str(content.crt_date)
+  
+    params = {
+        "item_code": conu.course_code,
+        "course_id": content.course_id,
+        "course_name": conu.course_name,
+        "course_name_eng": conu.course_name_eng,
+        "ev_generation": content.ev_generation,
+        "create_at": start,
+        "cancelled":0
+    }
+    # response = requests.get(api_url, headers=headers, params=params)
+    print(params)
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
 
