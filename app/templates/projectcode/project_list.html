@@ -482,95 +482,23 @@ function removeFirstCharacter(str) {
   }
 
   function setValueUpdateModal(
-    ev_id,
-    ev_date_start,
-    ev_date_end,
-    ev_hour,
-    ev_hour_two,
-    ev_hour_three,
-    ev_people,
-    ev_people_two,
-    ev_people_three,
-    ev_generation,
-    ev_remark,
-    ev_price,
-    ev_vat,
-    active,
-    project_id,
-    course_id,
-    crt_date,
-    upd_date,
-    ev_expired_cer_quantity,
-    ev_logo
+    ids,
+    project_code,
+    name
   ) {
-    document.getElementById("datecrt").innerHTML =
-      "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
-    document.getElementById("ev_id_update").value = ev_id;
-    document.getElementById("ev_date_start_update").value = ev_date_start;
-    document.getElementById("ev_date_end_update").value = ev_date_end;
-    document.getElementById("ev_hour_update").value = ev_hour;
-    document.getElementById("ev_hour_two_update").value = ev_hour_two;
-    document.getElementById("ev_hour_three_update").value = ev_hour_three;
-    document.getElementById("ev_people_update").value = ev_people;
-    document.getElementById("ev_people_two_update").value = ev_people_two;
-    document.getElementById("ev_people_three_update").value = ev_people_three;
-    document.getElementById("ev_remark_update").value = ev_remark;
-    document.getElementById("ev_generation_update").value = ev_generation;
-    document.getElementById("ev_price_update").value = ev_price;
-    document.getElementById("ev_vat_update").value = ev_vat;
+    document.getElementById("id_update").value = ids;
+    document.getElementById("project_code_update").value = project_code;
+    document.getElementById("name_update").value = name;
     
-    document.getElementById("ev_expired_cer_quantity_update").value =
-      ev_expired_cer_quantity;
-    document.getElementById("project_id_update").value = project_id;
-    document.getElementById("course_id_update").value = course_id;
-    
-    document.getElementById("active_update").value = active;
-    $(".selectUpdate").val(course_id).select2({
-      placeholder: "เลือกข้อมูล",
-      allowClear: true,
-    });
-    $(".selectUpdatePr").val(project_id).select2({
-      placeholder: "เลือกข้อมูล",
-      allowClear: true,
-    });
 
-    
-    if (ev_logo !== "") {
-      document.getElementById("blah2").src = ev_logo;
-    } else {
-      document.getElementById("blah2").src =
-        "{% static 'images/no-photo-available.png' %}";
-    }
   }
   function setValueDeleteModal(project_id) {
  
     document.getElementById("id").value = project_id;
   }
 
-  function default_date() {
-    const d = new Date();
-    let month = d.getMonth() + 1;
 
-    let year = d.getFullYear();
-    let formattedNumberMonth = month.toLocaleString("en-US", {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    });
 
-    const url = new URL(location.href);
-    //alert(url.searchParams.get("qmonths"));
-    let qmonth = url.searchParams.get("qmonths");
-    let qyear = url.searchParams.get("qyear");
-    if (qmonth !== null && qyear !== null) {
-      document.getElementById("qmonths").value = qmonth;
-      document.getElementById("qyear").value = qyear;
-    } else {
-      document.getElementById("qmonths").value = formattedNumberMonth;
-      document.getElementById("qyear").value = year;
-    }
-  }
-
-  window.onload = default_date;
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -652,7 +580,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.id}}','{{res.project_id}}')"
+                  onclick="setValueUpdateModal('{{res.project_id}}','{{res.project_code}}','{{res.name}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -696,243 +624,40 @@ function removeFirstCharacter(str) {
         </button>
       </div>
       <form
-        action="{% url 'CreateCourseEvent' %}"
+        action="{% url 'CreateProjectCodeEvent' %}"
         method="post"
         autocomplete="off"
         enctype="multipart/form-data"
       >
         {% csrf_token %}
         <div class="modal-body">
+        
+         
           <div class="form-group">
             <label>Project Code</label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              name="project_id"
-              id="project_id"
-              style="width: 100%"
-              required
-            >
-              <option value="">--เลือกหลักสูตร--</option>
-              {% for res in project_list %}
-              <option value="{{res.project_id}}">
-                {{res.project_code}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group">
-            <label>หลักสูตร</label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              name="course_id"
-              id="course_id"
-              style="width: 100%"
-              required
-              onchange="handleCategoryChange(this)"
-            >
-
-
-              <option value="">--เลือกหลักสูตร--</option>
-              {% for res in course_list %}
-              <option value="{{res.course_id}}">
-                {{res.course_code}} {{res.course_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group">
-            <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_start"
-              name="ev_date_start"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_end"
-              name="ev_date_end"
-              required
-            />
-          </div>
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour"
-              name="ev_hour"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbers(event)"
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people"
-              name="ev_people"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeople(event)"
-            />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_two"
-              name="ev_hour_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbers2(event)"
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_two"
-              name="ev_people_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeople2Edit(event)"
-            />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / ผู้ช่วย</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_three"
-              name="ev_hour_three"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbers3(event)"
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_three"
-              name="ev_people_three"
-              required
-              pattern="[0-9]+"
-              onkeydown="allowOnlyNumbersPeople3(event)"
-            />
-            </div>
-          </div>
-
-   
-
-          <div class="form-group">
-            <label>รุ่นที่</label> <label style="color: red">*</label>
             <input
               type="text"
               class="form-control"
-              id="ev_generation"
-              name="ev_generation"
-              required
-              pattern="[0-9]+"
-              readonly
-            />
-          </div>
-          <div class="form-group">
-            <label>ราคา (บาท)</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="ev_price"
-              name="ev_price"
+              id="project_code"
+              name="project_code"
               required
             />
           </div>
 
   
-       
           <div class="form-group">
-            <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
-            <select class="form-control" name="ev_vat" id="ev_vat" required>
-              <option value="">--เลือกข้อมูล--</option>
-              <option value="0">ไม่ใช่</option>
-              <option value="1">ใช่</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
-            <label style="color: red">*</label>
+            <label>Name</label>
             <input
-              type="text"
-              pattern="[0-9]+"
+              type="textarea"
               class="form-control"
-              id="ev_expired_cer_quantity"
-              name="ev_expired_cer_quantity"
+              id="name"
+              name="name"
               required
             />
           </div>
-          <div class="form-group">
-            <label>หมายเหตุ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_remark"
-              name="ev_remark"
-            />
-          </div>
-          <div class="form-group">
-            <label>LOGO Certificate (150 x 150)</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              onclick="imageupload.click()"
-            >
-              อัปโหลดรูป
-            </button>
-            <div>
-              <input
-                type="file"
-                name="ev_logo"
-                id="imageupload"
-                onchange="readURL(this);"
-                style="display: none"
-                accept=".png, .jpg, .jpeg"
-              />
-              <img
-                src="{% static 'images/no-photo-available.png' %}"
-                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
-                id="blah"
-                width="150"
-                height="150"
-              />
-            </div>
-          </div>
+   
 
-          <div class="form-group">
-            <label>เปิด-ปิด</label>
-            <select class="form-control" name="active" id="active" required>
-              <option value="0">ปิด</option>
-              <option value="1" selected>เปิด</option>
-            </select>
-          </div>
+     
         </div>
         <div class="modal-footer">
           <button
@@ -972,257 +697,41 @@ function removeFirstCharacter(str) {
         </button>
       </div>
       <form
-        action="{% url 'UpdateCourseEvent' %}"
+        action="{% url 'UpdateProjectCodeEvent' %}"
         method="post"
         autocomplete="off"
         enctype="multipart/form-data"
       >
         {% csrf_token %}
-        <input type="hidden" id="ev_id_update" name="ev_id" required />
+        <input type="hidden" id="id_update" name="id" required />
         <div class="modal-body">
+        
+         
           <div class="form-group">
             <label>Project Code</label> <label style="color: red">*</label>
-            <select
-              class="selectUpdatePr"
-              name="project_id"
-              id="project_id_update"
-              style="width: 100%"
-              required
-            >
-            
-              <option value="">--เลือกหลักสูตร--</option>
-              {% for res in project_list %}
-              <option value="{{res.project_id}}">
-                {{res.project_code}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group">
-            <label>หลักสูตร</label> <label style="color: red">*</label>
-            <select
-              class="selectUpdate"
-              name="course_id"
-              id="course_id_update"
-              required
-              style="width: 100%" onchange="handleCategoryChange(this)" disabled
-
-            >
-              <option value="">--เลือกหลักสูตร--</option>
-              {% for res in course_list %}
-              <option value="{{res.course_id}}">
-                {{res.course_code}} {{res.course_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group">
-            <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
             <input
               type="text"
-              class="form-control daterangesingle"
-              id="ev_date_start_update"
-              name="ev_date_start"
+              class="form-control"
+              id="project_code_update"
+              name="project_code"
               required
             />
           </div>
+
+  
           <div class="form-group">
-            <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
+            <label>Name</label>
             <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_end_update"
-              name="ev_date_end"
+              type="textarea"
+              class="form-control"
+              id="name_update"
+              name="name"
               required
             />
           </div>
-
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              pattern="[0-9]+"
-              class="form-control"
-              id="ev_hour_update"
-              name="ev_hour"
-              onkeydown="allowOnlyNumbersEdit(event)"
-              required
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_update"
-              name="ev_people_update"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeopleEdit(event)"
-            />
-            </div>
-          </div>
-
-          
-
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_two_update"
-              name="ev_hour_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersEdit2(event)"
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_two_update"
-              name="ev_people_two_update"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeopleEdit2(event)"
-            />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / ผู้ช่วย</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_three_update"
-              name="ev_hour_three"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersEdit3(event)"
-            />
-            </div>
-            <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_three_update"
-              name="ev_people_three_update"
-              required
-              pattern="[0-9]+"
-              onkeydown="allowOnlyNumbersPeopleEdit3(event)"
-            />
-            </div>
-          </div>
-
    
-          
-        
-          <div class="form-group">
-            <label>รุ่นที่</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_generation_update"
-              name="ev_generation"
-              required
-              pattern="[0-9]+"
-              readonly
-            />
-          </div>
-          <div class="form-group">
-            <label>ราคา (บาท)</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="ev_price_update"
-              name="ev_price"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
-            <select
-              class="form-control"
-              name="ev_vat"
-              id="ev_vat_update"
-              required
-            >
-              <option value="">--เลือกข้อมูล--</option>
-              <option value="0">ไม่ใช่</option>
-              <option value="1">ใช่</option>
-            </select>
-          </div>
 
-          <div class="form-group">
-            <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9]+"
-              class="form-control"
-              id="ev_expired_cer_quantity_update"
-              name="ev_expired_cer_quantity"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>หมายเหตุ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_remark_update"
-              name="ev_remark"
-            />
-          </div>
-          <div class="form-group">
-            <label>LOGO Certificate (150 x 150)</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              onclick="imageupload2.click()"
-            >
-              อัปโหลดรูป
-            </button>
-            <div>
-              <input
-                type="file"
-                name="ev_logo"
-                id="imageupload2"
-                onchange="readURL2(this);"
-                style="display: none"
-                accept=".png, .jpg, .jpeg"
-              />
-
-              <img
-                src="{% static 'images/no-photo-available.png' %}"
-                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
-                id="blah2"
-                width="150"
-                height="150"
-              />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>เปิด-ปิด</label>
-            <select
-              class="form-control"
-              name="active"
-              id="active_update"
-              required
-            >
-              <option value="0">ปิด</option>
-              <option value="1">เปิด</option>
-            </select>
-          </div>
-          <p id="datecrt"></p>
+     
         </div>
         <div class="modal-footer">
           <button

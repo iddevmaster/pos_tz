@@ -87,7 +87,11 @@ urlpatterns = [
     path('projectlist/', project.project_list),
     path('projectlist/event/delete/', project.project_event_delete,
          name="DeleteProjectEvent"),
-    
+    path('projectlist/create/', project.project_event_create,
+         name="CreateProjectCodeEvent"),
+    path('projectlist/update/', project.project_event_update,
+         name="UpdateProjectCodeEvent"),
+     
     # Master Data
     path('locationthai/', master_data.get_locationThai),
 

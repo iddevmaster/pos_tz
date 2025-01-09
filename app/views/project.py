@@ -42,6 +42,26 @@ def project_list(request):
     context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
     return render(request, 'projectcode/project_list.html', context)
 
+
+@login_required(login_url='/login')
+def project_event_update(request):
+   
+    project_codes = request.POST['project_code']
+    names = request.POST['name']
+    
+    project_id = request.POST['id']
+    
+    content = project_code.objects.get(project_id=project_id)
+    
+    # print(content)
+    content.project_code = project_codes
+    content.name = names
+    content.save()
+    messages.success(request, "ทำรายการสำเร็จ !")
+  
+    return redirect("/projectlist")
+
+
 @login_required(login_url='/login')
 def project_event_delete(request):
     project_id = request.POST['id']
@@ -50,6 +70,21 @@ def project_event_delete(request):
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/projectlist")
+
+def project_event_create(request):
+    content = project_code(
+        project_code=request.POST['project_code'],
+        name=request.POST['name'],
+        status=1,
+        crt_date=dateTimeNow(),
+        cancelled=1,
+
+    )
+    content.save()
+
+    return redirect("/projectlist")
+
+
 
 @csrf_exempt
 def updatestatus(request):
