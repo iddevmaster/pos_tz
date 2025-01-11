@@ -123,11 +123,16 @@ listMenu = [
     },
     {
         "value": "calendar_event",
-        "label": "ปฏิทินหลักสูตรอบรม",
+        "label": "ปฏิทินหลักสูตรอบรม ผอ",
         "group_value": "pRem5",
         "group_label": "หลักสูตร",
     },
-     
+       {
+        "value": "calendar_event_staff",
+        "label": "ปฏิทินหลักสูตรอบรม ผู้จัดการ",
+        "group_value": "pRem5",
+        "group_label": "หลักสูตร",
+    },
     {
         "value": "teachers",
         "label": "ครู - วิทยากร",

@@ -61,6 +61,7 @@ urlpatterns = [
          name="DeleteCourseEvent"),
     path('course/event/teachers/list/<slug:ev_id>', course.course_teacher_event_list),
     path('calendar_event/', course.calendar_event),
+    path('calendar_event_staff/', course.calendar_event_staff),
     path('calendar_event_api/', course.calendar_event_api),
 
 
