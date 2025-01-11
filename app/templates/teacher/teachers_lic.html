@@ -1,9 +1,61 @@
-{% extends 'base.html' %} {% block content %} {% load humanize %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% extends 'base.html' %} {% block content %} {% load humanize static %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   function setValueDeleteModal(id) {
     document.getElementById("id_delete").value = id;
+  }
+
+    function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        $("#blah").attr("src", e.target.result);
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  function readURL2(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        $("#blah2").attr("src", e.target.result);
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  function setValueUpdateModal(
+    id,
+    number_lic,
+    picture,
+    teacher_id,
+    status,
+    issue_date,
+    expire_date
+  ) {
+
+
+    document.getElementById("lic_id_update").value = id;
+    document.getElementById("number_lic_update").value = number_lic;
+
+
+    document.getElementById("issue_date_update").value = issue_date;
+    document.getElementById("expire_date_update").value = expire_date;
+
+    document.getElementById("teacher_id_update").value = teacher_id;
+    // document.getElementById("status_update").value = status;
+
+    if (picture !== "") {
+      document.getElementById("blah2").src = picture;
+    } else {
+      document.getElementById("blah2").src =
+        "{% static 'images/no-photo-available.png' %}";
+    }
+
   }
   function setValueDeleteModalUp(id) {
   
@@ -19,7 +71,7 @@
                 img.addEventListener('click', () => {
                     const imageUrl = img.getAttribute('data-bs-image');
                     lightboxImage.src = imageUrl;
-                    console.log('ok',imageUrl);
+                    
                    
                 });
             });
@@ -62,11 +114,13 @@
       <div align="right">
         <div class="btn-group mb-3" role="group" aria-label="Basic example">
           <button
-            class="btn btn-primary"
-            onclick="window.location.href='/licenteachers/form/create'"
-          >
-            <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
-          </button>
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#CreateClick"
+        >
+          <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
+        </button>
         </div>
       </div>
     </div>
@@ -105,12 +159,12 @@
               <div align="center">
                 <button
                 type="button"
-                onclick="setValueDeleteModalUp('{{res.lic_id}}')"
+                onclick="setValueUpdateModal('{{res.lic_id}}','{{res.number_lic}}','{{res.picture}}','{{res.teacher_id}}','{{res.status}}','{{res.issue_date|date:'d/m/Y'}}','{{res.expire_date|date:'d/m/Y'}}','{{res.type}}')"
                 class="btn btn-warning"
                 data-bs-toggle="modal"
-                data-bs-target="#DeleteClickUpdate"
+                data-bs-target="#UpdateClick"
               >
-                อนุมัติ
+                แก้ไข
               </button>
                 
                 <button
@@ -120,7 +174,7 @@
                   data-bs-toggle="modal"
                   data-bs-target="#DeleteClick"
                 >
-                  ไม่อนุมัติ
+                  ลบ
                 </button>
               </div>
             </td>
@@ -131,13 +185,15 @@
     </div>
   </div>
 
-  
-  {% comment %} Delete {% endcomment %}
-  <div class="modal fade" id="DeleteClick">
-    <div class="modal-dialog modal-sm">
+
+  <div class="modal fade text-left" id="CreateClick" >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+      role="document"
+    >
       <div class="modal-content">
-        <div class="modal-header bg-danger">
-          <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title white" id="myModalLabel160">เพิ่มข้อมูล</h5>
           <button
             type="button"
             class="close"
@@ -147,27 +203,247 @@
             <i data-feather="x"></i>
           </button>
         </div>
-        <form action="{% url 'approvlicen_form_delete' %}" method="post">
+        <form
+      
+          method="post"
+          autocomplete="off"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <input type="text" id="lic_id" name="lic_id"  />
+        
+      
+
+    
+     
           <div class="modal-body">
-            {% csrf_token %}
-            <input type="text" name="id" id="id_delete" required />
-            <div align="center">
-              <h4>ยืนยันการลบข้อมูล</h4>
+
+            <div class="form-group">
+              <label>teacher_id</label> <label style="color: red">*</label>
+              <select
+                class="select2"
+                name="teacher_id"
+                id="teacher_id"
+                style="width: 100%"
+                required
+              >
+                <option value="">--เลือกวิทยากร--</option>
+                {% for res in das %}
+                
+                <option value="{{res.teacher_id}}">
+                  {{res.teacher_firstname_th}}  {{res.teacher_lastname_th}}
+                </option>
+                {% endfor %}
+              </select>
             </div>
-            <div class="modal-footer">
+
+            <div class="form-group">
+              <label>รหัสบัตร</label> <label style="color: red">*</label>
+              <input
+                type="text"
+              
+                class="form-control"
+                id="number_lic_update"
+                name="number_lic"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
+              <input
+                type="text"
+                class="form-control daterangesingle"
+                id="issue_date_update"
+                name="issue_date"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
+              <input
+                type="text"
+                class="form-control daterangesingle"
+                id="expire_date_update"
+                name="expire_date"
+                required
+              />
+            </div>
+  
+           
+  
+          
+     
+            <div class="form-group">
+              <label>LOGO Certificate (150 x 150)</label>
               <button
                 type="button"
-                class="btn btn-light-secondary"
-                data-bs-dismiss="modal"
+                class="btn btn-sm btn-outline-primary"
+                onclick="imageupload2.click()"
               >
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">ยกเลิก</span>
+                อัปโหลดรูป
               </button>
-              <button type="submit" class="btn btn-primary ml-1">
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">ยืนยันการลบ</span>
-              </button>
+              <div>
+                <input
+                  type="file"
+                  name="ev_logo"
+                  id="imageupload2"
+                  onchange="readURL2(this);"
+                  style="display: none"
+                  accept=".png, .jpg, .jpeg"
+                />
+  
+                <img
+                  src="{% static 'images/no-photo-available.png' %}"
+                  alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
+                  id="blah2"
+                  width="150"
+                  height="150"
+                />
+              </div>
             </div>
+          
+          
+         
+      
+  
+        
+            <p id="datecrt"></p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1">
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">บันทึก</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal fade text-left" id="UpdateClick">
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+      role="document"
+    >
+      <div class="modal-content">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title white" id="myModalLabel160">แก้ไขข้อมูล</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+        <form
+        action="{% url 'UpdateLic' %}"
+          method="post"
+          autocomplete="off"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <input type="text" id="lic_id_update" name="lic_id"  />
+          <input type="text" id="teacher_id_update" name="teacher_id"  />
+          
+          <div class="modal-body">
+            <div class="form-group">
+              <label>รหัสบัตร</label> <label style="color: red">*</label>
+              <input
+                type="text"
+              
+                class="form-control"
+                id="number_lic_update"
+                name="number_lic"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
+              <input
+                type="text"
+                class="form-control daterangesingle"
+                id="issue_date_update"
+                name="issue_date"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
+              <input
+                type="text"
+                class="form-control daterangesingle"
+                id="expire_date_update"
+                name="expire_date"
+                required
+              />
+            </div>
+  
+           
+  
+          
+     
+            <div class="form-group">
+              <label>LOGO Certificate (150 x 150)</label>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                onclick="imageupload2.click()"
+              >
+                อัปโหลดรูป
+              </button>
+              <div>
+                <input
+                  type="file"
+                  name="ev_logo"
+                  id="imageupload2"
+                  onchange="readURL2(this);"
+                  style="display: none"
+                  accept=".png, .jpg, .jpeg"
+                />
+  
+                <img
+                  src="{% static 'images/no-photo-available.png' %}"
+                  alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
+                  id="blah2"
+                  width="150"
+                  height="150"
+                />
+              </div>
+            </div>
+          
+          
+         
+      
+  
+        
+            <p id="datecrt"></p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1">
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">บันทึก</span>
+            </button>
           </div>
         </form>
       </div>
@@ -193,6 +469,8 @@
           <div class="modal-body">
             {% csrf_token %}
             <input type="text" name="ids" id="id_delete_d" required />
+
+            
             <div align="center">
               <h4>ยืนยันการอนุมัติ</h4>
             </div>

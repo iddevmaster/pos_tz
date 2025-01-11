@@ -77,11 +77,16 @@ urlpatterns = [
     path('licenteachers', teacher.teacher_list_licen),
     path('licenteachers/form/create', teacher.teacher_formlicen_create,
          name="teacher_formlicen_create"),
+    path('licenteachers/update/', teacher.teacher_formlicen_update,
+         name="UpdateLic"),          
     path('approvlicen', teacher.teacher_list_appv),
     path('approvlicen/form/delete', teacher.teacher_appv_delete,
          name="approvlicen_form_delete"),
     path('approvlicen/form/de', teacher.teacher_appv_de,
          name="approvlicen_form_de"),
+
+
+
 
 
     path('projectlist/', project.project_list),

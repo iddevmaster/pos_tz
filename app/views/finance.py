@@ -445,6 +445,7 @@ def evenetdel(request):
            
 
             instance = teacher_income_setting.objects.filter(id=ev_id).count()
+            
          
 
     

@@ -6,7 +6,8 @@ from django.db.models import Count
 from ..models import teacher,user_group,category_program_permission,user_detail,compensation,user_lic,fact_teacher_user,teacher_income_setting
 from ..constant import defaultTitle
 from ..forms.teacher_form import  teacherForm
-from ..functions import  dateTimeNow
+
+from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 @login_required(login_url='/login')
 def teacher_list(request):
     user_id = request.user.id
@@ -363,8 +364,14 @@ def teacher_list_licen(request):
         return render(request, '404.html') 
     title = defaultTitle
     result = user_lic.objects.filter(cancelled=1,status='W')
-    
-    context = {'title': title,  'data': result,'listMenuPermission': objMenu}
+   
+    teact = teacher.objects.filter(cancelled=1).order_by("-crt_date")
+    obk = []
+    for rs in list(teact):
+        
+        s = { 'teacher_id':rs.teacher_id }
+        obk.append(s)
+    context = {'title': title,  'data': result,'listMenuPermission': objMenu,'das':teact}
     return render(request, 'teacher/teachers_lic.html', context) 
 
 
@@ -467,3 +474,24 @@ def teacher_formlicen_create(request):
     title = defaultTitle
     context = {'title': title, 'form':teacherForm(),'listMenuPermission': objMenu}
     return render(request, 'teacher/teacher_formlicen_create.html', context)    
+
+
+@login_required(login_url='/login')
+def teacher_formlicen_update(request):
+    id = request.POST['lic_id']
+    number = request.POST['number_lic']
+   
+    try:
+        ev_logo = request.FILES['ev_logo']
+    except KeyError:
+        ev_logo = None
+    issue = dmytoymd(request.POST['issue_date'])
+    expire = dmytoymd(request.POST['expire_date'])
+    content = user_lic.objects.get(lic_id=id)
+    content.number_lic = number
+    content.issue_date = issue
+    content.expire_date = expire
+    content.save()
+    messages.success(request, "ทำรายการสำเร็จ !")
+   
+    return redirect("/licenteachers")
