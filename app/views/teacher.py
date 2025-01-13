@@ -161,7 +161,7 @@ def teacher_form_create(request):
         )
 
         x3 = compensation(
-            compensation = count_hour_help,
+            compensation = 0,
             teacher_id = uuid_without_dashes,
             status = 'Y',
             note = note_help,
