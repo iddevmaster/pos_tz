@@ -98,7 +98,7 @@ def teacher_form_create(request):
         teacher_type =  request.POST['teacher_type']
         active = request.POST['active']
 
-
+        
         count_hour_wi = request.POST['count_hour_wi']
         count_hour_pi = request.POST['count_hour_pi']
         count_hour_help = request.POST['count_hour_help']
@@ -117,6 +117,8 @@ def teacher_form_create(request):
         if t > 0:
             messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
             return redirect("/teacher/form/create")
+       
+        
         content = teacher(
             teacher_identification_number = teacher_identification_number,
             teacher_prefix_th = teacher_prefix_th,
@@ -130,21 +132,23 @@ def teacher_form_create(request):
             active = active,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
-            module=m.module
-        )
+            module=m.module,
+            level = '4',
+            )
         content.save()
-
-        t1 = teacher.objects.filter(teacher_identification_number=teacher_identification_number).values('teacher_id').first()
-
       
+        t1 = teacher.objects.filter(teacher_identification_number=teacher_identification_number).values('teacher_id').first()
+        
+        
         # new_text = t1['teacher_id'].replace("-", "")  # ลบ "-"
 
-        old_uuid = str(t1['teacher_id'])
-        new_uuid_str = old_uuid.replace("-", "")
+        # old_uuid = str(t1['teacher_id'])
+        # print(old_uuid)
+        # new_uuid_str = old_uuid.replace("-", "")
     
         x1 = compensation(
             compensation = count_hour_wi,
-            teacher_id = new_uuid_str,
+            teacher_id = t1['teacher_id'],
             status = 'Y',
             note = note_wi,
             compensation_group_id = py_wi,
@@ -152,7 +156,7 @@ def teacher_form_create(request):
         )
         x2 = compensation(
             compensation = count_hour_pi,
-            teacher_id = new_uuid_str,
+            teacher_id = t1['teacher_id'],
             status = 'Y',
             note = note_pi,
             compensation_group_id = py_pi,
@@ -161,7 +165,7 @@ def teacher_form_create(request):
 
         x3 = compensation(
             compensation = count_hour_help,
-            teacher_id = new_uuid_str,
+            teacher_id = t1['teacher_id'],
             status = 'Y',
             note = note_help,
             compensation_group_id = py_help,
@@ -173,8 +177,8 @@ def teacher_form_create(request):
         x3.save()
     
       
-        # messages.success(request, "ทำรายการสำเร็จ !")
-        # return redirect("/teachers")
+        messages.success(request, "ทำรายการสำเร็จ !")
+        return redirect("/teachers")
     title = defaultTitle
     context = {'title': title, 'form':teacherForm(),'listMenuPermission': objMenu}
     return render(request, 'teacher/teacher_form_create.html', context)
