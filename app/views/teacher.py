@@ -6,6 +6,7 @@ from django.db.models import Count
 from ..models import teacher,user_group,category_program_permission,user_detail,compensation,user_lic,fact_teacher_user,teacher_income_setting
 from ..constant import defaultTitle
 from ..forms.teacher_form import  teacherForm
+import uuid
 
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 @login_required(login_url='/login')
@@ -137,18 +138,14 @@ def teacher_form_create(request):
             )
         content.save()
       
-        t1 = teacher.objects.filter(teacher_identification_number=teacher_identification_number).values('teacher_id').first()
-        
-        
-        # new_text = t1['teacher_id'].replace("-", "")  # ลบ "-"
-
-        # old_uuid = str(t1['teacher_id'])
-        # print(old_uuid)
-        # new_uuid_str = old_uuid.replace("-", "")
+        t1 = teacher.objects.filter(teacher_identification_number=teacher_identification_number).first()
+        uuid_with_dashes = t1.teacher_id  # This is a UUID object
+        uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
+       
     
         x1 = compensation(
             compensation = count_hour_wi,
-            teacher_id = t1['teacher_id'],
+            teacher_id = uuid_without_dashes,
             status = 'Y',
             note = note_wi,
             compensation_group_id = py_wi,
@@ -156,7 +153,7 @@ def teacher_form_create(request):
         )
         x2 = compensation(
             compensation = count_hour_pi,
-            teacher_id = t1['teacher_id'],
+            teacher_id = uuid_without_dashes,
             status = 'Y',
             note = note_pi,
             compensation_group_id = py_pi,
@@ -165,7 +162,7 @@ def teacher_form_create(request):
 
         x3 = compensation(
             compensation = count_hour_help,
-            teacher_id = t1['teacher_id'],
+            teacher_id = uuid_without_dashes,
             status = 'Y',
             note = note_help,
             compensation_group_id = py_help,

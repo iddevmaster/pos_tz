@@ -217,8 +217,8 @@ class register_ref(models.Model):
 # teacher_type 1 = วิทยากรภายใน , 2 = วิทยากรภายนอก
 @cleanup.select
 class teacher(models.Model):
-    teacher_id = models.CharField(
-        primary_key=True, max_length=128, editable=False)
+    teacher_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
     teacher_identification_number = models.CharField(
         max_length=24, blank=True, default=None)
     teacher_prefix_th = models.CharField(
