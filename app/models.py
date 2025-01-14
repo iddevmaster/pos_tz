@@ -83,6 +83,7 @@ class course_event(models.Model):
     ev_generation = models.IntegerField(default=0, blank=False)
     ev_remark = models.CharField(max_length=256, blank=True, default=None)
     ev_price = models.FloatField(default=0, blank=False)
+    limit_price = models.FloatField(default=0, blank=False)
     ev_vat = models.IntegerField(default=0, blank=False)
     ev_hour = models.IntegerField(default=0, blank=False)
     ev_hour_two = models.IntegerField(default=0, blank=False)

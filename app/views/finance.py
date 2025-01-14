@@ -263,15 +263,18 @@ def course_teacher_event_set_income_form_create(request, ev_id):
     # print(instance.ev_date_start.month)
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
     ids = [1, 2]
+ 
     count_hour_wi = teacher_income_setting.objects.filter(ev=ev_id,pi__in=ids).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
     count_hour_pi = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
+    dis_limit = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0
+    total = instance.limit_price - dis_limit
     listposition = pay_item.objects.filter(
             cancelled=1, active=1)
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     
     
-    context = {'title': title, 'main_data': instance,  'data': teacher_data,
+    context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,
                'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
@@ -444,13 +447,36 @@ def evenetdel(request):
             ev_id = data.get("id")
            
 
-            instance = teacher_income_setting.objects.filter(id=ev_id).count()
+
+            instance = teacher_income_setting.objects.get(pk=ev_id)
+            instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id).count()
+            
+            if instancexx == 1 :
+                print('if')
+                instecent = course_event.objects.get(pk=instance.ev_id)
+                instecent.status = 'N'
+                instecent.save()
+                instancex = teacher_income_setting.objects.get(pk=ev_id)
+                instancex.delete()
+
+
+                datas = {'status':200,'s':instancexx}
+                return JsonResponse(datas, status=200,safe=False)
+
+            else:   
+                instancex = teacher_income_setting.objects.get(pk=ev_id)
+                instancex.delete()
+
+                datas = {'status':200,'s':instancexx}
+                return JsonResponse(datas, status=200,safe=False)
             
          
+           
+          
+            
 
     
-            datas = {'status':200,'s':instance}
-            return JsonResponse(datas, status=200,safe=False)
+           
 
         except json.JSONDecodeError:
             datas = {'status':400}

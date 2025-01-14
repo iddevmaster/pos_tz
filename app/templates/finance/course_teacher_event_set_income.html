@@ -259,7 +259,25 @@ const status_people = document.getElementById("status_people").value
 const status_teacher = document.getElementById("status_teacher").value 
 
 
+   
+   if(pi == 3){
 
+    ////////// check จำนวนเงิน
+
+    const dis_limit_price = document.getElementById("dis_limit_price").value 
+    const tis_sum = document.getElementById("tis_sum").value 
+  
+    if(parseInt(tis_sum) > parseInt(dis_limit_price)){
+      Swal.fire({
+      title: 'จำนวนงบเกินกว่าที่ตั้งไว้',
+      text: 'จำนวนงบเกินกว่าที่ตั้งไว้',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+    }
+  
+   }
 
 
    if(status_hour == 'false'){
@@ -319,12 +337,24 @@ return true
     .then(data => {
         // Display response
      console.log(data);
+
+
         if(data.length == 0){
           document.getElementById("tis_compensation").value = 0
           return false;
         }
-        document.getElementById("tis_compensation").value = data.compensation
-        Caculate()
+        else {
+if(data.py_id == 3){
+  document.getElementById("tis_compensation").value = 125
+  Caculate()
+}else {
+  document.getElementById("tis_compensation").value = data.compensation
+  Caculate()
+}
+         
+
+        }
+    
 
 
     })
@@ -348,11 +378,24 @@ return false
    }
 
    function Caculate() {
+    const pi = document.getElementById("pi").value
+    const limit_price = document.getElementById("limit_price").value
+    
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
 console.log('cal',aaaa);
 console.log('cal',tis_quantity);
-   document.getElementById("tis_sum").value = aaaa * tis_quantity;
+console.log('pi',pi);
+if(pi == 3){
+  if(tis_quantity >= 8){
+    document.getElementById("tis_sum").value = limit_price;
+  }else {
+    document.getElementById("tis_sum").value = 125 * tis_quantity;
+  }
+}else {
+  document.getElementById("tis_sum").value = aaaa * tis_quantity;
+}
+  
    }
 
   async function CheckHourbeforeSave() {
@@ -490,7 +533,8 @@ return data
           {% endfor %}
         </div> {% endcomment %}
 
-
+        <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
+        <input type="hidden" class="form-control" name="limit_price" id="limit_price"  value="{{main_data.limit_price}}"/>
         <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
         <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
@@ -555,9 +599,7 @@ return data
 </div>  
 </div>
 
-{{main_data.ev_hour}} ชั่วโมง
-{{main_data.ev_hour_two}} ชั่วโมง
-{{main_data.ev_hour_three}} ชั่วโมง
+
 
 <div class="col-12 col-lg-12 col-md-12">
    <label style="color: red">หมายเหตุ *</label> 

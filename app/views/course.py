@@ -179,6 +179,7 @@ def course_event_create(request):
     ev_people = request.POST['ev_people']
     ev_people_two = request.POST['ev_people_two']
     ev_people_three = request.POST['ev_people_three']
+    show = request.POST['is_show']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -197,6 +198,7 @@ def course_event_create(request):
         active=active,
         course_id=course_id,
         project_id=project_id,
+        is_show=show,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         ev_hour=ev_hour,
@@ -205,6 +207,7 @@ def course_event_create(request):
         ev_people=ev_people,
         ev_people_two=ev_people_two,
         ev_people_three=ev_people_three,
+        limit_price=1000,
         status='N',
         module=m.module,
     )
@@ -425,7 +428,7 @@ def calendar_event_api(request):
             "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
             "tis_quantity": x.tis_quantity,
             "tis_unit": x.tis_unit,
-            "compensation": compensation.objects.filter(py_id=x.pi_id,teacher_id=x.teacher_id).values_list('compensation').first(),
+            "compensation":x.tis_compensation,
             "id":x.id,
             "status":x.status,
             "teacher_id": x.teacher_id,
@@ -435,10 +438,11 @@ def calendar_event_api(request):
         for x in teacher_data
         
     ]
-   
+    #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
+    #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
         
         res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'data':sff,
-               'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_three,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
+                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_three,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
         obj.append(res)
     return JsonResponse(obj, safe=False)
 

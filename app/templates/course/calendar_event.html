@@ -41,15 +41,14 @@ body: JSON.stringify({'id':document.getElementById("id_delete").value})
 .then(data => {
     // Display response
 
-console.log(data)
 
 // this.calen();
 // window.location.reload();
 //    return data.status
 
-// setTimeout(() => {
-//       window.location.reload();
-//  }, 100);
+setTimeout(() => {
+      window.location.reload();
+ }, 100);
 
 })
   
@@ -82,9 +81,13 @@ function calen() {
         },
       },
       eventClick: function (info) {
-
+      
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
+
+
+        document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
+        document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
 
         document.getElementById("ev_id").value = info.event.extendedProps.evs_id
 
@@ -160,9 +163,15 @@ function calen() {
       },
       eventClick: function (info) {
         
+        
   
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
+
+
+       
+        document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
+        document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
 
         document.getElementById("ev_id").value = info.event.extendedProps.evs_id
 
@@ -277,6 +286,24 @@ const status_hour = document.getElementById("status_hour").value
 const status_people = document.getElementById("status_people").value 
 const status_teacher = document.getElementById("status_teacher").value 
 
+if(pi == 3){
+
+////////// check จำนวนเงิน
+
+const dis_limit_price = document.getElementById("dis_limit_price").value 
+const tis_sum = document.getElementById("tis_sum").value 
+
+if(parseInt(tis_sum) > parseInt(dis_limit_price)){
+  Swal.fire({
+  title: 'จำนวนงบเกินกว่าที่ตั้งไว้',
+  text: 'จำนวนงบเกินกว่าที่ตั้งไว้',
+  icon: 'error',
+  confirmButtonText: 'OK'
+});
+return false
+}
+
+}
 
 if(status_hour == 'false'){
     Swal.fire({
@@ -391,11 +418,21 @@ if(data.status == 200){
   }
 
   function Caculate() {
+    const pi = document.getElementById("pi").value
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
-console.log('cal',aaaa);
-console.log('cal',tis_quantity);
-   document.getElementById("tis_sum").value = aaaa * tis_quantity;
+    const limit_price = document.getElementById("limit_price").value
+
+
+   if(pi == 3){
+  if(tis_quantity >= 8){
+    document.getElementById("tis_sum").value = limit_price;
+  }else {
+    document.getElementById("tis_sum").value = 125 * tis_quantity;
+  }
+}else {
+  document.getElementById("tis_sum").value = aaaa * tis_quantity;
+}
    }
 
    async function CheckHourbeforeSave() {
@@ -456,9 +493,19 @@ function getComposetaion() {
         if(data.length == 0){
           document.getElementById("tis_compensation").value = 0
           return false;
+        }else {
+          if(data.py_id == 3){
+  document.getElementById("tis_compensation").value = 125
+  Caculate()
+}else {
+  document.getElementById("tis_compensation").value = data.compensation
+  Caculate()
+}
+       
         }
-        document.getElementById("tis_compensation").value = data.compensation
-        Caculate()
+
+   
+
 
 
     })
@@ -613,7 +660,8 @@ CheckHourbeforeSave()
              
             />
 
-            
+        <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price" />
+        <input type="hidden" class="form-control" name="limit_price" id="limit_price"/>
         <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
         <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
