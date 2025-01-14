@@ -179,7 +179,7 @@ def course_event_create(request):
     ev_people = request.POST['ev_people']
     ev_people_two = request.POST['ev_people_two']
     ev_people_three = request.POST['ev_people_three']
-    show = request.POST['is_show']
+ 
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -198,7 +198,6 @@ def course_event_create(request):
         active=active,
         course_id=course_id,
         project_id=project_id,
-        is_show=show,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         ev_hour=ev_hour,
