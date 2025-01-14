@@ -198,6 +198,7 @@ def course_event_create(request):
         active=active,
         course_id=course_id,
         project_id=project_id,
+        is_show=1,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         ev_hour=ev_hour,
