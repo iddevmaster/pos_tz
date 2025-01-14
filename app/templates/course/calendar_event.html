@@ -168,7 +168,7 @@ function calen() {
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
 
-
+console.log(info.event.extendedProps.ev_hour_two);
        
         document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
         document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
