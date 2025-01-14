@@ -501,6 +501,7 @@ function removeFirstCharacter(str) {
     crt_date,
     upd_date,
     ev_expired_cer_quantity,
+    limit_price,
     ev_logo
   ) {
     document.getElementById("datecrt").innerHTML =
@@ -523,6 +524,7 @@ function removeFirstCharacter(str) {
       ev_expired_cer_quantity;
     document.getElementById("project_id_update").value = project_id;
     document.getElementById("course_id_update").value = course_id;
+    document.getElementById("limit_price_update").value = limit_price;
     
     document.getElementById("active_update").value = active;
     $(".selectUpdate").val(course_id).select2({
@@ -732,7 +734,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -742,7 +744,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -864,7 +866,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -891,7 +893,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -918,7 +920,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -1045,6 +1047,18 @@ function removeFirstCharacter(str) {
               <option value="1" selected>เปิด</option>
             </select>
           </div>
+
+          <div class="form-group">
+     
+            <input
+              type="hidden"
+           
+              class="form-control"
+              id="limit_price"
+              name="limit_price"
+              value="1000"
+            />
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -1163,7 +1177,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -1192,7 +1206,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -1219,7 +1233,7 @@ function removeFirstCharacter(str) {
             />
             </div>
             <div class="col-4 col-sm-6">
-              <label>คน</label> <label style="color: red">*</label>
+              <label>จำนวนคน</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -1334,6 +1348,19 @@ function removeFirstCharacter(str) {
               <option value="1">เปิด</option>
             </select>
           </div>
+
+          <div class="form-group">
+     
+            <input
+              type="hidden"
+           
+              class="form-control"
+              id="limit_price_update"
+              name="limit_price"
+              value="1000"
+            />
+          </div>
+
           <p id="datecrt"></p>
         </div>
         <div class="modal-footer">

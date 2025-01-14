@@ -179,7 +179,7 @@ def course_event_create(request):
     ev_people = request.POST['ev_people']
     ev_people_two = request.POST['ev_people_two']
     ev_people_three = request.POST['ev_people_three']
- 
+    limitprice = request.POST['limit_price']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -207,7 +207,7 @@ def course_event_create(request):
         ev_people=ev_people,
         ev_people_two=ev_people_two,
         ev_people_three=ev_people_three,
-        limit_price=1000,
+        limit_price=limitprice,
         status='N',
         module=m.module,
     )
@@ -245,7 +245,7 @@ def course_event_create(request):
 def course_event_update(request):
     
     ev_id = request.POST['ev_id']
-  
+    limitprice = request.POST['limit_price']
     project_id = request.POST['project_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
     ev_date_end = dmytoymd(request.POST['ev_date_end'])
@@ -285,6 +285,7 @@ def course_event_update(request):
     content.ev_people_three = ev_people_three
     content.upd_date = dateTimeNow()
     content.project_id = project_id
+    content.limit_price = limitprice
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
