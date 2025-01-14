@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_-+e6v9umc#o7qjr498!hj!23g05=*$my2x-w!!=mefr9^9(k%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["http://pos.idclever.net"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
