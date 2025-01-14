@@ -245,7 +245,7 @@ def course_event_create(request):
 def course_event_update(request):
     
     ev_id = request.POST['ev_id']
-    course_id = request.POST['course_id']
+  
     project_id = request.POST['project_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
     ev_date_end = dmytoymd(request.POST['ev_date_end'])
@@ -284,7 +284,6 @@ def course_event_update(request):
     content.ev_people_two = ev_people_two
     content.ev_people_three = ev_people_three
     content.upd_date = dateTimeNow()
-    content.course_id = course_id
     content.project_id = project_id
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
