@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_-+e6v9umc#o7qjr498!hj!23g05=*$my2x-w!!=mefr9^9(k%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["pos.idclever.net"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -111,7 +111,7 @@ WSGI_APPLICATION = 'trainingzenter.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'posid',
+        'NAME': 'backup',
         'USER': 'root',
         'HOST': '27.254.149.247',
         'PASSWORD': '@P@SS.W0rd',
@@ -119,6 +119,7 @@ DATABASES = {
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
+            
         }
     }
 }
