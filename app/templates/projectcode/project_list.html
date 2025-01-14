@@ -770,7 +770,7 @@ function removeFirstCharacter(str) {
       <form action="{% url 'DeleteProjectEvent' %}" method="post">
         <div class="modal-body">
           {% csrf_token %}
-          <input type="text" name="id" id="id" required />
+          <input type="hidden" name="id" id="id" required />
           <div align="center">
             <h4>ยืนยันการลบข้อมูล</h4>
           </div>
