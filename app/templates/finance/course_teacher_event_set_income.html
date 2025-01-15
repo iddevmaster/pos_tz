@@ -429,7 +429,9 @@ if(pi == 3){
     const tis_quantity = document.getElementById("tis_quantity").value;
     const teacher_id = document.getElementById("teacher_id").value
 
+    if((pi == 1) || (pi == 2)){
 
+      
  let data = await fetch('/api/checkhours', {
     method: 'POST',
     headers: {
@@ -455,6 +457,10 @@ if(pi == 3){
     });
    
 return data
+
+    }
+
+
    }
 
    
