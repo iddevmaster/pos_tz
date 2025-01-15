@@ -193,7 +193,6 @@ function removeFirstCharacter(str) {
  setTimeout(() => {
   CheckHourbeforeSave()
   getComposetaion()
-  
  }, 50);
 
 
@@ -201,7 +200,31 @@ function removeFirstCharacter(str) {
 
   function handleSelectChangePy(selectElement) {
     const selectedValue = selectElement.value;
- document.getElementById("pi").value = selectedValue;
+    document.getElementById("pi").value = selectedValue;
+    
+    if(selectElement.value == 3) {
+      document.getElementById("tis_unit").value = 'day';
+      
+    }
+    if(selectElement.value == 4) {
+      document.getElementById("tis_unit").value = 'day';
+      const input = document.getElementById('tis_quantity');
+      input.readOnly = true; // Set the input field to readonly
+      input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      input.value = 1;
+      
+    }
+    if((selectElement.value == 1) ||(selectElement.value == 2)) {
+      document.getElementById("tis_unit").value = 'hour';
+      const input = document.getElementById('tis_quantity');
+      input.readOnly = false; // Remove readonly
+      input.style.backgroundColor = ""; // Reset appearance
+    }
+
+
+
+
+
 
  setTimeout(() => {
   CheckHourbeforeSave()
@@ -349,6 +372,9 @@ if(data.py_id == 3){
   const limit_price = document.getElementById("limit_price").value
   document.getElementById("tis_compensation").value = (limit_price / 8);
   Caculate()
+}else if(data.py_id == 4) {
+  const limit_price = document.getElementById("limit_price").value
+  document.getElementById("tis_compensation").value = (limit_price / 8);
 }else {
   document.getElementById("tis_compensation").value = data.compensation
   Caculate()
@@ -563,10 +589,14 @@ return data
 
       <div class="col-12 col-lg-6 col-md-6">
         จำนวนต่อหน่วย :   <label style="color: red"> *</label> 
-        <select class="form-select" id="tis_unit" name="tis_unit">
+        <select class="form-select" id="tis_unit" name="tis_unit"  style="pointer-events: none; background-color: #e9ecef;">
+          
           <option value="hour">
              ชั่วโมง
           </option>
+          <option value="day">
+            วัน
+         </option>
         </select>
     </div>
 
