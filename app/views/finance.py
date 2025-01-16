@@ -233,13 +233,16 @@ def course_teacher_event_set_income_form_create(request, ev_id):
         instance = None
         return redirect("/finance/billing/setting")
     if request.method == 'POST':
+
         pi = request.POST['pi']
         tis_compensation = request.POST['tis_compensation']
         tis_unit = request.POST['tis_unit']
         tis_quantity = request.POST['tis_quantity']
         tis_sum = request.POST['tis_sum']
         teacher_id = request.POST['teacher']
-        content = teacher_income_setting(
+        
+        if pi == '1' or pi == '2':
+         content = teacher_income_setting(
             tis_compensation=tis_compensation,
             tis_unit=tis_unit,
             tis_quantity=tis_quantity,
@@ -253,17 +256,82 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             upd_date=dateTimeNow(),
             status='W'
         )
-        content.save()
-        x = course_event.objects.get(pk=ev_id)
-        x.status = "W"
-        x.save()
+         content.save()
+         x = course_event.objects.get(pk=ev_id)
+         x.status = "W"
+         x.save()
+
+        if pi == '4':
+       
+         contentx = teacher_income_setting(
+            tis_compensation=tis_compensation,
+            tis_unit=tis_unit,
+            tis_quantity=tis_quantity,
+            tis_sum=tis_sum,
+            tis_start_date=instance.ev_date_start,
+            tis_end_date=instance.ev_date_end,
+            ev_id=ev_id,
+            teacher_id=teacher_id,
+            pi_id=pi,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            status='W'
+         )
+         contentx.save()
+         x = course_event.objects.get(pk=ev_id)
+         x.status = "W"
+         x.save()
+         tot = 0
+         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+         bb = x.limit_price / totalpeol
+         if totalpeol > 0 :
+           teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
+        if pi == '3':
+
+         contentx = teacher_income_setting(
+            tis_compensation=tis_compensation,
+            tis_unit=tis_unit,
+            tis_quantity=tis_quantity,
+            tis_sum=tis_sum,
+            tis_start_date=instance.ev_date_start,
+            tis_end_date=instance.ev_date_end,
+            ev_id=ev_id,
+            teacher_id=teacher_id,
+            pi_id=pi,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            status='W'
+         )
+         contentx.save()
+  
+         x = course_event.objects.get(pk=ev_id)
+         x.status = "W"
+         x.save()
+         delta = x.ev_date_end - x.ev_date_start
+         days_difference = delta.days + 1
+         tot = 0
+         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+         tt_event = x.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+         bb = (x.limit_price * days_difference) / totalpeol
+         if totalpeol > 0 :
+            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+
+        # save เสร็จ ค่อยอัพเดท
+
 
         messages.success(request, "ทำรายการสำเร็จ !")
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     # print(instance.ev_date_start.month)
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
     ids = [1, 2]
- 
+
+
+
+
+    delta = instance.ev_date_end - instance.ev_date_start
+    days_difference = delta.days + 1
+
+        
     count_hour_wi = teacher_income_setting.objects.filter(ev=ev_id,pi__in=ids).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
     count_hour_pi = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
     dis_limit = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0
@@ -275,7 +343,7 @@ def course_teacher_event_set_income_form_create(request, ev_id):
     
     
     context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,
-               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi}
+               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
 
@@ -283,6 +351,8 @@ def course_teacher_event_set_income_form_create(request, ev_id):
 def course_teacher_event_set_income_form_delete(request):
     id = request.POST['id']
     ev_id = request.POST['ev_id']
+    py_id = request.POST['py_id_delete']
+    
     try:
         instance = teacher_income_setting.objects.get(pk=id)
     except teacher_income_setting.DoesNotExist:
@@ -290,12 +360,28 @@ def course_teacher_event_set_income_form_delete(request):
         return redirect("/course/event/teachers/form/create/" + str(ev_id))
     instance.delete()
 
-    x = course_event.objects.get(pk=ev_id)
-
+    c_event = course_event.objects.get(pk=ev_id)
    
+    if py_id == '4':
+       data_tac = teacher_income_setting.objects.filter(ev_id=ev_id,active=0,pi_id=py_id).count()
+       if data_tac > 0 :
+         bb = c_event.limit_price / data_tac
+         teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=py_id).update(tis_sum=bb,tis_compensation=bb)
+
+    if py_id == '3':
+        data_tac = teacher_income_setting.objects.filter(ev_id=ev_id,active=0,pi_id=py_id).count()
+        if data_tac > 0 :
+            bb = c_event.limit_price / data_tac
+            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=py_id).update(tis_sum=bb,tis_compensation=bb)
+
+    
+
     if teacher_income_setting.objects.filter(ev_id=ev_id).count() == 0:
-         x.status = "N"
-         x.save()
+        c_event = course_event.objects.get(pk=ev_id)
+        c_event.status = "N"
+        c_event.save()
+
+
    
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event/teachers/form/create/" + str(ev_id))
@@ -308,6 +394,7 @@ def course_teacher_event_get_income_form_compo(request):
         try:
             # Parse JSON data from the request body
             data = json.loads(request.body)
+            
             teacher = data.get("teacher_id")
             py = data.get("py")
             
@@ -340,42 +427,64 @@ def checkhours(request):
             ev_id = data.get("ev_id")
             teacher_id = data.get("teacher_id")
             instance = course_event.objects.filter(pk=ev_id).values().first()
-            print(teacher_id)
+            st =['Y','W']
+            content = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
+            tttt = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).values('pi').annotate(total=Count('pi')) 
+            teacher = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi,teacher_id=teacher_id).count() or 0
+         
             data['status_hour'] = True
             data['status_people'] = True
             data['status_teacher'] = True
-            if pi == '1' :
-               
+            if pi == '1' : 
                 hour = instance['ev_hour'] or 0
-                people = instance['ev_people'] or 0
+                people = instance['ev_people'] or 0   
+                
+            # เช็คว่า มีครูฝึกคนนี้รึยัง
+            
+                totalp = 0
+                total = content['total'] + tis_quantity
+                for author in tttt:
+                    totalp = author['total']
+                if hour < total :
+                    data['status_hour'] = False
+                if people <= totalp:
+                    data['status_people'] = False    
+                if teacher > 0:
+                    data['status_teacher'] = False
+
             elif  pi == '2' :
               
                 hour = instance['ev_hour_two'] or 0
                 people = instance['ev_people_two'] or 0
+
+                totalp = 0
+                total = content['total'] + tis_quantity
+                for author in tttt:
+                    totalp = author['total']
+                if hour < total :
+                    data['status_hour'] = False
+                if people <= totalp:
+                    data['status_people'] = False    
+                if teacher > 0:
+                    data['status_teacher'] = False
             elif  pi == '3' :
              
-                hour = instance['ev_hour_three'] or 0
-                people = instance['ev_people_three'] or 0
+              
 
-            st =['Y','W']
+                teacher = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi,teacher_id=teacher_id).count() or 0
+                if teacher > 0:
+                    data['status_hour'] = True
+                    data['status_people'] = True
+                    data['status_teacher'] = False
       
-            content = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).aggregate(total=Coalesce(Sum('tis_quantity'), Value(0)))
-            tttt = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi).values('pi').annotate(total=Count('pi')) 
-            teacher = teacher_income_setting.objects.filter(ev_id=ev_id,status__in=st,pi=pi,teacher_id=teacher_id).count() or 0
-            # เช็คว่า มีครูฝึกคนนี้รึยัง
-            
-            totalp = 0
-    
-            total = content['total'] + tis_quantity
-            for author in tttt:
-                totalp = author['total']
-            
-            if hour < total :
-                data['status_hour'] = False
-            if people <= totalp:
-                data['status_people'] = False    
-            if teacher > 0:
-                data['status_teacher'] = False
+            elif  pi == '4' :
+             
+                 if teacher > 0:
+                    data['status_hour'] = True
+                    data['status_people'] = True
+                    data['status_teacher'] = False
+       
+         
             if data:
                 datas = {'status_hour': data['status_hour'],'status_people': data['status_people'],'status_teacher': data['status_teacher']}
       
@@ -452,7 +561,7 @@ def evenetdel(request):
             instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id).count()
             
             if instancexx == 1 :
-                print('if')
+                
                 instecent = course_event.objects.get(pk=instance.ev_id)
                 instecent.status = 'N'
                 instecent.save()

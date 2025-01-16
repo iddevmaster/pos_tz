@@ -32,6 +32,8 @@ def unit_format(val):
         format = 'สัปดาห์'
     elif val == 'month':
         format = 'เดือน'
+    elif val == 'work':
+        format = 'งาน'
     else:
         format = '-'
     return format

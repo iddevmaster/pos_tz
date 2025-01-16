@@ -142,7 +142,6 @@
 
 
   setTimeout(() => {
-  
     getComposetaion()
    }, 100);
 
@@ -192,7 +191,7 @@ function removeFirstCharacter(str) {
 
  setTimeout(() => {
   CheckHourbeforeSave()
-  getComposetaion()
+   getComposetaion()
  }, 50);
 
 
@@ -203,12 +202,28 @@ function removeFirstCharacter(str) {
     document.getElementById("pi").value = selectedValue;
     
     if(selectElement.value == 3) {
+      const count_day = document.getElementById("count_day").value 
+      const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
+      document.getElementById('tis_quantity').value = count_day
+      document.getElementById('tis_compensation').value = limit_price
+      const input = document.getElementById('tis_sum').value = limit_price * count_day
+
+      
+      const x = document.getElementById('tis_quantity');
+      x.readOnly = true; // Set the input field to readonly
+      x.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+ 
+
       
     }
     if(selectElement.value == 4) {
-      document.getElementById("tis_unit").value = 'day';
+      document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
+      const limit_price = document.getElementById("limit_price").value
+      document.getElementById('tis_sum').value = limit_price
+      document.getElementById('tis_compensation').value = limit_price
+    
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
@@ -217,12 +232,14 @@ function removeFirstCharacter(str) {
     if((selectElement.value == 1) ||(selectElement.value == 2)) {
       document.getElementById("tis_unit").value = 'hour';
       const input = document.getElementById('tis_quantity');
+      const x = document.getElementById('tis_quantity');
+
+
       input.readOnly = false; // Remove readonly
       input.style.backgroundColor = ""; // Reset appearance
+      x.readOnly = false; // Remove readonly
+      x.style.backgroundColor = ""; // Reset appearance
     }
-
-
-
 
 
 
@@ -263,6 +280,7 @@ function removeFirstCharacter(str) {
    const count_hour_pi = document.getElementById("count_hour_pi").value ////ชั่วโมงที่เลือกไปแล้ว ของ ผู้ช่วย
    const pi = document.getElementById("pi").value
    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
+   const tis_quantity = document.getElementById("tis_quantity").value;
    let te = document.getElementById("teacher_id").value
     if(te == ""){
     Swal.fire({
@@ -277,13 +295,12 @@ function removeFirstCharacter(str) {
 
    
 const status_hour = document.getElementById("status_hour").value 
-
 const status_people = document.getElementById("status_people").value 
 const status_teacher = document.getElementById("status_teacher").value 
-
+const count_day = document.getElementById("count_day").value 
 
    
-  //  if(pi == 3){
+  //  if(parseInt(tis_quantity) > parseInt(count_day)){
 
   //   ////////// check จำนวนเงิน
 
@@ -349,7 +366,8 @@ return true
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
     const csrftoken = "{{ csrf_token }}";
-  fetch('/api/get/compensation', {
+    if((py == 1)||(py == 2)){
+      fetch('/api/get/compensation', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -358,29 +376,28 @@ return true
 })
     .then(response => response.json())
     .then(data => {
-        // Display response
-     console.log(data);
-
-
         if(data.length == 0){
           document.getElementById("tis_compensation").value = 0
           return false;
         }
         else {
-if(data.py_id == 3){
+          document.getElementById("tis_compensation").value = data.compensation
+          Caculate()
 
-  const limit_price = document.getElementById("limit_price").value
-  document.getElementById("tis_compensation").value = (limit_price / 8);
-  Caculate()
-}else if(data.py_id == 4) {
-  const limit_price = document.getElementById("limit_price").value
-  document.getElementById("tis_compensation").value = (limit_price / 8);
-}else {
-  document.getElementById("tis_compensation").value = data.compensation
-  Caculate()
-}
-         
-
+// if(data.py_id == 3){
+//   const limit_price = document.getElementById("limit_price").value
+//   document.getElementById("tis_compensation").value = (limit_price);
+//   Caculate()
+// } else if(data.py_id == 4){
+//   console.log('else if');
+//   const limit_price = document.getElementById("limit_price").value
+//   document.getElementById("tis_compensation").value = limit_price
+//   Caculate()
+// } else {
+//   document.getElementById("tis_compensation").value = data.compensation
+//   Caculate()
+// }
+        
         }
     
 
@@ -388,8 +405,12 @@ if(data.py_id == 3){
     })
     .catch(error => {
         console.error('Error:', error);
-      
     });
+
+    }else{
+
+    }
+
    }
 
 
@@ -413,9 +434,13 @@ return false
     const tis_quantity = document.getElementById("tis_quantity").value;
 
 if(pi == 3){
-
-  document.getElementById("tis_sum").value = (limit_price / 8) * tis_quantity;
-}else {
+  document.getElementById("tis_sum").value = (limit_price) * tis_quantity;
+  document.getElementById("tis_compensation").value = limit_price * tis_quantity ;
+}else if(pi == 4) {
+  document.getElementById("tis_sum").value = limit_price;
+  document.getElementById("tis_compensation").value = limit_price;
+}
+else {
   document.getElementById("tis_sum").value = aaaa * tis_quantity;
 }
   
@@ -429,7 +454,7 @@ if(pi == 3){
     const tis_quantity = document.getElementById("tis_quantity").value;
     const teacher_id = document.getElementById("teacher_id").value
 
-    if((pi == 1) || (pi == 2)){
+  
 
       
  let data = await fetch('/api/checkhours', {
@@ -458,7 +483,7 @@ if(pi == 3){
    
 return data
 
-    }
+
 
 
    }
@@ -504,8 +529,10 @@ return data
   }
 
 
-  function setValueDeleteModal(id) {
+  function setValueDeleteModal(id,py_id) {
     document.getElementById("id_delete").value = id;
+    document.getElementById("py_id_delete").value = py_id;
+    
   }
 
 
@@ -561,7 +588,7 @@ return data
           </div>
           {% endfor %}
         </div> {% endcomment %}
-
+        <input type="hidden" class="form-control" name="count_day" id="count_day"  value="{{count_day}}"/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
         <input type="hidden" class="form-control" name="limit_price" id="limit_price"  value="{{main_data.limit_price}}"/>
         <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
@@ -597,12 +624,15 @@ return data
         จำนวนต่อหน่วย :   <label style="color: red"> *</label> 
         <select class="form-select" id="tis_unit" name="tis_unit"  style="pointer-events: none; background-color: #e9ecef;">
           
-          <option value="hour">
+        <option value="hour">
              ชั่วโมง
-          </option>
-          <option value="day">
+        </option>
+        <option value="day">
             วัน
          </option>
+         <option value="work">
+          งาน
+        </option>
         </select>
     </div>
 
@@ -644,7 +674,10 @@ return data
   <label style="color: red">จำนวนชั่วโมงครูฝึก {{main_data.ev_hour_two}} ชั่วโมง</label>  <label style="color: red">จำนวนวิทยากร {{main_data.ev_people_two}} คน </label> 
 </div>
 <div class="col-12 col-lg-12 col-md-12">
-  <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร {{main_data.ev_hour_three}} ชั่วโมง</label>  <label style="color: red">จำนวนวิทยากร {{main_data.ev_people_three}} คน </label> 
+  <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร {{count_day}} วัน</label>  <label style="color: red"> ค่าตอบแทนจะเปลี่ยนแปลงเมื่อจำนวน ผู้ช่วยเพิ่ม </label> 
+</div>
+<div class="col-12 col-lg-12 col-md-12">
+  <label style="color: red">ผู้ช่วยงาน 1 งาน</label>  <label style="color: red"></label> 
 </div>
    
 
@@ -695,7 +728,7 @@ return data
               {{res.teacher.teacher_prefix_th}}{{res.teacher.teacher_firstname_th}}
               {{res.teacher.teacher_lastname_th}}
             </td>
-            <td>{{res.pi.pi_name}}</td>
+            <td>{{res.pi.pi_name}}  </td>
             <td align="right">
               {{res.tis_compensation|floatformat:2|intcomma}}
             </td>
@@ -707,7 +740,7 @@ return data
                 {% if res.active == 0 %}
                 <button
                   type="button"
-                  onclick="setValueDeleteModal('{{res.pk}}')"
+                  onclick="setValueDeleteModal('{{res.pk}}','{{res.pi_id}}')"
                   class="btn btn-danger"
                   data-bs-toggle="modal"
                   data-bs-target="#DeleteClick"
@@ -757,6 +790,7 @@ return data
           <div class="modal-body">
             {% csrf_token %}
             <input type="hidden" name="id" id="id_delete" required />
+            <input type="hidden" name="py_id_delete" id="py_id_delete" required />
             <input
               type="hidden"
               name="ev_id"
