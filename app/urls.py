@@ -47,6 +47,8 @@ urlpatterns = [
     path('approve/update/payment', register.approve_list),
     path('approve/update/set', register.approve_update_status,
          name="ApproveSetStatus"),
+
+    path('approve/update/event', register.approve_lis_event),
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),

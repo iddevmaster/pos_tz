@@ -387,6 +387,12 @@ def payment_create(request):
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
 
+ 
+    instecent = register_main.objects.get(register_id=register_id)
+    instecent.status = 'N'
+    instecent.save()
+
+
     # Crate Main
     object = register_payment.objects.create(
         rp_doc_number=rp_doc_number,
@@ -1002,6 +1008,48 @@ def register_management(request):
     return render(request, 'register/register_management.html', context)
 
 
+def approve_lis_event(request):
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    # month_current = date.today().month
+    # year_current = date.today().year
+    month_current = request.GET.get('qmonths', date.today().month)
+    year_current = request.GET.get('qyear', date.today().year)
+
+    content = register_main.objects.filter(status='N').exclude(register_number="-").order_by("-crt_date")
+    obj = []
+    for r in content:
+
+        customer_list = customers.objects.select_related('register').filter(
+            register_id=r.register_id).first()
+        total_payment = register_payment.objects.filter(
+            register_id=r.register_id).count()
+        course_list = course_event.objects.select_related(
+            'course').filter(ev_id=r.ev_id).first()
+        res = {'customer_list': customer_list,
+               'course_list': course_list, 'total_payment': total_payment}
+        print(customer_list.register)       
+        obj.append(res)
+    context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
+ 
+
+    return render(request, 'register/approve_list_event.html', context)
+
 @login_required(login_url='/login')
 def update_close_the_sale(request):
     current_user = request.user
@@ -1111,6 +1159,7 @@ def approve_update_status(request):
 #     return render(request, 'upload_excel.html', {'form': form})    
 
 
+
 def upload_excel(request):
 
   code = request.POST.get('register')  # Get text input from FormData
@@ -1137,8 +1186,7 @@ def upload_excel(request):
             excel_data = []
           
             total = rp_quota + row_count
-            print(payment_data.rp_quota)
-            print(total)
+      
             if payment_data.rp_quota >= total:
                
                 for row in worksheet.iter_rows(values_only=True):

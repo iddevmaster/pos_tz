@@ -169,6 +169,12 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
+        {
+        "value": "approve/update/event",
+        "label": "อนุมัติวันอบรม",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
     {
         "value": "finance/billing/setting",
         "label": "กำหนดค่าตอบแทนวันอบรม",
@@ -181,6 +187,7 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+
     {
         "value": "billing/setting/form/create",
         "label": "ตัดรอบค่าตอบแทน",
@@ -217,6 +224,7 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+    
 
 ]
 
