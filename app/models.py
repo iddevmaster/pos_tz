@@ -130,6 +130,7 @@ class register_main(models.Model):
         User, on_delete=models.CASCADE, related_name="user_create")
     user_update = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_update")
+    status = models.CharField(max_length=1, blank=True, default=None)    
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
 
 

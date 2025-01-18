@@ -1031,9 +1031,10 @@ def approve_lis_event(request):
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
 
-    content = register_main.objects.filter(status='N').exclude(register_number="-").order_by("-crt_date")
+    content = register_main.objects.filter(status='N')
     obj = []
-    for r in content:
+    if content:
+     for r in content:
 
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
@@ -1041,11 +1042,10 @@ def approve_lis_event(request):
             register_id=r.register_id).count()
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,
+        res = {'customer_list': customer_list,'register_id':r.register_id,
                'course_list': course_list, 'total_payment': total_payment}
-        print(customer_list.register)       
         obj.append(res)
-    context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
+     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
  
 
     return render(request, 'register/approve_list_event.html', context)

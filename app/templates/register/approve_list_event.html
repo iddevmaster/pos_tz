@@ -7,6 +7,19 @@
   function cancle_register(register_id) {
     document.getElementById("register_id_delete").value = register_id;
   }
+
+
+  function setValueUpdateModal(
+    register_id,
+    ids,
+  ) {
+    console.log(register_id);
+    document.getElementById("register_id_update").value = register_id;
+    document.getElementById("ev_id_update").value = ids;
+
+    
+
+  }
   function default_date() {
     const d = new Date();
     let month = d.getMonth() + 1;
@@ -97,12 +110,11 @@
           <tr>
             <th>ลำดับ</th>
             <th>เลขที่ใบสมัคร</th>
+            <th>ไอเทม</th>
             <th>หลักสูตร</th>
             <th>ชื่อลูกค้า</th>
-            <th>ประเภทลูกค้า</th>
-            <th>ประเภทการชำระเงิน</th>
-            <th>ปิดการขาย</th>
-            <th>วันที่ลงทะเบียน</th>
+            <th>วันที่จัด</th>
+        
             <th>#</th>
           </tr>
         </thead>
@@ -110,93 +122,28 @@
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.customer_list.register.register_number}}</td>
+            <td>{{res.customer_list.register.register_number}} {{res.register_id}}</td>
+            <td>{{res.course_list.course.course_code}}</td>
             <td>{{res.course_list.course.course_name}}</td>
             <td>{{res.customer_list.customer_name}}</td>
-            <td align="center">
-              {% if res.customer_list.register.customer_type == 1 %}
-
-              <span class="badge bg-success">บุคคล</span>
-              {% else %}
-              <span class="badge bg-info">บริษัท</span>
-              {% endif %}
-            </td>
-            <td align="center">
-              {% if res.customer_list.register.pay_type == 1 %}
-
-              <span class="badge bg-success">เงินสด</span>
-              {% else %}
-              <span class="badge bg-danger">เครดิต</span>
-              {% endif %}
-            </td>
-
-            <td align="center">
-              {% if res.customer_list.register.close_the_sale == 1 %}
-              <span class="badge bg-success">ปิดการขาย - ขายสำเร็จ</span>
-              {% elif res.customer_list.register.close_the_sale == 2 %}
-              <span class="badge bg-danger">ปิดการขาย - ขายไม่สำเร็จ</span>
-              {% else %}
-              <span class="badge bg-warning">กำลังขาย</span>
-              {% endif %}
-            </td>
-
-            <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
+            <td>{{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}</td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
 
               <div class="btn-group me-1 mb-1">
                 <div class="dropdown">
                   <button
-                    class="btn btn-primary btn-sm dropdown-toggle"
+                    class="btn btn-primary btn-sm"
                     type="button"
                     id="dropdownMenuButtonIcon"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
+                    data-bs-toggle="modal"
+                    data-bs-target="#UpdateClick"
+                    onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
                   >
-                    <i class="icon dripicons-checklist"></i>
+                   ปิดงาน
                   </button>
-                  <div class="dropdown-menu">
-                    <a
-                      class="dropdown-item"
-                      href="/register/payment/history/{{res.customer_list.register_id}}"
-                    >
-                      {% if res.customer_list.register.pay_type == 1 %} ใบเสร็จ
-                      {% else %} ใบเสนอราคา {% endif %}
-                    </a>
-                    {% if res.customer_list.register.close_the_sale < 1 %}
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#UpdateClick"
-                      onclick="set_close_the_sale('{{res.customer_list.register_id}}')"
-                      >ปิดการขาย</a
-                    >
-                    {% endif %}
-                    <a
-                      class="dropdown-item"
-                      href="/register/detail/{{res.customer_list.register_id}}"
-                      >รายละเอียดการสมัคร</a
-                    >
-                    {% if res.customer_list.register.close_the_sale == 1 %}
-                    <a
-                      class="dropdown-item"
-                      href="/register/studentlist/{{res.customer_list.register_id}}"
-                      >จัดการผู้เข้าอบรมและออกใบรับรอง
-                    </a>
-
-                    {% else %}
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#DeleteClick"
-                      onclick="cancle_register('{{res.customer_list.register_id}}')"
-                      >ยกเลิกใบสมัคร
-                    </a>
-                    {% endif %}
-                  </div>
+               
+        
                 </div>
               </div>
             </td>
@@ -234,14 +181,20 @@
       >
         {% csrf_token %}
         <input
-          type="hidden"
+          type="text"
           id="register_id_update"
           name="register_id"
           required
         />
+        <input
+        type="text"
+        name="ev_id"
+        id="ev_id_update"
+        required
+      />
         <div class="modal-body">
           <div class="form-group">
-            <label>ยืนยันราคา (ตัวอย่าง 25000)</label>
+            <label>Po</label>
             <label style="color: red">*</label>
             <input
               type="text"
@@ -251,24 +204,35 @@
               class="form-control"
               pattern="[0-9.]+"
             />
-            <p>
-              <small class="text-muted">ยืนยันราคาให้ตรงกับใบเสนอราคา</small>
-            </p>
           </div>
 
           <div class="form-group">
-            <label>ปิดการขาย</label> <label style="color: red">*</label>
-            <select
-              class="form-control"
-              name="close_the_sale"
-              id="close_the_sale"
+            <label>Sq</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              id="confirm_price"
+              name="confirm_price"
               required
-            >
-              <option value="">-เลือกสถานะ-</option>
-              <option value="1">ปิดการขาย - ขายสำเร็จ</option>
-              <option value="2">ปิดการขาย - ไม่ขายสำเร็จ</option>
-            </select>
+              class="form-control"
+              pattern="[0-9.]+"
+            />
           </div>
+
+          <div class="form-group">
+            <label>So</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              id="confirm_price"
+              name="confirm_price"
+              required
+              class="form-control"
+              pattern="[0-9.]+"
+            />
+          </div>
+
+   
           <p id="datecrt"></p>
         </div>
         <div class="modal-footer">
@@ -290,51 +254,6 @@
   </div>
 </div>
 
-{% comment %} Delete {% endcomment %}
-<div class="modal fade" id="DeleteClick">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header bg-danger">
-        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'CancleRegister' %}" method="post">
-        <div class="modal-body">
-          {% csrf_token %}
-          <input
-            type="hidden"
-            name="register_id"
-            id="register_id_delete"
-            required
-          />
-          <div align="center">
-            <h4>ยืนยันการลบข้อมูล</h4>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
-              <i class="bx bx-x d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยกเลิก</span>
-            </button>
-            <button type="submit" class="btn btn-primary ml-1">
-              <i class="bx bx-check d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยืนยันการลบ</span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
 
 {% endblock %}
