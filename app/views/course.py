@@ -392,28 +392,29 @@ def calendar_event_api(request):
         # 2022-10-31T00:00:00+07:00 to  2022-10-31
         eobj = str(end).split("T")[0]
     else:
-        sobj = _date + timedelta(days=-30)
-        eobj = _date + timedelta(days=30)
-
-    contentxxx = event_register.objects.select_related('ev').filter(status='N')
+        sobj = _date + timedelta(days=0)
+        eobj = _date + timedelta(days=60)
+    status = ['N','W','Y']
+    contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
     
-        
-    content = course_event.objects.select_related(
-        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
+ 
+    # content = course_event.objects.select_related(
+    #     "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
     # print(len(content))
 
-    obj = []
     
-    for x in contentxxx:
-       
-       content = course_event.objects.select_related("course").filter(ev_id=x.ev_id,active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
-       for r in content:
-        instance = course_event.objects.get(pk=r.ev_id)
+    obj = []
+    sff = []
+    for r in contentxxx:
         
-        end = str(r.ev_date_end)
+    
+        instance = course_event.objects.get(pk=r.ev.ev_id)
+    
+        end = str(r.ev.ev_date_end)
+      
         y, m, d = end.split("-")
         nextdayend = addDay(1, int(y), int(m), int(d))
-            
+        
 
         col = r.status
         if col == 'W' :
@@ -422,34 +423,35 @@ def calendar_event_api(request):
          t = '#eb2509'   
         else:
          t = '#4be01b'
-        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
+        teacher_data = teacher_income_setting.objects.filter(ev=r.ev.ev_id)
+       
+      
+        if teacher_data.count() > 0:
+            sff = [
+            {
+                "teacher_prefix_th": x.teacher.teacher_prefix_th,
+                "teacher_firstname_th": x.teacher.teacher_firstname_th,
+                "teacher_lastname_th": x.teacher.teacher_lastname_th,
+                "pi_id":x.pi_id,
+                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "tis_quantity": x.tis_quantity,
+                "tis_unit": x.tis_unit,
+                "compensation":x.tis_compensation,
+                "id":x.id,
+                "status":x.status,
+                "teacher_id": x.teacher_id,
+                "tis_sum": x.tis_sum
+            }
+            for x in teacher_data
+         ]
         
-        sff = [
-        
-        {
-            "teacher_prefix_th": x.teacher.teacher_prefix_th,
-            "teacher_firstname_th": x.teacher.teacher_firstname_th,
-            "teacher_lastname_th": x.teacher.teacher_lastname_th,
-            "pi_id":x.pi_id,
-            "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
-            "tis_quantity": x.tis_quantity,
-            "tis_unit": x.tis_unit,
-            "compensation":x.tis_compensation,
-            "id":x.id,
-            "status":x.status,
-            "teacher_id": x.teacher_id,
-            "tis_sum": x.tis_sum
-        }
-          
-        for x in teacher_data
-        
-    ]
     #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
     #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
-       
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'data':sff,
-                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
+        
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.ev.course.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'data':sff,
+                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
         obj.append(res)
+        print('r',res)
     return JsonResponse(obj, safe=False)
 
 

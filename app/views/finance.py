@@ -272,7 +272,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
             register_id=register,
         )
          content.save()
-         x = course_event.objects.get(pk=instance_ev.ev_id)
+         x = event_register.objects.get(register_id=register_id)
          x.status = "W"
          x.save()
 
@@ -295,7 +295,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
             
          )
          contentx.save()
-         x = course_event.objects.get(pk=instance_ev.ev_id)
+         x = event_register.objects.get(register_id=register_id)
          x.status = "W"
          x.save()
          tot = 0
@@ -322,7 +322,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
          )
          contentx.save()
   
-         x = course_event.objects.get(pk=instance_ev.ev_id)
+         x = event_register.objects.get(register_id=register_id)
          x.status = "W"
          x.save()
          delta = x.ev_date_end - x.ev_date_start
