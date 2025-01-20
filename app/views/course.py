@@ -460,7 +460,7 @@ def calendar_event_api2(request,id):
     sss = id
     
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
-  
+    
     obj = []
     
     for r in content:  
@@ -478,7 +478,7 @@ def calendar_event_api2(request,id):
         a = teacher.objects.get(teacher_id=x.teacher_id)
         pa = pay_item.objects.filter(id=x.pi_id).first()
        
-        fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa)}
+        fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa),'register_id':r.register_id}
         
         te.append(fs)  
         
@@ -582,12 +582,12 @@ def updateeve(request):
             return JsonResponse({"error": 'x'}, status=400,safe=False)
 
         content = teacher_income_setting.objects.get(id=evs_id)
-    
+       
         teach = teacher_income_setting.objects.filter(ev_id=content.ev_id)
         all_passed = all(record.status == 'Y' for record in teach)
         if all_passed:
          
-            content = course_event.objects.get(ev_id=content.ev_id)
+            content = event_register.objects.get(ev_id=content.ev_id,register_id=content.register_id)
             content.status = 'Y'
             content.save()
         return JsonResponse({"status": "ok"}, status=200)       

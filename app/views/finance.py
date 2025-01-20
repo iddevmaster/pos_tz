@@ -49,7 +49,8 @@ def course_event_list(request):
     # result = course_event.objects.select_related("course").filter(
     #     cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
     te = []
-    result = event_register.objects.select_related("ev").filter(ev__cancelled=1, status='N', ev__ev_date_start__month=month_current, ev__ev_date_start__year=year_current, ev__module=m.module)
+    status = ['N','W','Y']
+    result = event_register.objects.select_related("ev").filter(ev__cancelled=1, status__in=status, ev__ev_date_start__month=month_current, ev__ev_date_start__year=year_current, ev__module=m.module)
     for r in result:  
      content = course.objects.get(pk=r.ev.course_id)
      saf = register_main.objects.get(pk=r.register_id)
