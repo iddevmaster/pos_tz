@@ -47,8 +47,10 @@ urlpatterns = [
     path('approve/update/payment', register.approve_list),
     path('approve/update/set', register.approve_update_status,
          name="ApproveSetStatus"),
-
+    path('approve/update/processevent', register.approve_lis_event_end),
     path('approve/update/event', register.approve_lis_event),
+    path('register/update/event',
+         register.update_close_the_event, name="UpdateCloseTheEvent"),
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),
@@ -142,7 +144,7 @@ urlpatterns = [
          name="billing_cycle_setting_form_create"),
     path('billing/setting/form/delete', finance.billing_cycle_setting_form_delete,
          name="billing_cycle_setting_form_delete"),
-    path('course/event/teachers/form/create/<slug:ev_id>',
+    path('course/event/teachers/form/create/<slug:register_id>',
          finance.course_teacher_event_set_income_form_create),
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),

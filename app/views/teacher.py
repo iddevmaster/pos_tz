@@ -306,7 +306,6 @@ def teacher_list_cale(request):
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
-     
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0

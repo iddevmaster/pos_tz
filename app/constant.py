@@ -176,6 +176,12 @@ listMenu = [
         "group_label": "อนุมัติเอกสาร",
     },
     {
+        "value": "approve/update/processevent",
+        "label": "อนุมัติการจบงาน",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
+    {
         "value": "finance/billing/setting",
         "label": "กำหนดค่าตอบแทนวันอบรม",
         "group_value": "naSt0v",

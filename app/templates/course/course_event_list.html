@@ -650,7 +650,7 @@ function removeFirstCharacter(str) {
           </div>
         </div>
       </form>
-
+   
       <table class="table table-striped" id="table1">
         <thead>
           <tr>
@@ -663,7 +663,7 @@ function removeFirstCharacter(str) {
             <th>ชั่วโมง</th>
             <th>รุ่น</th>
             <th>วันหมดอายุใบรับรอง</th>
-            <th>ครู - วิทยากร</th>
+            <th>ครู + วิทยากร</th>
             <th>พร้อมทำงาน</th>
             <th>แสดงทีมงาน</th>
             <th>#</th>
@@ -672,6 +672,8 @@ function removeFirstCharacter(str) {
         <tbody>
           
           {% for res in data %}
+
+        
           <tr>
            
             <td align="center">{{ forloop.counter }}</td>

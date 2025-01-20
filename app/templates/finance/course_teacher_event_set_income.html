@@ -576,7 +576,7 @@ return data
         </h3>
       </div>
       <form onsubmit="return Save(event);"
-        action="/course/event/teachers/form/create/{{main_data.ev_id}}"
+        action="/course/event/teachers/form/create/{{register_id}}"
         method="post"
         autocomplete="off"
       >
@@ -588,6 +588,9 @@ return data
           </div>
           {% endfor %}
         </div> {% endcomment %}
+
+       
+        <input type="text" class="form-control" name="register_id" id="register_id"  value="{{register_id}}"/>
         <input type="hidden" class="form-control" name="count_day" id="count_day"  value="{{count_day}}"/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
         <input type="hidden" class="form-control" name="limit_price" id="limit_price"  value="{{main_data.limit_price}}"/>

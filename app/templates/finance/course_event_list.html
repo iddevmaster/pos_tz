@@ -91,6 +91,7 @@
         <thead>
           <tr>
             <th>ลำดับ</th>
+            <th>เลขที่บิล</th>
             <th>รหัสหลักสูตร</th>
             <th>ชื่อหลักสูตร</th>
             <th>ราคา (บาท)</th>
@@ -105,8 +106,9 @@
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.course.course_code}}</td>
-            <td>{{res.course.course_name}}</td>
+            <td>{{res.bill}}</td>
+            <td>{{res.course_code}}</td>
+            <td>{{res.course_name}}</td>
             <td align="right">{{ res.ev_price|floatformat:2|intcomma }}</td>
             <td align="center">
               {% if res.ev_vat == 1 %}
@@ -129,7 +131,7 @@
               <button
                 type="button"
                 class="btn btn-info"
-                onclick="window.location.href='/course/event/teachers/form/create/{{res.ev_id}}'"
+                onclick="window.location.href='/course/event/teachers/form/create/{{res.register_id}}'"
               >
                 <i class="icon dripicons-user"></i> จัดการ
               </button>

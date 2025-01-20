@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -394,14 +394,20 @@ def calendar_event_api(request):
     else:
         sobj = _date + timedelta(days=-30)
         eobj = _date + timedelta(days=30)
+
+    contentxxx = event_register.objects.select_related('ev').filter(status='N')
+    
+        
     content = course_event.objects.select_related(
         "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
     # print(len(content))
 
     obj = []
     
-    for r in content:
-        
+    for x in contentxxx:
+       
+       content = course_event.objects.select_related("course").filter(ev_id=x.ev_id,active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
+       for r in content:
         instance = course_event.objects.get(pk=r.ev_id)
         
         end = str(r.ev_date_end)
@@ -557,8 +563,7 @@ def updateeve(request):
             # Parse JSON data from the request body
             data = json.loads(request.body)
             evs_id = data.get("evs_id")
-           
-
+    
             content = teacher_income_setting.objects.get(id=evs_id)
             
             content.status = "Y"

@@ -130,7 +130,10 @@ class register_main(models.Model):
         User, on_delete=models.CASCADE, related_name="user_create")
     user_update = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_update")
-    status = models.CharField(max_length=1, blank=True, default=None)    
+    status = models.CharField(
+        max_length=1, blank=True, default=None)
+    number_order = models.CharField(
+        max_length=64, blank=True, default=None)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
 
 
@@ -265,6 +268,7 @@ class teacher_income_setting(models.Model):
     teacher = models.ForeignKey(teacher, on_delete=models.CASCADE)
     pi = models.ForeignKey(pay_item, on_delete=models.CASCADE)
     status = models.CharField(blank=True, null=True, max_length=1)
+    register_id  = models.CharField(max_length=254, blank=True, default="-")
 
 class billing_cycle_setting(models.Model):
     bcs_start_day = models.IntegerField(default=0, blank=False)
@@ -330,4 +334,20 @@ class project_code(models.Model):
     status = models.IntegerField(default=1, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
+
+class event_register(models.Model):
+    er_id = models.AutoField(primary_key=True)
+    ev = models.ForeignKey(course_event, on_delete=models.CASCADE ,related_name="ref_create_ev")
+    register = models.ForeignKey(register_main, on_delete=models.CASCADE, related_name="ref_create_ev_reg")
+    status = models.CharField(max_length=1, default=0 , blank=False)
+
+class salesorder(models.Model):
+    sale_id = models.AutoField(primary_key=True)
+    er = models.ForeignKey(event_register, on_delete=models.CASCADE ,related_name="ref_er")
+    type_sa = models.CharField(max_length=128, default=None , blank=True)
+    po = models.CharField(max_length=64, blank=True, default=None)
+    sq = models.CharField(max_length=64, blank=True, default=None)
+    so = models.CharField(max_length=64, blank=True, default=None)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
 
