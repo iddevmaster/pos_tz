@@ -175,10 +175,10 @@ def course_event_create(request):
     active = request.POST['active']
     ev_hour = request.POST['ev_hour']
     ev_hour_two = request.POST['ev_hour_two']
-    ev_hour_three = request.POST['ev_hour_three']
+    # ev_hour_three = request.POST['ev_hour_three']
     ev_people = request.POST['ev_people']
     ev_people_two = request.POST['ev_people_two']
-    ev_people_three = request.POST['ev_people_three']
+    # ev_people_three = request.POST['ev_people_three']
     limitprice = request.POST['limit_price']
 
     try:
@@ -203,10 +203,10 @@ def course_event_create(request):
         upd_date=dateTimeNow(),
         ev_hour=ev_hour,
         ev_hour_two=ev_hour_two,
-        ev_hour_three=ev_hour_three,
+        ev_hour_three=0,
         ev_people=ev_people,
         ev_people_two=ev_people_two,
-        ev_people_three=ev_people_three,
+        ev_people_three=10,
         limit_price=limitprice,
         status='N',
         module=m.module,
@@ -258,10 +258,10 @@ def course_event_update(request):
     active = request.POST['active']
     ev_hour = request.POST['ev_hour']
     ev_hour_two = request.POST['ev_hour_two']
-    ev_hour_three = request.POST['ev_hour_three']
+    ev_hour_three = 0
     ev_people = request.POST['ev_people_update']
     ev_people_two = request.POST['ev_people_two_update']
-    ev_people_three = request.POST['ev_people_three_update']
+    ev_people_three = 10
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -447,9 +447,10 @@ def calendar_event_api(request):
         
     #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
     #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
-        
+        delta = r.ev.ev_date_end - r.ev.ev_date_start
+        days_difference = delta.days + 1
         res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.ev.course.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'data':sff,
-                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three}
+                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three,'count_day':days_difference,'register_id':r.register_id}
         obj.append(res)
         print('r',res)
     return JsonResponse(obj, safe=False)

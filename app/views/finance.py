@@ -54,7 +54,7 @@ def course_event_list(request):
     for r in result:  
      content = course.objects.get(pk=r.ev.course_id)
      saf = register_main.objects.get(pk=r.register_id)
-     print(saf)
+     
      
      fs = {'register_id':r.register_id,'course_code':content.course_code,'course_name':content.course_name,'ev_id':r.ev.ev_id,'ev_price':r.ev.ev_price,'ev_date_start':r.ev.ev_date_start,'ev_date_end':r.ev.ev_date_end,'ev_generation':r.ev.ev_generation,'ev_expired_cer_date':r.ev.ev_expired_cer_date,'ev_expired_cer_quantity':r.ev.ev_expired_cer_quantity,'bill':saf.register_number}
         
@@ -536,11 +536,14 @@ def saveeventadmin(request):
             tis_quantity = data.get("tis_quantity")
             tis_sum = data.get("tis_sum")
             tis_unit = data.get("tis_unit")
-
+            
+                 
+            register = str(data.get("register_id")).replace('-', '')
+          
             instance = course_event.objects.filter(pk=ev_id).first()
-            print(instance.ev_date_start)
-
-            content = teacher_income_setting(
+      
+            if pi == '1' or pi == '2':
+              content = teacher_income_setting(
                 tis_compensation=tis_compensation,
                 tis_unit=tis_unit,
                 tis_quantity=tis_quantity,
@@ -552,12 +555,65 @@ def saveeventadmin(request):
                 pi_id=pi,
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
-                status='W'
+                status='W',
+                register_id=register,
                 )
-            content.save()
+              content.save()
+            datas = {'status':200} 
+            if pi == '3':
 
-            instance.status = 'W'
-            instance.save()
+              content = teacher_income_setting(
+                tis_compensation=tis_compensation,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=tis_sum,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id=register,
+            )
+              content.save()
+  
+              x = course_event.objects.get(ev_id=ev_id)
+             
+              delta = x.ev_date_end - x.ev_date_start
+              days_difference = delta.days + 1
+              tot = 0
+              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).count()
+            
+              if totalpeol > 0 :
+               tt_event = x.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+               bb = (x.limit_price * days_difference) / totalpeol
+               teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+            datas = {'status':200}
+            if pi == '4':    
+              content = teacher_income_setting(
+                tis_compensation=tis_compensation,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=tis_sum,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id=register,
+            )
+              content.save()
+              x = course_event.objects.get(ev_id=ev_id)
+              tot = 0
+              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).count()
+              if totalpeol > 0 :
+                  bb = x.limit_price / totalpeol
+                  teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).update(tis_sum=bb,tis_compensation=bb)
             
             datas = {'status':200}
             return JsonResponse(datas, status=200,safe=False)

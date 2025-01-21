@@ -4,19 +4,37 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
+// $(document).ready(function () {
+//     // Initialize Select2
+//     $('#teacher').select2({
+//         dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+//     });
+
+//     // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
+//     $('#select2Modal').on('shown.bs.modal', function () {
+//         $('#teacher').select2({
+//             dropdownParent: $('#select2Modal')
+//         });
+//     });
+// });
+
+
 $(document).ready(function () {
-    // Initialize Select2
-    $('#teacher').select2({
-        dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+    // Initialize Select2 inside modal
+    $('#eventModal').on('shown.bs.modal', function () {
+        $('#teacher').select2({
+            dropdownParent: $('#eventModal') // Ensure dropdown is within the modal
+        }).select2('close'); // Optional: Auto-open Select2
     });
 
-    // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
-    $('#select2Modal').on('shown.bs.modal', function () {
-        $('#teacher').select2({
-            dropdownParent: $('#select2Modal')
-        });
+    // Prevent form submission on Enter key in search field
+    $(document).on('keypress', '.select2-search__field', function (e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+        }
     });
 });
+
 
 function setValueDeleteModal(id) {
   
@@ -81,7 +99,7 @@ function calen() {
         },
       },
       eventClick: function (info) {
-      
+        
     $('#cardContainer').empty(); // Clear previous cards
         document.getElementById('eventModalLabel').innerText = info.event.title;
 
@@ -163,13 +181,12 @@ function calen() {
       },
       eventClick: function (info) {
         
-        
-  
     $('#cardContainer').empty(); // Clear previous cards
+        document.getElementById('register_id').value = info.event.extendedProps.register_id;
+        document.getElementById('count_day').value = info.event.extendedProps.count_day;
         document.getElementById('eventModalLabel').innerText = info.event.title;
 
-
-       
+        
         document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
         document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
 
@@ -178,12 +195,12 @@ function calen() {
 
         document.getElementById("ev_hour").innerText = info.event.extendedProps.ev_hour
         document.getElementById("ev_hour_two").innerText = info.event.extendedProps.ev_hour_two
-        document.getElementById("ev_hour_three").innerText = info.event.extendedProps.ev_hour_three
+
 
 
         document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
         document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
-        document.getElementById("ev_people_three").innerText = info.event.extendedProps.ev_people_three
+  
         
         const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
         eventModal.show();
@@ -193,13 +210,26 @@ function calen() {
     const tableBody = document.getElementById('json-table-body');
     tableBody.innerHTML = ''; // Clears all rows
             jsonData.forEach((item,index) => {
+              console.log(item)
+              if(item.tis_unit == 'day'){
+                var dt = 'วัน'
+              }
+              if(item.tis_unit == 'hour'){
+                var dt = 'ชั่วโมง'
+              }
+              if(item.tis_unit == 'work'){
+                var dt = 'งาน'
+              }
+              
                 const row = document.createElement('tr');
+
                 if(item.status == 'W'){
+                 
                   row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
-                  <td>${item.compensation} / ชั่วโมง</td>
+                    <td>${item.compensation} / ${dt}</td>
                     <td>${item.tis_quantity} </td>  
                     <td>${item.tis_sum}</td>
                       <td><span style="color:#ea7731">รอการยืนยัน</span></td>
@@ -267,9 +297,9 @@ function calen() {
    let tis_quantity = document.getElementById("tis_quantity").value
    let tis_sum = document.getElementById("tis_sum").value
    const ev_id = document.getElementById("ev_id").value
-
-
-
+   const register_id = document.getElementById("register_id").value
+   console.log(register_id);
+   
     if(te == ""){
     Swal.fire({
       title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
@@ -339,7 +369,7 @@ method: 'POST',
 headers: {
     'Content-Type': 'application/json',
 },
-body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum})
+body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum,'register_id':register_id})
 })
 .then(response => response.json())
 .then(data => {
@@ -380,9 +410,53 @@ if(data.status == 200){
     
   }
 
+
+
   function handleSelectChangePy(selectElement) {
     const selectedValue = selectElement.value;
- document.getElementById("pi").value = selectedValue;
+    document.getElementById("pi").value = selectedValue;
+    
+    if(selectElement.value == 3) {
+      const count_day = document.getElementById("count_day").value 
+      const limit_price = document.getElementById("limit_price").value
+      document.getElementById("tis_unit").value = 'day';
+      document.getElementById('tis_quantity').value = count_day
+      document.getElementById('tis_compensation').value = limit_price
+      const input = document.getElementById('tis_sum').value = limit_price * count_day
+
+      
+      const x = document.getElementById('tis_quantity');
+      x.readOnly = true; // Set the input field to readonly
+      x.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+ 
+
+      
+    }
+    if(selectElement.value == 4) {
+      document.getElementById("tis_unit").value = 'work';
+      const input = document.getElementById('tis_quantity');
+      const limit_price = document.getElementById("limit_price").value
+      document.getElementById('tis_sum').value = limit_price
+      document.getElementById('tis_compensation').value = limit_price
+    
+      input.readOnly = true; // Set the input field to readonly
+      input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      input.value = 1;
+      
+    }
+    if((selectElement.value == 1) ||(selectElement.value == 2)) {
+      document.getElementById("tis_unit").value = 'hour';
+      const input = document.getElementById('tis_quantity');
+      const x = document.getElementById('tis_quantity');
+
+
+      input.readOnly = false; // Remove readonly
+      input.style.backgroundColor = ""; // Reset appearance
+      x.readOnly = false; // Remove readonly
+      x.style.backgroundColor = ""; // Reset appearance
+    }
+
+
 
  setTimeout(() => {
   CheckHourbeforeSave()
@@ -395,6 +469,7 @@ if(data.status == 200){
   Caculate()
  }, 200);
   }
+
 
 
   function handleSelectChange(selectElement) {
@@ -419,18 +494,22 @@ if(data.status == 200){
 
   function Caculate() {
     const pi = document.getElementById("pi").value
+    const limit_price = document.getElementById("limit_price").value
+    
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
-    const limit_price = document.getElementById("limit_price").value
 
-
-   if(pi == 3){
-
-    document.getElementById("tis_sum").value = (limit_price / 8) * tis_quantity;
-
-}else {
-    document.getElementById("tis_sum").value = aaaa * tis_quantity;
+if(pi == 3){
+  document.getElementById("tis_sum").value = (limit_price) * tis_quantity;
+  document.getElementById("tis_compensation").value = limit_price * tis_quantity ;
+}else if(pi == 4) {
+  document.getElementById("tis_sum").value = limit_price;
+  document.getElementById("tis_compensation").value = limit_price;
 }
+else {
+  document.getElementById("tis_sum").value = aaaa * tis_quantity;
+}
+  
    }
 
    async function CheckHourbeforeSave() {
@@ -442,6 +521,8 @@ const tis_quantity = document.getElementById("tis_quantity").value;
 const teacher_id = document.getElementById("teacher_id").value
 
 
+
+  
 let data = await fetch('/api/checkhours', {
 method: 'POST',
 headers: {
@@ -456,9 +537,6 @@ body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':pars
     document.getElementById("status_hour").value = data.status_hour;
     document.getElementById("status_people").value = data.status_people;
     document.getElementById("status_teacher").value = data.status_teacher;
-
-
-
 //    return data.status
 
 
@@ -470,6 +548,10 @@ body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':pars
 });
 
 return data
+
+
+
+
 }
 
 
@@ -477,7 +559,8 @@ function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
     const csrftoken = "{{ csrf_token }}";
-  fetch('/api/get/compensation', {
+    if((py == 1)||(py == 2)){
+      fetch('/api/get/compensation', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -486,34 +569,41 @@ function getComposetaion() {
 })
     .then(response => response.json())
     .then(data => {
-        // Display response
-     console.log(data);
         if(data.length == 0){
           document.getElementById("tis_compensation").value = 0
           return false;
-        }else {
-          if(data.py_id == 3){
-
-            const limit_price = document.getElementById("limit_price").value
-            document.getElementById("tis_compensation").value = (limit_price / 8);
-
-  Caculate()
-}else {
-  document.getElementById("tis_compensation").value = data.compensation
-  Caculate()
-}
-       
         }
+        else {
+          document.getElementById("tis_compensation").value = data.compensation
+          Caculate()
 
-   
-
+// if(data.py_id == 3){
+//   const limit_price = document.getElementById("limit_price").value
+//   document.getElementById("tis_compensation").value = (limit_price);
+//   Caculate()
+// } else if(data.py_id == 4){
+//   console.log('else if');
+//   const limit_price = document.getElementById("limit_price").value
+//   document.getElementById("tis_compensation").value = limit_price
+//   Caculate()
+// } else {
+//   document.getElementById("tis_compensation").value = data.compensation
+//   Caculate()
+// }
+        
+        }
+    
 
 
     })
     .catch(error => {
         console.error('Error:', error);
-      
     });
+
+    }else{
+
+    }
+
    }
 
    function allowOnlyNumbers(event) {
@@ -591,6 +681,7 @@ CheckHourbeforeSave()
 </script>
 <style>
 
+
 .modal-xxl {
             max-width: 90%;
             width: 90%;
@@ -652,7 +743,7 @@ CheckHourbeforeSave()
       <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="eventModalLabel"></h5>
-
+            <input type="hidden" class="form-control" name="register_id" id="register_id" />
               <input
               type="hidden"
               name="ev_id"
@@ -660,7 +751,8 @@ CheckHourbeforeSave()
               required
              
             />
-
+         
+        <input type="hidden" class="form-control" name="count_day" id="count_day"  value=""/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price" />
         <input type="hidden" class="form-control" name="limit_price" id="limit_price"/>
         <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
@@ -671,7 +763,7 @@ CheckHourbeforeSave()
           <div class="modal-body">
             <div class="row">
               <div class="col-12 col-lg-6 col-md-6">
-                ตำแหน่ง / หน้าที่ / รายการ: *   <label style="color: red"> *</label> 
+                ตำแหน่ง / หน้าที่ / รายการ:    <label style="color: red"> *</label> 
                 <select class="form-select"  id="py" name="py" onchange="handleSelectChangePy(this)">
                   <option value="" disabled>
                     เลือก
@@ -691,11 +783,17 @@ CheckHourbeforeSave()
 
           
       <div class="col-12 col-lg-6 col-md-6">
-        จำนวนต่อหน่วย *:   <label style="color: red"> *</label> 
-        <select class="form-select" id="tis_unit" name="tis_unit">
+        จำนวนต่อหน่วย :   <label style="color: red"> *</label> 
+        <select class="form-select" id="tis_unit" name="tis_unit" style="pointer-events: none; background-color: #e9ecef;">
           <option value="hour">
-             ชั่วโมง
-          </option>
+            ชั่วโมง
+       </option>
+       <option value="day">
+           วัน
+        </option>
+        <option value="work">
+         งาน
+       </option>
         </select>
     </div>
 
@@ -705,17 +803,19 @@ CheckHourbeforeSave()
     </div>
 
     <div class="col-12 col-lg-6 col-md-6">
-      รวม: *   <label style="color: red"> *</label> 
+      รวม:   <label style="color: red"> *</label> 
       <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0"  readonly/>
   </div>
 
     <div class="col-6 col-lg-6 col-md-6">
       ครู - วิทยากร:   <label style="color: red"> *</label> 
-    <select id="select-example teacher" class="form-select select2" onchange="handleSelectChange(this)" name="teacher" style="width: 100%;">
-      {% for teachers in teacher %}
+    
+    <select id="teacher" class="form-select" onchange="handleSelectChange(this)" name="teacher" style="width: 100%;">
+      
       <option value="">
       เลือก
      </option>
+     {% for teachers in teacher %}
       <option value="{{ teachers.teacher_id }}">
          {{ teachers}}
       </option>
@@ -732,14 +832,18 @@ CheckHourbeforeSave()
             <label style="color: red">หมายเหตุ *</label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงวิทยากร <span id="ev_hour"></span>  ชั่วโมง </label>    <label style="color: red">จำนวน <span id="ev_people"></span> ท่าน </label> 
+           <label style="color: red">วิทยากร <span id="ev_hour"></span>  ชั่วโมง </label>    <label style="color: red">จำนวน <span id="ev_people"></span> ท่าน </label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
+           <label style="color: red">ครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร <span id="ev_hour_three"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_three"></span> ท่าน </label> 
+           <label style="color: red">ผู้ช่วยวิทยากร <span id="count_day"> วัน </span>  งาน</label><label style="color: red"> ค่าตอบแทนจะเปลี่ยนแปลงเมื่อจำนวน ผู้ช่วยเพิ่ม </label> 
          </div>
+         <div class="col-12 col-lg-12 col-md-12">
+          <label style="color: red">ผู้ช่วยงาน 1   งาน</label>  
+        </div>
+       
 
  
       <table class="table table-bordered table-striped">

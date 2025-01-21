@@ -487,10 +487,8 @@ function removeFirstCharacter(str) {
     ev_date_end,
     ev_hour,
     ev_hour_two,
-    ev_hour_three,
     ev_people,
     ev_people_two,
-    ev_people_three,
     ev_generation,
     ev_remark,
     ev_price,
@@ -511,10 +509,10 @@ function removeFirstCharacter(str) {
     document.getElementById("ev_date_end_update").value = ev_date_end;
     document.getElementById("ev_hour_update").value = ev_hour;
     document.getElementById("ev_hour_two_update").value = ev_hour_two;
-    document.getElementById("ev_hour_three_update").value = ev_hour_three;
+  
     document.getElementById("ev_people_update").value = ev_people;
     document.getElementById("ev_people_two_update").value = ev_people_two;
-    document.getElementById("ev_people_three_update").value = ev_people_three;
+ 
     document.getElementById("ev_remark_update").value = ev_remark;
     document.getElementById("ev_generation_update").value = ev_generation;
     document.getElementById("ev_price_update").value = ev_price;
@@ -736,7 +734,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -746,7 +744,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_hour_three}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_people_three}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -908,7 +906,7 @@ function removeFirstCharacter(str) {
             </div>
           </div>
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-8 col-sm-6">
               <label>จำนวนชั่วโมง / ผู้ช่วย</label> <label style="color: red">*</label>
               <input
@@ -935,7 +933,7 @@ function removeFirstCharacter(str) {
             </div>
           </div>
 
-   
+    -->
 
           <div class="form-group">
             <label>รุ่นที่</label> <label style="color: red">*</label>
@@ -1221,7 +1219,7 @@ function removeFirstCharacter(str) {
             </div>
           </div>
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-8 col-sm-6">
               <label>จำนวนชั่วโมง / ผู้ช่วย</label> <label style="color: red">*</label>
               <input
@@ -1246,7 +1244,7 @@ function removeFirstCharacter(str) {
               onkeydown="allowOnlyNumbersPeopleEdit3(event)"
             />
             </div>
-          </div>
+          </div> -->
 
    
           
