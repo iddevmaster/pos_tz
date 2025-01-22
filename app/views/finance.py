@@ -637,23 +637,59 @@ def evenetdel(request):
 
 
             instance = teacher_income_setting.objects.get(pk=ev_id)
-            instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id).count()
+
+            register = instance.register_id
+            pi_id = instance.pi_id
+            evs_id = instance.ev_id
+            insevent = course_event.objects.get(pk=instance.ev_id)
+            instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id,register_id=register,pi_id=pi_id).count()
+
+           
+            print(instancexx)
             
-            if instancexx == 1 :
+            if instancexx >= 1 :
                 
-                instecent = course_event.objects.get(pk=instance.ev_id)
-                instecent.status = 'N'
-                instecent.save()
-                instancex = teacher_income_setting.objects.get(pk=ev_id)
-                instancex.delete()
+                if pi_id == 1 or pi_id == 2:
+                  instancex = teacher_income_setting.objects.get(pk=ev_id)
+                  instancex.delete()
 
 
-                datas = {'status':200,'s':instancexx}
+                if pi_id == 3:
+                  
+                  instancex = teacher_income_setting.objects.get(pk=ev_id)
+                  instancex.delete()
+                  insevent = course_event.objects.get(pk=instance.ev_id)
+                  delta = insevent.ev_date_end - insevent.ev_date_start
+                  days_difference = delta.days + 1
+                  tot = 0
+                  totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
+                  if totalpeol > 0 :
+                   tt_event = insevent.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+                   bb = (insevent.limit_price * days_difference) / totalpeol
+                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
+                  datas = {'status':200}
+                if pi_id == 4:        
+                  instancex = teacher_income_setting.objects.get(pk=ev_id)
+                  instancex.delete()
+                  insevent = course_event.objects.get(pk=instance.ev_id)
+                  delta = insevent.ev_date_end - insevent.ev_date_start
+                  days_difference = delta.days + 1
+                  tot = 0
+                  totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
+                  if totalpeol > 0 :
+                   tt_event = insevent.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+                   bb = insevent.limit_price / totalpeol
+                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
+                  datas = {'status':200}
+                # ลบก่อน
+
+
+                datas = {'status':200}
                 return JsonResponse(datas, status=200,safe=False)
 
             else:   
-                instancex = teacher_income_setting.objects.get(pk=ev_id)
-                instancex.delete()
+                # instancex = teacher_income_setting.objects.get(pk=ev_id)
+                # instancex.delete()
 
                 datas = {'status':200,'s':instancexx}
                 return JsonResponse(datas, status=200,safe=False)
@@ -661,9 +697,9 @@ def evenetdel(request):
          
            
           
-            
+            datas = {'status':200}
 
-    
+            return JsonResponse(datas, status=200,safe=False)
            
 
         except json.JSONDecodeError:

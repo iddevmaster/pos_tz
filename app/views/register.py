@@ -1145,6 +1145,8 @@ def update_close_the_sale(request):
 def update_close_the_event(request):
     current_user = request.user
     user_id_authen = current_user.id
+   
+    
     register_id = request.POST['register_id']
     ev_id = request.POST['ev_id']
 
@@ -1152,8 +1154,15 @@ def update_close_the_event(request):
     sqs= request.POST['sq']
     sos = request.POST['so']
     accept_terms = request.POST.get('flexCheckDefault')
- 
+    try:
+        ev_logo = request.FILES['ev_logo']
+        print(ev_logo)
+    except KeyError:
+        ev_logo = None
 
+    
+    
+    
     content = register_main.objects.get(pk=register_id)
     content.status = 'Y'
     content.save()
@@ -1161,7 +1170,7 @@ def update_close_the_event(request):
     contentev = event_register.objects.get(ev_id=ev_id)
     contentev.status = 'N'
     contentev.save()
-
+       
 
 
     savesal = salesorder.objects.create(
@@ -1170,41 +1179,24 @@ def update_close_the_event(request):
         po=pos,
         sq=sqs,
         so=sos,
+        img=ev_logo,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow()
     )
 
-
-    # confirm_price = float(request.POST['confirm_price'])
-    # close_the_sale = int(request.POST['close_the_sale'])
-    # if close_the_sale == 1:
-    #     customer_status = 1
-    # else:
-    #     customer_status = 0
-    # try:
-    #     content = register_main.objects.get(pk=register_id)
-    # except:
-    #     content = None
-    #     return redirect("/approve/update/event")
-    # # เปรียบเทียบราคาเพื่อยืนยันการปิดการขาย
-    # check_payment = register_payment_items.objects.filter(
-    #     rpi_price_result=confirm_price, register_id=register_id).order_by("-rpi_id").first()
-    # if check_payment:
-    #     set_active = register_payment.objects.get(rp_id=check_payment.rp_id)
-    #     set_active.active = 1
-    #     set_active.upd_date = dateTimeNow()
-    #     set_active.save()
-    # else:
-    #     messages.error(request, "ไม่สามารถทำรายการได้ !")
-    #     return redirect("/approve/update/event")
-    # content.close_the_sale = close_the_sale
-    # content.customer_status = customer_status
-    # content.upd_date = dateTimeNow()
-    # content.user_update_id = user_id_authen
-    # content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")
 
+def delete_close_the_event(request):
+    register_id = request.POST['register_id']
+    ev_id = request.POST['ev_id']
+
+    contentev = event_register.objects.get(ev_id=ev_id,register_id=register_id)
+    contentev.status = 'C'
+    contentev.save()
+
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/approve/update/event")
 
 @login_required(login_url='/login')
 def register_cancle(request):

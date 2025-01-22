@@ -51,6 +51,8 @@ urlpatterns = [
     path('approve/update/event', register.approve_lis_event),
     path('register/update/event',
          register.update_close_the_event, name="UpdateCloseTheEvent"),
+    path('register/update/delete',
+         register.delete_close_the_event, name="DeleteCloseTheEvent"),    
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),

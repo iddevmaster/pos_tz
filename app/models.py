@@ -340,6 +340,8 @@ class event_register(models.Model):
     ev = models.ForeignKey(course_event, on_delete=models.CASCADE ,related_name="ref_create_ev")
     register = models.ForeignKey(register_main, on_delete=models.CASCADE, related_name="ref_create_ev_reg")
     status = models.CharField(max_length=1, default=0 , blank=False)
+ 
+    
 
 class salesorder(models.Model):
     sale_id = models.AutoField(primary_key=True)
@@ -350,4 +352,6 @@ class salesorder(models.Model):
     so = models.CharField(max_length=64, blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
+    img = models.ImageField(
+        upload_to=generate_unique_name('images/sales'), default=None)
 
