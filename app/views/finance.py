@@ -369,7 +369,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
     
     
     context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,
-               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference,'register_id':regis_i.register_id}
+               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference,'register_id':regis_i.register_id,'register_status':regis_i.status}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
 

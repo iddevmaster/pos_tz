@@ -593,6 +593,7 @@ return data
         </div> {% endcomment %}
 
        
+        <input type="text" class="form-control" name="register_status" id="register_status"  value="{{register_status}}"/>
         <input type="hidden" class="form-control" name="register_id" id="register_id"  value="{{register_id}}"/>
         <input type="hidden" class="form-control" name="count_day" id="count_day"  value="{{count_day}}"/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
@@ -744,7 +745,8 @@ return data
             <td align="right">{{res.tis_sum|floatformat:2|intcomma}}</td>
             <td>
               <div align="center">
-                {% if res.active == 0 %}
+                
+                {% if register_status != "Y" %}
                 <button
                   type="button"
                   onclick="setValueDeleteModal('{{res.pk}}','{{res.pi_id}}')"
