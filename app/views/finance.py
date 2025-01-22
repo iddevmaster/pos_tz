@@ -329,16 +329,19 @@ def course_teacher_event_set_income_form_create(request, register_id):
          x = event_register.objects.get(register_id=register)
          x.status = "W"
          x.save()
-         delta = x.ev_date_end - x.ev_date_start
+         delta = instance.ev_date_end - instance.ev_date_start
          days_difference = delta.days + 1
          tot = 0
+         print(instance_ev.ev_id)
+         print(pi)
+         print(register)
          totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register).count()
         
  
          if totalpeol > 0 :
-            tt_event = x.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
-            bb = (x.limit_price * days_difference) / totalpeol
-            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+            tt_event = instance.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+            bb = (instance.limit_price * days_difference) / totalpeol
+            teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
 
         # save เสร็จ ค่อยอัพเดท
 
