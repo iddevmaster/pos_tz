@@ -455,7 +455,7 @@ def calendar_event_api(request):
         delta = r.ev.ev_date_end - r.ev.ev_date_start
         days_difference = delta.days + 1
         res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.ev.course.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'data':sff,
-                'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three,'count_day':days_difference,'register_id':r.register_id}
+                'limit_price_workhelp':instance.limit_price_workhelp,'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three,'count_day':days_difference,'register_id':r.register_id}
         obj.append(res)
        
     return JsonResponse(obj, safe=False)

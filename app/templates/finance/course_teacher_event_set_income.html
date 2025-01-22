@@ -221,8 +221,10 @@ function removeFirstCharacter(str) {
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
-      document.getElementById('tis_sum').value = limit_price
-      document.getElementById('tis_compensation').value = limit_price
+      const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      
+      document.getElementById('tis_sum').value = limit_price_workhelp
+      document.getElementById('tis_compensation').value = limit_price_workhelp
     
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
@@ -429,6 +431,7 @@ return false
    function Caculate() {
     const pi = document.getElementById("pi").value
     const limit_price = document.getElementById("limit_price").value
+    const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
     
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
@@ -437,8 +440,8 @@ if(pi == 3){
   document.getElementById("tis_sum").value = (limit_price) * tis_quantity;
   document.getElementById("tis_compensation").value = limit_price * tis_quantity ;
 }else if(pi == 4) {
-  document.getElementById("tis_sum").value = limit_price;
-  document.getElementById("tis_compensation").value = limit_price;
+  document.getElementById("tis_sum").value = limit_price_workhelp;
+  document.getElementById("tis_compensation").value = limit_price_workhelp;
 }
 else {
   document.getElementById("tis_sum").value = aaaa * tis_quantity;
@@ -594,6 +597,7 @@ return data
         <input type="hidden" class="form-control" name="count_day" id="count_day"  value="{{count_day}}"/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
         <input type="hidden" class="form-control" name="limit_price" id="limit_price"  value="{{main_data.limit_price}}"/>
+        <input type="hidden" class="form-control" name="limit_price_workhelp" id="limit_price_workhelp"  value="{{main_data.limit_price_workhelp}}"/>
         <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
         <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>

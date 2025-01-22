@@ -296,13 +296,16 @@ def course_teacher_event_set_income_form_create(request, register_id):
             
          )
          contentx.save()
-         x = event_register.objects.get(register_id=register_id)
+         x = event_register.objects.get(register_id=register)
          x.status = "W"
          x.save()
          tot = 0
-         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register_id).count()
+      
+         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register).count()
+    
+     
          if totalpeol > 0 :
-           bb = x.limit_price / totalpeol
+           bb = instance.limit_price_workhelp / totalpeol
            teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
         if pi == '3':
 
@@ -323,13 +326,13 @@ def course_teacher_event_set_income_form_create(request, register_id):
          )
          contentx.save()
   
-         x = event_register.objects.get(register_id=register_id)
+         x = event_register.objects.get(register_id=register)
          x.status = "W"
          x.save()
          delta = x.ev_date_end - x.ev_date_start
          days_difference = delta.days + 1
          tot = 0
-         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register_id).count()
+         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register).count()
         
  
          if totalpeol > 0 :
@@ -612,7 +615,7 @@ def saveeventadmin(request):
               tot = 0
               totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).count()
               if totalpeol > 0 :
-                  bb = x.limit_price / totalpeol
+                  bb = x.limit_price_workhelp / totalpeol
                   teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).update(tis_sum=bb,tis_compensation=bb)
             
             datas = {'status':200}
