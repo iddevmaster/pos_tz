@@ -500,6 +500,7 @@ function removeFirstCharacter(str) {
     upd_date,
     ev_expired_cer_quantity,
     limit_price,
+    limit_price_workhelp,
     ev_logo
   ) {
     document.getElementById("datecrt").innerHTML =
@@ -523,7 +524,8 @@ function removeFirstCharacter(str) {
     document.getElementById("project_id_update").value = project_id;
     document.getElementById("course_id_update").value = course_id;
     document.getElementById("limit_price_update").value = limit_price;
-    
+    document.getElementById("limit_price_workhelp_update").value = limit_price_workhelp;
+   
     document.getElementById("active_update").value = active;
     $(".selectUpdate").val(course_id).select2({
       placeholder: "เลือกข้อมูล",
@@ -734,7 +736,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -744,7 +746,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -854,7 +856,7 @@ function removeFirstCharacter(str) {
           </div>
           <div class="row">
             <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
+              <label>รวมจำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -881,7 +883,7 @@ function removeFirstCharacter(str) {
 
           <div class="row">
             <div class="col-8 col-sm-6">
-              <label>จำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
+              <label>รวมจำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
               <input
               type="text"
               class="form-control"
@@ -1056,6 +1058,19 @@ function removeFirstCharacter(str) {
               class="form-control"
               id="limit_price"
               name="limit_price"
+              value="1000"
+            />
+          </div>
+
+          
+          <div class="form-group">
+     
+            <input
+              type="hidden"
+           
+              class="form-control"
+              id="limit_price_workhelp"
+              name="limit_price_workhelp"
               value="1000"
             />
           </div>
@@ -1360,6 +1375,19 @@ function removeFirstCharacter(str) {
               value="1000"
             />
           </div>
+
+          <div class="form-group">
+     
+            <input
+              type="hidden"
+           
+              class="form-control"
+              id="limit_price_workhelp_update"
+              name="limit_price_workhelp"
+              value="1000"
+            />
+          </div>
+
 
           <p id="datecrt"></p>
         </div>

@@ -180,6 +180,7 @@ def course_event_create(request):
     ev_people_two = request.POST['ev_people_two']
     # ev_people_three = request.POST['ev_people_three']
     limitprice = request.POST['limit_price']
+    limit_price_workhelp = request.POST['limit_price_workhelp']
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -209,6 +210,7 @@ def course_event_create(request):
         ev_people_two=ev_people_two,
         ev_people_three=10,
         limit_price=limitprice,
+        limit_price_workhelp=limit_price_workhelp,
         status='N',
         module=m.module,
     )
@@ -247,6 +249,7 @@ def course_event_update(request):
     
     ev_id = request.POST['ev_id']
     limitprice = request.POST['limit_price']
+    limit_price_workhelp = request.POST['limit_price_workhelp']
     project_id = request.POST['project_id']
     ev_date_start = dmytoymd(request.POST['ev_date_start'])
     ev_date_end = dmytoymd(request.POST['ev_date_end'])
@@ -287,6 +290,7 @@ def course_event_update(request):
     content.upd_date = dateTimeNow()
     content.project_id = project_id
     content.limit_price = limitprice
+    content.limit_price_workhelp = limit_price_workhelp
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
@@ -378,7 +382,7 @@ def calendar_event_staff(request):
 
 def calendar_event_api(request):
     user_id = request.user.id
-    print (request.GET)
+  
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
@@ -466,7 +470,7 @@ def calendar_event_api2(request,id):
     obj = []
     
     for r in content:  
-       print(r)
+    
        start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        y, m, d = end.split("-")
