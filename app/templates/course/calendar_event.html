@@ -182,7 +182,7 @@ function calen() {
       eventClick: function (info) {
         
     $('#cardContainer').empty(); // Clear previous cards
-        document.getElementById('register_id').value = info.event.extendedProps.register_id;
+   
         document.getElementById('count_day').value = info.event.extendedProps.count_day;
         document.getElementById('eventModalLabel').innerText = info.event.title;
 
@@ -297,7 +297,7 @@ function calen() {
    let tis_quantity = document.getElementById("tis_quantity").value
    let tis_sum = document.getElementById("tis_sum").value
    const ev_id = document.getElementById("ev_id").value
-   const register_id = document.getElementById("register_id").value
+
  
     if(te == ""){
     Swal.fire({
@@ -368,7 +368,7 @@ method: 'POST',
 headers: {
     'Content-Type': 'application/json',
 },
-body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum,'register_id':register_id})
+body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum})
 })
 .then(response => response.json())
 .then(data => {
@@ -744,7 +744,7 @@ CheckHourbeforeSave()
       <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="eventModalLabel"></h5>
-            <input type="hidden" class="form-control" name="register_id" id="register_id" />
+
               <input
               type="hidden"
               name="ev_id"

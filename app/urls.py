@@ -146,7 +146,7 @@ urlpatterns = [
          name="billing_cycle_setting_form_create"),
     path('billing/setting/form/delete', finance.billing_cycle_setting_form_delete,
          name="billing_cycle_setting_form_delete"),
-    path('course/event/teachers/form/create/<slug:register_id>',
+    path('course/event/teachers/form/create/<slug:ev_id>',
          finance.course_teacher_event_set_income_form_create),
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),

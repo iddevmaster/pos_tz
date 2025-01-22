@@ -579,7 +579,7 @@ return data
         </h3>
       </div>
       <form onsubmit="return Save(event);"
-        action="/course/event/teachers/form/create/{{register_id}}"
+        action="/course/event/teachers/form/create/{{main_data.ev_id}}"
         method="post"
         autocomplete="off"
       >
@@ -592,9 +592,9 @@ return data
           {% endfor %}
         </div> {% endcomment %}
 
-       
-        <input type="hidden" class="form-control" name="register_status" id="register_status"  value="{{register_status}}"/>
-        <input type="hidden" class="form-control" name="register_id" id="register_id"  value="{{register_id}}"/>
+<!--        
+        <input type="text" class="form-control" name="register_status" id="register_status"  value="{{register_status}}"/>
+        <input type="text" class="form-control" name="register_id" id="register_id"  value="{{register_id}}"/> -->
         <input type="hidden" class="form-control" name="count_day" id="count_day"  value="{{count_day}}"/>
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price"  value="{{dis_limit}}"/>
         <input type="hidden" class="form-control" name="limit_price" id="limit_price"  value="{{main_data.limit_price}}"/>
@@ -746,7 +746,7 @@ return data
             <td>
               <div align="center">
                 
-                {% if register_status != "Y" %}
+            
                 <button
                   type="button"
                   onclick="setValueDeleteModal('{{res.pk}}','{{res.pi_id}}')"
@@ -757,7 +757,7 @@ return data
                   <i class="icon dripicons-trash" aria-hidden="true"></i>
                   ลบ
                 </button>
-                {% endif %} 
+          
               </div>
             </td>
           </tr>

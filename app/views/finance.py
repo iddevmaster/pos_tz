@@ -46,21 +46,22 @@ def course_event_list(request):
     year_current = request.GET.get('qyear', date.today().year)
     course_list = course.objects.filter(
         cancelled=1, active=1).order_by("-course_id")
-    # result = course_event.objects.select_related("course").filter(
-    #     cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
+    result = course_event.objects.select_related("course").filter(
+        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
+
     te = []
     status = ['N','W','Y']
-    result = event_register.objects.select_related("ev").filter(ev__cancelled=1, status__in=status, ev__ev_date_start__month=month_current, ev__ev_date_start__year=year_current, ev__module=m.module)
-    for r in result:  
-     content = course.objects.get(pk=r.ev.course_id)
-     saf = register_main.objects.get(pk=r.register_id)
+    # result = event_register.objects.select_related("ev").filter(ev__cancelled=1, status__in=status, ev__ev_date_start__month=month_current, ev__ev_date_start__year=year_current, ev__module=m.module)
+    # for r in result:  
+    #  content = course.objects.get(pk=r.ev.course_id)
+    #  saf = register_main.objects.get(pk=r.register_id)
      
      
-     fs = {'register_id':r.register_id,'course_code':content.course_code,'course_name':content.course_name,'ev_id':r.ev.ev_id,'ev_price':r.ev.ev_price,'ev_date_start':r.ev.ev_date_start,'ev_date_end':r.ev.ev_date_end,'ev_generation':r.ev.ev_generation,'ev_expired_cer_date':r.ev.ev_expired_cer_date,'ev_expired_cer_quantity':r.ev.ev_expired_cer_quantity,'bill':saf.register_number}
+    #  fs = {'register_id':r.register_id,'course_code':content.course_code,'course_name':content.course_name,'ev_id':r.ev.ev_id,'ev_price':r.ev.ev_price,'ev_date_start':r.ev.ev_date_start,'ev_date_end':r.ev.ev_date_end,'ev_generation':r.ev.ev_generation,'ev_expired_cer_date':r.ev.ev_expired_cer_date,'ev_expired_cer_quantity':r.ev.ev_expired_cer_quantity,'bill':saf.register_number}
         
-     te.append(fs)  
+    #  te.append(fs)  
     
-    context = {'title': defaultTitle,  'data': te,
+    context = {'title': defaultTitle,  'data': result,
                'course_list': course_list, 'listMenuPermission': objMenu}
             
     return render(request, 'finance/course_event_list.html', context)
@@ -215,7 +216,7 @@ def billing_cycle_result(request):
 
 
 @login_required(login_url='/login')
-def course_teacher_event_set_income_form_create(request, register_id):
+def course_teacher_event_set_income_form_create(request, ev_id):
     user_id = request.user.id
     # Menu
     try:
@@ -240,9 +241,9 @@ def course_teacher_event_set_income_form_create(request, register_id):
     module = m.module
     title = defaultTitle
     try:
-        instance_ev = event_register.objects.get(register_id=register_id)
-        instance = course_event.objects.get(ev_id=instance_ev.ev_id)
-    except event_register.DoesNotExist:
+    
+        instance = course_event.objects.get(ev_id=ev_id)
+    except course_event.DoesNotExist:
         instance = None
         return redirect("/finance/billing/setting")
     if request.method == 'POST':
@@ -254,7 +255,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
         tis_sum = request.POST['tis_sum']
         teacher_id = request.POST['teacher']
         
-        register = str(request.POST['register_id']).replace('-', '')
+        # register = str(request.POST['register_id']).replace('-', '')
         
         if pi == '1' or pi == '2':
          content = teacher_income_setting(
@@ -264,18 +265,18 @@ def course_teacher_event_set_income_form_create(request, register_id):
             tis_sum=tis_sum,
             tis_start_date=instance.ev_date_start,
             tis_end_date=instance.ev_date_end,
-            ev_id=instance_ev.ev_id,
+            ev_id=ev_id,
             teacher_id=teacher_id,
             pi_id=pi,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             status='W',
-            register_id=register,
+            register_id='-',
         )
          content.save()
-         x = event_register.objects.get(register_id=register_id)
-         x.status = "W"
-         x.save()
+        #  x = event_register.objects.get(register_id=register_id)
+        #  x.status = "W"
+        #  x.save()
 
         if pi == '4':
        
@@ -286,27 +287,27 @@ def course_teacher_event_set_income_form_create(request, register_id):
             tis_sum=tis_sum,
             tis_start_date=instance.ev_date_start,
             tis_end_date=instance.ev_date_end,
-            ev_id=instance_ev.ev_id,
+            ev_id=ev_id,
             teacher_id=teacher_id,
             pi_id=pi,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             status='W',
-            register_id=register,
+            register_id='-',
             
          )
          contentx.save()
-         x = event_register.objects.get(register_id=register)
-         x.status = "W"
-         x.save()
+        #  x = event_register.objects.get(register_id=register)
+        #  x.status = "W"
+        #  x.save()
          tot = 0
       
-         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register).count()
+         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
     
      
          if totalpeol > 0 :
            bb = instance.limit_price_workhelp / totalpeol
-           teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
+           teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
         if pi == '3':
 
          contentx = teacher_income_setting(
@@ -316,42 +317,40 @@ def course_teacher_event_set_income_form_create(request, register_id):
             tis_sum=tis_sum,
             tis_start_date=instance.ev_date_start,
             tis_end_date=instance.ev_date_end,
-            ev_id=instance_ev.ev_id,
+            ev_id=ev_id,
             teacher_id=teacher_id,
             pi_id=pi,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             status='W',
-            register_id=register,
+            register_id='-',
          )
          contentx.save()
   
-         x = event_register.objects.get(register_id=register)
-         x.status = "W"
-         x.save()
+        #  x = event_register.objects.get(register_id=register)
+        #  x.status = "W"
+        #  x.save()
          delta = instance.ev_date_end - instance.ev_date_start
          days_difference = delta.days + 1
          tot = 0
-         print(instance_ev.ev_id)
-         print(pi)
-         print(register)
-         totalpeol = teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi,register_id=register).count()
+
+         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
         
  
          if totalpeol > 0 :
             tt_event = instance.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
             bb = (instance.limit_price * days_difference) / totalpeol
-            teacher_income_setting.objects.filter(ev_id=instance_ev.ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
 
         # save เสร็จ ค่อยอัพเดท
 
 
         messages.success(request, "ทำรายการสำเร็จ !")
-        return redirect("/course/event/teachers/form/create/" + str(register_id))
+        return redirect("/course/event/teachers/form/create/" + str(ev_id))
     # print(instance.ev_date_start.month)
-    regis_i = event_register.objects.get(register_id=register_id)
+    # regis_i = event_register.objects.get(register_id=register_id)
     
-    teacher_data = teacher_income_setting.objects.filter(ev=regis_i.ev_id)
+    teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
   
     ids = [1, 2]
 
@@ -361,9 +360,9 @@ def course_teacher_event_set_income_form_create(request, register_id):
     days_difference = delta.days + 1
 
         
-    count_hour_wi = teacher_income_setting.objects.filter(ev=regis_i.ev_id,pi__in=ids).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
-    count_hour_pi = teacher_income_setting.objects.filter(ev=regis_i.ev_id,pi=3).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
-    dis_limit = teacher_income_setting.objects.filter(ev=regis_i.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0
+    count_hour_wi = teacher_income_setting.objects.filter(ev=ev_id,pi__in=ids).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
+    count_hour_pi = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_quantity'))['tis_quantity__sum'] or 0
+    dis_limit = teacher_income_setting.objects.filter(ev=ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0
     total = instance.limit_price - dis_limit
     listposition = pay_item.objects.filter(
             cancelled=1, active=1)
@@ -372,7 +371,7 @@ def course_teacher_event_set_income_form_create(request, register_id):
     
     
     context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,
-               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference,'register_id':regis_i.register_id,'register_status':regis_i.status}
+               'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 
 
@@ -393,17 +392,19 @@ def course_teacher_event_set_income_form_delete(request):
    
     if py_id == '4':
        data_tac = teacher_income_setting.objects.filter(ev_id=ev_id,active=0,pi_id=py_id).count()
+       print(data_tac)
        if data_tac > 0 :
-         bb = c_event.limit_price / data_tac
+         bb = c_event.limit_price_workhelp / data_tac
          teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=py_id).update(tis_sum=bb,tis_compensation=bb)
 
     if py_id == '3':
         data_tac = teacher_income_setting.objects.filter(ev_id=ev_id,active=0,pi_id=py_id).count()
         if data_tac > 0 :
-            bb = c_event.limit_price / data_tac
+            delta = c_event.ev_date_end - c_event.ev_date_start
+            days_difference = delta.days + 1
+            bb = (c_event.limit_price * days_difference) / data_tac
             teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=py_id).update(tis_sum=bb,tis_compensation=bb)
 
-    
 
     if teacher_income_setting.objects.filter(ev_id=ev_id).count() == 0:
         c_event = course_event.objects.get(pk=ev_id)
@@ -544,7 +545,7 @@ def saveeventadmin(request):
             tis_unit = data.get("tis_unit")
             
                  
-            register = str(data.get("register_id")).replace('-', '')
+       
           
             instance = course_event.objects.filter(pk=ev_id).first()
       
@@ -562,7 +563,7 @@ def saveeventadmin(request):
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
                 status='W',
-                register_id=register,
+                register_id='-',
                 )
               content.save()
             datas = {'status':200} 
@@ -581,7 +582,7 @@ def saveeventadmin(request):
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
                 status='W',
-                register_id=register,
+                register_id='-',
             )
               content.save()
   
@@ -590,7 +591,7 @@ def saveeventadmin(request):
               delta = x.ev_date_end - x.ev_date_start
               days_difference = delta.days + 1
               tot = 0
-              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).count()
+              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
             
               if totalpeol > 0 :
                tt_event = x.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
@@ -611,15 +612,15 @@ def saveeventadmin(request):
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
                 status='W',
-                register_id=register,
+                register_id='-',
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
               tot = 0
-              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).count()
+              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
               if totalpeol > 0 :
                   bb = x.limit_price_workhelp / totalpeol
-                  teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi,register_id=register).update(tis_sum=bb,tis_compensation=bb)
+                  teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
             
             datas = {'status':200}
             return JsonResponse(datas, status=200,safe=False)
@@ -648,20 +649,14 @@ def evenetdel(request):
             pi_id = instance.pi_id
             evs_id = instance.ev_id
             insevent = course_event.objects.get(pk=instance.ev_id)
-            instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id,register_id=register,pi_id=pi_id).count()
+            instancexx = teacher_income_setting.objects.filter(ev_id=instance.ev_id,pi_id=pi_id).count()
 
-           
-            print(instancexx)
             
             if instancexx >= 1 :
-                
                 if pi_id == 1 or pi_id == 2:
                   instancex = teacher_income_setting.objects.get(pk=ev_id)
                   instancex.delete()
-
-
                 if pi_id == 3:
-                  
                   instancex = teacher_income_setting.objects.get(pk=ev_id)
                   instancex.delete()
                   insevent = course_event.objects.get(pk=instance.ev_id)
@@ -683,20 +678,25 @@ def evenetdel(request):
                   tot = 0
                   totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
                   if totalpeol > 0 :
-                   tt_event = insevent.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
-                   bb = insevent.limit_price / totalpeol
+                   tt_event = insevent.limit_price_workhelp / totalpeol  # ค่าตอบแทนรายบุคคล
+                   bb = insevent.limit_price_workhelp / totalpeol
                    teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
                   datas = {'status':200}
                 # ลบก่อน
 
-
+         
+                aaaa = teacher_income_setting.objects.filter(ev_id=instance.ev_id,pi_id=pi_id).count()
+                if aaaa == 0 :
+                    xx = course_event.objects.get(pk=instance.ev_id)
+                    xx.status = 'N'
+                    xx.save()   
                 datas = {'status':200}
                 return JsonResponse(datas, status=200,safe=False)
 
             else:   
                 # instancex = teacher_income_setting.objects.get(pk=ev_id)
                 # instancex.delete()
-
+       
                 datas = {'status':200,'s':instancexx}
                 return JsonResponse(datas, status=200,safe=False)
             
