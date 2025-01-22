@@ -392,7 +392,7 @@ def course_teacher_event_set_income_form_delete(request):
    
     if py_id == '4':
        data_tac = teacher_income_setting.objects.filter(ev_id=ev_id,active=0,pi_id=py_id).count()
-       print(data_tac)
+       
        if data_tac > 0 :
          bb = c_event.limit_price_workhelp / data_tac
          teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=py_id).update(tis_sum=bb,tis_compensation=bb)
@@ -411,8 +411,6 @@ def course_teacher_event_set_income_form_delete(request):
         c_event.status = "N"
         c_event.save()
 
-
-   
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event/teachers/form/create/" + str(ev_id))
 
