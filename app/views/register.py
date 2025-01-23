@@ -1156,6 +1156,8 @@ def update_close_the_event(request):
     sqs= request.POST['sq']
     sos = request.POST['so']
     accept_terms = request.POST.get('flexCheckDefault')
+
+    print(accept_terms)
     try:
         ev_logo = request.FILES['ev_logo']
         
