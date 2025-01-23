@@ -1052,10 +1052,12 @@ def approve_lis_event(request):
             register_id=r.register_id).first()
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
+        payment_item = register_payment.objects.get(
+            register_id=r.register_id)
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
         res = {'customer_list': customer_list,'register_id':r.register_id,
-               'course_list': course_list, 'total_payment': total_payment}
+               'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
  
@@ -1156,7 +1158,7 @@ def update_close_the_event(request):
     accept_terms = request.POST.get('flexCheckDefault')
     try:
         ev_logo = request.FILES['ev_logo']
-        print(ev_logo)
+        
     except KeyError:
         ev_logo = None
 
@@ -1167,8 +1169,8 @@ def update_close_the_event(request):
     content.status = 'Y'
     content.save()
 
-    contentev = event_register.objects.get(ev_id=ev_id)
-    contentev.status = 'N'
+    contentev = event_register.objects.get(register_id=register_id)
+    contentev.status = 'Y'
     contentev.save()
        
 
@@ -1183,6 +1185,17 @@ def update_close_the_event(request):
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow()
     )
+
+    checkev = event_register.objects.filter(ev_id=ev_id)
+    all_passed = all(record.status == 'Y' for record in checkev)
+    if all_passed:
+            content = course_event.objects.get(ev_id=ev_id)
+            content.status = 'Y'
+            content.save()
+
+
+    # เช็ค ev นั้นว่า มีการ ยืนยันหมดรึยัง
+
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")

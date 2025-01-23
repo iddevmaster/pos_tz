@@ -400,22 +400,20 @@ def calendar_event_api(request):
         sobj = _date + timedelta(days=0)
         eobj = _date + timedelta(days=60)
     status = ['N','W','Y']
-    contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
     
  
-    # content = course_event.objects.select_related(
-    #     "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module)
-    # print(len(content))
-
-    
+    content = course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status='Y')
+   
     obj = []
     sff = []
-    for r in contentxxx:
+    for r in content:
         
     
-        instance = course_event.objects.get(pk=r.ev.ev_id)
+     
     
-        end = str(r.ev.ev_date_end)
+        end = str(r.ev_date_end)
       
         y, m, d = end.split("-")
         nextdayend = addDay(1, int(y), int(m), int(d))
@@ -424,11 +422,11 @@ def calendar_event_api(request):
         col = r.status
         if col == 'W' :
          t = '#e0ce1b'
-        elif col == 'N': 
+        elif col == 'Y': 
          t = '#eb2509'   
         else:
          t = '#4be01b'
-        teacher_data = teacher_income_setting.objects.filter(ev=r.ev.ev_id)
+        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
        
       
         if teacher_data.count() > 0:
@@ -452,10 +450,10 @@ def calendar_event_api(request):
         
     #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
     #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
-        delta = r.ev.ev_date_end - r.ev.ev_date_start
+        delta = r.ev_date_end - r.ev_date_start
         days_difference = delta.days + 1
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.ev.course.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+")",'data':sff,
-                'limit_price_workhelp':instance.limit_price_workhelp,'limit_price':instance.limit_price,'dis_limit': instance.limit_price - (teacher_income_setting.objects.filter(ev=r.ev.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev.ev_id,'ev_hour':instance.ev_hour,'ev_hour_two':instance.ev_hour_two,'ev_hour_three':instance.ev_hour_three,'ev_people': instance.ev_people,'ev_people_two': instance.ev_people_two,'ev_people_three': instance.ev_people_three,'count_day':days_difference,'register_id':r.register_id}
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'data':sff,
+                'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference}
         obj.append(res)
        
     return JsonResponse(obj, safe=False)
