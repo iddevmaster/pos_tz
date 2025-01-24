@@ -47,7 +47,7 @@ def course_event_list(request):
     course_list = course.objects.filter(
         cancelled=1, active=1).order_by("-course_id")
     result = course_event.objects.select_related("course").filter(
-        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
+        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module,status='Y').order_by("-ev_id")
 
     te = []
     status = ['N','W','Y']

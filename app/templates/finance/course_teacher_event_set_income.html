@@ -203,6 +203,7 @@ function removeFirstCharacter(str) {
     
     if(selectElement.value == 3) {
       const count_day = document.getElementById("count_day").value 
+      console.log(count_day);
       const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
       document.getElementById('tis_quantity').value = count_day
@@ -735,6 +736,8 @@ return data
             <td>
               {{res.teacher.teacher_prefix_th}}{{res.teacher.teacher_firstname_th}}
               {{res.teacher.teacher_lastname_th}}
+
+             
             </td>
             <td>{{res.pi.pi_name}}  </td>
             <td align="right">

@@ -961,6 +961,33 @@ function removeFirstCharacter(str) {
             />
           </div>
 
+          <div class="form-group">
+            <label>กำหนดค่าตอบแทนผู้ช่วย</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="limit_price"
+              name="limit_price"
+              value="1000" 
+              
+            />
+          </div>
+
+          
+          <div class="form-group">
+            <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="limit_price_workhelp"
+              name="limit_price_workhelp"
+              value="500"
+              
+            />
+          </div>
+
           <!-- <div class="row">
             <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์ <span style="color: red;">*</span></label>
             <div class="col-12 col-sm-12">
@@ -1050,30 +1077,7 @@ function removeFirstCharacter(str) {
             </select>
           </div>
 
-          <div class="form-group">
-     
-            <input
-              type="hidden"
-           
-              class="form-control"
-              id="limit_price"
-              name="limit_price"
-              value="1000"
-            />
-          </div>
-
-          
-          <div class="form-group">
-     
-            <input
-              type="hidden"
-           
-              class="form-control"
-              id="limit_price_workhelp"
-              name="limit_price_workhelp"
-              value="1000"
-            />
-          </div>
+  
         </div>
         <div class="modal-footer">
           <button
@@ -1287,6 +1291,36 @@ function removeFirstCharacter(str) {
               required
             />
           </div>
+          
+
+
+          <div class="form-group">
+            <label>กำหนดค่าตอบแทนผู้ช่วย</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="limit_price_update"
+              name="limit_price"
+              value="1000" 
+              readonly
+            />
+          </div>
+
+          
+          <div class="form-group">
+            <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
+            <input
+              type="text"
+              pattern="[0-9.]+"
+              class="form-control"
+              id="limit_price_workhelp_update"
+              name="limit_price_workhelp"
+              value="1000"
+              readonly
+            />
+          </div>
+
           <div class="form-group">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select
@@ -1364,29 +1398,7 @@ function removeFirstCharacter(str) {
             </select>
           </div>
 
-          <div class="form-group">
-     
-            <input
-              type="hidden"
-           
-              class="form-control"
-              id="limit_price_update"
-              name="limit_price"
-              value="1000"
-            />
-          </div>
-
-          <div class="form-group">
-     
-            <input
-              type="hidden"
-           
-              class="form-control"
-              id="limit_price_workhelp_update"
-              name="limit_price_workhelp"
-              value="1000"
-            />
-          </div>
+        
 
 
           <p id="datecrt"></p>
