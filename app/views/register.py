@@ -1215,7 +1215,7 @@ def update_close_the_eventend(request):
 
 
     messages.success(request, "ทำรายการสำเร็จ !")
-    return redirect("/approve/update/event")    
+    return redirect("/approve/update/processevent")    
 
 def delete_close_the_event(request):
     register_id = request.POST['register_id']
