@@ -1002,11 +1002,13 @@ def register_management(request):
         crt_date__month=month_current, crt_date__year=year_current).exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
-        # print(r.register_id)
+
+        
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id, register__crt_date__month=1).first()
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
+        print(r.register_id)    
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         course_list = course_event.objects.select_related(
