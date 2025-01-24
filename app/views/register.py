@@ -1208,10 +1208,12 @@ def update_close_the_eventend(request):
     current_user = request.user
     user_id_authen = current_user.id
    
+    ev_id = request.POST['ev_id']
+    content = course_event.objects.get(ev_id=ev_id)
+    content.status = 'S'
+    content.save()
 
 
-
-    # เช็ค ev นั้นว่า มีการ ยืนยันหมดรึยัง
 
 
     messages.success(request, "ทำรายการสำเร็จ !")
