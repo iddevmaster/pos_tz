@@ -14,7 +14,7 @@
     ids,
   ) {
   
-    document.getElementById("register_id_update").value = register_id;
+  
     document.getElementById("ev_id_update").value = ids;
 
     
@@ -109,10 +109,10 @@
         <thead>
           <tr>
             <th>ลำดับ</th>
-            <th>เลขที่ใบสมัคร</th>
+         
             <th>ไอเทม</th>
             <th>หลักสูตร</th>
-            <th>ชื่อลูกค้า</th>
+            <th>รุ่น</th>
             <th>วันที่จัด</th>
             <th>#</th>
           </tr>
@@ -121,11 +121,11 @@
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.customer_list.register.register_number}}</td>
-            <td>{{res.course_list.course.course_code}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
-            <td>{{res.customer_list.customer_name}}</td>
-            <td>{{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}</td>
+           
+            <td>{{res.course.course_code}}</td>
+            <td>{{res.course.course_name}}</td>
+            <td>{{res.ev_generation}}</td>
+            <td>{{res.ev_date_start|date:"d/m/Y"}} - {{res.ev_date_end|date:"d/m/Y"}}</td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
 
@@ -137,7 +137,7 @@
                     id="dropdownMenuButtonIcon"
                     data-bs-toggle="modal"
                     data-bs-target="#UpdateClick"
-                    onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
+                    onclick="setValueUpdateModal('{{res.course_list.ev_id}}')"
                   >
                    ยืนยันจบงาน
                   </button>
@@ -179,12 +179,7 @@
         {% csrf_token %}
 
 
-        <input
-          type="hidden"
-          id="register_id_update"
-          name="register_id"
-          required
-        />
+      
         <input
         type="hidden"
         name="ev_id"
