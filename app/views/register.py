@@ -1094,7 +1094,6 @@ def approve_lis_event_end(request):
     obj = []
     if content:
      for r in content:
-
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
         total_payment = register_payment.objects.filter(
@@ -1203,6 +1202,20 @@ def update_close_the_event(request):
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")
+
+@login_required(login_url='/login')
+def update_close_the_eventend(request):
+    current_user = request.user
+    user_id_authen = current_user.id
+   
+
+
+
+    # เช็ค ev นั้นว่า มีการ ยืนยันหมดรึยัง
+
+
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/approve/update/event")    
 
 def delete_close_the_event(request):
     register_id = request.POST['register_id']

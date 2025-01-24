@@ -48,11 +48,16 @@ urlpatterns = [
     path('approve/update/set', register.approve_update_status,
          name="ApproveSetStatus"),
     path('approve/update/processevent', register.approve_lis_event_end),
+    path('approve/update/processeventend',
+         register.update_close_the_eventend, name="UpdateCloseEndTheEvent"),
     path('approve/update/event', register.approve_lis_event),
+
     path('register/update/event',
          register.update_close_the_event, name="UpdateCloseTheEvent"),
     path('register/update/delete',
          register.delete_close_the_event, name="DeleteCloseTheEvent"),    
+
+     
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),
