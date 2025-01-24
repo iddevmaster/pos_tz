@@ -1088,8 +1088,8 @@ def approve_lis_event_end(request):
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
 
-   
-    content = event_register.objects.select_related('ev').filter(ev__status='Y')
+    
+    content = event_register.objects.select_related('ev').filter(ev__status='I')
 
     obj = []
     if content:
