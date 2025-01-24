@@ -1089,21 +1089,21 @@ def approve_lis_event_end(request):
     year_current = request.GET.get('qyear', date.today().year)
 
     
-    content = event_register.objects.select_related('ev').filter(ev__status='I')
+    content = course_event.objects.select_related('course').filter(status='I')
 
-    obj = []
-    if content:
-     for r in content:
-        customer_list = customers.objects.select_related('register').filter(
-            register_id=r.register_id).first()
-        total_payment = register_payment.objects.filter(
-            register_id=r.register_id).count()
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,'register_id':r.register_id,
-               'course_list': course_list, 'total_payment': total_payment}
-        obj.append(res)
-    context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
+    # obj = []
+    # if content:
+    #  for r in content:
+    #     customer_list = customers.objects.select_related('register').filter(
+    #         register_id=r.register_id).first()
+    #     total_payment = register_payment.objects.filter(
+    #         register_id=r.register_id).count()
+    #     course_list = course_event.objects.select_related(
+    #         'course').filter(ev_id=r.ev_id).first()
+    #     res = {'customer_list': customer_list,'register_id':r.register_id,
+    #            'course_list': course_list, 'total_payment': total_payment}
+    #     obj.append(res)
+    context = {'title': title,  'data': content,'listMenuPermission': objMenu} 
  
 
     return render(request, 'register/approve_list_event_end.html', context)
