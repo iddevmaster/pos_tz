@@ -332,7 +332,7 @@ def teacher_list_cale(request):
     title = defaultTitle
     result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
   
-
+    
 
 
     teacher_data = teacher_income_setting.objects.select_related('ev').filter(status='Y',teacher_id=a.teacher_id)

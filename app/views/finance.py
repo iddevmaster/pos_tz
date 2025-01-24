@@ -274,9 +274,9 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             register_id='-',
         )
          content.save()
-        #  x = event_register.objects.get(register_id=register_id)
-        #  x.status = "W"
-        #  x.save()
+         x = course_event.objects.get(ev_id=ev_id)
+         x.status = "W"
+         x.save()
 
         if pi == '4':
        
@@ -301,7 +301,9 @@ def course_teacher_event_set_income_form_create(request, ev_id):
         #  x.status = "W"
         #  x.save()
          tot = 0
-      
+         x = course_event.objects.get(ev_id=ev_id)
+         x.status = "W"
+         x.save()
          totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
     
      
@@ -327,9 +329,9 @@ def course_teacher_event_set_income_form_create(request, ev_id):
          )
          contentx.save()
   
-        #  x = event_register.objects.get(register_id=register)
-        #  x.status = "W"
-        #  x.save()
+         x = course_event.objects.get(ev_id=ev_id)
+         x.status = "W"
+         x.save()
          delta = instance.ev_date_end - instance.ev_date_start
          days_difference = delta.days + 1
          tot = 0
@@ -564,6 +566,10 @@ def saveeventadmin(request):
                 register_id='-',
                 )
               content.save()
+              x = course_event.objects.get(ev_id=ev_id)
+        
+              x.status = 'W'
+              x.save()
             datas = {'status':200} 
             if pi == '3':
 
@@ -585,6 +591,9 @@ def saveeventadmin(request):
               content.save()
   
               x = course_event.objects.get(ev_id=ev_id)
+        
+              x.status = 'W'
+              x.save()
              
               delta = x.ev_date_end - x.ev_date_start
               days_difference = delta.days + 1
@@ -614,6 +623,8 @@ def saveeventadmin(request):
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
+              x.status = 'W'
+              x.save()
               tot = 0
               totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
               if totalpeol > 0 :
@@ -686,7 +697,7 @@ def evenetdel(request):
                 aaaa = teacher_income_setting.objects.filter(ev_id=instance.ev_id,pi_id=pi_id).count()
                 if aaaa == 0 :
                     xx = course_event.objects.get(pk=instance.ev_id)
-                    xx.status = 'N'
+                    xx.status = 'Y'
                     xx.save()   
                 datas = {'status':200}
                 return JsonResponse(datas, status=200,safe=False)

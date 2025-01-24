@@ -52,7 +52,7 @@
 
     url: "/api/calendar_event_api2/" + teacher,
     success: function (response) {
-     
+     console.log(response);
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
 

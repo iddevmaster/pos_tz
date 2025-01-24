@@ -399,12 +399,12 @@ def calendar_event_api(request):
     else:
         sobj = _date + timedelta(days=0)
         eobj = _date + timedelta(days=60)
-    status = ['N','W','Y']
+    status = ['W','Y','I']
     # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
     
  
     content = course_event.objects.select_related(
-        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status='Y')
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
    
     obj = []
     sff = []
@@ -423,7 +423,11 @@ def calendar_event_api(request):
         if col == 'W' :
          t = '#e0ce1b'
         elif col == 'Y': 
-         t = '#eb2509'   
+         t = '#eb2509'  
+        elif col == 'I': 
+         t = '#4be01b'  
+        elif col == 'S': 
+         t = '#4be01b'    
         else:
          t = '#4be01b'
         teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
@@ -463,7 +467,8 @@ def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
     
-    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
+    # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
     
     obj = []
     
@@ -476,9 +481,9 @@ def calendar_event_api2(request,id):
        te = []
        teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
        evte = course_event.objects.get(ev_id=r.ev_id)
-     
+
        for x in teach: 
-        
+       
         a = teacher.objects.get(teacher_id=x.teacher_id)
         pa = pay_item.objects.filter(id=x.pi_id).first()
        
@@ -591,8 +596,8 @@ def updateeve(request):
         all_passed = all(record.status == 'Y' for record in teach)
         if all_passed:
          
-            content = event_register.objects.get(ev_id=content.ev_id,register_id=content.register_id)
-            content.status = 'Y'
+            content = course_event.objects.get(ev_id=content.ev_id)
+            content.status = 'I'
             content.save()
         return JsonResponse({"status": "ok"}, status=200)       
 
