@@ -1089,7 +1089,7 @@ def approve_lis_event_end(request):
     year_current = request.GET.get('qyear', date.today().year)
 
    
-    content = event_register.objects.select_related('ev').filter(status='Y')
+    content = event_register.objects.select_related('ev').filter(ev__status='Y')
 
     obj = []
     if content:
