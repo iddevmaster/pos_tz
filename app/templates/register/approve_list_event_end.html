@@ -13,7 +13,7 @@
     register_id,
     ids,
   ) {
-    console.log(register_id);
+  
     document.getElementById("register_id_update").value = register_id;
     document.getElementById("ev_id_update").value = ids;
 
@@ -139,7 +139,7 @@
                     data-bs-target="#UpdateClick"
                     onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
                   >
-                   ยืนยันวันอบรม
+                   ยืนยันจบงาน
                   </button>
                 </div>
               </div>
@@ -193,54 +193,7 @@
       />
         <div class="modal-body">
 
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Public" id="flexCheckDefault" name="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">
-              Public
-            </label>
-          </div>
-      
-          <div class="form-group">
-            <label>Po</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              id="po"
-              name="po"
-              required
-              class="form-control"
-           
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Sq</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              id="sq"
-              name="sq"
-              
-              class="form-control"
-            
-            />
-          </div>
-
-          <div class="form-group">
-            <label>So</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              id="so"
-              name="so"
-              
-              class="form-control"
-           
-            />
-          </div>
-
-   
-          <p id="datecrt"></p>
+       
         </div>
         <div class="modal-footer">
           <button
