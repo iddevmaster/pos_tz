@@ -180,6 +180,8 @@ function calen() {
         },
       },
       eventClick: function (info) {
+
+      console.log(info.event.extendedProps.data)
         
     $('#cardContainer').empty(); // Clear previous cards
    
@@ -210,7 +212,7 @@ function calen() {
     const tableBody = document.getElementById('json-table-body');
     tableBody.innerHTML = ''; // Clears all rows
             jsonData.forEach((item,index) => {
-              console.log(item)
+             
               if(item.tis_unit == 'day'){
                 var dt = 'วัน'
               }
