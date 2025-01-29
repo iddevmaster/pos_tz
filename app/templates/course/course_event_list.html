@@ -3,6 +3,83 @@
 <script>
 
 
+function allowOnlyNumbersTra(event) {
+
+   
+// Allow: Backspace, Tab, Arrow keys, Delete
+if (
+    event.key === "Backspace" || 
+    event.key === "Tab" || 
+    event.key === "ArrowLeft" || 
+    event.key === "ArrowRight" || 
+    event.key === "Delete"
+) {
+    return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+    event.preventDefault(); // Block other characters
+    return false; // Prevent default behavior
+}
+
+
+
+
+
+setTimeout(() => {
+const it = document.getElementById("ev_training").value;
+
+if (it.charAt(0) == "0") {
+  if (it.charAt(1)) {
+    let result = removeFirstCharacter(it);
+    document.getElementById("ev_training").value = result 
+  }
+}
+}, 20);
+
+}
+
+
+function allowOnlyNumbersTraEdit(event) {
+
+   
+// Allow: Backspace, Tab, Arrow keys, Delete
+if (
+    event.key === "Backspace" || 
+    event.key === "Tab" || 
+    event.key === "ArrowLeft" || 
+    event.key === "ArrowRight" || 
+    event.key === "Delete"
+) {
+    return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+    event.preventDefault(); // Block other characters
+    return false; // Prevent default behavior
+}
+
+
+
+
+
+setTimeout(() => {
+const it = document.getElementById("ev_hour_three_update").value;
+
+if (it.charAt(0) == "0") {
+  if (it.charAt(1)) {
+    let result = removeFirstCharacter(it);
+    document.getElementById("ev_hour_three_update").value = result 
+  }
+}
+}, 20);
+
+}
+
+
+
 function handleCategoryChange(select) {
         const selectedValue = select.value;
         if (selectedValue) {
@@ -501,8 +578,10 @@ function removeFirstCharacter(str) {
     ev_expired_cer_quantity,
     limit_price,
     limit_price_workhelp,
+    ev_training,
     ev_logo
   ) {
+ 
     document.getElementById("datecrt").innerHTML =
       "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
     document.getElementById("ev_id_update").value = ev_id;
@@ -518,6 +597,7 @@ function removeFirstCharacter(str) {
     document.getElementById("ev_generation_update").value = ev_generation;
     document.getElementById("ev_price_update").value = ev_price;
     document.getElementById("ev_vat_update").value = ev_vat;
+    document.getElementById("ev_training_update").value = ev_training;
     
     document.getElementById("ev_expired_cer_quantity_update").value =
       ev_expired_cer_quantity;
@@ -736,7 +816,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_logo.url}}')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.ev_logo.url}}')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -746,7 +826,7 @@ function removeFirstCharacter(str) {
                   class="btn btn-warning"
                   data-bs-toggle="modal"
                   data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','')"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','')"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -834,6 +914,8 @@ function removeFirstCharacter(str) {
               {% endfor %}
             </select>
           </div>
+
+          
           <div class="form-group">
             <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
             <input
@@ -854,6 +936,21 @@ function removeFirstCharacter(str) {
               required
             />
           </div>
+          <div class="row">
+            <div class="col-12 col-sm-12">
+              <label>จำนวนคนเข้าอบรม</label> <label style="color: red">* ไม่เกิน</label>
+              <input
+              type="text"
+              class="form-control"
+              id="ev_training"
+              name="ev_training"
+              required
+              pattern="[0-9]+"
+               onkeydown="allowOnlyNumbersTra(event)"
+            />
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>รวมจำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
@@ -881,6 +978,7 @@ function removeFirstCharacter(str) {
             </div>
           </div>
 
+   
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>รวมจำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
@@ -1161,6 +1259,9 @@ function removeFirstCharacter(str) {
               {% endfor %}
             </select>
           </div>
+
+        
+          
           <div class="form-group">
             <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
             <input
@@ -1181,7 +1282,21 @@ function removeFirstCharacter(str) {
               required
             />
           </div>
-
+          
+          <div class="row">
+            <div class="col-12 col-sm-12">
+              <label>จำนวนคนเข้าอบรม</label> <label style="color: red">* ไม่เกิน</label>
+              <input
+              type="text"
+              class="form-control"
+              id="ev_training_update"
+              name="ev_training"
+              required
+              pattern="[0-9]+"
+               onkeydown="allowOnlyNumbersTraEdit(event)"
+            />
+            </div>
+          </div>
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>จำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>

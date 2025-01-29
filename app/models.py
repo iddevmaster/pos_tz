@@ -93,6 +93,7 @@ class course_event(models.Model):
     ev_people_two = models.IntegerField(default=0, blank=False)
     ev_people_three = models.IntegerField(default=0, blank=False)
     ev_expired_cer_quantity = models.IntegerField(default=0, blank=False)
+    ev_training = models.IntegerField(default=1, blank=False)
     ev_expired_cer_date = models.DateField(blank=True, null=True)
     is_show = models.IntegerField(default=1, blank=False)
     ev_logo = models.ImageField(
