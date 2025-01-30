@@ -1044,18 +1044,19 @@ def approve_lis_event(request):
     year_current = request.GET.get('qyear', date.today().year)
 
    
-    content = event_register.objects.select_related('ev').filter(status='D')
+    content = event_register.objects.select_related('ev').filter(status='D').order_by('ev_id')
 
     obj = []
     if content:
      for r in content:
-
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         payment_item = register_payment.objects.get(
             register_id=r.register_id)
+     
+        
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
         res = {'customer_list': customer_list,'register_id':r.register_id,
