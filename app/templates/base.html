@@ -91,6 +91,34 @@
     />
 
     <style>
+
+      
+
+.hamburger {
+            display: block;
+            width: 35px;
+            height: 30px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 5px;
+            background-color: black;
+            position: absolute;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .hamburger span:nth-child(1) { top: 0; }
+        .hamburger span:nth-child(2) { top: 12px; }
+        .hamburger span:nth-child(3) { top: 24px; }
+
+        /* เมื่อเมนูถูกเปิด */
+        .hamburger.active span:nth-child(1) { transform: translateY(12px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: translateY(-12px) rotate(-45deg); }
       body {
         font-family: "Sarabun", sans-serif;
         font-size: 16px;
@@ -172,10 +200,12 @@
       }
       .sidebar-wrapper {
         background-image: linear-gradient(#03a1fc, yellow);
+        position: fixed;
       }
       .sidebar-header {
         background-image: url("{% static "images/bg.jpg" %}");
       }
+      
     </style>
   </head>
   <body>
@@ -205,16 +235,19 @@
                 </div>
               </div>
 
-              <div class="toggler">
-                <a href="#" class="sidebar-hide d-xl-none d-block"
-                  ><i class="bi bi-x bi-middle"></i
-                ></a>
-              </div>
+         
             </div>
           </div>
           <div class="sidebar-menu">
             <ul class="menu">
+            
+              <li class="sidebar-title">  <div class="toggler">
+                <a href="#" class="sidebar-hide d-xl-none d-block" style="text-align: right;"
+                  ><i class="bi bi-x bi-middle"> ซ่อน </i
+                ></a>
+              </div></li>
               <li class="sidebar-title">เมนู</li>
+         
               <li class="{% if request.path == "/" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/" class="sidebar-link">
                   <i class="icon dripicons-store"></i>
@@ -387,6 +420,14 @@
           <a href="#" class="burger-btn d-block d-xl-none">
             <i class="bi bi-justify fs-3"></i>
           </a>
+        
+        
+
+          <div class="hamburger" id="hamburger-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         </header>
 
         <div class="page-heading">
@@ -425,6 +466,12 @@
 
     <!-- Include select2 JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script>
+      document.getElementById("hamburger-btn").addEventListener("click", function() {
+          document.getElementById("sidebar").classList.toggle("active");
+      });
+      </script>
     <script>
       // Simple Datatable
 
