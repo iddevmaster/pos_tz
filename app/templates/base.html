@@ -121,10 +121,11 @@
         .hamburger.active span:nth-child(3) { transform: translateY(-12px) rotate(-45deg); }
       body {
         font-family: "Sarabun", sans-serif;
-        font-size: 16px;
+        font-size: 24px;
         background-image: url("{% static "images/rm218batch4-katie-20.jpg" %}");
         background-size: cover;
       }
+
       .btn {
         font-size: 16px;
       }
@@ -205,7 +206,14 @@
       .sidebar-header {
         background-image: url("{% static "images/bg.jpg" %}");
       }
-      
+
+
+@media (max-width: 576px) {
+  .font-default {
+        font-size: 24px;
+      }
+ }
+ 
     </style>
   </head>
   <body>
@@ -241,11 +249,11 @@
           <div class="sidebar-menu">
             <ul class="menu">
             
-              <li class="sidebar-title">  <div class="toggler">
+              <li class="sidebar-title"> 
                 <a href="#" class="sidebar-hide d-xl-none d-block" style="text-align: right;"
                   ><i class="bi bi-x bi-middle"> ซ่อน </i
                 ></a>
-              </div></li>
+              </li>
               <li class="sidebar-title">เมนู</li>
          
               <li class="{% if request.path == "/" %} sidebar-item active {% else %} sidebar-item {% endif %}">

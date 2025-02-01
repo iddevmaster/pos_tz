@@ -766,7 +766,9 @@ CheckHourbeforeSave()
           <div class="modal-body">
             <div class="row">
               <div class="col-12 col-lg-6 col-md-6">
-                ตำแหน่ง / หน้าที่ / รายการ:    <label style="color: red"> *</label> 
+                   
+                <span class="font-default">ตำแหน่ง / หน้าที่ / รายการ:</span>
+                <label style="color: red"> *</label> 
                 <select class="form-select"  id="py" name="py" onchange="handleSelectChangePy(this)">
                   <option value="" disabled>
                     เลือก
@@ -779,14 +781,17 @@ CheckHourbeforeSave()
                 </select>
             </div>
             <div class="col-12 col-lg-6 col-md-6">
-              ค่าตอบแทน:   <label style="color: red"> *</label> 
+           
+              <span class="font-default">ค่าตอบแทน:</span>
+              <label style="color: red"> *</label> 
               <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
         
           </div>
 
           
       <div class="col-12 col-lg-6 col-md-6">
-        จำนวนต่อหน่วย :   <label style="color: red"> *</label> 
+        <span class="font-default">จำนวนต่อหน่วย:</span>
+        <label style="color: red"> *</label> 
         <select class="form-select" id="tis_unit" name="tis_unit" style="pointer-events: none; background-color: #e9ecef;">
           <option value="hour">
             ชั่วโมง
@@ -801,17 +806,21 @@ CheckHourbeforeSave()
     </div>
 
       <div class="col-12 col-lg-6 col-md-6">
-        หน่วย:   <label style="color: red"> *</label> 
+        <span class="font-default">หน่วย:</span>
+           <label style="color: red"> *</label> 
         <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" required />
     </div>
 
     <div class="col-12 col-lg-6 col-md-6">
-      รวม:   <label style="color: red"> *</label> 
+      <span class="font-default">รวม:</span>
+         <label style="color: red"> *</label> 
       <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0"  readonly/>
   </div>
 
     <div class="col-6 col-lg-6 col-md-6">
-      ครู - วิทยากร:   <label style="color: red"> *</label> 
+      
+      <span class="font-default">ครู - วิทยากร: :</span>
+      <label style="color: red"> *</label> 
     
     <select id="teacher" class="form-select" onchange="handleSelectChange(this)" name="teacher" style="width: 100%;">
       
@@ -832,19 +841,20 @@ CheckHourbeforeSave()
 
 
           <div class="col-12 col-lg-12 col-md-12">
-            <label style="color: red">หมายเหตุ *</label> 
+           
+            <span class="font-default"  style="color: red"> หมายเหตุ *</span>
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">วิทยากร <span id="ev_hour"></span>  ชั่วโมง </label>    <label style="color: red">จำนวน <span id="ev_people"></span> ท่าน </label> 
+           <label style="color: red" class="font-default">วิทยากร <span id="ev_hour" class="font-default"></span>  ชั่วโมง </label>    <label style="color: red" class="font-default">จำนวน <span id="ev_people"></span> ท่าน </label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">ครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
+           <label style="color: red" class="font-default">ครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red" class="font-default">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">ผู้ช่วยวิทยากร <span id="count_day"> วัน </span>  งาน</label><label style="color: red"> ค่าตอบแทนจะเปลี่ยนแปลงเมื่อจำนวน ผู้ช่วยเพิ่ม </label> 
+           <label style="color: red" class="font-default">ผู้ช่วยวิทยากร <span id="count_day"> วัน </span>  งาน</label><label style="color: red" class="font-default"> ค่าตอบแทนจะเปลี่ยนแปลงเมื่อจำนวน ผู้ช่วยเพิ่ม </label> 
          </div>
          <div class="col-12 col-lg-12 col-md-12">
-          <label style="color: red">ผู้ช่วยงาน 1   งาน</label>  
+          <label style="color: red" class="font-default">ผู้ช่วยงาน 1   งาน</label>  
         </div>
        
 
