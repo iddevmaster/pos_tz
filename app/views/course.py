@@ -181,6 +181,8 @@ def course_event_create(request):
     # ev_people_three = request.POST['ev_people_three']
     limitprice = request.POST['limit_price']
     limit_price_workhelp = request.POST['limit_price_workhelp']
+    ev_training = request.POST['ev_training']
+    
 
     try:
         ev_logo = request.FILES['ev_logo']
@@ -212,6 +214,7 @@ def course_event_create(request):
         limit_price=limitprice,
         limit_price_workhelp=limit_price_workhelp,
         status='N',
+        ev_training=ev_training,
         module=m.module,
     )
     content.save()
@@ -236,7 +239,7 @@ def course_event_create(request):
         "cancelled":1
     }
     # response = requests.get(api_url, headers=headers, params=params)
-    print(params)
+    
 
 
 
@@ -266,6 +269,7 @@ def course_event_update(request):
     ev_people = request.POST['ev_people_update']
     ev_people_two = request.POST['ev_people_two_update']
     ev_people_three = 10
+    ev_training = request.POST['ev_training']
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -291,6 +295,8 @@ def course_event_update(request):
     content.project_id = project_id
     content.limit_price = limitprice
     content.limit_price_workhelp = limit_price_workhelp
+    content.limit_price_workhelp = limit_price_workhelp
+    content.ev_training = ev_training
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
