@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 # from django.http import HttpResponse, response
 from datetime import date, timedelta
 from dateutil import rrule
@@ -320,7 +320,16 @@ def payment(request, register_id):
         return redirect("/")
     content_regist = register_main.objects.select_related(
         "seller", "ev").prefetch_related("student_register").get(register_id=register_id)
-
+    
+  
+    regbyev = register_main.objects.filter(ev_id=content_regist.ev_id)
+    total_rq_quta = 0
+    for aaa in regbyev:
+        try:
+            bbbb = register_payment.objects.get(register_id=aaa.register_id)
+            total_rq_quta += bbbb.rp_quota
+        except register_payment.DoesNotExist:    
+            bbbb = 0
     content_course = course_event.objects.select_related(
         "course").get(ev_id=content_regist.ev_id)
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
@@ -334,7 +343,7 @@ def payment(request, register_id):
         student_data = None
     # print(content)
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,
-               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data}
+               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_price,'ev_training':content_regist.ev.ev_training}
     return render(request, 'register/register_payment.html', context)
 
 

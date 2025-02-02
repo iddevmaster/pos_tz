@@ -1,6 +1,20 @@
 {% extends 'base.html' %} {% block content %}
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+
+function validateForm() {
+
+  Swal.fire({
+      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
+      text: 'กรุณาเลือกรายชื่อ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+  return false;  // Prevents form submission
+}
+
   function validate(evt) {
     var theEvent = evt || window.event;
 
@@ -116,7 +130,8 @@
 </div>
 
 <section class="section">
-  <form method="post" action="{% url 'CreatePayment' %}" autocomplete="off">
+  
+  <form method="post"  onsubmit="return validateForm()" action="{% url 'CreatePayment' %}" autocomplete="off">
     {% csrf_token %}
     <div class="card">
       <div class="card-body">
@@ -378,7 +393,14 @@
         <div class="form-group">
           <label>ชำระเงิน</label>   <label style="color: red">จำนวนผู้เข้าอบรมเหลือ 1 *</label>
         </div>
-
+        <input
+        type="text"
+        class="form-control"
+        value="{{quata}}"
+        id="quata"
+        name="quata"
+        required
+      />
         <div class="row">
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
