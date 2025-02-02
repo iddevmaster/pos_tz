@@ -343,7 +343,7 @@ def payment(request, register_id):
         student_data = None
     # print(content)
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,
-               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_price,'ev_training':content_regist.ev.ev_training}
+               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_rq_quta,'ev_training':content_regist.ev.ev_training}
     return render(request, 'register/register_payment.html', context)
 
 
