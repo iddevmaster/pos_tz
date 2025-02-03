@@ -5,14 +5,62 @@
 
 function validateForm() {
 
-  Swal.fire({
-      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-      text: 'กรุณาเลือกรายชื่อ',
+  // let rp_quota = document.getElementById("rp_quota").value;
+  // let quata = document.getElementById("quata").value;
+  let customer_type = document.getElementById("customer_type").value;
+
+  if(customer_type == '1'){
+  let rp_quota = document.getElementById("rp_quota").value;
+  let quata = document.getElementById("quata").value;
+  console.log(rp_quota);
+  console.log(quata);
+    if(parseInt(rp_quota) > parseInt(quata)) {
+    Swal.fire({
+      title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
+      text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรบ',
       icon: 'error',
       confirmButtonText: 'OK'
     });
+    return false;  
+  }else {
+    return true; 
+  } 
 
-  return false;  // Prevents form submission
+  }
+
+  if(customer_type == '2'){
+  let rp_quota = document.getElementById("rp_quota").value;
+  let quata = document.getElementById("quata").value;
+    if(parseInt(rp_quota) > parseInt(quata)) {
+    Swal.fire({
+      title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
+      text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรบ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;  
+  }else {
+    return true; 
+  } 
+  }
+
+
+ 
+  // let rp_quota = document.getElementById("rp_quota").value;
+  // let quata = document.getElementById("quata").value;
+  // console.log(quata);
+  // if(parseInt(rp_quota) > parseInt(quata)) {
+  //   Swal.fire({
+  //     title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
+  //     text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรบ',
+  //     icon: 'error',
+  //     confirmButtonText: 'OK'
+  //   });
+  //   return false;  
+  // }else {
+  //   return true; 
+  // } 
+  
 }
 
   function validate(evt) {
@@ -131,7 +179,7 @@ function validateForm() {
 
 <section class="section">
   
-  <form method="post"  onsubmit="return validateForm()" action="{% url 'CreatePayment' %}" autocomplete="off">
+  <form method="post"  onsubmit="return validateForm();" action="{% url 'CreatePayment' %}" autocomplete="off">
     {% csrf_token %}
     <div class="card">
       <div class="card-body">
@@ -318,7 +366,30 @@ function validateForm() {
             </div>
           </div>
 
-          {% endif %} {% if content_regist.customer_type == 2 %}
+ 
+          
+          
+        
+
+          {% endif %}
+
+          {% if content_regist.customer_type == 1 %}
+          <div class="col-lg-3 col-md-6">
+            <div class="form-group">
+              <label>จำนวนผู้เข้าอบรม</label>
+              <label style="color: red">*</label>
+              <input
+                type="number"
+                class="form-control"
+                id="rp_quota"
+                name="rp_quota"
+                value="1"
+                readonly
+              />
+            </div>
+          </div>
+          {% endif %}
+          {% if content_regist.customer_type == 2 %}
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>จำนวนผู้เข้าอบรม</label>
@@ -333,6 +404,9 @@ function validateForm() {
             </div>
           </div>
           {% endif %}
+
+
+
 
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
@@ -391,16 +465,25 @@ function validateForm() {
     <div class="card">
       <div class="card-body">
         <div class="form-group">
-          <label>ชำระเงิน</label>   <label style="color: red">จำนวนผู้เข้าอบรมเหลือ 1 *</label>
+          <label>ชำระเงิน</label>   <label style="color: red">จำนวนผู้เข้าอบรมเหลือ {{quata}} *</label>
         </div>
         <input
-        type="text"
+        type="hidden"
         class="form-control"
         value="{{quata}}"
         id="quata"
         name="quata"
         required
       />
+
+      <input
+      type="hidden"
+      class="form-control"
+      id="customer_type"
+      name="customer_type"
+      value="{{content_regist.customer_type}}"
+      
+    />
         <div class="row">
           <div class="col-lg-4 col-md-6">
             <div class="form-group">

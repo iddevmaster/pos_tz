@@ -333,6 +333,8 @@ def payment(request, register_id):
     content_course = course_event.objects.select_related(
         "course").get(ev_id=content_regist.ev_id)
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
+    total_ca_quta = content_regist.ev.ev_training - total_rq_quta
+    print(total_ca_quta)
     if content_regist.customer_type == 1:
         try:
             student_data = student.objects.filter(
@@ -343,7 +345,7 @@ def payment(request, register_id):
         student_data = None
     # print(content)
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,
-               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_rq_quta,'ev_training':content_regist.ev.ev_training}
+               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training}
     return render(request, 'register/register_payment.html', context)
 
 
