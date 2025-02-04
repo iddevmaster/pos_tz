@@ -92,7 +92,7 @@ async function down(e) {
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.name}}</td>
-            <td>{{res.seq}}</td>
+           
             <td>
 
               {% if forloop.first %}
@@ -119,11 +119,11 @@ async function down(e) {
              id="bottom"
              data-original-title="bottom tooltip">
              <i class="dripicons-chevron-up"></i>
-     </button>
+             </button>
             
               {% else %}
 
-              <button onclick="up('{{res.seq}}')"
+      <button onclick="up('{{res.seq}}')"
               class="btn btn-outline-secondary up"
               data-name="brand" data-no=""
               data-popup="tooltip"
@@ -150,6 +150,9 @@ async function down(e) {
               <div align="center">
               
               </div>
+            </td>
+            <td>
+              x
             </td>
           </tr>
           {% endfor %}
