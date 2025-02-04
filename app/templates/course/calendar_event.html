@@ -422,8 +422,8 @@ if(data.status == 200){
       const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
       document.getElementById('tis_quantity').value = count_day
-      document.getElementById('tis_compensation').value = limit_price
-      const input = document.getElementById('tis_sum').value = limit_price * count_day
+      document.getElementById('tis_compensation').value = 800
+      const input = document.getElementById('tis_sum').value = 800 * count_day
 
       
       const x = document.getElementById('tis_quantity');
@@ -434,14 +434,41 @@ if(data.status == 200){
       
     }
     if(selectElement.value == 4) {
+      const count_day = document.getElementById("count_day").value 
+      const limit_price = document.getElementById("limit_price").value
+      document.getElementById("tis_unit").value = 'day';
+      document.getElementById('tis_quantity').value = count_day
+      document.getElementById('tis_compensation').value = 500
+      const input = document.getElementById('tis_sum').value = 500 * count_day
+
+      
+      const x = document.getElementById('tis_quantity');
+      x.readOnly = true; // Set the input field to readonly
+      x.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      
+    }
+
+    if(selectElement.value == 5) {
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
       const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      document.getElementById('tis_sum').value = 1000
+      document.getElementById('tis_compensation').value = 1000
+      input.readOnly = true; // Set the input field to readonly
+      input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      input.value = 1;
       
+    }
+
+    if(selectElement.value == 6) {
+      document.getElementById("tis_unit").value = 'work';
+      const input = document.getElementById('tis_quantity');
+      const limit_price = document.getElementById("limit_price").value
+      const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
       document.getElementById('tis_sum').value = limit_price_workhelp
       document.getElementById('tis_compensation').value = limit_price_workhelp
-    
+
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
@@ -502,12 +529,20 @@ if(data.status == 200){
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
 
-if(pi == 3){
-  document.getElementById("tis_sum").value = (limit_price) * tis_quantity;
-  document.getElementById("tis_compensation").value = limit_price * tis_quantity ;
+    if(pi == 3){
+  document.getElementById("tis_sum").value = (800) * tis_quantity;
+  document.getElementById("tis_compensation").value = 800;
 }else if(pi == 4) {
-  document.getElementById("tis_sum").value = limit_price_workhelp;
-  document.getElementById("tis_compensation").value = limit_price_workhelp;
+  document.getElementById("tis_sum").value = (500) * tis_quantity;
+  document.getElementById("tis_compensation").value = 500;
+}
+else if(pi == 5) {
+  document.getElementById("tis_sum").value = (1000);
+  document.getElementById("tis_compensation").value = 1000;
+}
+else if(pi == 6) {
+  document.getElementById("tis_sum").value = (300);
+  document.getElementById("tis_compensation").value = 300;
 }
 else {
   document.getElementById("tis_sum").value = aaaa * tis_quantity;

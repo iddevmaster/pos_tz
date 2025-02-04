@@ -278,8 +278,40 @@ def course_teacher_event_set_income_form_create(request, ev_id):
          x.status = "W"
          x.save()
 
-        if pi == '4':
-       
+        if pi == '5':
+         print('5',tis_sum)
+         contentx = teacher_income_setting(
+            tis_compensation=tis_compensation,
+            tis_unit=tis_unit,
+            tis_quantity=tis_quantity,
+            tis_sum=tis_sum,
+            tis_start_date=instance.ev_date_start,
+            tis_end_date=instance.ev_date_end,
+            ev_id=ev_id,
+            teacher_id=teacher_id,
+            pi_id=pi,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            status='W',
+            register_id='-',
+            
+         )
+         contentx.save()
+        #  x = event_register.objects.get(register_id=register)
+        #  x.status = "W"
+        #  x.save()
+         tot = 0
+         x = course_event.objects.get(ev_id=ev_id)
+         x.status = "W"
+         x.save()
+         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+        #  print(totalpeol)
+         if totalpeol > 0 :
+           bb = 1000 / totalpeol
+           teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
+
+        if pi == '6':
+        
          contentx = teacher_income_setting(
             tis_compensation=tis_compensation,
             tis_unit=tis_unit,
@@ -307,10 +339,35 @@ def course_teacher_event_set_income_form_create(request, ev_id):
          totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
     
      
+
          if totalpeol > 0 :
-           bb = instance.limit_price_workhelp / totalpeol
-           teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
+            bb = 300 / totalpeol
+            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
         if pi == '3':
+         contentx = teacher_income_setting(
+            tis_compensation=tis_compensation,
+            tis_unit=tis_unit,
+            tis_quantity=tis_quantity,
+            tis_sum=tis_sum,
+            tis_start_date=instance.ev_date_start,
+            tis_end_date=instance.ev_date_end,
+            ev_id=ev_id,
+            teacher_id=teacher_id,
+            pi_id=pi,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            status='W',
+            register_id='-',
+         )
+         contentx.save()
+  
+         x = course_event.objects.get(ev_id=ev_id)
+         x.status = "W"
+         x.save()
+
+
+
+        if pi == '4':
 
          contentx = teacher_income_setting(
             tis_compensation=tis_compensation,
@@ -332,17 +389,15 @@ def course_teacher_event_set_income_form_create(request, ev_id):
          x = course_event.objects.get(ev_id=ev_id)
          x.status = "W"
          x.save()
-         delta = instance.ev_date_end - instance.ev_date_start
-         days_difference = delta.days + 1
-         tot = 0
 
-         totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+
+        #  totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
         
  
-         if totalpeol > 0 :
-            tt_event = instance.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
-            bb = (instance.limit_price * days_difference) / totalpeol
-            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+        #  if totalpeol > 0 :
+        #     tt_event = instance.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+        #     bb = (instance.limit_price * days_difference) / totalpeol
+        #     teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)    
 
         # save เสร็จ ค่อยอัพเดท
 
@@ -595,17 +650,37 @@ def saveeventadmin(request):
               x.status = 'W'
               x.save()
              
-              delta = x.ev_date_end - x.ev_date_start
-              days_difference = delta.days + 1
-              tot = 0
-              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
-            
-              if totalpeol > 0 :
-               tt_event = x.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
-               bb = (x.limit_price * days_difference) / totalpeol
-               teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=tt_event)
+   
+            if pi == '4':
+
+              content = teacher_income_setting(
+                tis_compensation=tis_compensation,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=tis_sum,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id='-',
+            )
+              content.save()
+  
+              x = course_event.objects.get(ev_id=ev_id)
+        
+              x.status = 'W'
+              x.save()
+             
+
+
             datas = {'status':200}
-            if pi == '4':    
+
+
+            if pi == '5':    
               content = teacher_income_setting(
                 tis_compensation=tis_compensation,
                 tis_unit=tis_unit,
@@ -628,7 +703,36 @@ def saveeventadmin(request):
               tot = 0
               totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
               if totalpeol > 0 :
-                  bb = x.limit_price_workhelp / totalpeol
+                  bb = 1000 / totalpeol
+                  teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
+            
+            datas = {'status':200}
+
+
+            if pi == '6':    
+              content = teacher_income_setting(
+                tis_compensation=tis_compensation,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=tis_sum,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id='-',
+            )
+              content.save()
+              x = course_event.objects.get(ev_id=ev_id)
+              x.status = 'W'
+              x.save()
+              tot = 0
+              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+              if totalpeol > 0 :
+                  bb = 300 / totalpeol
                   teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
             
             datas = {'status':200}

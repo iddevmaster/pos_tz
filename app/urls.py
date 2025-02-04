@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill
 
 urlpatterns = [
     # Register
@@ -155,6 +155,9 @@ urlpatterns = [
          finance.course_teacher_event_set_income_form_create),
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),
+
+    path('description/setting/form/create', desbill.listdesc,
+         name="description_setting_form_create"),
     #     public
     path('public/form/certificate', report_and_print.public_form_print),
     path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),

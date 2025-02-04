@@ -357,3 +357,11 @@ class salesorder(models.Model):
     img = models.ImageField(
         upload_to=generate_unique_name('images/sales'), default=None)
 
+class desciption_bill(models.Model):
+    des_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=64, blank=True, default=None)
+    seq = models.IntegerField(default=None, blank=False)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+       
+
