@@ -156,8 +156,10 @@ urlpatterns = [
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),
 
-    path('description/setting/form/create', desbill.listdesc,
+    path('description/setting/form/create', desbill.setting_form_create,
          name="description_setting_form_create"),
+    path('api/sequence/up', desbill.up),
+    path('api/sequence/down', desbill.down),     
     #     public
     path('public/form/certificate', report_and_print.public_form_print),
     path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),
@@ -173,6 +175,8 @@ urlpatterns = [
     path('api/studentlist', register.listdata),
     path('api/tests', register.tests),
     path('api/data', register.testsdata),
+
+ 
    
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

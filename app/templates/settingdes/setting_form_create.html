@@ -3,6 +3,31 @@
     function setValueDeleteModal(id) {
       document.getElementById("id_delete").value = id;
     }
+
+
+
+   async function up(e) {
+    const ex = await fetch('/api/sequence/up', {
+              method: 'POST',
+              body:JSON.stringify({'id':e})
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+          })
+}
+
+async function down(e) {
+    const ex = await fetch('/api/sequence/down', {
+              method: 'POST',
+              body:JSON.stringify({'id':e})
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+          })
+}
+
   </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -53,7 +78,7 @@
 
   <div class="card">
     <div class="card-body">
-      <table class="table table-striped" id="table1">
+      <table class="table table-striped" id="table22">
         <thead>
           <tr>
             <th>ลำดับ</th>
@@ -66,20 +91,64 @@
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.bcs_start_day}}</td>
-            <td>{{res.bcs_end_day}}</td>
+            <td>{{res.name}}</td>
+            <td>{{res.seq}}</td>
             <td>
+
+              {% if forloop.first %}
+
+              <button onclick="down('{{res.seq}}')"
+              class="btn btn-outline-secondary down"
+              data-name="brand" data-no="{{res.seq}}"
+              data-popup="tooltip"
+              title="เลื่อนตำแหน่งลง"
+              data-placement="top"
+              id="top"
+              data-original-title="top tooltip">
+              <i class="dripicons-chevron-down"></i>
+             </button>
+
+             {% elif forloop.last %}
+
+             <button  onclick="up('{{res.seq}}')"
+             class="btn btn-outline-secondary up"
+             data-name="brand" data-no="{{res.seq}}"
+             data-popup="tooltip"
+             title="เลื่อนตำแหน่งขึ้น"
+             data-placement="bottom"
+             id="bottom"
+             data-original-title="bottom tooltip">
+             <i class="dripicons-chevron-up"></i>
+     </button>
+            
+              {% else %}
+
+              <button onclick="up('{{res.seq}}')"
+              class="btn btn-outline-secondary up"
+              data-name="brand" data-no=""
+              data-popup="tooltip"
+              title="เลื่อนตำแหน่งขึ้น"
+              data-placement="bottom"
+              id="bottom"
+              data-original-title="bottom tooltip">
+              <i class="dripicons-chevron-up"></i>
+      </button>
+      <button onclick="down('{{res.seq}}')"
+              class="btn btn-outline-secondary down"
+              data-name="brand" data-no=""
+              data-popup="tooltip"
+              title="เลื่อนตำแหน่งลง"
+              data-placement="top"
+              id="top"
+              data-original-title="top tooltip">
+              <i class="dripicons-chevron-down"></i>
+      </button>
+           
+
+              {% endif %}
+    
               <div align="center">
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.pk}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
-                  <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
-                </button>
+              
               </div>
             </td>
           </tr>
