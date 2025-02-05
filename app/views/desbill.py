@@ -42,6 +42,16 @@ def setting_form_create(request):
         m = None
         return render(request, '404.html')
     if request.method == 'POST':
+       
+        name = request.POST['name']
+        last_entry = desciption_bill.objects.order_by('-seq').first()
+        
+        content = desciption_bill(
+        name=name,
+        seq=last_entry.seq + 1,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow())
+        content.save()
         messages.success(request, "ทำรายการสำเร็จ !")
         return redirect("/description/setting/form/create")
 
@@ -70,6 +80,14 @@ def setting_form_delete(request):
 
 
 def setting_form_update(request):
+
+
+    des_id = request.POST['des_id']
+    name = request.POST['name']
+    content = desciption_bill.objects.get(des_id=des_id)
+    content.name = name
+    content.save()
+
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/description/setting/form/create")
 

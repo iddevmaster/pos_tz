@@ -363,5 +363,10 @@ class desciption_bill(models.Model):
     seq = models.IntegerField(default=None, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
+
+class factbilldes(models.Model):
+    factbill_id = models.AutoField(primary_key=True)
+    register_id  = models.CharField(max_length=254, blank=True, default="-")
+    des_id = models.IntegerField(default=None, blank=False) 
        
 

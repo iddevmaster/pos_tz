@@ -7,8 +7,20 @@ function validateForm() {
 
   // let rp_quota = document.getElementById("rp_quota").value;
   // let quata = document.getElementById("quata").value;
+  // let selectedValues = [];  // Array to store selected values
+  //   let checkboxes = document.querySelectorAll('input[name="selected_bills"]:checked');
+
+  //   checkboxes.forEach((checkbox) => {
+  //       selectedValues.push(checkbox.value);  // Add checked values to array
+  //   });
+
+  //   document.getElementById("selectedValuesInput").value = selectedValues.join(",");
+
+
   let customer_type = document.getElementById("customer_type").value;
 
+
+  
   if(customer_type == '1'){
   let rp_quota = document.getElementById("rp_quota").value;
   let quata = document.getElementById("quata").value;
@@ -181,6 +193,53 @@ function validateForm() {
   
   <form method="post"  onsubmit="return validateForm();" action="{% url 'CreatePayment' %}" autocomplete="off">
     {% csrf_token %}
+
+
+    <div class="modal fade" id="EditClick">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title white" id="myModalLabel19">รายละเอียดการอบรม</h5>
+            <button
+              type="button"
+              class="close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i data-feather="x"></i>
+            </button>
+          </div>
+       
+            <div class="modal-body">
+              {% csrf_token %}
+              <input type="hidden" name="des_id" id="des_id" required />
+              <div class="col-12 col-sm-12">
+                {% for res in des_bill %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selected_bills" value="{{ res.des_id }}" id="bill{{ res.des_id }}">
+                    <label class="form-check-label" for="bill{{ res.des_id }}">
+                        {{ res.name }}
+                    </label>
+                </div>
+            {% endfor %}
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-light-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  <i class="bx bx-x d-block d-sm-none"></i>
+                  <span class="d-none d-sm-block">ปิด</span>
+                </button>
+              
+              </div>
+            </div>
+       
+        </div>
+      </div>
+    </div>
+    
     <div class="card">
       <div class="card-body">
         <div class="form-group">
@@ -465,6 +524,22 @@ function validateForm() {
     <div class="card">
       <div class="card-body">
         <div class="form-group">
+          
+  
+          <button type="button" class="btn btn-primary"  
+   
+       
+          data-bs-toggle="modal"
+          data-bs-target="#EditClick">
+          รายละเอียดการอบรม
+          </button>
+          <input type="hidden" id="selectedValuesInput" name="selected_values">
+        </div>
+   </div></div></div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="form-group">
           <label>ชำระเงิน</label>   <label style="color: red">จำนวนผู้เข้าอบรมเหลือ {{quata}} *</label>
         </div>
         <input
@@ -643,7 +718,10 @@ function validateForm() {
         </div>
       </div>
     </div>
+
+    
   </form>
 </section>
+
 
 {% endblock %}
