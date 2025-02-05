@@ -160,7 +160,7 @@ urlpatterns = [
          name="description_setting_form_create"),
     path('description/setting/form/delete', desbill.setting_form_delete,
          name="description_setting_form_delete"),
-    path('description/setting/form/delete', desbill.setting_form_update,
+    path('description/setting/form/update', desbill.setting_form_update,
          name="description_setting_form_update"), 
          
     path('api/sequence/up', desbill.up),
