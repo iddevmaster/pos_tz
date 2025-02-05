@@ -324,17 +324,22 @@ def payment(request, register_id):
   
     regbyev = register_main.objects.filter(ev_id=content_regist.ev_id)
     total_rq_quta = 0
+    
     for aaa in regbyev:
+        
         try:
-            bbbb = register_payment.objects.get(register_id=aaa.register_id)
-            total_rq_quta += bbbb.rp_quota
-        except register_payment.DoesNotExist:    
+            bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+            if bbbb:
+             total_rq_quta += bbbb.rp_quota
+             
+        except register_payment.DoesNotExist:  
+      
             bbbb = 0
     content_course = course_event.objects.select_related(
         "course").get(ev_id=content_regist.ev_id)
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
     total_ca_quta = content_regist.ev.ev_training - total_rq_quta
-    print(total_ca_quta)
+    
     if content_regist.customer_type == 1:
         try:
             student_data = student.objects.filter(

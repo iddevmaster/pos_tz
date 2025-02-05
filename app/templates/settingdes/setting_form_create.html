@@ -4,7 +4,16 @@
       document.getElementById("id_delete").value = id;
     }
 
+    function setValueUpdateModal(
+    des_id,
+    name
+  ) {
 
+    console.log(name);
+    document.getElementById("des_id").value = des_id;
+    document.getElementById("name_update").value = name;
+
+  }
 
    async function up(e) {
     const ex = await fetch('/api/sequence/up', {
@@ -152,7 +161,31 @@ async function down(e) {
               </div>
             </td>
             <td>
-              x
+              <div align="center">
+                <button
+                  type="button"
+                  onclick="setValueUpdateModal('{{res.des_id}}','{{res.name}}','{{res.seq}}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#EditClick"
+                >
+           
+                  <i class="icon dripicons-document-edit"></i> 
+                  แก้ไข
+                </button>
+              </div>
+              <div align="center">
+                <button
+                  type="button"
+                  onclick="setValueDeleteModal('{{res.seq}}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteClick"
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button>
+              </div>
             </td>
           </tr>
           {% endfor %}
@@ -177,7 +210,7 @@ async function down(e) {
             <i data-feather="x"></i>
           </button>
         </div>
-        <form action="{% url 'billing_cycle_setting_form_delete' %}" method="post">
+        <form action="{% url 'description_setting_form_delete' %}" method="post">
           <div class="modal-body">
             {% csrf_token %}
             <input type="hidden" name="id" id="id_delete" required />
@@ -203,6 +236,57 @@ async function down(e) {
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="EditClick">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title white" id="myModalLabel19">แก้ไข</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+        <form action="{% url 'description_setting_form_update' %}" method="post">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="des_id" id="des_id" required />
+            <div class="col-12 col-sm-12">
+              <label>รายละเอียดการอบรม</label> <label style="color: red">*</label>
+              <input
+              type="text"
+              class="form-control"
+              id="name_update"
+              name="name"
+              required
+            
+              
+            />
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-light-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">ยกเลิก</span>
+              </button>
+              <button type="submit" class="btn btn-primary ml-1">
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">บันทึก</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 
 </section>
 {% endblock %}

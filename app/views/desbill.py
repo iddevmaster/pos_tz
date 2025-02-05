@@ -51,6 +51,29 @@ def setting_form_create(request):
     return render(request, 'settingdes/setting_form_create.html', context)
 
 
+
+def setting_form_delete(request):
+
+    id = request.POST['id']     
+   
+    instance = desciption_bill.objects.get(seq=id)
+    instance.delete()
+    desciption = desciption_bill.objects.all().order_by('seq')  
+    t = 0
+    for desciptions in desciption:
+        t += 1
+        desciptions.seq = t
+        desciptions.save()
+        print(t) 
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/description/setting/form/create")
+
+
+def setting_form_update(request):
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/description/setting/form/create")
+
+
 @csrf_exempt
 def up(request):
     data = json.loads(request.body)
