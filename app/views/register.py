@@ -377,149 +377,150 @@ def payment_create(request):
     uuid_without_dashes = str(register_id).replace('-', '')
     factbilldes.objects.filter(register_id=uuid_without_dashes).delete()  # Keeps the record with id=1
 
+   
+
+    
+    try:
+        rp_quota = request.POST['rp_quota']
+    except KeyError:
+        rp_quota = 1
+
+    rp_ref1 = request.POST['rp_ref1']
+    rp_ref2 = request.POST['rp_ref2']
+    content_main = register_main.objects.get(register_id=register_id)
+    pay_type = content_main.pay_type
+    customer_type = content_main.customer_type
+    if pay_type == 1:
+        active = 1
+    else:
+        active = 0
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    totaldata = register_payment.objects.filter(
+        crt_date__month=month_current, crt_date__year=year_current).count()
+    running_number = treeDigit(totaldata + 1)
+    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+        str(twoDigit(month_current)) + "/" + str(running_number)
+    # Item
+    rpi_code = request.POST['rpi_code']
+    rpi_name = request.POST['rpi_name']
+    rpi_quantity = request.POST['rpi_quantity']
+    rpi_unit = request.POST['rpi_unit']
+    rpi_price = request.POST['rpi_price']
+    rpi_price_discount = request.POST['rpi_price_discount']
+    rpi_price_total = request.POST['rpi_price_total']
+    rpi_price_vat = request.POST['rpi_price_vat']
+    rpi_price_result = request.POST['rpi_price_result']
+
+ 
+    instecent = register_main.objects.get(register_id=register_id)
+    instecent.status = 'N'
+    instecent.save()
+
+  
+    dtaf = event_register.objects.create(
+        ev_id=instecent.ev_id,
+        register_id=register_id,
+        status='D'
+    )
+
+
+    # Crate Main
+    object = register_payment.objects.create(
+        rp_doc_number=rp_doc_number,
+        rp_code_customer=rp_code_customer,
+        rp_name_customer=rp_name_customer,
+        rp_tax=rp_tax,
+        rp_name_seller=rp_name_seller,
+        rp_name_contact=rp_name_contact,
+        rp_branch=rp_branch,
+        rp_address=rp_address,
+        rp_phone=rp_phone,
+        rp_email=rp_email,
+        rp_confirm_date_price=rp_confirm_date_price,
+        rp_date_delivery=rp_date_delivery,
+        rp_quota=rp_quota,
+        rp_ref1=rp_ref1,
+        rp_ref2=rp_ref2,
+        active=active,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        register_id=register_id
+    )
+    object.refresh_from_db()
+    rp_id = object.rp_id
+    # Create Item
+    content_regist = register_main.objects.select_related(
+        "ev").get(register_id=register_id)
+    ev_vat = content_regist.ev.ev_vat
+    # print(ev_vat)
+
+    if ev_vat == 0:
+        new_total = rpi_price_total
+    else:
+        new_total = float(rpi_price_total) - float(rpi_price_vat)
+    register_payment_items.objects.create(
+        rpi_code=rpi_code,
+        rpi_name=rpi_name,
+        rpi_quantity=rpi_quantity,
+        rpi_unit=rpi_unit,
+        rpi_price=rpi_price,
+        rpi_price_discount=rpi_price_discount,
+        rpi_price_total=new_total,
+        rpi_price_vat=rpi_price_vat,
+        rpi_price_result=rpi_price_result,
+        rpi_pay=rpi_price_result,
+        rp_id=rp_id,
+        register_id=register_id
+    )
+
+    # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
+    check_bill = register_payment.objects.filter(
+        register_id=register_id).exclude(rp_id=rp_id)
+    if check_bill.count() >= 1 and pay_type == 2:
+        check_bill.update(active=0)
+
+    # ตรวจสอบว่ามีการอนุมัติให้แก้ไขหรือยัง จากนั้นให้ทำการเปลี่ยน complete เป็น 1 ทันที
+    content_approve = register_applove.objects.filter(
+        register_id=register_id, doc_type=1, status=1, complete=0)
+    if content_approve.count() > 0:
+        content_approve.update(complete=1)
+        if pay_type == 2:
+            content_main.close_the_sale = 0
+            content_main.save()
+
+    # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
+    if customer_type == 1:
+        # Delete ข้อมูลนักเรียนเก่าทิ้ง
+        content = student.objects.get(register_id=register_id)
+        content.delete()
+
+        student_firstname_th = request.POST['student_firstname_th']
+        student_lastname_th = request.POST['student_lastname_th']
+        totaldata = student.objects.filter(
+            crt_date__month=month_current, crt_date__year=year_current).count()
+        running_number = treeDigit(totaldata + 1)
+        student_code = "TZ" + str(twoDigit(month_current)) + \
+            str(running_number) + "/" + str(year_current)
+        student.objects.create(
+            student_identification_number=rp_tax,
+            student_prefix_th="",
+            student_firstname_th=student_firstname_th,
+            student_lastname_th=student_lastname_th,
+            student_prefix_eng="",
+            student_firstname_eng="",
+            student_lastname_eng="",
+            student_code=student_code,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            register_id=register_id
+        )
     for bill in bills:
         dtaf = factbilldes.objects.create(
         register_id=uuid_without_dashes,
         des_id=bill
-    )
-
-    
-    # try:
-    #     rp_quota = request.POST['rp_quota']
-    # except KeyError:
-    #     rp_quota = 1
-
-    # rp_ref1 = request.POST['rp_ref1']
-    # rp_ref2 = request.POST['rp_ref2']
-    # content_main = register_main.objects.get(register_id=register_id)
-    # pay_type = content_main.pay_type
-    # customer_type = content_main.customer_type
-    # if pay_type == 1:
-    #     active = 1
-    # else:
-    #     active = 0
-    # month_current = date.today().month
-    # year_current = date.today().year
-    # year_current_f = str(int(date.today().year) + 543)
-    # totaldata = register_payment.objects.filter(
-    #     crt_date__month=month_current, crt_date__year=year_current).count()
-    # running_number = treeDigit(totaldata + 1)
-    # rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
-    #     str(twoDigit(month_current)) + "/" + str(running_number)
-    # # Item
-    # rpi_code = request.POST['rpi_code']
-    # rpi_name = request.POST['rpi_name']
-    # rpi_quantity = request.POST['rpi_quantity']
-    # rpi_unit = request.POST['rpi_unit']
-    # rpi_price = request.POST['rpi_price']
-    # rpi_price_discount = request.POST['rpi_price_discount']
-    # rpi_price_total = request.POST['rpi_price_total']
-    # rpi_price_vat = request.POST['rpi_price_vat']
-    # rpi_price_result = request.POST['rpi_price_result']
-
- 
-    # instecent = register_main.objects.get(register_id=register_id)
-    # instecent.status = 'N'
-    # instecent.save()
-
-  
-    # dtaf = event_register.objects.create(
-    #     ev_id=instecent.ev_id,
-    #     register_id=register_id,
-    #     status='D'
-    # )
-
-
-    # # Crate Main
-    # object = register_payment.objects.create(
-    #     rp_doc_number=rp_doc_number,
-    #     rp_code_customer=rp_code_customer,
-    #     rp_name_customer=rp_name_customer,
-    #     rp_tax=rp_tax,
-    #     rp_name_seller=rp_name_seller,
-    #     rp_name_contact=rp_name_contact,
-    #     rp_branch=rp_branch,
-    #     rp_address=rp_address,
-    #     rp_phone=rp_phone,
-    #     rp_email=rp_email,
-    #     rp_confirm_date_price=rp_confirm_date_price,
-    #     rp_date_delivery=rp_date_delivery,
-    #     rp_quota=rp_quota,
-    #     rp_ref1=rp_ref1,
-    #     rp_ref2=rp_ref2,
-    #     active=active,
-    #     crt_date=dateTimeNow(),
-    #     upd_date=dateTimeNow(),
-    #     register_id=register_id
-    # )
-    # object.refresh_from_db()
-    # rp_id = object.rp_id
-    # # Create Item
-    # content_regist = register_main.objects.select_related(
-    #     "ev").get(register_id=register_id)
-    # ev_vat = content_regist.ev.ev_vat
-    # # print(ev_vat)
-
-    # if ev_vat == 0:
-    #     new_total = rpi_price_total
-    # else:
-    #     new_total = float(rpi_price_total) - float(rpi_price_vat)
-    # register_payment_items.objects.create(
-    #     rpi_code=rpi_code,
-    #     rpi_name=rpi_name,
-    #     rpi_quantity=rpi_quantity,
-    #     rpi_unit=rpi_unit,
-    #     rpi_price=rpi_price,
-    #     rpi_price_discount=rpi_price_discount,
-    #     rpi_price_total=new_total,
-    #     rpi_price_vat=rpi_price_vat,
-    #     rpi_price_result=rpi_price_result,
-    #     rpi_pay=rpi_price_result,
-    #     rp_id=rp_id,
-    #     register_id=register_id
-    # )
-
-    # # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
-    # check_bill = register_payment.objects.filter(
-    #     register_id=register_id).exclude(rp_id=rp_id)
-    # if check_bill.count() >= 1 and pay_type == 2:
-    #     check_bill.update(active=0)
-
-    # # ตรวจสอบว่ามีการอนุมัติให้แก้ไขหรือยัง จากนั้นให้ทำการเปลี่ยน complete เป็น 1 ทันที
-    # content_approve = register_applove.objects.filter(
-    #     register_id=register_id, doc_type=1, status=1, complete=0)
-    # if content_approve.count() > 0:
-    #     content_approve.update(complete=1)
-    #     if pay_type == 2:
-    #         content_main.close_the_sale = 0
-    #         content_main.save()
-
-    # # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
-    # if customer_type == 1:
-    #     # Delete ข้อมูลนักเรียนเก่าทิ้ง
-    #     content = student.objects.get(register_id=register_id)
-    #     content.delete()
-
-    #     student_firstname_th = request.POST['student_firstname_th']
-    #     student_lastname_th = request.POST['student_lastname_th']
-    #     totaldata = student.objects.filter(
-    #         crt_date__month=month_current, crt_date__year=year_current).count()
-    #     running_number = treeDigit(totaldata + 1)
-    #     student_code = "TZ" + str(twoDigit(month_current)) + \
-    #         str(running_number) + "/" + str(year_current)
-    #     student.objects.create(
-    #         student_identification_number=rp_tax,
-    #         student_prefix_th="",
-    #         student_firstname_th=student_firstname_th,
-    #         student_lastname_th=student_lastname_th,
-    #         student_prefix_eng="",
-    #         student_firstname_eng="",
-    #         student_lastname_eng="",
-    #         student_code=student_code,
-    #         crt_date=dateTimeNow(),
-    #         upd_date=dateTimeNow(),
-    #         register_id=register_id
-    #     )
+    )    
 
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
