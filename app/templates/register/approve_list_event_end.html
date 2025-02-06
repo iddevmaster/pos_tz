@@ -11,9 +11,45 @@
 
   function setValueUpdateModal(
     ids,
+    end
   ) {
     document.getElementById("ev_id_update").value = ids;
+
+
+
+    const months = {
+        "มกราคม": "01", "กุมภาพันธ์": "02", "มีนาคม": "03", "เมษายน": "04",
+        "พฤษภาคม": "05", "มิถุนายน": "06", "กรกฎาคม": "07", "สิงหาคม": "08",
+        "กันยายน": "09", "ตุลาคม": "10", "พฤศจิกายน": "11", "ธันวาคม": "12"
+    };
+
+    let parts = end.split(" "); // แยกวันที่
+    let day = String(parts[0]).padStart(2, '0'); // ทำให้เป็น 2 หลัก (เช่น 3 -> 03)
+    let month = months[parts[1]]; // แปลงชื่อเดือนเป็นตัวเลข
+    let year = parts[2]; // ปี
+
+    let endeb = `${year}-${month}-${day}`;
+    
+    document.getElementById("myButton").hidden = true;
+  
+    let today = new Date();
+    today.setDate(today.getDate() - 1); // เพิ่ม 1 วัน
+    
+    let formattedDate = today.toISOString().split('T')[0]; // แปลงเป็น YYYY-MM-DD
+  
+    if (endeb > formattedDate) {
+      document.getElementById("result").innerText = "ยังไม่ถึงวันปิดการขายตามที่กำหนด";
+      document.getElementById("myButton").style.display = "block";
+    } else {
+      document.getElementById("myButton").hidden = false;
+      document.getElementById("result").innerText = "ปิดการขายได้";
+
+      
+    }
+   
   }
+
+  
   function default_date() {
     const d = new Date();
     let month = d.getMonth() + 1;
@@ -119,7 +155,7 @@
             <td>{{res.course.course_code}}</td>
             <td>{{res.course.course_name}}</td>
             <td>{{res.ev_generation}}</td>
-            <td>{{res.ev_date_start|date:"d/m/Y"}} - {{res.ev_date_end|date:"d/m/Y"}}</td>
+            <td>{{res.ev_date_start|date:"d/m/Y"}} - {{res.ev_date_end|date:"d/m/Y"}} </td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
 
@@ -131,7 +167,7 @@
                     id="dropdownMenuButtonIcon"
                     data-bs-toggle="modal"
                     data-bs-target="#UpdateClick"
-                    onclick="setValueUpdateModal('{{res.ev_id}}')"
+                    onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_end}}')"
                   >
                    ยืนยันจบงาน
                   </button>
@@ -182,7 +218,9 @@
       />
         <div class="modal-body">
 
-       
+          <label class="form-check-label" id="result">
+          
+        </label>
         </div>
         <div class="modal-footer">
           <button
@@ -193,7 +231,7 @@
             <i class="bx bx-x d-block d-sm-none"></i>
             <span class="d-none d-sm-block">ยกเลิก</span>
           </button>
-          <button type="submit" class="btn btn-primary ml-1">
+          <button type="submit" class="btn btn-primary ml-1" id="myButton">
             <i class="bx bx-check d-block d-sm-none"></i>
             <span class="d-none d-sm-block">บันทึก</span>
           </button>

@@ -318,6 +318,7 @@ def payment(request, register_id):
     except:
         content = None
         return redirect("/")
+    print(register_id)
     content_regist = register_main.objects.select_related(
         "seller", "ev").prefetch_related("student_register").get(register_id=register_id)
     
