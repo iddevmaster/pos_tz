@@ -368,5 +368,7 @@ class factbilldes(models.Model):
     factbill_id = models.AutoField(primary_key=True)
     register_id  = models.CharField(max_length=254, blank=True, default="-")
     des_id = models.IntegerField(default=None, blank=False) 
+
+    
        
 

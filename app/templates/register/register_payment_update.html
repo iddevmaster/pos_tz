@@ -116,6 +116,56 @@
 <section class="section">
   <form method="post" action="{% url 'CreatePayment' %}" autocomplete="off">
     {% csrf_token %}
+
+
+    <div class="modal fade" id="EditClick">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title white" id="myModalLabel19">รายละเอียดการอบรม</h5>
+            <button
+              type="button"
+              class="close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i data-feather="x"></i>
+            </button>
+          </div>
+       
+            <div class="modal-body">
+              {% csrf_token %}
+              <input type="hidden" name="des_id" id="des_id" required />
+              <div class="col-12 col-sm-12">
+                
+                {% for res in des_bill %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selected_bills" value="{{ res.des_id }}" 
+                    {% if res.des_id in selected_bills %} checked {% endif %} 
+                    id="bill{{ res.des_id }}"
+                    >
+                    <label class="form-check-label" for="bill{{ res.des_id }}">
+                        {{ res.name }}
+                    </label>
+                </div>
+            {% endfor %}
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-light-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  <i class="bx bx-x d-block d-sm-none"></i>
+                  <span class="d-none d-sm-block">ปิด</span>
+                </button>
+              
+              </div>
+            </div>
+       
+        </div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-body">
         <div class="form-group">
@@ -378,6 +428,22 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="form-group">
+          
+  
+          <button type="button" class="btn btn-primary"  
+   
+       
+          data-bs-toggle="modal"
+          data-bs-target="#EditClick">
+          รายละเอียดการอบรม
+          </button>
+          <input type="hidden" id="selectedValuesInput" name="selected_values">
+        </div>
+   </div></div>
 
     <div class="card">
       <div class="card-body">

@@ -568,9 +568,16 @@ def payment_form_update(request, register_id):
     else:
         student_data = None
     # print(total_pay)
+    des_bill = desciption_bill.objects.all()
+   
+    uuid_without_dashes = str(register_id).replace('-', '')
+   
+    filtered_objects = factbilldes.objects.filter(register_id=uuid_without_dashes)
+    selected_bills = [obj.des_id for obj in filtered_objects]
+    
     context1 = {'title': title,  'data': content, 'listMenuPermission': objMenu,
                 'content_regist': content_regist, 'content_course': content_course}
-    context2 = {'title': title,  'data': last_data, 'content_regist': content_regist, 'listMenuPermission': objMenu,
+    context2 = {'title': title,  'data': last_data, 'content_regist': content_regist, 'listMenuPermission': objMenu,'des_bill':des_bill,'selected_bills':selected_bills,
                 'content_course': content_course, 'student_data': student_data}
     if total_pay < 1:
         return render(request, 'register/register_payment.html', context1)
