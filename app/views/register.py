@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes
+from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -1250,9 +1250,13 @@ def update_close_the_eventend(request):
     content.status = 'S'
     content.save()
 
-
-
-
+    checkincome = teacher_income_setting.objects.filter(ev_id=ev_id)
+    if checkincome:
+       for r in checkincome:
+            instance = teacher_income_setting.objects.get(id=r.id)
+            instance.status = 'S'
+            instance.save()
+        
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/processevent")    
 

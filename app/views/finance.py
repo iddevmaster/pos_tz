@@ -148,7 +148,8 @@ def billing_cycle_result(request):
     # day_current = 10
     b = billing_cycle_setting.objects.filter(module=m.module)
     start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module, tis_end_date__year=year_current).annotate(month=TruncMonth('tis_start_date'))
+        ev__module=m.module, tis_end_date__year=year_current,status='S').annotate(month=TruncMonth('tis_start_date'))
+   
     start_content = start_content.values('month').annotate(
         order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('-month')
     if teacher_current != None and teacher_current != '':
@@ -173,6 +174,8 @@ def billing_cycle_result(request):
         for r2 in b:
             day_start = r2.bcs_start_day
             day_end = r2.bcs_end_day
+
+          
             # ถ้าเดือนสุดท้ายน้อยกว่าค่า day_end ที่ตั้งไว้ ให้เอาเดือนสุดท้ายมาตั้งใหม่
             if last_day <= day_end:
                 day_end = last_day
@@ -182,7 +185,8 @@ def billing_cycle_result(request):
                 tis_start_date__day__gte=day_start,
                 tis_end_date__day__lte=day_end,
                 tis_end_date__month=month,
-                tis_end_date__year=year_current
+                tis_end_date__year=year_current,
+                status="S"
             )
             if teacher_current != None and teacher_current != '':
                 instance = instance.filter(teacher=teacher_current)
@@ -192,7 +196,7 @@ def billing_cycle_result(request):
                                 upd_date=dateTimeNow())
         obj2 = []
         content = teacher_income_setting.objects.filter(
-            ev__module=m.module, active=1, tis_end_date__month=month, tis_end_date__year=year_current)
+            ev__module=m.module, active=1, tis_end_date__month=month, tis_end_date__year=year_current,status='S')
         if teacher_current != None and teacher_current != '':
             content = content.filter(teacher=teacher_current)
         group_content = content.values('tis_group').annotate(
