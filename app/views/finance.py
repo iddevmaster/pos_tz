@@ -46,11 +46,12 @@ def course_event_list(request):
     year_current = request.GET.get('qyear', date.today().year)
     course_list = course.objects.filter(
         cancelled=1, active=1).order_by("-course_id")
+    status = ['N','W','Y','I']    
     result = course_event.objects.select_related("course").filter(
-        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module,status='Y').order_by("-ev_id")
+        cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module,status__in=status).order_by("-ev_id")
 
     te = []
-    status = ['N','W','Y']
+
     # result = event_register.objects.select_related("ev").filter(ev__cancelled=1, status__in=status, ev__ev_date_start__month=month_current, ev__ev_date_start__year=year_current, ev__module=m.module)
     # for r in result:  
     #  content = course.objects.get(pk=r.ev.course_id)
