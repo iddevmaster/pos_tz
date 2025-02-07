@@ -217,11 +217,14 @@
             </td>
           </tr>
 
-          <tr>
-            <td colspan="5" rowspan="6" style="vertical-align: top">
+          <tr >
+            <td colspan="5" rowspan="6" style="vertical-align: top;padding-left: 5px;">
               หมายเหตุ <br />
-              {{data.rp_ref1}}<br />
-              {{data.rp_ref2}}
+             
+              {% for etcs in etc %}
+            -  {{etcs.name}}<br />
+            
+              {% endfor %}
             </td>
 
             <td colspan="2">รวมเงิน</td>

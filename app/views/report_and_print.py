@@ -10,7 +10,7 @@ from dateutil import rrule
 import json
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -32,7 +32,16 @@ def register_print(request, rp_id):
    
 
     items = register_payment_items.objects.filter(rp_id=content.rp_id).first()
-
+    uuid_without_dashes = str(content.register_id).replace('-', '')
+    billdess = factbilldes.objects.filter(register_id=uuid_without_dashes)
+    obj2 = []
+    if billdess:
+        for rsx in billdess:    
+            print(rsx)
+            x = desciption_bill.objects.get(des_id=rsx.des_id)
+            v = {'des_id': x.des_id,  'name': x.name}
+            obj2.append(v)
+    
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
     customer = customers.objects.get(register_id=content.register_id)
@@ -41,7 +50,7 @@ def register_print(request, rp_id):
             items.rpi_price_total) + float(items.rpi_price_vat)
     else:
         rpi_price_default = items.rpi_price_total
-    context = {'title': defaultTitle,  'data': content,
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
