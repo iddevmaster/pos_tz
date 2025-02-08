@@ -815,39 +815,63 @@ def evenetdel(request):
 
             
             if instancexx >= 1 :
-                if pi_id == 1 or pi_id == 2:
+                if pi_id == 1 or pi_id == 2 or pi_id == 3 or pi_id == 4:
                   instancex = teacher_income_setting.objects.get(pk=ev_id)
                   instancex.delete()
-                if pi_id == 3:
+                if pi_id == 7 or pi_id == 8:        
+                  instancex = teacher_income_setting.objects.get(pk=ev_id)
+                  instancex.delete()  
+                # if pi_id == 3:
+                #   instancex = teacher_income_setting.objects.get(pk=ev_id)
+                #   instancex.delete()
+                #   insevent = course_event.objects.get(pk=instance.ev_id)
+                #   delta = insevent.ev_date_end - insevent.ev_date_start
+                #   days_difference = delta.days + 1
+                #   tot = 0
+                #   totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
+                #   if totalpeol > 0 :
+                #    tt_event = insevent.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
+                #    bb = (insevent.limit_price * days_difference) / totalpeol
+                #    teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
+                #   datas = {'status':200}
+                # if pi_id == 4:        
+                #   instancex = teacher_income_setting.objects.get(pk=ev_id)
+                #   instancex.delete()
+                #   insevent = course_event.objects.get(pk=instance.ev_id)
+                #   delta = insevent.ev_date_end - insevent.ev_date_start
+                #   days_difference = delta.days + 1
+                #   tot = 0
+                #   totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
+                #   if totalpeol > 0 :
+                #    tt_event = insevent.limit_price_workhelp / totalpeol  # ค่าตอบแทนรายบุคคล
+                #    bb = insevent.limit_price_workhelp / totalpeol
+                #    teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
+                #   datas = {'status':200}
+
+                if pi_id == 6:        
                   instancex = teacher_income_setting.objects.get(pk=ev_id)
                   instancex.delete()
-                  insevent = course_event.objects.get(pk=instance.ev_id)
-                  delta = insevent.ev_date_end - insevent.ev_date_start
-                  days_difference = delta.days + 1
-                  tot = 0
+
                   totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
-                  if totalpeol > 0 :
-                   tt_event = insevent.limit_price / totalpeol  # ค่าตอบแทนรายบุคคล
-                   bb = (insevent.limit_price * days_difference) / totalpeol
-                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
-                  datas = {'status':200}
-                if pi_id == 4:        
+                  if totalpeol > 0:
+                   bb = 300 / totalpeol
+                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=bb)
+                  datas = {'status':200}  
+
+
+                if pi_id == 5:        
                   instancex = teacher_income_setting.objects.get(pk=ev_id)
                   instancex.delete()
-                  insevent = course_event.objects.get(pk=instance.ev_id)
-                  delta = insevent.ev_date_end - insevent.ev_date_start
-                  days_difference = delta.days + 1
-                  tot = 0
+
                   totalpeol = teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).count()
-                  if totalpeol > 0 :
-                   tt_event = insevent.limit_price_workhelp / totalpeol  # ค่าตอบแทนรายบุคคล
-                   bb = insevent.limit_price_workhelp / totalpeol
-                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=bb,tis_compensation=tt_event)
-                  datas = {'status':200}
+                  if totalpeol > 0:
+                   xx = 1000 / totalpeol
+                   teacher_income_setting.objects.filter(ev_id=evs_id, active=0,pi_id=pi_id,register_id=register).update(tis_sum=xx,tis_compensation=xx)
+                  datas = {'status':200}    
                 # ลบก่อน
 
          
-                aaaa = teacher_income_setting.objects.filter(ev_id=instance.ev_id,pi_id=pi_id).count()
+                aaaa = teacher_income_setting.objects.filter(ev_id=instance.ev_id).count()
                 if aaaa == 0 :
                     xx = course_event.objects.get(pk=instance.ev_id)
                     xx.status = 'Y'
