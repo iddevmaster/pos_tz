@@ -217,10 +217,18 @@
           </tr>
           {% endcomment %}
           <tr>
-            <td colspan="3" rowspan="5" style="vertical-align: top">
+            <!-- <td colspan="3" rowspan="5" style="vertical-align: top">
               หมายเหตุ <br />
               {{data.rp_ref1}}<br />
               {{data.rp_ref2}}
+            </td> -->
+            <td colspan="3" rowspan="5" style="vertical-align: top;padding-left: 3px;font-size: 14px;">
+              หมายเหตุ <br />
+             
+              {% for etcs in etc %}
+            -  {{etcs.name}}<br />
+            
+              {% endfor %}
             </td>
             <td></td>
             <td></td>
