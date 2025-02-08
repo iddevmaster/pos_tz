@@ -740,6 +740,50 @@ def saveeventadmin(request):
                   bb = 300 / totalpeol
                   teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)
             
+
+            if pi == '7':    
+              content = teacher_income_setting(
+                tis_compensation=0,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=0,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id='-',
+            )
+              content.save()
+              x = course_event.objects.get(ev_id=ev_id)
+              x.status = 'W'
+              x.save()
+
+            if pi == '8':    
+              content = teacher_income_setting(
+                tis_compensation=0,
+                tis_unit=tis_unit,
+                tis_quantity=tis_quantity,
+                tis_sum=0,
+                tis_start_date=instance.ev_date_start,
+                tis_end_date=instance.ev_date_end,
+                ev_id=ev_id,
+                teacher_id=teacher_id,
+                pi_id=pi,
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                status='W',
+                register_id='-',
+            )
+              content.save()
+              x = course_event.objects.get(ev_id=ev_id)
+              x.status = 'W'
+              x.save()  
+         
+            
             datas = {'status':200}
             return JsonResponse(datas, status=200,safe=False)
 

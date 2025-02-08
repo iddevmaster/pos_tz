@@ -474,6 +474,39 @@ if(data.status == 200){
       input.value = 1;
       
     }
+
+    if(selectElement.value == 7) {
+      
+      document.getElementById("tis_unit").value = 'work';
+      const input = document.getElementById('tis_quantity');
+      const limit_price = document.getElementById("limit_price").value
+      const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      document.getElementById('tis_sum').value = 1
+      document.getElementById('tis_compensation').value = 0
+
+      input.readOnly = true; // Set the input field to readonly
+      input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      input.value = 1;
+      
+    }
+
+    if(selectElement.value == 8) {
+
+ 
+      document.getElementById("tis_unit").value = 'work';
+      const input = document.getElementById('tis_quantity');
+      const limit_price = document.getElementById("limit_price").value
+      const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      document.getElementById('tis_sum').value = 0
+      document.getElementById('tis_compensation').value = 0
+
+      input.readOnly = true; // Set the input field to readonly
+      input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
+      input.value = 1;
+      
+    }
+
+
     if((selectElement.value == 1) ||(selectElement.value == 2)) {
       document.getElementById("tis_unit").value = 'hour';
       const input = document.getElementById('tis_quantity');
@@ -544,6 +577,8 @@ else if(pi == 6) {
   document.getElementById("tis_sum").value = (300);
   document.getElementById("tis_compensation").value = 300;
 }
+
+
 else {
   document.getElementById("tis_sum").value = aaaa * tis_quantity;
 }
@@ -863,9 +898,17 @@ CheckHourbeforeSave()
       เลือก
      </option>
      {% for teachers in teacher %}
-      <option value="{{ teachers.teacher_id }}">
-         {{ teachers}}
+  
+
+     {% if teachers.teacher_type == 1 %}
+     <option value="{{ teachers.teacher_id }}">
+      {{ teachers}}  - ภายใน
       </option>
+     {% else %}
+     <option value="{{ teachers.teacher_id }}">
+      {{ teachers}}  - ภายนอก
+      </option>
+     {% endif %}
     {% endfor %}
     </select>
     </div> 

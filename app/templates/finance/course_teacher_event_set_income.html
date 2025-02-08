@@ -200,24 +200,20 @@ function removeFirstCharacter(str) {
   function handleSelectChangePy(selectElement) {
  
   
+//     const bs = document.getElementById("teacher");
+//     const allOptions = Array.from(bs.options)
+// .filter(option => option.dataset.teacher_type != "2")
+// .map(option => ({
+//   id: option.value,
+//   text: option.text,
+//   dataInfo: option.dataset.teacher_type // Access data-info attribute
+// }));
 
-    const x = document.getElementById("teacher");
-
-// Convert options to an array and map to objects
-const allOptions = Array.from(x.options).map(option => ({
-  id: option.value,
-  text: option.text
-}));
-
-
-
-    $('#items').empty().select2({
-      data: allOptions
-    });
     
-    $('#teacher').empty().select2({
-      data: allOptions
-    });
+//     $('#teacher').empty().select2({
+//       data: allOptions
+//     });
+
 
 
 
@@ -298,6 +294,8 @@ const allOptions = Array.from(x.options).map(option => ({
     }
 
     if(selectElement.value == 8) {
+
+ 
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
@@ -697,14 +695,8 @@ return data
         <input type="hidden" class="form-control" name="ev_hour" id="ev_hour" value="{{main_data.ev_hour}}" />
 
 
-        <label for="category">Select Category:</label>
-<select id="category" class="form-control">
-  <option value="fruits">Fruits</option>
-  <option value="vegetables">Vegetables</option>
-</select>
 
-<label for="items">Select Item:</label>
-<select id="items" class="form-control" style="width: 100%"></select>
+
         <div class="row">
           <div class="col-12 col-lg-6 col-md-6">
             ตำแหน่ง / หน้าที่ / รายการ: <label style="color: red"> *</label> 
@@ -760,8 +752,8 @@ return data
   เลือก
  </option>
  {% for teachers in teacher %}
-  <option value="{{ teachers.teacher_id }}">
-     {{ teachers}}
+  <option value="{{ teachers.teacher_id }}"  data-teacher_type="{{ teachers.teacher_type }}">
+     {{ teachers}} 
   </option>
 {% endfor %}
 </select>
