@@ -1323,6 +1323,35 @@ def approve_update_status(request):
     return redirect("/approve/update/payment")
 
 
+@login_required(login_url='/login')
+def approve_list_payment(request):
+
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        pi_id = [7,8]   
+        content = teacher_income_setting.objects.filter(pi_id__in=pi_id)
+    except:
+        content = None
+
+    context = {'title': title,  'data': content, 'listMenuPermission': objMenu}
+
+    return render(request, 'register/approve_list_event_bill.html',context)
 # def upload_excel(request):
 #     if request.method == 'POST':
 #         form = ExcelUploadForm(request.POST, request.FILES)
