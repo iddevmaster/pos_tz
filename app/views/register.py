@@ -1203,8 +1203,7 @@ def update_close_the_event(request):
         ev_logo = None
 
     
-    
-    
+
     content = register_main.objects.get(pk=register_id)
     content.status = 'Y'
     content.save()
@@ -1253,9 +1252,17 @@ def update_close_the_eventend(request):
     checkincome = teacher_income_setting.objects.filter(ev_id=ev_id)
     if checkincome:
        for r in checkincome:
+           
+        if r.pi_id == 1 or r.pi_id == 2 or r.pi_id == 3 or r.pi_id == 4 or r.pi_id == 5 or r.pi_id == 6:
+            print('if')
             instance = teacher_income_setting.objects.get(id=r.id)
             instance.status = 'S'
             instance.save()
+
+        if r.pi_id == 7 or r.pi_id == 8:
+            instance2 = teacher_income_setting.objects.get(id=r.id)
+            instance2.status = 'I'
+            instance2.save()
         
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/processevent")    
@@ -1344,12 +1351,24 @@ def approve_list_payment(request):
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
     try:
-        pi_id = [7,8]   
-        content = teacher_income_setting.objects.filter(pi_id__in=pi_id)
+        obj = []
+        pi_id = ['7','8']   
+        
+        content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='I')
+        
+        for r in content:  
+            
+            ev = course_event.objects.get(ev_id=r.ev_id)
+            cou = course.objects.get(pk=ev.course_id)
+            res = {'course_name':cou.course_name,'gen':ev.ev_generation,'ev_date_start':ev.ev_date_start,'ev_date_end':ev.ev_date_end,'tis_unit':r.tis_unit,'pi_id':r.pi_id,'item_code':cou.course_code,'teacher':r.teacher,'id':r.id,'tis_sum':r.tis_sum}
+
+            obj.append(res)    
+           
     except:
         content = None
+        
 
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu}
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
 
     return render(request, 'register/approve_list_event_bill.html',context)
 # def upload_excel(request):
@@ -1372,7 +1391,18 @@ def approve_list_payment(request):
 #         form = ExcelUploadForm()
 #     return render(request, 'upload_excel.html', {'form': form})    
 
+def approve_list_payment_update(request):
+      
+      tis_sum = request.POST['tis_sum']
+      ids = request.POST['id']
+    
 
+      set_active = teacher_income_setting.objects.get(id=ids)
+      set_active.tis_sum = tis_sum
+      set_active.tis_compensation = tis_sum
+      set_active.save()
+
+      return redirect("/approvebill/update/bill")
 
 def upload_excel(request):
 

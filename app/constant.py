@@ -183,7 +183,7 @@ listMenu = [
     },
     {
         "value": "approvebill/update/bill",
-        "label": "อนุมัติภายใน",
+        "label": "ราคาจ้างเหมา",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },

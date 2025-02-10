@@ -1,6 +1,30 @@
 {% extends 'base.html' %} {% block content %} {% load humanize static %}
 <script>
 
+function allowOnlyNumbers(event) {
+
+   
+// Allow: Backspace, Tab, Arrow keys, Delete
+if (
+    event.key === "Backspace" || 
+    event.key === "Tab" || 
+    event.key === "ArrowLeft" || 
+    event.key === "ArrowRight" || 
+    event.key === "Delete"
+) {
+    return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+    event.preventDefault(); // Block other characters
+    return false; // Prevent default behavior
+}
+
+
+
+}
+
 function readURL(input) {
     if (input.files && input.files[0]) {
       console.log(input.files[0])
@@ -24,15 +48,12 @@ function readURL(input) {
 
 
   function setValueUpdateModal(
-    register_id,
     ids,
+    tis_sum
   ) {
-    console.log(register_id);
-    document.getElementById("register_id_update").value = register_id;
-    document.getElementById("ev_id_update").value = ids;
 
-    document.getElementById("register_id_update2").value = register_id;
-    document.getElementById("ev_id_update2").value = ids;
+    document.getElementById("id_update").value = ids;
+    document.getElementById("tis_sum_update").value = tis_sum;
 
 
   }
@@ -51,7 +72,7 @@ function readURL(input) {
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>อนุมัติบิล</h3>
+    <h3>ราคาจ้างเหมา</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
     <nav
@@ -114,14 +135,13 @@ function readURL(input) {
         <thead>
           <tr>
             <th>ลำดับ</th>
-            <th>เลขที่ใบสมัคร</th>
-            <th>ไอเทม</th>
             <th>หลักสูตร</th>
+            <th>ไอเทม</th>
             <th>รุ่น</th>
-            <th>ชื่อลูกค้า</th>
-            <th>ประเภทลูกค้า</th>
-            <th>ประเภทการชำระเงิน</th>
-            <th>วันที่อบรม</th>
+            <th>ชื่อ / บริษัท</th>
+            <th>วันที่</th>
+            <th>หน่วย</th>
+            <th>ยอดเงิน</th>
             <th>#</th>
           </tr>
         </thead>
@@ -129,31 +149,25 @@ function readURL(input) {
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.customer_list.register.register_number}}</td>
-            <td>{{res.course_list.course.course_code}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
-            <td>{{res.course_list.ev_generation}}</td>
-            <td>{{res.customer_list.customer_name}}</td>
+            <td>{{res.course_name}}</td>
+    
+            <td>{{res.item_code}}</td>
+            
+            <td>{{res.gen}}</td>
+            <td>{{res.teacher}}</td>
+            <td>
+
+              {{res.ev_date_start|date:"d/m/Y"}} -
+              {{res.ev_date_end|date:"d/m/Y"}}
+
+            </td>
+            <td>งานเหมา</td>
+            <td>{{res.tis_sum}}</td>
           
 
-            <td align="center">
-              {% if res.customer_list.register.pay_type == 1 %}
-              <span class="badge bg-success">เงินสด</span>
-              {% else %}
-              <span class="badge bg-danger">เครดิต</span>
-              {% endif %}
-            </td>
-            <td align="center">
-              {% if res.customer_list.register.customer_type == 1 %}
-              <span class="badge bg-success">บุคคล</span>
-              {% else %}
-              <span class="badge bg-info">บริษัท</span>
-              {% endif %}
-            </td>
-            <td>{{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}</td>
+       
             <td>
-              {% comment %} {{res.total_payment}} {% endcomment %}
-              {% if res.customer_list.register.pay_type == 1 %}
+          
               <div class="btn-group me-1 mb-1">
                 <div class="dropdown">
                   <button
@@ -162,9 +176,9 @@ function readURL(input) {
                     id="dropdownMenuButtonIcon"
                     data-bs-toggle="modal"
                     data-bs-target="#UpdateClick1"
-                    onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
+                    onclick="setValueUpdateModal('{{res.id}}','{{res.tis_sum}}')"
                   >
-                   ยืนยันวันอบรม
+                   ใส่จำนวนเงิน
                   </button>
 
                   <button
@@ -173,42 +187,17 @@ function readURL(input) {
                   id="dropdownMenuButtonIcon"
                   data-bs-toggle="modal"
                   data-bs-target="#DeleteClick"
-                  onclick="setValueDeleteModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
+                
                 >
                  ยกเลิก
                 </button>
                 </div>
               </div>
               
-              {% else %}
+          
 
-              <div class="btn-group me-1 mb-1">
-                <div class="dropdown">
-                  <button
-                    class="btn btn-primary btn-sm"
-                    type="button"
-                    id="dropdownMenuButtonIcon"
-                    data-bs-toggle="modal"
-                    data-bs-target="#UpdateClick2"
-                    onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
-                  >
-                   ยืนยันวันอบรม
-                  </button>
-
-                  <button
-                  class="btn btn-danger btn-sm"
-                  type="button"
-                  id="dropdownMenuButtonIcon"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                  onclick="setValueDeleteModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
-                >
-                 ยกเลิก
-                </button>
-                </div>
-              </div>
-              {% endif %}
      
+       
             </td>
           </tr>
           {% endfor %}
@@ -226,7 +215,7 @@ function readURL(input) {
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title white" id="myModalLabel160">
-          ปรับสถานะ ปิดการขาย
+          ปรับยอดเงิน
         </h5>
         <button
           type="button"
@@ -238,7 +227,7 @@ function readURL(input) {
         </button>
       </div>
       <form
-        action="{% url 'UpdateCloseTheEvent' %}"
+        action="{% url 'UpdateCloseEndTheEventAll' %}"
         method="post"
         autocomplete="off"
         enctype="multipart/form-data"
@@ -248,45 +237,23 @@ function readURL(input) {
 
         <input
           type="hidden"
-          id="register_id_update"
-          name="register_id"
+          id="id_update"
+          name="id"
           required
         />
-        <input
-        type="hidden"
-        name="ev_id"
-        id="ev_id_update"
-        required
-      />
+
         <div class="modal-body">
-          <div class="form-check" hidden>
-            <input class="form-check-input" type="checkbox" value="Public" id="flexCheckDefault" name="flexCheckDefault" checked  onclick="return false;">
-            <label class="form-check-label" for="flexCheckDefault">
-              Public
-            </label>
-          </div>
-      
-          <div class="form-group" hidden>
-            <label>Po</label>
+    
+ 
+          <div class="form-group">
+            <label>ยอดเงิน</label>
             <label style="color: red">*</label>
             <input
               type="text"
-              id="po"
-              name="po"
-              
+              id="tis_sum_update"
+              name="tis_sum"
               class="form-control"
-           
-            />
-          </div>
-          <div class="form-group" hidden>
-            <label>Sq</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              id="sq"
-              name="sq"
-              class="form-control"
-            
+              onkeydown="allowOnlyNumbers(event)"
             />
           </div>
 

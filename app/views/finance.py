@@ -410,7 +410,7 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             pi_id=pi,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
-            status='W',
+            status='Y',
             register_id='-',
         )
          content.save()
@@ -766,7 +766,7 @@ def saveeventadmin(request):
                 pi_id=pi,
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
-                status='W',
+                status='Y',
                 register_id='-',
             )
               content.save()
@@ -787,7 +787,7 @@ def saveeventadmin(request):
                 pi_id=pi,
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
-                status='W',
+                status='Y',
                 register_id='-',
             )
               content.save()
