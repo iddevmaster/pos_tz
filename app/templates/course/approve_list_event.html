@@ -1,0 +1,271 @@
+{% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+// $(document).ready(function () {
+//     // Initialize Select2
+//     $('#teacher').select2({
+//         dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+//     });
+
+//     // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
+//     $('#select2Modal').on('shown.bs.modal', function () {
+//         $('#teacher').select2({
+//             dropdownParent: $('#select2Modal')
+//         });
+//     });
+// });
+
+
+$(document).ready(function () {
+    // Initialize Select2 inside modal
+    $('#eventModal').on('shown.bs.modal', function () {
+        $('#teacher').select2({
+            dropdownParent: $('#eventModal') // Ensure dropdown is within the modal
+        }).select2('close'); // Optional: Auto-open Select2
+    });
+
+    // Prevent form submission on Enter key in search field
+    $(document).on('keypress', '.select2-search__field', function (e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+        }
+    });
+});
+
+
+function setValueDeleteModal(id) {
+  
+
+    document.getElementById("id_delete").value = id;
+
+    const eventModal = new bootstrap.Modal(document.getElementById('DeleteClick'));
+    eventModal.show();
+  }
+
+  async function delel() {
+
+
+    let data = await fetch('/api/evenetdel', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'id':document.getElementById("id_delete").value})
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+
+
+// this.calen();
+// window.location.reload();
+//    return data.status
+
+setTimeout(() => {
+      window.location.reload();
+ }, 100);
+
+})
+  
+
+  }
+
+  
+
+function calen() {
+
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+      locale: "th",
+      buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+      editable: false,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+        url: "/calendar_event_apieve/",
+        failure: function () {
+          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+        },
+      },
+      eventClick: function (info) {
+        document.getElementById('eventModalLabel').innerText = info.event.title;
+      document.getElementById("evs_id").value = info.event.extendedProps.evs_id
+      document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        eventModal.show();
+
+},
+      
+    });
+    calendar.render();
+ 
+
+}
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+      locale: "th",
+      buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+      editable: false,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+        url: "/calendar_event_apieve/",
+        failure: function () {
+          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+        },
+      },
+      eventClick: function (info) {
+      document.getElementById('eventModalLabel').innerText = info.event.title;
+      document.getElementById("evs_id").value = info.event.extendedProps.evs_id
+      document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        eventModal.show();
+            // Add new JSON data dynamically
+            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
+
+    
+ // Populate modal with event data
+
+},
+      
+    });
+    calendar.render();
+  });
+
+  
+
+
+
+
+
+  function confirm() {
+
+const it = document.getElementById("evs_id").value;
+fetch('/api/courseupdateeve', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ 'evs_id': it })
+})
+  .then(response => response.json())
+  .then(data => {
+    // Display response
+  
+    setTimeout(calen(), 1000); // Executes after 3 seconds
+ 
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+
+}
+</script>
+<style>
+
+
+.modal-xxl {
+            max-width: 90%;
+            width: 90%;
+        }
+
+        /* Ensure modal-content scales properly */
+        .modal-xxl .modal-content {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Optional: Add responsive styling */
+        @media (max-width: 768px) {
+            .modal-xxl {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        .select2-container {
+    z-index: 1055 !important; /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+}
+</style>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตารางอนุมัติวันอบรม</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางอนุมัติวันอบรม
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <span id="msg" style="color: red"></span>
+      <div id="calendar"></div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <input type="hidden" class="form-control" name="evs_id" id="evs_id" value="" />
+      <input type="hidden" class="form-control" name="evs_status" id="evs_status" value="" />
+      <!-- <div class="modal-body">
+        <input type="hidden" class="form-control" name="evs_id" id="evs_id" value="" />
+        <input type="hidden" class="form-control" name="evs_status" id="evs_status" value="" />
+
+        <p><strong>Title:</strong> <span id="modalTitle"></span></p>
+        <p><strong>Start:</strong> <span id="modalStart"></span></p>
+        <p><strong>End:</strong> <span id="modalEnd"></span></p>
+      </div> -->
+      <div class="modal-footer" id="bt_confirm">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="confirm()">รับงาน</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

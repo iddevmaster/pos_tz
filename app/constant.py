@@ -181,6 +181,12 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
+      {
+        "value": "approve/update/eventdate",
+        "label": "อนุมัติEventอบรม",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
     {
         "value": "approvebill/update/bill",
         "label": "ราคาจ้างเหมา",

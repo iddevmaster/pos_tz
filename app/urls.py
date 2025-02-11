@@ -54,7 +54,7 @@ urlpatterns = [
     path('approvebill/update/bill', register.approve_list_payment),
     path('approvebill/update/bill2', register.approve_list_payment_update, name="UpdateCloseEndTheEventAll"
     ),
-
+    path('approve/update/eventdate', course.approve_listevent),
 
     path('register/update/event',
          register.update_close_the_event, name="UpdateCloseTheEvent"),
@@ -78,6 +78,7 @@ urlpatterns = [
     path('calendar_event/', course.calendar_event),
     path('calendar_event_staff/', course.calendar_event_staff),
     path('calendar_event_api/', course.calendar_event_api),
+    path('calendar_event_apieve/', course.calendar_event_apizs),
 
 
     #     teacher
@@ -173,6 +174,7 @@ urlpatterns = [
     path('public/form/certificate', report_and_print.public_form_print),
     path('api/get/compensation', finance.course_teacher_event_get_income_form_compo),
     path('api/calendar_event_api2/<slug:id>/', course.calendar_event_api2),
+
     path('api/checkhours', finance.checkhours),
     path('api/updateeve', course.updateeve),
     path('api/updatstatusev', course.updatstatusev),
@@ -185,6 +187,7 @@ urlpatterns = [
     path('api/tests', register.tests),
     path('api/data', register.testsdata),
 
+    path('api/courseupdateeve', course.update_course_even),
  
    
     #     API

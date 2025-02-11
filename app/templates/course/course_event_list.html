@@ -1060,7 +1060,7 @@ function removeFirstCharacter(str) {
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วย</label>
             <input
               type="text"
@@ -1074,7 +1074,7 @@ function removeFirstCharacter(str) {
           </div>
 
           
-          <div class="form-group">
+          <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
             <input
               type="text"
@@ -1175,7 +1175,13 @@ function removeFirstCharacter(str) {
               <option value="1" selected>เปิด</option>
             </select>
           </div>
-
+          <div class="form-group">
+            <label>ตรวจสอบวันจัดอบรม</label>
+            <select class="form-control" name="checkevent" id="checkevent" required>
+              <option value="1" selected>ผู้จัดการตรวจสอบ</option>
+              <option value="0">ไม่ตรวจสอบ</option>
+            </select>
+          </div>
   
         </div>
         <div class="modal-footer">
@@ -1410,7 +1416,7 @@ function removeFirstCharacter(str) {
           
 
 
-          <div class="form-group">
+          <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วย</label>
             <input
               type="text"
@@ -1424,7 +1430,7 @@ function removeFirstCharacter(str) {
           </div>
 
           
-          <div class="form-group">
+          <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
             <input
               type="text"

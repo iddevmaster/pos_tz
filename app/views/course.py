@@ -182,12 +182,17 @@ def course_event_create(request):
     limitprice = request.POST['limit_price']
     limit_price_workhelp = request.POST['limit_price_workhelp']
     ev_training = request.POST['ev_training']
-    
-
+    checkevent = request.POST['checkevent']
+    status = ''
+    print(checkevent)
+    if checkevent == '0':
+        status = 'N'
+ 
     try:
         ev_logo = request.FILES['ev_logo']
-        print(ev_logo)
+       
     except KeyError:
+
         ev_logo = None
     content = course_event(
         ev_date_start=ev_date_start,
@@ -213,11 +218,14 @@ def course_event_create(request):
         ev_people_three=10,
         limit_price=limitprice,
         limit_price_workhelp=limit_price_workhelp,
-        status='N',
+        status=status,
         ev_training=ev_training,
+        checkevent=checkevent,
         module=m.module,
-    )
+     )
     content.save()
+
+    
 
     conu = course.objects.get(pk=course_id)
     api_url = "http://127.0.0.1:8000/api/data"
@@ -225,7 +233,7 @@ def course_event_create(request):
     # Optional: Add headers or parameters
     headers = {
         "Content-Type": "application/json",
-    }
+        }
 
     start = str(content.crt_date)
   
@@ -237,14 +245,17 @@ def course_event_create(request):
         "ev_generation": ev_generation,
         "create_at": start,
         "cancelled":1
-    }
-    # response = requests.get(api_url, headers=headers, params=params)
-    
-
+      }
+   
 
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
+
+
+
+
+
 
 
 @login_required(login_url='/login')
@@ -545,6 +556,63 @@ def calendar_event_api2(request,id):
        
     return JsonResponse(obj, safe=False)
 
+def calendar_event_apizs(request):
+    user_id = request.user.id
+  
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    start = request.GET.get('start', None)
+    end = request.GET.get('end', None)
+    _date = date.today()
+    if start is not None and end is not None:
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        sobj = str(start).split("T")[0]
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        eobj = str(end).split("T")[0]
+    else:
+        sobj = _date + timedelta(days=0)
+        eobj = _date + timedelta(days=60)
+    status = ['','N','Y','I','S']
+    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    
+ 
+    content = course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status,checkevent=1)
+   
+    obj = []
+    sff = []
+    for r in content:
+        
+    
+     
+    
+        end = str(r.ev_date_end)
+      
+        y, m, d = end.split("-")
+        nextdayend = addDay(1, int(y), int(m), int(d))
+        
+
+        col = r.status
+       
+        if col == '' :
+         t = '#f60a0a'
+        else:
+         t = '#4be01b'
+ 
+    #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
+    #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
+        delta = r.ev_date_end - r.ev_date_start
+        days_difference = delta.days + 1
+     
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference}
+        obj.append(res)
+       
+    return JsonResponse(obj, safe=False)
+
+
 @login_required(login_url='/login')
 def course_teacher_event_list(request,ev_id):
     user_id = request.user.id
@@ -572,6 +640,30 @@ def course_teacher_event_list(request,ev_id):
     teacher_data = teacher_income_setting.objects.filter(ev=ev_id)
     context = {'title': defaultTitle, 'main_data': instance,  'data': teacher_data,'listMenuPermission': objMenu}
     return render(request, 'course/course_teacher_event_list.html', context)
+
+
+@login_required(login_url='/login')
+def approve_listevent(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+    context = {'title': defaultTitle,'listMenuPermission': objMenu}
+    return render(request, 'course/approve_list_event.html', context)    
 
 
 
@@ -646,4 +738,18 @@ def getgen(request):
                     return JsonResponse(1, status=200,safe=False)
         except course_event.DoesNotExist:
             
-            return JsonResponse({'error': 'not found'}, status=405)               
+            return JsonResponse({'error': 'not found'}, status=405)       
+
+
+
+
+@csrf_exempt
+def update_course_even(request):
+    data = json.loads(request.body)
+    ev_id = data.get("evs_id")
+
+    content = course_event.objects.get(ev_id=ev_id)
+    content.status = 'Y'
+    content.save()
+
+    return JsonResponse({"status": "ok"}, status=200)      

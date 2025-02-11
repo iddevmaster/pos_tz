@@ -116,9 +116,9 @@ def register_home(request):
         yearstart = _newdate.split("-")[0]
         monthstart = _newdate.split("-")[1]
         label = month_fomat(monthstart) + " " + yearstart
-      
+        status = ['N','W','I','S','Y']
         # print(label)
-        result = course_event.objects.select_related("course").filter(
+        result = course_event.objects.select_related("course").filter(status__in=status,
             cancelled=1, active=1, ev_date_start__month=int(monthstart), ev_date_start__year=int(yearstart), module=m.module).order_by("ev_date_start")
         content = {"label": label, "data": result}
         obj.append(content)
@@ -414,17 +414,17 @@ def payment_create(request):
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
 
- 
+        
     instecent = register_main.objects.get(register_id=register_id)
     instecent.status = 'N'
     instecent.save()
 
-  
-    dtaf = event_register.objects.create(
+    if pay_type == 2:
+        dtaf = event_register.objects.create(
         ev_id=instecent.ev_id,
         register_id=register_id,
         status='D'
-    )
+         )
 
 
     # Crate Main
