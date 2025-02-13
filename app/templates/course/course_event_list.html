@@ -2,538 +2,610 @@
 
 <script>
 
+  $(document).ready(function () {
+    // Initialize Select2 inside modal
+    $('#CreateClick').on('shown.bs.modal', function () {
+      
+      $("#selLocations").select2({
+        dropdownParent: $('#CreateClick'), // Ensure dropdown is within the modal
+        ajax: {
+          url: "/locationthai/",
+          type: "post",
+          dataType: "json",
+          delay: 250,
+          data: function (params) {
+            return {
+              searchTerm: params.term, // search term
+              csrfmiddlewaretoken: "{{ csrf_token }}",
+            };
+          },
+          processResults: function (response) {
+            return {
+              results: response,
+            };
+          },
+          cache: true,
+        },
+      });
+    });
 
-function allowOnlyNumbersTra(event) {
 
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
+    $('#UpdateClick').on('shown.bs.modal', function () {
+      
+      $("#selLocations_update").select2({
+        dropdownParent: $('#UpdateClick'), // Ensure dropdown is within the modal
+        ajax: {
+          url: "/locationthai/",
+          type: "post",
+          dataType: "json",
+          delay: 250,
+          data: function (params) {
+            return {
+              searchTerm: params.term, // search term
+              csrfmiddlewaretoken: "{{ csrf_token }}",
+            };
+          },
+          processResults: function (response) {
+            return {
+              results: response,
+            };
+          },
+          cache: true,
+        },
+      });
+    });
 
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+
+
+
+    $('#CreateClick').on('shown.bs.modal', function () {
+      $('#course_id').select2({
+        dropdownParent: $('#CreateClick') // Ensure dropdown is within the modal
+      }).select2('close'); // Optional: Auto-open Select2
+    });
+
+
+
+
+  });
 
 
 
 
 
-setTimeout(() => {
-const it = document.getElementById("ev_training").value;
 
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_training").value = result 
+
+  function allowOnlyNumbersTra(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_training").value;
+
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_training").value = result
+        }
+      }
+    }, 20);
+
   }
-}
-}, 20);
-
-}
 
 
-function allowOnlyNumbersTraEdit(event) {
+  function allowOnlyNumbersTraEdit(event) {
 
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
 
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
 
 
 
 
 
-setTimeout(() => {
-const it = document.getElementById("ev_hour_three_update").value;
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_three_update").value;
 
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_three_update").value = result 
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_hour_three_update").value = result
+        }
+      }
+    }, 20);
+
   }
-}
-}, 20);
-
-}
 
 
 
-function handleCategoryChange(select) {
-        const selectedValue = select.value;
-        if (selectedValue) {
-         
-        fetch('/api/getgen', {
+  function handleCategoryChange(select) {
+    const selectedValue = select.value;
+    if (selectedValue) {
+
+      fetch('/api/getgen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'ev_id': selectedValue })
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Display response
+          console.log(data);
+          document.getElementById("ev_generation").value = data;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+
+    }
+  }
+
+  function updateStatus(itemId, isChecked) {
+    const status = isChecked ? '1' : '0';
+
+
+    fetch('/api/updatstatusev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'ev_id': selectedValue })
+      body: JSON.stringify({ 'is_show': status, 'ev_id': itemId })
     })
       .then(response => response.json())
       .then(data => {
         // Display response
-    console.log(data);
-       document.getElementById("ev_generation").value = data;
+
       })
       .catch(error => {
         console.error('Error:', error);
       });
 
-
-        }
-    }
-
-function updateStatus(itemId, isChecked) {
-  const status = isChecked ? '1' : '0';
-
-
-  fetch('/api/updatstatusev', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({'is_show':status,'ev_id':itemId})
-})
-    .then(response => response.json())
-    .then(data => {
-        // Display response
-  
-    })
-    .catch(error => {
-        console.error('Error:', error); 
-    });
- 
-}
+  }
 
 
   function allowOnlyNumbersPeople(event) {
 
     if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
 
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
 
 
-setTimeout(() => {
-const it = document.getElementById("ev_people").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people").value = result 
-  }
-}
-}, 20);
+    setTimeout(() => {
+      const it = document.getElementById("ev_people").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people").value = result
+        }
+      }
+    }, 20);
 
   }
   function allowOnlyNumbersPeople2(event) {
 
     if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
 
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
 
 
-setTimeout(() => {
-const it = document.getElementById("ev_people_two").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people_two").value = result 
-  }
-}
-}, 20);
+    setTimeout(() => {
+      const it = document.getElementById("ev_people_two").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people_two").value = result
+        }
+      }
+    }, 20);
 
   }
   function allowOnlyNumbersPeople3(event) {
 
     if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_people_three").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people_three").value = result 
-  }
-}
-}, 20);
-
-  }
-  function allowOnlyNumbers(event) {
-
-   
-    // Allow: Backspace, Tab, Arrow keys, Delete
-    if (
-        event.key === "Backspace" || 
-        event.key === "Tab" || 
-        event.key === "ArrowLeft" || 
-        event.key === "ArrowRight" || 
-        event.key === "Delete"
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
     ) {
-        return true; // Allow default behavior
+      return true; // Allow default behavior
     }
 
     // Allow only numbers (0-9)
     if (!/^\d$/.test(event.key)) {
-        event.preventDefault(); // Block other characters
-        return false; // Prevent default behavior
-    }
-
-
-
-
-
-  setTimeout(() => {
-   const it = document.getElementById("ev_hour").value;
-    if (it.charAt(0) == "0") {
-      let result = removeFirstCharacter(it);
-      document.getElementById("ev_hour").value = result 
-     // return it.slice(0); // Removes the first character
-    }
-
-  }, 20);
-
-}
-
-function allowOnlyNumbers2(event) {
-
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_hour_two").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_two").value = result 
-  }
-}
-}, 20);
-}
-
-
-
-function allowOnlyNumbers3(event) {
-
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_hour_three").value;
-
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_three").value = result 
-  }
-}
-}, 20);
-
-}
-
-
-
-function allowOnlyNumbersPeopleEdit(event) {
-
-  if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_people_update").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people_update").value = result 
-  }
-}
-}, 20);
-
-}
-function allowOnlyNumbersPeopleEdit2(event) {
-
-  if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_people_two_update").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people_two_update").value = result 
-  }
-}
-}, 20);
-
-}
-function allowOnlyNumbersPeopleEdit3(event) {
-
-
-  if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_people_three_update").value;
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_people_three_update").value = result 
-  }
-}
-}, 20);
-
-}
-function allowOnlyNumbersEdit(event) {
-
-   
-  // Allow: Backspace, Tab, Arrow keys, Delete
-  if (
-      event.key === "Backspace" || 
-      event.key === "Tab" || 
-      event.key === "ArrowLeft" || 
-      event.key === "ArrowRight" || 
-      event.key === "Delete"
-  ) {
-      return true; // Allow default behavior
-  }
-
-  // Allow only numbers (0-9)
-  if (!/^\d$/.test(event.key)) {
       event.preventDefault(); // Block other characters
       return false; // Prevent default behavior
+    }
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_people_three").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people_three").value = result
+        }
+      }
+    }, 20);
+
+  }
+  function allowOnlyNumbers(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour").value;
+      if (it.charAt(0) == "0") {
+        let result = removeFirstCharacter(it);
+        document.getElementById("ev_hour").value = result
+        // return it.slice(0); // Removes the first character
+      }
+
+    }, 20);
+
+  }
+
+  function allowOnlyNumbers2(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_two").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_hour_two").value = result
+        }
+      }
+    }, 20);
   }
 
 
 
+  function allowOnlyNumbers3(event) {
 
 
-setTimeout(() => {
- const it = document.getElementById("ev_hour_update").value;
-  if (it.charAt(0) == "0") {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_update").value = result 
-   // return it.slice(0); // Removes the first character
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_three").value;
+
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_hour_three").value = result
+        }
+      }
+    }, 20);
+
   }
 
-}, 20);
-
-}
 
 
-function allowOnlyNumbersEdit2(event) {
+  function allowOnlyNumbersPeopleEdit(event) {
 
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
 
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
 
 
+    setTimeout(() => {
+      const it = document.getElementById("ev_people_update").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people_update").value = result
+        }
+      }
+    }, 20);
 
-
-
-
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_hour_two_update").value;
-
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_two_update").value = result 
   }
-}
-}, 20);
+  function allowOnlyNumbersPeopleEdit2(event) {
 
-}
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
 
-function allowOnlyNumbersEdit3(event) {
-
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
 
 
+    setTimeout(() => {
+      const it = document.getElementById("ev_people_two_update").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people_two_update").value = result
+        }
+      }
+    }, 20);
 
-
-
-setTimeout(() => {
-const it = document.getElementById("ev_hour_three_update").value;
-
-if (it.charAt(0) == "0") {
-  if (it.charAt(1)) {
-    let result = removeFirstCharacter(it);
-    document.getElementById("ev_hour_three_update").value = result 
   }
-}
-}, 20);
-
-}
+  function allowOnlyNumbersPeopleEdit3(event) {
 
 
-function removeFirstCharacter(str) {
-  console.log(str);
-  return str.substring(1);
-}
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_people_three_update").value;
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_people_three_update").value = result
+        }
+      }
+    }, 20);
+
+  }
+  function allowOnlyNumbersEdit(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_update").value;
+      if (it.charAt(0) == "0") {
+        let result = removeFirstCharacter(it);
+        document.getElementById("ev_hour_update").value = result
+        // return it.slice(0); // Removes the first character
+      }
+
+    }, 20);
+
+  }
+
+
+  function allowOnlyNumbersEdit2(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
+
+
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_two_update").value;
+
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_hour_two_update").value = result
+        }
+      }
+    }, 20);
+
+  }
+
+  function allowOnlyNumbersEdit3(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
+
+    setTimeout(() => {
+      const it = document.getElementById("ev_hour_three_update").value;
+
+      if (it.charAt(0) == "0") {
+        if (it.charAt(1)) {
+          let result = removeFirstCharacter(it);
+          document.getElementById("ev_hour_three_update").value = result
+        }
+      }
+    }, 20);
+
+  }
+
+
+  function removeFirstCharacter(str) {
+    console.log(str);
+    return str.substring(1);
+  }
 
   function readURL(input) {
     if (input.files && input.files[0]) {
@@ -558,6 +630,8 @@ function removeFirstCharacter(str) {
     }
   }
 
+
+
   function setValueUpdateModal(
     ev_id,
     ev_date_start,
@@ -579,9 +653,12 @@ function removeFirstCharacter(str) {
     limit_price,
     limit_price_workhelp,
     ev_training,
-    ev_logo
+    location_id,
+    address,
+    ev_logo,
+
   ) {
- 
+    console.log(address)
     document.getElementById("datecrt").innerHTML =
       "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
     document.getElementById("ev_id_update").value = ev_id;
@@ -589,23 +666,25 @@ function removeFirstCharacter(str) {
     document.getElementById("ev_date_end_update").value = ev_date_end;
     document.getElementById("ev_hour_update").value = ev_hour;
     document.getElementById("ev_hour_two_update").value = ev_hour_two;
-  
+
     document.getElementById("ev_people_update").value = ev_people;
     document.getElementById("ev_people_two_update").value = ev_people_two;
- 
+
     document.getElementById("ev_remark_update").value = ev_remark;
     document.getElementById("ev_generation_update").value = ev_generation;
     document.getElementById("ev_price_update").value = ev_price;
     document.getElementById("ev_vat_update").value = ev_vat;
     document.getElementById("ev_training_update").value = ev_training;
-    
+
     document.getElementById("ev_expired_cer_quantity_update").value =
       ev_expired_cer_quantity;
     document.getElementById("project_id_update").value = project_id;
     document.getElementById("course_id_update").value = course_id;
     document.getElementById("limit_price_update").value = limit_price;
     document.getElementById("limit_price_workhelp_update").value = limit_price_workhelp;
-   
+    document.getElementById("address_update").value = address;
+
+    
     document.getElementById("active_update").value = active;
     $(".selectUpdate").val(course_id).select2({
       placeholder: "เลือกข้อมูล",
@@ -615,8 +694,7 @@ function removeFirstCharacter(str) {
       placeholder: "เลือกข้อมูล",
       allowClear: true,
     });
-
-    
+    $('#selLocations_update').val(location_id).trigger('change');
     if (ev_logo !== "") {
       document.getElementById("blah2").src = ev_logo;
     } else {
@@ -658,10 +736,7 @@ function removeFirstCharacter(str) {
     <h3>กำหนดวันอบรมและราคาอบรม</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">หน้าหลัก</a>
@@ -681,12 +756,7 @@ function removeFirstCharacter(str) {
     <div class="card-header">
       <div align="right">
         <div class="btn-group mb-3" role="group" aria-label="Basic example">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#CreateClick"
-          >
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateClick">
             <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
           </button>
         </div>
@@ -694,6 +764,10 @@ function removeFirstCharacter(str) {
     </div>
     <div class="card-body">
       <form method="get" action="/course/event" autocomplete="off">
+
+
+
+
         <div class="row">
           <div class="col-lg-3 col-md-6">
             <select class="form-select" id="qmonths" name="qmonths">
@@ -713,14 +787,7 @@ function removeFirstCharacter(str) {
           </div>
 
           <div class="col-lg-3 col-md-6">
-            <input
-              type="number"
-              class="form-control"
-              id="qyear"
-              name="qyear"
-              required
-              placeholder="ปี (ค.ศ.)"
-            />
+            <input type="number" class="form-control" id="qyear" name="qyear" required placeholder="ปี (ค.ศ.)" />
           </div>
           <div class="col-lg-3 col-md-6">
             <button type="submit" class="btn btn-success">
@@ -730,7 +797,7 @@ function removeFirstCharacter(str) {
           </div>
         </div>
       </form>
-   
+
       <table class="table table-striped" id="table1">
         <thead>
           <tr>
@@ -740,22 +807,22 @@ function removeFirstCharacter(str) {
             <th>ราคา (บาท)</th>
             <th>รวม VAT</th>
             <th>วันที่อบรม</th>
-          
+
             <th>รุ่น</th>
             <th>วันหมดอายุใบรับรอง</th>
-            <th>ครู  วิทยากร</th>
+            <th>ครู วิทยากร</th>
             <th>พร้อมทำงาน</th>
             <th>แสดงทีมงาน</th>
             <th>#</th>
           </tr>
         </thead>
         <tbody>
-          
+
           {% for res in data %}
 
-        
+
           <tr>
-           
+
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.course.course_code}}</td>
             <td>{{res.course.course_name}}</td>
@@ -772,18 +839,15 @@ function removeFirstCharacter(str) {
               {{res.ev_date_start|date:"d/m/Y"}} ถึง
               {{res.ev_date_end|date:"d/m/Y"}}
             </td>
-           
+
             <td>{{res.ev_generation}}</td>
             <td align="center">
               {{res.ev_expired_cer_date|date:"d/m/Y"}}
               ({{res.ev_expired_cer_quantity}} ปี)
             </td>
             <td>
-              <button
-                  type="button"
-                  class="btn btn-info"
-                  onclick="window.location.href='/course/event/teachers/list/{{res.ev_id}}'" 
-                >
+              <button type="button" class="btn btn-info"
+                onclick="window.location.href='/course/event/teachers/list/{{res.ev_id}}'">
                 <i class="icon dripicons-user"></i> จัดการ
               </button>
             </td>
@@ -797,47 +861,32 @@ function removeFirstCharacter(str) {
 
             <td align="center">
 
-    <label class="switch">
-      {% if res.is_show == 1 %}
-        <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)"  checked >
-        <span class="slider"></span>
-      {% else %}
-      <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)">
-      <span class="slider"></span>
-      {% endif %}
-  </label>
+              <label class="switch">
+                {% if res.is_show == 1 %}
+                <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)" checked>
+                <span class="slider"></span>
+                {% else %}
+                <input type="checkbox" role="switch" onclick="updateStatus('{{res.ev_id}}', this.checked)">
+                <span class="slider"></span>
+                {% endif %}
+              </label>
             </td>
 
             <td>
               <div align="center">
                 {% if res.ev_logo %}
-                <button
-                  type="button"
-                  class="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.ev_logo.url}}')"
-                >
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateClick"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','{{res.ev_logo.url}}')">
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
                 {% else %}
-                <button
-                  type="button"
-                  class="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','')"
-                >
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateClick"
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','')">
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
                 {% endif %}
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.ev_id}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
+                <button type="button" onclick="setValueDeleteModal('{{res.ev_id}}')" class="btn btn-danger"
+                  data-bs-toggle="modal" data-bs-target="#DeleteClick">
                   <i class="icon dripicons-trash" aria-hidden="true"></i>
                   ลบ
                 </button>
@@ -853,57 +902,32 @@ function removeFirstCharacter(str) {
 
 {% comment %} Create {% endcomment %}
 <div class="modal fade bd-example-modal-lg text-left" id="CreateClick">
-  <div
-    class="modal-dialog modal-lg  modal-dialog-scrollable "
-    role="document"
-  >
+  <div class="modal-dialog modal-lg  modal-dialog-scrollable " role="document">
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title white" id="myModalLabel160">เพิ่มข้อมูล</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
-      <form
-        action="{% url 'CreateCourseEvent' %}"
-        method="post"
-        autocomplete="off"
-        enctype="multipart/form-data"
-      >
+      <form action="{% url 'CreateCourseEvent' %}" method="post" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="modal-body">
           <div class="form-group">
             <label>Project Code</label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              name="project_id"
-              id="project_id"
-              style="width: 100%"
-              required
-            >
+            <select class="select2" name="project_id" id="project_id" style="width: 100%" required>
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in project_list %}
               <option value="{{res.project_id}}">
-                {{res.project_code}}  {{res.name}}
+                {{res.project_code}} {{res.name}}
               </option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
             <label>หลักสูตร</label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              name="course_id"
-              id="course_id"
-              style="width: 100%"
-              required
-              onchange="handleCategoryChange(this)"
-            >
+            <select class="select2" name="course_id" id="course_id" style="width: 100%" required
+              onchange="handleCategoryChange(this)">
 
 
               <option value="">--เลือกหลักสูตร--</option>
@@ -915,94 +939,65 @@ function removeFirstCharacter(str) {
             </select>
           </div>
 
-          
+          <div class="form-group">
+            <label>เลือกสถานที่อบรม</label> <label style="color: red">*</label>
+            <select class="form-select" required name="location_id" id="selLocations" style="width: 100%">
+
+              {% if location != None %}
+              <option value="{{location.location_id}}" selected>{{location.district_name}} -
+                {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
+              {% endif %}
+
+              <option value="">-เลือกข้อมูล-</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>ที่อยู่</label> <label style="color: red">*</label>
+            <input type="text" class="form-control" id="address" name="address" required 
+               />
+          </div>
+
           <div class="form-group">
             <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_start"
-              name="ev_date_start"
-              required
-            />
+            <input type="text" class="form-control daterangesingle" id="ev_date_start" name="ev_date_start" required />
           </div>
           <div class="form-group">
             <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_end"
-              name="ev_date_end"
-              required
-            />
+            <input type="text" class="form-control daterangesingle" id="ev_date_end" name="ev_date_end" required />
           </div>
           <div class="row">
             <div class="col-12 col-sm-12">
               <label>จำนวนคนเข้าอบรม</label> <label style="color: red">* ไม่เกิน</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_training"
-              name="ev_training"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersTra(event)"
-            />
+              <input type="text" class="form-control" id="ev_training" name="ev_training" required pattern="[0-9]+"
+                onkeydown="allowOnlyNumbersTra(event)" />
             </div>
           </div>
 
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>รวมจำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour"
-              name="ev_hour"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbers(event)"
-            />
+              <input type="text" class="form-control" id="ev_hour" name="ev_hour" required pattern="[0-9]+"
+                onkeydown="allowOnlyNumbers(event)" />
             </div>
             <div class="col-4 col-sm-6">
               <label>จำนวนคน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people"
-              name="ev_people"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeople(event)"
-            />
+              <input type="text" class="form-control" id="ev_people" name="ev_people" required pattern="[0-9]+"
+                onkeydown="allowOnlyNumbersPeople(event)" />
             </div>
           </div>
 
-   
+
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>รวมจำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_two"
-              name="ev_hour_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbers2(event)"
-            />
+              <input type="text" class="form-control" id="ev_hour_two" name="ev_hour_two" required pattern="[0-9]+"
+                onkeydown="allowOnlyNumbers2(event)" />
             </div>
             <div class="col-4 col-sm-6">
               <label>จำนวนคน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_two"
-              name="ev_people_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeople2(event)"
-            />
+              <input type="text" class="form-control" id="ev_people_two" name="ev_people_two" required pattern="[0-9]+"
+                onkeydown="allowOnlyNumbersPeople2(event)" />
             </div>
           </div>
 
@@ -1037,80 +1032,33 @@ function removeFirstCharacter(str) {
 
           <div class="form-group">
             <label>รุ่นที่</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_generation"
-              name="ev_generation"
-              required
-              pattern="[0-9]+"
-              readonly
-            />
+            <input type="text" class="form-control" id="ev_generation" name="ev_generation" required pattern="[0-9]+"
+              readonly />
           </div>
-          
+
           <div class="form-group">
             <label>ราคา (บาท)</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="ev_price"
-              name="ev_price"
-              required
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="ev_price" name="ev_price" required />
           </div>
 
           <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วย</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="limit_price"
-              name="limit_price"
-              value="1000" 
-              
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="limit_price" name="limit_price"
+              value="1000" />
           </div>
 
-          
+
           <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="limit_price_workhelp"
-              name="limit_price_workhelp"
-              value="500"
-              
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="limit_price_workhelp"
+              name="limit_price_workhelp" value="500" />
           </div>
 
-          <!-- <div class="row">
-            <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์ <span style="color: red;">*</span></label>
-            <div class="col-12 col-sm-12">
-         
-              <select
-              class="form-select"
-              required
-              name="location_id"
-              id="selLocations"
-              style="width: 100%;"
-              required
-            >
-           
-            {% if location != None %}
-            <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
-            {% endif %}
 
-              <option value="">-เลือกข้อมูล-</option>
-            </select>
-            </div>
+ 
+    
 
-          </div>
-   -->
-       
+
           <div class="form-group">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select class="form-control" name="ev_vat" id="ev_vat" required>
@@ -1122,49 +1070,23 @@ function removeFirstCharacter(str) {
           <div class="form-group">
             <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
             <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9]+"
-              class="form-control"
-              id="ev_expired_cer_quantity"
-              name="ev_expired_cer_quantity"
-              required
-            />
+            <input type="text" pattern="[0-9]+" class="form-control" id="ev_expired_cer_quantity"
+              name="ev_expired_cer_quantity" required />
           </div>
           <div class="form-group">
             <label>หมายเหตุ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_remark"
-              name="ev_remark"
-            />
+            <input type="text" class="form-control" id="ev_remark" name="ev_remark" />
           </div>
           <div class="form-group">
             <label>LOGO Certificate (150 x 150)</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              onclick="imageupload.click()"
-            >
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="imageupload.click()">
               อัปโหลดรูป
             </button>
             <div>
-              <input
-                type="file"
-                name="ev_logo"
-                id="imageupload"
-                onchange="readURL(this);"
-                style="display: none"
-                accept=".png, .jpg, .jpeg"
-              />
-              <img
-                src="{% static 'images/no-photo-available.png' %}"
-                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
-                id="blah"
-                width="150"
-                height="150"
-              />
+              <input type="file" name="ev_logo" id="imageupload" onchange="readURL(this);" style="display: none"
+                accept=".png, .jpg, .jpeg" />
+              <img src="{% static 'images/no-photo-available.png' %}" alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="blah"
+                width="150" height="150" />
             </div>
           </div>
 
@@ -1182,14 +1104,10 @@ function removeFirstCharacter(str) {
               <option value="0">ไม่ตรวจสอบ</option>
             </select>
           </div>
-  
+
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-light-secondary"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
             <i class="bx bx-x d-block d-sm-none"></i>
             <span class="d-none d-sm-block">ยกเลิก</span>
           </button>
@@ -1205,59 +1123,34 @@ function removeFirstCharacter(str) {
 
 {% comment %} Update {% endcomment %}
 <div class="modal fade text-left" id="UpdateClick">
-  <div
-    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-    role="document"
-  >
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title white" id="myModalLabel160">แก้ไขข้อมูล</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
-      <form
-        action="{% url 'UpdateCourseEvent' %}"
-        method="post"
-        autocomplete="off"
-        enctype="multipart/form-data"
-      >
+      <form action="{% url 'UpdateCourseEvent' %}" method="post" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" id="ev_id_update" name="ev_id" required />
         <div class="modal-body">
           <div class="form-group">
             <label>Project Code</label> <label style="color: red">*</label>
-            <select
-              class="selectUpdatePr"
-              name="project_id"
-              id="project_id_update"
-              style="width: 100%"
-              required
-            >
-            
+            <select class="selectUpdatePr" name="project_id" id="project_id_update" style="width: 100%" required>
+
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in project_list %}
               <option value="{{res.project_id}}">
-                {{res.project_code}}  {{res.name}}
+                {{res.project_code}} {{res.name}}
               </option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
             <label>หลักสูตร</label> <label style="color: red">*</label>
-            <select
-              class="selectUpdate"
-              name="course_id"
-              id="course_id_update"
-              required
-              style="width: 100%" onchange="handleCategoryChange(this)" disabled
-
-            >
+            <select class="selectUpdate" name="course_id" id="course_id_update" required style="width: 100%"
+              onchange="handleCategoryChange(this)" disabled>
               <option value="">--เลือกหลักสูตร--</option>
               {% for res in course_list %}
               <option value="{{res.course_id}}">
@@ -1266,97 +1159,71 @@ function removeFirstCharacter(str) {
               {% endfor %}
             </select>
           </div>
-
-        
           
           <div class="form-group">
+            <label>เลือกสถานที่อบรม</label> <label style="color: red">*</label>
+            <select class="form-select" required name="location_id" id="selLocations_update" style="width: 100%">
+
+      
+
+              {% for location in addall %}
+              <option value="{{location.location_id}}" selected>{{location.district_name}} -
+                {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
+              {% endfor %}
+
+              
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>ที่อยู่</label> <label style="color: red">*</label>
+            <input type="text" class="form-control" id="address_update" name="address" required 
+               />
+          </div>
+
+          <div class="form-group">
             <label>วันที่เริ่มต้น</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_start_update"
-              name="ev_date_start"
-              required
-            />
+            <input type="text" class="form-control daterangesingle" id="ev_date_start_update" name="ev_date_start"
+              required />
           </div>
           <div class="form-group">
             <label>วันที่สิ้นสุด</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control daterangesingle"
-              id="ev_date_end_update"
-              name="ev_date_end"
-              required
-            />
+            <input type="text" class="form-control daterangesingle" id="ev_date_end_update" name="ev_date_end"
+              required />
           </div>
-          
+
           <div class="row">
             <div class="col-12 col-sm-12">
               <label>จำนวนคนเข้าอบรม</label> <label style="color: red">* ไม่เกิน</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_training_update"
-              name="ev_training"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersTraEdit(event)"
-            />
+              <input type="text" class="form-control" id="ev_training_update" name="ev_training" required
+                pattern="[0-9]+" onkeydown="allowOnlyNumbersTraEdit(event)" />
             </div>
           </div>
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>จำนวนชั่วโมง / วิทยากร</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              pattern="[0-9]+"
-              class="form-control"
-              id="ev_hour_update"
-              name="ev_hour"
-              onkeydown="allowOnlyNumbersEdit(event)"
-              required
-            />
+              <input type="text" pattern="[0-9]+" class="form-control" id="ev_hour_update" name="ev_hour"
+                onkeydown="allowOnlyNumbersEdit(event)" required />
             </div>
             <div class="col-4 col-sm-6">
               <label>จำนวนคน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_update"
-              name="ev_people_update"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeopleEdit(event)"
-            />
+              <input type="text" class="form-control" id="ev_people_update" name="ev_people_update" required
+                pattern="[0-9]+" onkeydown="allowOnlyNumbersPeopleEdit(event)" />
             </div>
           </div>
 
-          
+
 
           <div class="row">
             <div class="col-8 col-sm-6">
               <label>จำนวนชั่วโมง / ครูฝึก</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_hour_two_update"
-              name="ev_hour_two"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersEdit2(event)"
-            />
+              <input type="text" class="form-control" id="ev_hour_two_update" name="ev_hour_two" required
+                pattern="[0-9]+" onkeydown="allowOnlyNumbersEdit2(event)" />
             </div>
             <div class="col-4 col-sm-6">
               <label>จำนวนคน</label> <label style="color: red">*</label>
-              <input
-              type="text"
-              class="form-control"
-              id="ev_people_two_update"
-              name="ev_people_two_update"
-              required
-              pattern="[0-9]+"
-               onkeydown="allowOnlyNumbersPeopleEdit2(event)"
-            />
+              <input type="text" class="form-control" id="ev_people_two_update" name="ev_people_two_update" required
+                pattern="[0-9]+" onkeydown="allowOnlyNumbersPeopleEdit2(event)" />
             </div>
           </div>
 
@@ -1387,70 +1254,37 @@ function removeFirstCharacter(str) {
             </div>
           </div> -->
 
-   
-          
-        
+
+
+
           <div class="form-group">
             <label>รุ่นที่</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_generation_update"
-              name="ev_generation"
-              required
-              pattern="[0-9]+"
-              readonly
-            />
+            <input type="text" class="form-control" id="ev_generation_update" name="ev_generation" required
+              pattern="[0-9]+" readonly />
           </div>
           <div class="form-group">
             <label>ราคา (บาท)</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="ev_price_update"
-              name="ev_price"
-              required
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="ev_price_update" name="ev_price" required />
           </div>
-          
+
 
 
           <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วย</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="limit_price_update"
-              name="limit_price"
-              value="1000" 
-              readonly
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="limit_price_update" name="limit_price"
+              value="1000" readonly />
           </div>
 
-          
+
           <div class="form-group" hidden>
             <label>กำหนดค่าตอบแทนผู้ช่วยงาน</label>
-            <input
-              type="text"
-              pattern="[0-9.]+"
-              class="form-control"
-              id="limit_price_workhelp_update"
-              name="limit_price_workhelp"
-              value="1000"
-              readonly
-            />
+            <input type="text" pattern="[0-9.]+" class="form-control" id="limit_price_workhelp_update"
+              name="limit_price_workhelp" value="1000" readonly />
           </div>
 
           <div class="form-group">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
-            <select
-              class="form-control"
-              name="ev_vat"
-              id="ev_vat_update"
-              required
-            >
+            <select class="form-control" name="ev_vat" id="ev_vat_update" required>
               <option value="">--เลือกข้อมูล--</option>
               <option value="0">ไม่ใช่</option>
               <option value="1">ใช่</option>
@@ -1460,77 +1294,42 @@ function removeFirstCharacter(str) {
           <div class="form-group">
             <label>จำนวนปีที่หมดอายุของใบรับรอง</label>
             <label style="color: red">*</label>
-            <input
-              type="text"
-              pattern="[0-9]+"
-              class="form-control"
-              id="ev_expired_cer_quantity_update"
-              name="ev_expired_cer_quantity"
-              required
-            />
+            <input type="text" pattern="[0-9]+" class="form-control" id="ev_expired_cer_quantity_update"
+              name="ev_expired_cer_quantity" required />
           </div>
 
           <div class="form-group">
             <label>หมายเหตุ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="ev_remark_update"
-              name="ev_remark"
-            />
+            <input type="text" class="form-control" id="ev_remark_update" name="ev_remark" />
           </div>
           <div class="form-group">
             <label>LOGO Certificate (150 x 150)</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              onclick="imageupload2.click()"
-            >
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="imageupload2.click()">
               อัปโหลดรูป
             </button>
             <div>
-              <input
-                type="file"
-                name="ev_logo"
-                id="imageupload2"
-                onchange="readURL2(this);"
-                style="display: none"
-                accept=".png, .jpg, .jpeg"
-              />
+              <input type="file" name="ev_logo" id="imageupload2" onchange="readURL2(this);" style="display: none"
+                accept=".png, .jpg, .jpeg" />
 
-              <img
-                src="{% static 'images/no-photo-available.png' %}"
-                alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !"
-                id="blah2"
-                width="150"
-                height="150"
-              />
+              <img src="{% static 'images/no-photo-available.png' %}" alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="blah2"
+                width="150" height="150" />
             </div>
           </div>
           <div class="form-group">
             <label>เปิด-ปิด</label>
-            <select
-              class="form-control"
-              name="active"
-              id="active_update"
-              required
-            >
+            <select class="form-control" name="active" id="active_update" required>
               <option value="0">ปิด</option>
               <option value="1">เปิด</option>
             </select>
           </div>
 
-        
+
 
 
           <p id="datecrt"></p>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-light-secondary"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
             <i class="bx bx-x d-block d-sm-none"></i>
             <span class="d-none d-sm-block">ยกเลิก</span>
           </button>
@@ -1550,12 +1349,7 @@ function removeFirstCharacter(str) {
     <div class="modal-content">
       <div class="modal-header bg-danger">
         <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
@@ -1567,11 +1361,7 @@ function removeFirstCharacter(str) {
             <h4>ยืนยันการลบข้อมูล</h4>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
               <i class="bx bx-x d-block d-sm-none"></i>
               <span class="d-none d-sm-block">ยกเลิก</span>
             </button>
@@ -1586,55 +1376,54 @@ function removeFirstCharacter(str) {
   </div>
 </div>
 <style>
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+  }
 
-.slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px;
-        }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background-color: white;
+    top: 3px;
+    left: 3px;
+    transition: .4s;
+  }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            border-radius: 50%;
-            background-color: white;
-            top: 3px;
-            left: 3px;
-            transition: .4s;
-        }
+  input:checked+.slider {
+    background-color: #4caf50;
+  }
 
-        input:checked + .slider {
-            background-color: #4caf50;
-        }
+  input:checked+.slider:before {
+    transform: translateX(20px);
+  }
 
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
 
-      
 
-    
 
-        /* Switch styling */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+  /* Switch styling */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 </style>
 {% endblock %}

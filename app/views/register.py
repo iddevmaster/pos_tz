@@ -1400,6 +1400,7 @@ def approve_list_payment_update(request):
       set_active = teacher_income_setting.objects.get(id=ids)
       set_active.tis_sum = tis_sum
       set_active.tis_compensation = tis_sum
+      set_active.status = 'S'
       set_active.save()
 
       return redirect("/approvebill/update/bill")

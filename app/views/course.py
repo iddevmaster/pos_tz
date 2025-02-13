@@ -136,11 +136,13 @@ def course_event_list(request):
             cancelled=1, active=1).order_by("-course_id")
     project_list = project_code.objects.filter(
             status=1)      
+    print(Province)
     
     if Province is not None:
         try:
             _location = location_thai.objects.get(
                 province_name__icontains=Province, amphur_name__icontains=Amphur, district_name__icontains=Tumbol)
+           
         except location_thai.DoesNotExist:
             _location = None
     else:
@@ -148,8 +150,9 @@ def course_event_list(request):
         
     result = course_event.objects.select_related("course").filter(
             cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
-
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location,'project_list':project_list}
+    
+    addall = location_thai.objects.all()
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location,'project_list':project_list,'addall':addall}
     
     return render(request, 'course/course_event_list.html', context)
 
@@ -183,8 +186,10 @@ def course_event_create(request):
     limit_price_workhelp = request.POST['limit_price_workhelp']
     ev_training = request.POST['ev_training']
     checkevent = request.POST['checkevent']
+    local = request.POST['location_id']
+    address = request.POST['address']
     status = ''
-    print(checkevent)
+    print(local)
     if checkevent == '0':
         status = 'N'
  
@@ -219,6 +224,8 @@ def course_event_create(request):
         limit_price=limitprice,
         limit_price_workhelp=limit_price_workhelp,
         status=status,
+        location_id=local,
+        address=address,
         ev_training=ev_training,
         checkevent=checkevent,
         module=m.module,
@@ -281,6 +288,8 @@ def course_event_update(request):
     ev_people_two = request.POST['ev_people_two_update']
     ev_people_three = 10
     ev_training = request.POST['ev_training']
+    local = request.POST['location_id']
+    address = request.POST['address']
     try:
         ev_logo = request.FILES['ev_logo']
     except KeyError:
@@ -306,12 +315,12 @@ def course_event_update(request):
     content.project_id = project_id
     content.limit_price = limitprice
     content.limit_price_workhelp = limit_price_workhelp
-    content.limit_price_workhelp = limit_price_workhelp
     content.ev_training = ev_training
+    content.location_id = local
+    content.address = address
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
-
 
 @login_required(login_url='/login')
 def course_event_delete(request):
