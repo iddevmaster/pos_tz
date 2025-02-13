@@ -257,42 +257,8 @@ function readURL(input) {
             />
           </div>
 
-          <div class="form-group"  hidden>
-            <label>So</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              id="so"
-              name="so"
-              
-              class="form-control"
-           
-            />
-          </div>
 
-          <div class="form-group" hidden>
-            <label>Upload File</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary"
-              onclick="imageupload.click()"
-            >
-            File
-            </button>
-            <div>
-              <input
-                type="file"
-                name="ev_logo"
-                id="imageupload"
-                onchange="readURL(this);"
-                style="display: none"
-                accept=".pdf, .xls, .xlsx, .doc, .docx"
-              />
-           
-            </div>
-          </div>
 
-   
           <p id="datecrt"></p>
         </div>
         <div class="modal-footer">
