@@ -136,7 +136,7 @@ def course_event_list(request):
             cancelled=1, active=1).order_by("-course_id")
     project_list = project_code.objects.filter(
             status=1)      
-    print(Province)
+    
     
     if Province is not None:
         try:
@@ -512,11 +512,14 @@ def calendar_event_api2(request,id):
        te = []
        teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
        evte = course_event.objects.get(ev_id=r.ev_id)
+       
 
        for x in teach: 
        
         a = teacher.objects.get(teacher_id=x.teacher_id)
         pa = pay_item.objects.filter(id=x.pi_id).first()
+   
+
        
         fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa),'register_id':r.register_id}
         
@@ -561,8 +564,12 @@ def calendar_event_api2(request,id):
         t = '#e0ce1b'
        else:
         t = '#4be01b'
-
-       res = {'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show}
+       r.ev_id
+       eve = course_event.objects.get(ev_id=r.ev_id)
+       loc = location_thai.objects.get(location_id=eve.location_id)
+     
+  
+       res = {'address':eve.address,'prov':loc.province_name,'amphur_name':loc.amphur_name,'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show}
 
        obj.append(res)      
        

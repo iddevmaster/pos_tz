@@ -55,7 +55,7 @@
      console.log(response);
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
-
+        console.log(card);
         if(card.evs_status == 'Y'){
   
   if(card.show == 1){
@@ -69,7 +69,7 @@
     var $mainCard5 = $('<div class="col-9 col-md-9 col-sm-9 col-xs-9"></div>')
     var $mainCard6 = $('<div class="card-body"></div>')
     $mainCard6.append(`<span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>`);
-    $mainCard6.append(`<p>${card.title} </p>`);
+    $mainCard6.append(`<p>${card.title}xxxxxxxxxxx </p>`);
   
     $mainCard5.append($mainCard6);
     $mainCard3.append($mainCard4);
@@ -185,7 +185,7 @@
      
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
-       
+        console.log(card);
 if(card.evs_status == 'Y'){
   
   if(card.show == 1){
@@ -199,7 +199,7 @@ if(card.evs_status == 'Y'){
     var $mainCard5 = $('<div class="col-9 col-md-9 col-sm-9 col-xs-9"></div>')
     var $mainCard6 = $('<div class="card-body"></div>')
     $mainCard6.append(`<span> วันที่เริ่ม ${card.start}  ถึง  ${card.end}</span>`);
-    $mainCard6.append(`<p>${card.title} </p>`);
+    $mainCard6.append(`<span> ${card.title} </span> <p>ที่จัดอบรม : ${card.address}  จ. ${card.prov} อ. ${card.amphur_name}</p>`);
   
     $mainCard5.append($mainCard6);
     $mainCard3.append($mainCard4);
