@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -443,9 +443,10 @@ def course_teacher_event_set_income_form_create(request, ev_id):
             cancelled=1, active=1)
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
+    location = location_thai.objects.get(location_id=instance.location_id)
+
     
-    
-    context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,
+    context = {'title': title, 'main_data': instance,  'data': teacher_data,'dis_limit': total,'address':location,
                'form': teacherIncomeSettingForm(module), 'listMenuPermission': objMenu,'teacher':list_teacher,'unit':unitPayChoices,'listposition':listposition,'hour_wi':count_hour_wi,'hour_pi':count_hour_pi,'count_day':days_difference}
     return render(request, 'finance/course_teacher_event_set_income.html', context)
 

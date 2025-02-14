@@ -171,7 +171,7 @@ listMenu = [
     },
         {
         "value": "approve/update/event",
-        "label": "อนุมัติวันอบรม",
+        "label": "อนุมัติรายการ",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },

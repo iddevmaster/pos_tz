@@ -187,7 +187,7 @@ function calen() {
    
         document.getElementById('count_day').value = info.event.extendedProps.count_day;
         document.getElementById('eventModalLabel').innerText = info.event.title;
-
+        document.getElementById('address').innerText = info.event.extendedProps.address;
         document.getElementById('limit_price_workhelp').value = info.event.extendedProps.limit_price_workhelp;
         document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
         document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
@@ -816,7 +816,8 @@ CheckHourbeforeSave()
       <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="eventModalLabel"></h5>
-
+            <br>
+          
               <input
               type="hidden"
               name="ev_id"
@@ -832,6 +833,9 @@ CheckHourbeforeSave()
         <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
         <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" >
+            <div class="modal-title" id="address"></div>
           </div>
           <div class="modal-body">
             <div class="row">
