@@ -5,6 +5,8 @@ class teacherForm(forms.Form):
     teacher_cover = forms.ImageField(label="รูประจำตัวครู / วิทยากร")
     teacher_identification_number = forms.CharField(
         label="รหัสบัตร ปชช./ Passport", max_length=64, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    tax_number = forms.CharField(
+        label="เลขที่ผู้เสียภาษี", max_length=24, widget=forms.TextInput(attrs={'class': 'form-control'}))
     teacher_prefix_th = forms.ChoiceField(label="คำนำหน้าภาษาไทย", required=False,
                                           choices=prefixThai, widget=forms.Select(attrs={'class': 'form-control'}))
     teacher_firstname_th = forms.CharField(label="ชื่อภาษาไทย",max_length=128,   widget=forms.TextInput(attrs={'class': 'form-control'}))

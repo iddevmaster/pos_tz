@@ -243,6 +243,8 @@ class teacher(models.Model):
         max_length=128, blank=True, default=None)
     teacher_lastname_eng = models.CharField(
         max_length=128, blank=True, default=None)
+    tax_number = models.CharField(
+        max_length=24, blank=True, default=None)
     teacher_cover = models.ImageField(
         upload_to=generate_unique_name('images/teacher'), default=None)
     teacher_type = models.IntegerField(default=1, blank=False)

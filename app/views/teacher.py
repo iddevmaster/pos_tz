@@ -97,6 +97,7 @@ def teacher_form_create(request):
         teacher_firstname_eng = request.POST['teacher_firstname_eng']
         teacher_lastname_eng = request.POST['teacher_lastname_eng']
         teacher_type =  request.POST['teacher_type']
+        tax_number =  request.POST['tax_number']
         active = request.POST['active']
 
         
@@ -131,6 +132,7 @@ def teacher_form_create(request):
             teacher_cover = teacher_cover,
             teacher_type = teacher_type,
             active = active,
+            tax_number = tax_number,
             crt_date=dateTimeNow(),
             upd_date=dateTimeNow(),
             module=m.module,
@@ -221,6 +223,8 @@ def teacher_form_update(request,teacher_id):
         instance.teacher_firstname_th = request.POST['teacher_firstname_th']
         instance.teacher_lastname_th = request.POST['teacher_lastname_th']
         instance.teacher_prefix_eng = request.POST['teacher_prefix_eng']
+        instance.tax_number = request.POST['tax_number']
+        
         instance.teacher_firstname_eng = request.POST['teacher_firstname_eng']
         instance.teacher_lastname_eng = request.POST['teacher_lastname_eng']
         instance.teacher_type =  request.POST['teacher_type']
@@ -248,7 +252,7 @@ def teacher_form_update(request,teacher_id):
         data3.save()
         messages.success(request, "ทำรายการสำเร็จ !")
         return redirect("/teachers")
-    initial = {'teacher_identification_number':instance.teacher_identification_number,'teacher_prefix_th':instance.teacher_prefix_th,'teacher_firstname_th': instance.teacher_firstname_th,
+    initial = {'teacher_identification_number':instance.teacher_identification_number,'tax_number':instance.tax_number,'teacher_prefix_th':instance.teacher_prefix_th,'teacher_firstname_th': instance.teacher_firstname_th,
                'teacher_lastname_th':instance.teacher_lastname_th,'teacher_prefix_eng':instance.teacher_prefix_eng,'teacher_firstname_eng': instance.teacher_firstname_eng,
                'teacher_lastname_eng':instance.teacher_lastname_eng,'teacher_cover':instance.teacher_cover,'teacher_type':instance.teacher_type,'active':instance.active}
 

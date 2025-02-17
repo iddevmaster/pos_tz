@@ -91,12 +91,13 @@ function myApprov() {
 
     <tr style="font-weight: bold">
       <td>ลำดับ</td>
-      <td>ใบเสร็จรับเงินเลขที่</td>
-      <td>ชื่อ - นามสกุล / บริษัท</td>
-      <td>เลขที่บัตรปชช</td>
+      <td>ใบเสร็จรับเงินเลขที่ /<br>ใบเสนอราคา</td>
+      <td>ชื่อ - นามสกุล / <br>ชื่อบริษัท</td>
+      <td>เลขที่บัตรปชช / <br> เลขที่ผู้เสียภาษี</td>
       <td>โทร</td>
-      <td>ประเภท</td>
-      <td>จำนวนเงิน</td>
+      <td>จำนวนเงินสด(โอน)</td>
+      <td>จำนวนเงิน (เครดิต)</td>
+      <td>รวมเป็นเงิน  </td>
     </tr>
     {% for res in data %}
     <tr>
@@ -107,43 +108,45 @@ function myApprov() {
    
     
       <td>{{res.customer_list.customer_phone}}</td>
-      <td>เงินสด</td>
       <td>300000</td>
+      <td>300000</td>
+      <td></td>
       {% endfor %}
     </tr>
+
     <tr>
       <td></td>
-      <td>ใบเสนอราคาที่ปิดงานขายแล้ว เลขที......... Auto..........</td>
-      <td>จำนวนคน.. Auto....คนเข้าอบรม</td>
-      <td>เลขที่ผู้เสียภาษี
-        .... Auto........
-        </td>
-      <td>โทร 0833268813</td>
       <td></td>
-      <td colspan="2">
-        <div style="display: flex;">
-          <div style="flex: 1;">รวม 1</div>
-          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
-        </div>
-        <div style="display: flex;">
-          <div style="flex: 1;">รวม 2</div>
-          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
-        </div>
-
-        <div style="display: flex;">
-          <div style="flex: 1;">รวม 3</div>
-          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
-        </div>
-
-        <div style="display: flex;">
-          <div style="flex: 1;">รวม 4</div>
-          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
-        </div>
+      <td></td>
+      <td></td>
+      <td>รวม</td>
+      <td>xxx</td>
+      <td>
+       xxx
       </td>
     
     
     </tr>
-   
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>xxx</td>
+      <td>
+       xxx
+      </td>
+      <td>
+        xxx
+       </td>
+    
+    
+    </tr>
+
+
+    
 
     <tr>
       <td></td>
@@ -151,7 +154,7 @@ function myApprov() {
       <td colspan="3">
 
         <div style="display: flex;">
-          <div style="flex: 1;">จำนวนใบเสร็จ 1</div>
+          <div style="flex: 1;">จำนวนใบเสร็จ</div>
           <div style="flex: 1;">50</div>
           <div style="flex: 1;">บิล</div>
         </div>
@@ -162,26 +165,11 @@ function myApprov() {
           <div style="flex: 1;">บิล</div>
         </div>
 
-        <div style="display: flex;">
-          <div style="flex: 1;">จำนวนใบเสนอราคา</div>
-          <div style="flex: 1;">50</div>
-          <div style="flex: 1;">คนเข้าอบรม(เงินสด)</div>
-        </div>
-
-
-        <div style="display: flex;">
-          <div style="flex: 1;">จำนวนคน </div>
-          <div style="flex: 1;">50</div>
-          <div style="flex: 1;">คนเข้าอบรม(เครดิต)</div>
-        </div>
-
-        <div style="display: flex;">
-          <div style="flex: 1;">รวมจำนวนคน </div>
-          <div style="flex: 1;">100</div>
-          <div style="flex: 1;">คนที่เข้าอบรม</div>
-        </div>
+   
         </td>
-      <td colspan="2"></td>
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
 
 
@@ -189,28 +177,22 @@ function myApprov() {
     <tr>
       <td></td>
       <td></td>
-      <td colspan="3">
-        <div style="display: flex;">
-          <div style="flex: 1;">ตามใบต้นทุนเลขที่</div>
-    
-        </div>
+      <td colspan="5">
+     
 
         <div style="display: flex;">
-          <div style="flex: 1;">ใบเสนอราคา </div>
+          <div style="flex: 1;">นโยบายจ่ายค่าจ้างเหมา เลขที่ <input type="text" id="fname" name="fname"> </div>
 
         </div>
 
-        <div style="display: flex;">
-          <div style="flex: 1;">จำนวนเงิน </div>
-
-        </div>
+       
 
         <div style="display: flex;">
-          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน </div>
+          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน  16 ชั่วโมง  ชั่วโมงละ <input type="text" id="fname" name="fname">  </div>
 
         </div>
         </td>
-      <td colspan="2"></td>
+      <td > 10000</td>
     </tr>
 
     <tr>
