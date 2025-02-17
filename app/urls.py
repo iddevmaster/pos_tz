@@ -54,8 +54,10 @@ urlpatterns = [
     path('approvebill/update/bill', register.approve_list_payment),
     path('approvebill/update/bill2', register.approve_list_payment_update, name="UpdateCloseEndTheEventAll"
     ),
+    path('approvebill/accept/<slug:pk>',
+         register.approve_list_payment_accept  ,name='acceptbill'),
     path('approve/update/eventdate', course.approve_listevent),
-
+ 
     path('register/update/event',
          register.update_close_the_event, name="UpdateCloseTheEvent"),
     path('register/update/delete',
@@ -134,6 +136,7 @@ urlpatterns = [
          report_and_print.register_report_approve),
     path('register/print/<slug:rp_id>', report_and_print.register_print),
     path('register/excel/seller', report_and_print.register_excel_seller),
+    path('register/excel/seller/accpept', report_and_print.register_excel_seller_accept),
     path('register/excel/quotation', report_and_print.register_excel_quotation),
     path('register/excel/bill', report_and_print.register_excel_bill),
     path('register/excel/learning_status',

@@ -1,0 +1,221 @@
+{% load humanize %} {% comment %}
+https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel-using-JavaScript/
+{% endcomment %}
+<script
+  src="https://code.jquery.com/jquery-latest.min.js"
+  type="text/javascript"
+></script>
+<script type="text/javascript">
+
+function myApprov() {
+  window.print();
+
+}
+
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
+</script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+  rel="stylesheet"
+/>
+
+<style type="text/css">
+  body {
+    font-family: "Sarabun", sans-serif;
+    font-size: 16px;
+  }
+  table {
+    font-size: 16px;
+  }
+  .green {
+    background-color: green;
+  }
+  .grid-container-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* สร้าง 3 คอลัมน์ที่มีขนาดเท่ากัน */
+      gap: 10px; /* ช่องว่างระหว่างคอลัมน์ */
+    }
+
+    .grid-container-1 {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr); /* สร้าง 3 คอลัมน์ที่มีขนาดเท่ากัน */
+      gap: 10px; /* ช่องว่างระหว่างคอลัมน์ */
+    }
+    
+</style>
+<div class="grid-container-3" style="padding-top: 15px">
+  <div class="grid-item"></div>
+  <div class="grid-item"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก )   </div>
+  <div class="grid-item"> เลขที่เอกสาร............</div>
+</div>
+<div class="grid-container-1" style="padding-top: 15px">
+  <div class="grid-item" style="text-align: center;"> ชื่อ.นิติบุคคล หรือ บุคคลธรรมดาชื่อ........................... เลขที่ผู้เสียภาษี..............................................  </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> ประจำวันที่............. เดือน ................. ปี............. </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน.  Event item....................   ชื่อหลักสูตร...........................  จัดวดป...................... </div>
+</div>
+
+{% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
+<table
+  id="testTable"
+  summary="Code page support in different versions of MS Windows."
+  style="width: 100%; border-collapse: collapse"
+  border="1"
+>
+  <tbody>
+
+
+    <tr style="font-weight: bold">
+      <td>ลำดับ</td>
+      <td>ใบเสร็จรับเงินเลขที่</td>
+      <td>ชื่อ - นามสกุล / บริษัท</td>
+      <td>เลขที่บัตรปชช</td>
+      <td>โทร</td>
+      <td>ประเภท</td>
+      <td>จำนวนเงิน</td>
+    </tr>
+    {% for res in data %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td>-</td>
+      <td>ทดสอบ  ระบบ</td>
+      <td>2409905415165</td>
+   
+    
+      <td>{{res.customer_list.customer_phone}}</td>
+      <td>เงินสด</td>
+      <td>300000</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      <td></td>
+      <td>ใบเสนอราคาที่ปิดงานขายแล้ว เลขที......... Auto..........</td>
+      <td>จำนวนคน.. Auto....คนเข้าอบรม</td>
+      <td>เลขที่ผู้เสียภาษี
+        .... Auto........
+        </td>
+      <td>โทร 0833268813</td>
+      <td></td>
+      <td colspan="2">
+        <div style="display: flex;">
+          <div style="flex: 1;">รวม 1</div>
+          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
+        </div>
+        <div style="display: flex;">
+          <div style="flex: 1;">รวม 2</div>
+          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">รวม 3</div>
+          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">รวม 4</div>
+          <div style="flex: 1;">{{total_sum|floatformat:2|intcomma}}</div>
+        </div>
+      </td>
+    
+    
+    </tr>
+   
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="3">
+
+        <div style="display: flex;">
+          <div style="flex: 1;">จำนวนใบเสร็จ 1</div>
+          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">บิล</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">จำนวนใบเสนอราคา</div>
+          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">บิล</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">จำนวนใบเสนอราคา</div>
+          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">คนเข้าอบรม(เงินสด)</div>
+        </div>
+
+
+        <div style="display: flex;">
+          <div style="flex: 1;">จำนวนคน </div>
+          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">คนเข้าอบรม(เครดิต)</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">รวมจำนวนคน </div>
+          <div style="flex: 1;">100</div>
+          <div style="flex: 1;">คนที่เข้าอบรม</div>
+        </div>
+        </td>
+      <td colspan="2"></td>
+    </tr>
+
+
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="3">
+        <div style="display: flex;">
+          <div style="flex: 1;">ตามใบต้นทุนเลขที่</div>
+    
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">ใบเสนอราคา </div>
+
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">จำนวนเงิน </div>
+
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน </div>
+
+        </div>
+        </td>
+      <td colspan="2"></td>
+    </tr>
+
+    <tr>
+      <td colspan="6"></td>
+      <td > <button type="button" class="btn btn-success" onclick="myApprov()">Accept</button> </td>
+    </tr>
+  </tbody>
+</table>

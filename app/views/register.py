@@ -1371,6 +1371,45 @@ def approve_list_payment(request):
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
 
     return render(request, 'register/approve_list_event_bill.html',context)
+
+
+@login_required(login_url='/login')
+def approve_list_payment_accept(request,pk):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
+
+    try:
+        province_list = location_thai.objects.all().values(
+            'province_code', 'province_name').annotate(total=Count('province_code'))
+    except location_thai.DoesNotExist:
+        province_list = None
+    context = {'title': defaultTitle,  'province_list': province_list, 'listMenuPermission': objMenu,
+               'list_user': list_user}
+  
+    return render(request, 'register/register_selller_report.html',context)
+
+
 # def upload_excel(request):
 #     if request.method == 'POST':
 #         form = ExcelUploadForm(request.POST, request.FILES)
