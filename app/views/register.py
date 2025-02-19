@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting
+from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -318,7 +318,7 @@ def payment(request, register_id):
     except:
         content = None
         return redirect("/")
-    print(register_id)
+   
     content_regist = register_main.objects.select_related(
         "seller", "ev").prefetch_related("student_register").get(register_id=register_id)
     
@@ -338,6 +338,8 @@ def payment(request, register_id):
             bbbb = 0
     content_course = course_event.objects.select_related(
         "course").get(ev_id=content_regist.ev_id)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
     total_ca_quta = content_regist.ev.ev_training - total_rq_quta
     
@@ -352,7 +354,7 @@ def payment(request, register_id):
     # print(content)
 
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,
-               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training}
+               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
 
 
@@ -415,25 +417,34 @@ def payment_create(request):
     rpi_price_result = request.POST['rpi_price_result']
 
         
-    instecent = register_main.objects.get(register_id=register_id)
-    instecent.status = 'N'
-    instecent.save()
+    if pay_type == 1:
+        instecent = register_main.objects.get(register_id=register_id)
+        instecent.status = 'Y'
+        instecent.save()
+       
 
     if pay_type == 2:
+        instecent = register_main.objects.get(register_id=register_id)
+        instecent.status = 'N'
+        instecent.save()
         dtaf = event_register.objects.create(
         ev_id=instecent.ev_id,
         register_id=register_id,
         status='D'
          )
 
+    u = User.objects.get(id=rp_name_seller)
 
+    content_regist = register_main.objects.get(register_id=register_id)
+    content_regist.seller_id = rp_name_seller
+    content_regist.save()
     # Crate Main
     object = register_payment.objects.create(
         rp_doc_number=rp_doc_number,
         rp_code_customer=rp_code_customer,
         rp_name_customer=rp_name_customer,
         rp_tax=rp_tax,
-        rp_name_seller=rp_name_seller,
+        rp_name_seller=u.first_name+' '+u.last_name,
         rp_name_contact=rp_name_contact,
         rp_branch=rp_branch,
         rp_address=rp_address,
@@ -1044,7 +1055,7 @@ def register_management(request):
         #     register_id=r.register_id, register__crt_date__month=1).first()
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
-        print(r.register_id)    
+        
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         course_list = course_event.objects.select_related(
@@ -1152,6 +1163,7 @@ def update_close_the_sale(request):
     register_id = request.POST['register_id']
     confirm_price = float(request.POST['confirm_price'])
     close_the_sale = int(request.POST['close_the_sale'])
+
     if close_the_sale == 1:
         customer_status = 1
     else:
@@ -1164,6 +1176,7 @@ def update_close_the_sale(request):
     # เปรียบเทียบราคาเพื่อยืนยันการปิดการขาย
     check_payment = register_payment_items.objects.filter(
         rpi_price_result=confirm_price, register_id=register_id).order_by("-rpi_id").first()
+    print(check_payment)
     if check_payment:
         set_active = register_payment.objects.get(rp_id=check_payment.rp_id)
         set_active.active = 1
@@ -1399,13 +1412,14 @@ def approve_list_payment_accept(request,pk):
     
     list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
 
-    try:
-        province_list = location_thai.objects.all().values(
-            'province_code', 'province_name').annotate(total=Count('province_code'))
-    except location_thai.DoesNotExist:
-        province_list = None
-    context = {'title': defaultTitle,  'province_list': province_list, 'listMenuPermission': objMenu,
-               'list_user': list_user}
+    # try:
+    #     province_list = location_thai.objects.all().values(
+    #         'province_code', 'province_name').annotate(total=Count('province_code'))
+    # except location_thai.DoesNotExist:
+    #     province_list = None
+    
+   
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk }
   
     return render(request, 'register/register_selller_report.html',context)
 

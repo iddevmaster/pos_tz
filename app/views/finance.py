@@ -586,6 +586,12 @@ def checkhours(request):
                     data['status_hour'] = True
                     data['status_people'] = True
                     data['status_teacher'] = False
+            elif  pi == '4' or pi == '5'or pi == '6'or pi == '7'or pi == '8':
+             
+                 if teacher > 0:
+                    data['status_hour'] = True
+                    data['status_people'] = True
+                    data['status_teacher'] = False        
        
          
             if data:

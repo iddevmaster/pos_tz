@@ -136,7 +136,7 @@ urlpatterns = [
          report_and_print.register_report_approve),
     path('register/print/<slug:rp_id>', report_and_print.register_print),
     path('register/excel/seller', report_and_print.register_excel_seller),
-    path('register/excel/seller/accpept', report_and_print.register_excel_seller_accept),
+    path('register/excel/seller/accpept/<slug:ev_id>', report_and_print.register_excel_seller_accept),
     path('register/excel/quotation', report_and_print.register_excel_quotation),
     path('register/excel/bill', report_and_print.register_excel_bill),
     path('register/excel/learning_status',

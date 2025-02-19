@@ -7,6 +7,37 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 ></script>
 <script type="text/javascript">
 
+
+function allowOnlyNumbersPeople(event) {
+
+if (
+  event.key === "Backspace" ||
+  event.key === "Tab" ||
+  event.key === "ArrowLeft" ||
+  event.key === "ArrowRight" ||
+  event.key === "Delete"
+) {
+  return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+  event.preventDefault(); // Block other characters
+  return false; // Prevent default behavior
+}
+
+
+setTimeout(() => {
+  const it = document.getElementById("totalhours").value;
+  const total = document.getElementById("total").value;
+
+
+  document.getElementById("result").innerHTML = it * total;
+
+}, 20);
+
+}
+
 function myApprov() {
   window.print();
 
@@ -64,22 +95,27 @@ function myApprov() {
     }
     
 </style>
+<input type="่hidden" id="totalhours" name="totalhours" value="{{totalhours}}" style="display: none;">
 <div class="grid-container-3" style="padding-top: 15px">
   <div class="grid-item"></div>
-  <div class="grid-item"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก )   </div>
-  <div class="grid-item"> เลขที่เอกสาร............</div>
+  <div class="grid-item" style="text-align: center;font-size: 24px;"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก )</div>
+  <div class="grid-item" style="text-align: center;"> เลขที่เอกสาร  {{doc}}</div>
 </div>
 <div class="grid-container-1" style="padding-top: 15px">
-  <div class="grid-item" style="text-align: center;"> ชื่อ.นิติบุคคล หรือ บุคคลธรรมดาชื่อ........................... เลขที่ผู้เสียภาษี..............................................  </div>
+  <div class="grid-item" style="text-align: center;"> ชื่อ  {{fname}} {{lname}} เลขที่ผู้เสียภาษี    {{tax_number}}  </div>
 </div>
 <div class="grid-container-1" style="padding-top: 5px">
-  <div class="grid-item" style="text-align: center;"> ประจำวันที่............. เดือน ................. ปี............. </div>
+  <div class="grid-item" style="text-align: center;"> ประจำวันที่ 18 เดือน กุมภาพันธ์ ปี 2568 </div>
 </div>
 <div class="grid-container-1" style="padding-top: 5px">
-  <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน.  Event item....................   ชื่อหลักสูตร...........................  จัดวดป...................... </div>
+  <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน  Item {{course_code}}  </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> ชื่อ {{course_name}}  วันที่ {{course_ev.ev_date_start}} - {{course_ev.ev_date_end}} </div>
 </div>
 
 {% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
+<br>
 <table
   id="testTable"
   summary="Code page support in different versions of MS Windows."
@@ -102,14 +138,26 @@ function myApprov() {
     {% for res in data %}
     <tr>
       <td align="center">{{ forloop.counter }}</td>
-      <td>-</td>
-      <td>ทดสอบ  ระบบ</td>
-      <td>2409905415165</td>
+      <td>{{res.rp_doc_number}}</td>
+      <td>{{res.customer}}</td>
+      <td>{{res.tax}}</td>
    
     
-      <td>{{res.customer_list.customer_phone}}</td>
-      <td>300000</td>
-      <td>300000</td>
+      <td>{{res.tel}}</td>
+      <td>
+        {% if res.pay_type == 1 %}
+        {{res.rpi_price}}
+        {% else %}
+       -
+        {% endif %}
+      </td>
+      <td>
+        {% if res.pay_type == 2 %}
+        {{res.rpi_price}}
+        {% else %}
+        -
+        {% endif %}
+      </td>
       <td></td>
       {% endfor %}
     </tr>
@@ -134,12 +182,12 @@ function myApprov() {
       <td></td>
       <td></td>
       <td></td>
-      <td>xxx</td>
+      <td> {{total_payment}}</td>
       <td>
-       xxx
+        {{total_credit}}
       </td>
       <td>
-        xxx
+        {{total}}
        </td>
     
     
@@ -155,13 +203,13 @@ function myApprov() {
 
         <div style="display: flex;">
           <div style="flex: 1;">จำนวนใบเสร็จ</div>
-          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">{{total_bill_payment}}</div>
           <div style="flex: 1;">บิล</div>
         </div>
 
         <div style="display: flex;">
           <div style="flex: 1;">จำนวนใบเสนอราคา</div>
-          <div style="flex: 1;">50</div>
+          <div style="flex: 1;">{{total_bill_credit}}</div>
           <div style="flex: 1;">บิล</div>
         </div>
 
@@ -185,19 +233,23 @@ function myApprov() {
 
         </div>
 
-       
+      
 
         <div style="display: flex;">
-          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน  16 ชั่วโมง  ชั่วโมงละ <input type="text" id="fname" name="fname">  </div>
+          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน  {{totalhours}} ชั่วโมง  ชั่วโมงละ <input type="text" id="total" name="total"    onkeydown="allowOnlyNumbersPeople(event)"> 
+         
+          </div>
 
         </div>
         </td>
-      <td > 10000</td>
+      <td > <span id="result"></span></td>
     </tr>
-
+   
     <tr>
-      <td colspan="6"></td>
-      <td > <button type="button" class="btn btn-success" onclick="myApprov()">Accept</button> </td>
+      <td colspan="5" style="text-align: center;">ฝ่ายบัญชี  Accept</td>
+   
+ 
+      <td colspan="3" style="text-align: center;"> <button type="button" class="btn btn-success" onclick="myApprov()">Accept</button> </td>
     </tr>
   </tbody>
 </table>

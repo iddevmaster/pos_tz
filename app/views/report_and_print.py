@@ -8,9 +8,10 @@ from django.db.models import Q, Count
 from datetime import date, timedelta
 from dateutil import rrule
 import json
+from datetime import datetime
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -221,117 +222,59 @@ def register_excel_seller(request):
 
 
 @login_required(login_url='/login')
-def register_excel_seller_accept(request):
+def register_excel_seller_accept(request,ev_id):
     user_id = request.user.id
+    
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
+    content = teacher_income_setting.objects.select_related('ev').filter(pk=ev_id)
+    tincome = teacher_income_setting.objects.select_related('teacher').get(pk=ev_id)
+    cou_ev = course_event.objects.select_related('course').get(pk=tincome.ev_id)
+    # teach = teacher.objects.get(teacher_id=tincome.teacher)
+    status = ['N','Y']
+    content_regist = register_main.objects.select_related(
+        "seller", "ev").filter(ev_id=tincome.ev_id,status__in=status).order_by("pay_type")
+    obj = []  
+    total_payment = 0
+    total_credit = 0
+    for r in content_regist:  
+       
+         
+         payment = register_payment.objects.get(register_id=r.register_id)
+         item = register_payment_items.objects.get(register_id=r.register_id)
+         custo = customers.objects.get(register_id=r.register_id)
+      
+         if r.pay_type == 1:
+             total_payment += item.rpi_price_total
+         else:
+             total_credit += item.rpi_price_total
+                 
+          
+         fs = {'rp_doc_number':payment.rp_doc_number,'pay_type':r.pay_type,'customer':custo.customer_name,'tax':custo.customer_tax,'tel':custo.customer_phone,'rpi_price':item.rpi_price_total}
+         obj.append(fs) 
+           
+    total = total_payment + total_credit
+    status = ['N','Y']
+    count_payment = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=1).count()
+    count_credit = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=2).count()
+    totaldata = document.objects.filter().count()
+    payment = register_payment.objects.get(register_id=r.register_id)
+   
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    current_time = datetime.now().time()
+    totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
+    running_number = treeDigit(totaldata + 1)
+    student_code = "PO" + str(twoDigit(month_current)) + \
+            str(running_number) + "/" + str(year_current)
+ 
     
-    date_range = request.POST.get('date_range', None)
-    # year_current = int(request.POST.get('qyear', date.today().year))
-    # month_current = int(request.POST.get('qmonths', date.today().month))
-    province_code = int(request.POST.get('qprovince', 0))
-    customer_type = int(request.POST.get('qcustomer_type', 0))
-    pay_type = int(request.POST.get('qpay_type', 0))
-    close_the_sale = int(request.POST.get('qclose_the_sale', -1))
-    course_id = int(request.POST.get('qcourse', 0))
-    generation = request.POST.get('qgeneration', 0)
-    seller = int(request.POST.get('qseller', 0))
-    customer_name = request.POST.get('qcustomer_name', None)
-    content = customers.objects.select_related(
-        'register', 'location').filter(register__module=m.module)
-    lastday = lastDateOfmonth(
-        date.today().year,  date.today().month, date.today().day)
-    default_start = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + "01"
-    default_end = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + str(lastday)
-
-    if date_range is not None:
-        start, end = format_daterange(date_range)
-        if start == end:
-            content = content.filter(
-                register__crt_date__date=start)
-        else:
-            content = content.filter(
-                register__crt_date__date__gte=start, register__crt_date__date__lte=end)
-        range_param = date_range
-    else:
-        # content = content.filter(
-        #     register__crt_date__month=month_current, register__crt_date__year=year_current)
-        content = content.filter(
-            register__crt_date__date__gte=default_start, register__crt_date__date__lte=default_end)
-        range_param = str(ymdtodmy(default_start)) + \
-            " - " + str(ymdtodmy(default_end))
-    province_name = "ทุกจังหวัด"
-    if province_code != 0:
-        content = content.filter(location__province_code=province_code)
-        p = location_thai.objects.filter(
-            province_code=province_code).values_list("province_name").first()
-        province_name = p[0]
-    customer_type_param = "ทุกประเภท"
-    if customer_type != 0:
-        content = content.filter(register__customer_type=customer_type)
-        if customer_type == 1:
-            customer_type_param = "บุคคล"
-        else:
-            customer_type_param = "บริษัท"
-    pay_type_param = "ทุกประเภท"
-    if pay_type != 0:
-        content = content.filter(register__pay_type=pay_type)
-        if pay_type == 1:
-            pay_type_param = "เงินสด"
-        else:
-            pay_type_param = "เครดิต"
-    close_the_sale_param = "ทุกประเภท"
-    if close_the_sale != -1:
-        content = content.filter(register__close_the_sale=close_the_sale)
-        if close_the_sale == 0:
-            close_the_sale_param = "กำลังขาย"
-        elif close_the_sale == 1:
-            close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
-        elif close_the_sale == 2:
-            close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
-    if course_id != 0:
-        content = content.filter(register__ev__course_id=course_id)
-        c = course.objects.get(course_id=course_id)
-        course_param = str(c.course_code) + " " + str(c.course_name)
-    generation_param = "ทุกรุ่น"
-    if generation:
-        content = content.filter(register__ev__ev_generation=generation)
-        generation_param = generation
-    seller_param = "ทุกคน"
-    if seller != 0:
-        content = content.filter(register__seller_id=seller)
-        u = User.objects.get(id=seller)
-        seller_param = str(u.first_name) + " " + str(u.last_name)
-    if customer_name != None:
-        content = content.filter(Q(customer_name__icontains=customer_name))
-    obj = []
-    total_sum = 0
-    for r in content:
-        # print(r.register_id)
-        payment_list = register_payment_items.objects.select_related('rp').filter(
-            register_id=r.register).order_by("-rp__rp_id").first()
-
-        if payment_list is not None:
-            rpi_price_result = payment_list.rpi_price_result
-        else:
-            rpi_price_result = 0
-        total_sum += rpi_price_result
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.register.ev_id).first()
-        res = {'customer_list': r,
-               'course_list': course_list, 'payment_list': payment_list}
-        obj.append(res)
-
-    param = {'total_data': len(content), 'range_param': range_param, 'province_name': province_name, 'customer_type_param': customer_type_param,
-             'pay_type_param': pay_type_param, 'close_the_sale_param': close_the_sale_param, 'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
-    context = {'title': defaultTitle, 'data': obj,
-               'param': param, 'total_sum': total_sum}
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,
+               'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':student_code}
     return render(request, 'print/register_excel_seller_accept.html', context)
 
 
