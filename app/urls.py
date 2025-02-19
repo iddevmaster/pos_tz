@@ -51,7 +51,7 @@ urlpatterns = [
     path('approve/update/processeventend',
          register.update_close_the_eventend, name="UpdateCloseEndTheEvent"),
     path('approve/update/event', register.approve_lis_event),
-    path('approvebill/update/bill', register.approve_list_payment),
+#     path('approvebill/update/bill', register.approve_list_payment),
     path('approvebill/update/bill2', register.approve_list_payment_update, name="UpdateCloseEndTheEventAll"
     ),
     path('approvebill/accept/<slug:pk>',
