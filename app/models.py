@@ -382,5 +382,6 @@ class document(models.Model):
     title = models.CharField(max_length=20, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     price = models.FloatField(default=0 , blank=False)
+    payment_policy = models.CharField(max_length=20, unique=True, blank=True)
     teacher_income_id = models.IntegerField(default=None, blank=False) 
    

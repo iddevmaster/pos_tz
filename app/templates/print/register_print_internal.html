@@ -1,0 +1,334 @@
+{% load humanize %} {% comment %}
+https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel-using-JavaScript/
+{% endcomment %}
+<script
+  src="https://code.jquery.com/jquery-latest.min.js"
+  type="text/javascript"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript">
+
+
+function allowOnlyNumbersPeople(event) {
+  
+if (
+  event.key === "Backspace" ||
+  event.key === "Tab" ||
+  event.key === "ArrowLeft" ||
+  event.key === "ArrowRight" ||
+  event.key === "Delete"
+) {
+  return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+  event.preventDefault(); // Block other characters
+  return false; // Prevent default behavior
+}
+
+
+setTimeout(() => {
+  const it = document.getElementById("totalhours").value;
+  const total = document.getElementById("total").value;
+
+
+  document.getElementById("result").innerHTML = it * total;
+
+}, 20);
+
+}
+
+
+async function myApprov() {
+
+  const it = document.getElementById("totalhours").value;
+  const total = document.getElementById("total").value;
+  const doc = document.getElementById("doc").value;
+  const doc_document = document.getElementById("doc_document").value;
+  const teach_in_come = document.getElementById("teach_in_come").value;
+  
+  if(it == ''){
+    Swal.fire({
+      title: 'ไม่มีจำนวนชั่วโมง!',
+      text: 'กรุณากรอกชั่วโมง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(total == ''){
+    Swal.fire({
+      title: 'กรุณากรอกยอดเงิน!',
+      text: 'กรุณากรอกยอดเงิน',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(doc == ''){
+    Swal.fire({
+      title: 'กรุณากรอกเลขที่จ้างเหมา!',
+      text: 'กรุณากรอกเลขที่จ้างเหมา',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(doc_document == ''){
+    Swal.fire({
+      title: 'ไม่มีเลขที่เอกสาร!',
+      text: 'ไม่มีเลขที่เอกสาร',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+    return false;
+
+  } 
+
+
+
+    let data = await fetch('/api/updateteachincome', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_document':doc_document,'it':it})
+})
+.then(response => response.json())
+.then(data => {
+
+  // approvebill/update/bill
+  Swal.fire({
+      title: 'บันทึกสำเสร็จ!',
+      text: 'บันทึกสำเสร็จ',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+    window.top.location.reload();
+ 
+})
+.catch(error => {
+   
+  
+});
+}
+
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
+</script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+  rel="stylesheet"
+/>
+
+<style type="text/css">
+  body {
+    font-family: "Sarabun", sans-serif;
+    font-size: 16px;
+  }
+  table {
+    font-size: 16px;
+  }
+  .green {
+    background-color: green;
+  }
+  .grid-container-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* สร้าง 3 คอลัมน์ที่มีขนาดเท่ากัน */
+      gap: 10px; /* ช่องว่างระหว่างคอลัมน์ */
+    }
+
+    .grid-container-1 {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr); /* สร้าง 3 คอลัมน์ที่มีขนาดเท่ากัน */
+      gap: 10px; /* ช่องว่างระหว่างคอลัมน์ */
+    }
+    .space {
+    margin-bottom: 30px; /* ปรับระยะห่างตามต้องการ */
+    display: block;
+  }
+    
+</style>
+<body onLoad="window.print()">
+<input type="่hidden" id="totalhours" name="totalhours" value="{{totalhours}}" style="display: none;">
+<input type="text" id="teach_in_come" name="teach_in_come" value="{{teach_in_come}}" style="display: none;">
+<input type="text" id="doc_document" name="doc_document" value="{{doc}}" style="display: none;" >
+
+
+
+<div class="grid-container-3" style="padding-top: 15px" >
+  <div class="grid-item"></div>
+  <div class="grid-item" style="text-align: center;font-size: 24px;"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก)</div>
+  <div class="grid-item" style="text-align: center;"> เลขที่เอกสาร  {{doc}}</div>
+</div>
+<div class="grid-container-1" style="padding-top: 15px">
+  <div class="grid-item" style="text-align: center;"> ชื่อ  {{fname}} {{lname}} เลขที่ผู้เสียภาษี    {{tax_number}}  </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> ประจำวันที่ 21 เดือน กุมภาพันธ์ ปี 2568 </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน  Item {{course_code}}  </div>
+</div>
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item" style="text-align: center;"> ชื่อ {{course_name}}  วันที่ {{course_ev.ev_date_start}} - {{course_ev.ev_date_end}} </div>
+</div>
+
+{% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
+<br>
+<table
+  id="testTable"
+  summary="Code page support in different versions of MS Windows."
+  style="width: 100%; border-collapse: collapse"
+  border="1"
+>
+  <tbody>
+    <tr style="font-weight: bold">
+      <td>ลำดับ</td>
+      <td>ใบเสร็จรับเงินเลขที่ /<br>ใบเสนอราคา</td>
+      <td>ชื่อ - นามสกุล / <br>ชื่อบริษัท</td>
+      <td>เลขที่บัตรปชช / <br> เลขที่ผู้เสียภาษี</td>
+      <td>โทร</td>
+      <td>จำนวนเงินสด(โอน)</td>
+      <td>จำนวนเงิน (เครดิต)</td>
+      <td>รวมเป็นเงิน  </td>
+    </tr>
+    {% for res in data %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td>{{res.rp_doc_number}}</td>
+      <td>{{res.customer}}</td>
+      <td>{{res.tax}}</td>
+   
+    
+      <td>{{res.tel}}</td>
+      <td>
+        {% if res.pay_type == 1 %}
+        {{res.rpi_price}}
+        {% else %}
+       -
+        {% endif %}
+      </td>
+      <td>
+        {% if res.pay_type == 2 %}
+        {{res.rpi_price}}
+        {% else %}
+        -
+        {% endif %}
+      </td>
+      <td></td>
+      {% endfor %}
+    </tr>
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>รวม</td>
+      <td> {{total_payment}}</td>
+      <td>
+        {{total_credit}}
+      </td>
+      <td>
+        {{total}}
+       </td>
+    
+    
+    </tr>
+
+
+    
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="3">
+
+        <div style="display: flex;">
+          <div style="flex: 2;">จำนวนใบเสร็จ</div>
+          <div style="flex: 1;">{{total_bill_payment}}</div>
+          <div style="flex: 1;">บิล</div>
+        </div>
+
+        <div style="display: flex;">
+          <div style="flex: 2;">จำนวนใบเสนอราคา</div>
+          <div style="flex: 1;">{{total_bill_credit}}</div>
+          <div style="flex: 1;">บิล</div>
+        </div>
+
+   
+        </td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="5">
+     
+
+        <div style="display: flex;">
+          <div style="flex: 1;">นโยบายจ่ายค่าจ้างเหมา เลขที่ {{payment_policy}}</div>
+        </div>
+
+      
+
+        <div style="display: flex;">
+          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน  {{totalhours}} ชั่วโมง  ชั่วโมงละ  {{totalprice}} บาท
+         
+          </div>
+        </div>
+        </td>
+      <td > <span id="result">{{price}}</span></td>
+    </tr>
+    <tr>
+      <td colspan="8" >
+
+        <div class="grid-container-3" style="padding-top: 15px">
+          <div class="grid-item" style="text-align: center;line-height: 2.5;"> <span >ผู้ขอบันทึก</span><br class="spacer"><span ></span><br class="spacer"><span >(ฝ่ายบัญชี ..........   )</span></div>
+          <div class="grid-item" style="text-align: center;line-height: 2.5;">  <span >ผู้ตรวจสอบ</span><br class="spacer"><span ></span><br class="spacer"><span >(ศิริโรจน์   เสนาดี)</span></div>
+          <div class="grid-item" style="text-align: center;line-height: 2.5;"> <span >ผู้อนุมัติ</span><br class="spacer"><span ></span><br class="spacer"><span >(อ.เฉลิมชัย  หุ่นนนาครินทร์ )</span></div>
+        </div>
+      </td>
+   
+ 
+   
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: center;">ฝ่ายบัญชี  Accept</td>
+   
+ 
+      <td colspan="1" style="text-align: center;">  </td>
+      <td colspan="1" style="text-align: center;">  </td>
+      <td colspan="1" style="text-align: center;">  </td>
+    </tr>
+  </tbody>
+</table>
+</body>

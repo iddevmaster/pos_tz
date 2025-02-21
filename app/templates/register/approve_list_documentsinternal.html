@@ -122,10 +122,44 @@ function readURL(input) {
             <td>{{res.doc_number}}</td>
     
             <td>{{res.title}}</td>
-            <td>{{res.doc_number}}</td>
-            <td>{{res.doc_number}}</td>
-            <td>{{res.doc_number}}</td>
-            <td>{{res.doc_number}}</td>
+          
+            <td>{{res.course_name}} - {{res.item}}</td>
+            <td>
+
+              {{res.ev_date_start|date:"d/m/Y"}} -
+              {{res.ev_date_end|date:"d/m/Y"}}
+            </td>
+            <td>{{res.fname}}</td>
+            <td>{{res.price}}</td>
+            <td>x</td>
+            <td>x</td>
+            <td>
+
+              <div class="btn-group me-1 mb-1">
+                <div class="dropdown">
+                  <button
+                  class="btn btn-success btn-sm"
+                  type="button"
+                  id="dropdownMenuButtonIcon"
+               
+                  onclick="goToDetail('approve/documents/internal/view','{{res.doc_id}}')"
+                >
+                 View
+                </button>
+                <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="window.open('/approve/documents/internal/print/view/'+'{{res.doc_id}}','','width=950,height=650'); return false;"
+              >
+                <i class="icon dripicons-print"></i>
+                พิมพ์
+              </button>
+        
+       
+           
+                </div>
+              </div>
+            </td>
         
           </tr>
           {% endfor %}

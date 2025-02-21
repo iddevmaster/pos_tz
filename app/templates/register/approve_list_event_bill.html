@@ -176,15 +176,14 @@ function readURL(input) {
               <div class="btn-group me-1 mb-1">
                 <div class="dropdown">
                   <button
-                    class="btn btn-primary btn-sm"
-                    type="button"
-                    id="dropdownMenuButtonIcon"
-                    data-bs-toggle="modal"
-                    data-bs-target="#UpdateClick1"
-                    onclick="setValueUpdateModal('{{res.id}}','{{res.tis_sum}}')"
-                  >
-                   ใส่จำนวนเงิน
-                  </button>
+                  class="btn btn-success btn-sm"
+                  type="button"
+                  id="dropdownMenuButtonIcon"
+               
+                  onclick="goToDetail('approvebill/accept','{{res.id}}')"
+                >
+                 Accept
+                </button>
 
                   <button
                   class="btn btn-danger btn-sm"
@@ -197,15 +196,7 @@ function readURL(input) {
                  ยกเลิก
                 </button>
 
-                <button
-                class="btn btn-success btn-sm"
-                type="button"
-                id="dropdownMenuButtonIcon"
-             
-                onclick="goToDetail('approvebill/accept','{{res.id}}')"
-              >
-               Accept
-              </button>
+           
                 </div>
               </div>
               

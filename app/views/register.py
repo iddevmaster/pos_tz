@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document
+from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -1578,11 +1578,109 @@ def approve_internal(request):
         r = {'group_label': rs['group_label'],
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
-    try:
-        content = document.objects.filter()
-    except:
-        content = None
-        print(content)
 
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu}
+    obj = []
+    content = document.objects.filter()
+    for rs in content:
+        
+        teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
+        x = course_event.objects.get(ev_id=teacher_income.ev_id)
+        courses = course.objects.get(course_id=x.course_id)
+        uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
+
+        a = teacher.objects.get(teacher_id=uuid_without_dashes)
+        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th}
+        obj.append(r)
+        
+    print(obj)
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
     return render(request, 'register/approve_list_documentsinternal.html', context)
+
+@login_required(login_url='/login')
+def approve_internal_doc(request,doc_id):
+
+    
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    obj = []
+
+
+
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'doc_id':doc_id}
+    return render(request, 'print/register_excel_seller_view.html', context)
+
+
+
+@login_required(login_url='/login')
+def approve_internal_doc_print(request,doc_id):
+    user_id = request.user.id
+    print(doc_id)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+
+    obj = []
+    getdoc = document.objects.get(doc_id=doc_id)
+    tincome = teacher_income_setting.objects.select_related('teacher').get(pk=getdoc.teacher_income_id)
+    cou_ev = course_event.objects.select_related('course').get(pk=tincome.ev_id)
+    # teach = teacher.objects.get(teacher_id=tincome.teacher)
+    status = ['N','Y']
+    content_regist = register_main.objects.select_related(
+        "seller", "ev").filter(ev_id=tincome.ev_id,status__in=status).order_by("pay_type")
+    obj = []  
+    total_payment = 0
+    total_credit = 0
+    for r in content_regist:  
+       
+         
+         payment = register_payment.objects.get(register_id=r.register_id)
+         item = register_payment_items.objects.get(register_id=r.register_id)
+         custo = customers.objects.get(register_id=r.register_id)
+      
+         if r.pay_type == 1:
+             total_payment += item.rpi_price_total
+         else:
+             total_credit += item.rpi_price_total
+                 
+          
+         fs = {'rp_doc_number':payment.rp_doc_number,'pay_type':r.pay_type,'customer':custo.customer_name,'tax':custo.customer_tax,'tel':custo.customer_phone,'rpi_price':item.rpi_price_total}
+         obj.append(fs) 
+    total = total_payment + total_credit
+    status = ['N','Y']
+    count_payment = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=1).count()
+    count_credit = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=2).count()
+    totaldata = document.objects.filter().count()
+    payment = register_payment.objects.get(register_id=r.register_id)
+   
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    current_time = datetime.now().time()
+    totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
+    totalprice = int(getdoc.price) / totalhours 
+    
+    running_number = treeDigit(totaldata + 1)
+    student_code = "TOP" + str(twoDigit(month_current)) + \
+            str(running_number) + "/" + str(year_current)
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,
+               'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
+
+    return render(request, 'print/register_print_internal.html', context)    

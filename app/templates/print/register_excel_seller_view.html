@@ -1,0 +1,35 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายงานข้อมูลใบเสร็จ</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          รายงานข้อมูลใบเสร็จ
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+ 
+  <iframe
+    id="iframe_target"
+    name="iframe_target"
+    src="/register/excel/seller/view/{{doc_id}}"
+    style="height: 700px; width: 100%; border: thin; background-color: #fff"
+  ></iframe>
+</section>
+
+{% endblock %}

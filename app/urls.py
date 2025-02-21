@@ -62,8 +62,10 @@ urlpatterns = [
          register.update_close_the_event, name="UpdateCloseTheEvent"),
     path('register/update/delete',
          register.delete_close_the_event, name="DeleteCloseTheEvent"),    
-     path('approve/documents/internal', register.approve_internal),
-     
+    path('approve/documents/internal', register.approve_internal),
+    path('approve/documents/internal/view/<slug:doc_id>', register.approve_internal_doc),
+    path('approve/documents/internal/print/view/<slug:doc_id>', register.approve_internal_doc_print),
+   
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),
@@ -144,6 +146,7 @@ urlpatterns = [
     path('certificate/print/<slug:student_id>',
          report_and_print.student_print_certificate),
     path('manual/idcard', general.manual_idcard),
+    path('register/excel/seller/view/<slug:doc_id>', report_and_print.register_excel_seller_view),
 
     #     user
     path('user/category/list', user.category_program_form_create,
