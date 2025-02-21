@@ -937,19 +937,20 @@ def updateteachincom(request):
             doc_number=doc_document,
             title='ขอตั้งเบิกค่าจ้างเหมา ',
             teacher_income_id=teach_id,
+            price=sumt,
             created_at=dateTimeNow(),
         )
     content.save()
 
 
 
-    teacher_income = teacher_income_setting.objects.get(id=teach_id)
+    # teacher_income = teacher_income_setting.objects.get(id=teach_id)
     
-    teacher_income.status = 'S'
-    teacher_income.tis_sum = sumt
-    teacher_income.tis_compensation = sumt
-    teacher_income.tis_compensation = sumt
-    teacher_income.save()
+    # teacher_income.status = 'S'
+    # teacher_income.tis_sum = sumt
+    # teacher_income.tis_compensation = sumt
+    # teacher_income.tis_compensation = sumt
+    # teacher_income.save()
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)
