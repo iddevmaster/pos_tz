@@ -177,25 +177,25 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
 <input type="text" id="doc_document" name="doc_document" value="{{doc}}" style="display: none;" >
 
 
-
+<div style="padding: 10px;">
 <div class="grid-container-3" style="padding-top: 15px" >
   <div class="grid-item"></div>
-  <div class="grid-item" style="text-align: center;font-size: 24px;"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก)</div>
+  <div class="grid-item" style="text-align: center;font-size: 24px;"> ใบบันทึกภายใน </div>
   <div class="grid-item" style="text-align: center;"> เลขที่เอกสาร  {{doc}}</div>
 </div>
+
+
 <div class="grid-container-1" style="padding-top: 15px">
-  <div class="grid-item" style="text-align: center;"> ชื่อ  {{fname}} {{lname}} เลขที่ผู้เสียภาษี    {{tax_number}}  </div>
+  <div class="grid-item"> เรียน  ผบห. บริษัทไอดีไดร์ฟ   อ.เฉลิมชัย หุ่นนนาครินทร์ ผู้อนุมัติ และ  ศิริโรจน์  เสนาดี ผุ้ตรวจสอบ   </div>
 </div>
-<div class="grid-container-1" style="padding-top: 5px">
-  <div class="grid-item" style="text-align: center;"> ประจำวันที่ 21 เดือน กุมภาพันธ์ ปี 2568 </div>
-</div>
-<div class="grid-container-1" style="padding-top: 5px">
-  <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน  Item {{course_code}}  </div>
-</div>
-<div class="grid-container-1" style="padding-top: 5px">
-  <div class="grid-item" style="text-align: center;"> ชื่อ {{course_name}}  วันที่ {{course_ev.ev_date_start}} - {{course_ev.ev_date_end}} </div>
+<div class="grid-container-1" style="padding-top: 15px">
+  <div class="grid-item" > เรื่อง  ขอเบิกจ่ายผู้รับจ้างเหมา   รหัสเจ้าหนี้ xxxxxxx  ชื่อ {{fname}} {{lname}} เลขที่ผู้เสียภาษี {{tax_number}}  ที่อยู่ 171/8 อ.เมือง จ.ขอนแก่น       </div>
 </div>
 
+<div class="grid-container-1" style="padding-top: 5px">
+  <div class="grid-item">อ้างอิง Item {{course_code}} ชื่อหลักสูตร {{course_name}}  จัดวันที่ {{course_ev.ev_date_start}} - {{course_ev.ev_date_end}} </div>
+</div>
+</div>
 {% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
 <br>
 <table
