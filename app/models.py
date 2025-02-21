@@ -377,8 +377,9 @@ class factbilldes(models.Model):
     
        
 class document(models.Model):
+    doc_id = models.AutoField(primary_key=True)
     doc_number = models.CharField(max_length=20, unique=True, blank=True)
     title = models.CharField(max_length=20, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    teacher_income_id = models.IntegerField(default=None, blank=False) 
    

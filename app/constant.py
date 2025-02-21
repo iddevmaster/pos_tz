@@ -169,9 +169,15 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
-        {
+    {
         "value": "approve/update/event",
         "label": "อนุมัติรายการ",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
+        {
+        "value": "approve/documents/internal",
+        "label": "อนุมัติภายใน",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },

@@ -51,7 +51,7 @@ urlpatterns = [
     path('approve/update/processeventend',
          register.update_close_the_eventend, name="UpdateCloseEndTheEvent"),
     path('approve/update/event', register.approve_lis_event),
-#     path('approvebill/update/bill', register.approve_list_payment),
+    path('approvebill/update/bill', register.approve_list_payment),
     path('approvebill/update/bill2', register.approve_list_payment_update, name="UpdateCloseEndTheEventAll"
     ),
     path('approvebill/accept/<slug:pk>',
@@ -62,7 +62,7 @@ urlpatterns = [
          register.update_close_the_event, name="UpdateCloseTheEvent"),
     path('register/update/delete',
          register.delete_close_the_event, name="DeleteCloseTheEvent"),    
-
+     path('approve/documents/internal', register.approve_internal),
      
     # Course
     path('course/', course.course_list),
@@ -191,6 +191,7 @@ urlpatterns = [
     path('api/data', register.testsdata),
 
     path('api/courseupdateeve', course.update_course_even),
+    path('api/updateteachincome', finance.updateteachincom),
  
    
     #     API

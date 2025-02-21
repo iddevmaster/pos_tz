@@ -5,11 +5,12 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   src="https://code.jquery.com/jquery-latest.min.js"
   type="text/javascript"
 ></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
 
 
 function allowOnlyNumbersPeople(event) {
-
+  
 if (
   event.key === "Backspace" ||
   event.key === "Tab" ||
@@ -38,9 +39,80 @@ setTimeout(() => {
 
 }
 
-function myApprov() {
-  window.print();
 
+async function myApprov() {
+
+  const it = document.getElementById("totalhours").value;
+  const total = document.getElementById("total").value;
+  const doc = document.getElementById("doc").value;
+  const doc_document = document.getElementById("doc_document").value;
+  const teach_in_come = document.getElementById("teach_in_come").value;
+  
+  if(it == ''){
+    Swal.fire({
+      title: 'ไม่มีจำนวนชั่วโมง!',
+      text: 'กรุณากรอกชั่วโมง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(total == ''){
+    Swal.fire({
+      title: 'กรุณากรอกยอดเงิน!',
+      text: 'กรุณากรอกยอดเงิน',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(doc == ''){
+    Swal.fire({
+      title: 'กรุณากรอกเลขที่จ้างเหมา!',
+      text: 'กรุณากรอกเลขที่จ้างเหมา',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+  }
+  if(doc_document == ''){
+    Swal.fire({
+      title: 'ไม่มีเลขที่เอกสาร!',
+      text: 'ไม่มีเลขที่เอกสาร',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+    return false;
+
+  } 
+
+
+
+    let data = await fetch('/api/updateteachincome', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_document':doc_document,'it':it})
+})
+.then(response => response.json())
+.then(data => {
+
+  // approvebill/update/bill
+  Swal.fire({
+      title: 'บันทึกสำเสร็จ!',
+      text: 'บันทึกสำเสร็จ',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+    window.top.location.reload();
+ 
+})
+.catch(error => {
+   
+  
+});
 }
 
   var tableToExcel = (function () {
@@ -96,6 +168,11 @@ function myApprov() {
     
 </style>
 <input type="่hidden" id="totalhours" name="totalhours" value="{{totalhours}}" style="display: none;">
+<input type="text" id="teach_in_come" name="teach_in_come" value="{{teach_in_come}}" style="display: none;">
+<input type="text" id="doc_document" name="doc_document" value="{{doc}}" style="display: none;" >
+
+
+
 <div class="grid-container-3" style="padding-top: 15px">
   <div class="grid-item"></div>
   <div class="grid-item" style="text-align: center;font-size: 24px;"> รายงานขอตั้งเบิกค่าจ้างเหมา  (ภายนอก )</div>
@@ -162,26 +239,13 @@ function myApprov() {
       {% endfor %}
     </tr>
 
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>รวม</td>
-      <td>xxx</td>
-      <td>
-       xxx
-      </td>
-    
-    
-    </tr>
 
     <tr>
       <td></td>
       <td></td>
       <td></td>
       <td></td>
-      <td></td>
+      <td>รวม</td>
       <td> {{total_payment}}</td>
       <td>
         {{total_credit}}
@@ -229,8 +293,7 @@ function myApprov() {
      
 
         <div style="display: flex;">
-          <div style="flex: 1;">นโยบายจ่ายค่าจ้างเหมา เลขที่ <input type="text" id="fname" name="fname"> </div>
-
+          <div style="flex: 1;">นโยบายจ่ายค่าจ้างเหมา เลขที่ <input type="text" id="doc" name="doc"> </div>
         </div>
 
       
