@@ -331,6 +331,7 @@ def register_excel_seller_view(request,doc_id):
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
+    print(getdoc.price)        
     context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
     return render(request, 'print/register_excel_seller_view_frame.html', context)
