@@ -1630,7 +1630,7 @@ def approve_internal_doc(request,doc_id):
 @login_required(login_url='/login')
 def approve_internal_doc_print(request,doc_id):
     user_id = request.user.id
-    print(doc_id)
+   
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
