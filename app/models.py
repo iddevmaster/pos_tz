@@ -384,4 +384,6 @@ class document(models.Model):
     price = models.FloatField(default=0 , blank=False)
     payment_policy = models.CharField(max_length=20, unique=True, blank=True)
     teacher_income_id = models.IntegerField(default=None, blank=False) 
+    status_mange = models.CharField(max_length=1, unique=True, blank=True)
+    status_gm = models.CharField(max_length=1, unique=True, blank=True)
    

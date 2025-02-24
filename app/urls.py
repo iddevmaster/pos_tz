@@ -65,7 +65,11 @@ urlpatterns = [
     path('approve/documents/internal', register.approve_internal),
     path('approve/documents/internal/view/<slug:doc_id>', register.approve_internal_doc),
     path('approve/documents/internal/print/view/<slug:doc_id>', register.approve_internal_doc_print),
-   
+
+    path('approv/internal/manage', register.approve_manage),
+    path('approv/internal/gm', register.approve_gm),
+    path('approv/save/gm', register.approve_gm_save),
+    path('approv/save/mange', register.approve_manage_save),
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),
@@ -106,6 +110,7 @@ urlpatterns = [
     path('approvlicen/form/de', teacher.teacher_appv_de,
          name="approvlicen_form_de"),
 
+  
 
 
 

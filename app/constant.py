@@ -177,7 +177,19 @@ listMenu = [
     },
         {
         "value": "approve/documents/internal",
-        "label": "อนุมัติภายใน",
+        "label": "เอกสารบันทึกภายใน",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
+    {
+        "value": "approv/internal/manage",
+        "label": "ตรวจสอบและอนุมัติ",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
+       {
+        "value": "approv/internal/gm",
+        "label": "อนุมัติ",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },

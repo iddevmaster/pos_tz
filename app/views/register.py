@@ -1592,7 +1592,7 @@ def approve_internal(request):
         r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th}
         obj.append(r)
         
-    print(obj)
+  
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
     return render(request, 'register/approve_list_documentsinternal.html', context)
 
@@ -1684,3 +1684,114 @@ def approve_internal_doc_print(request,doc_id):
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
 
     return render(request, 'print/register_print_internal.html', context)    
+
+
+@login_required(login_url='/login')
+def approve_manage(request):
+
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    obj = []
+    status = ['N','']
+    content = document.objects.filter(status_mange__in=status)
+    for rs in content:
+        
+        teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
+        x = course_event.objects.get(ev_id=teacher_income.ev_id)
+        courses = course.objects.get(course_id=x.course_id)
+        uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
+
+        a = teacher.objects.get(teacher_id=uuid_without_dashes)
+        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
+        obj.append(r)
+        
+  
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+ 
+    return render(request, 'register/approve_mange.html', context)
+
+@login_required(login_url='/login')
+def approve_gm(request):
+
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    obj = []
+    status = ['N','']
+    
+    content = document.objects.filter()
+    
+    for rs in content:
+        
+        teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
+        x = course_event.objects.get(ev_id=teacher_income.ev_id)
+        courses = course.objects.get(course_id=x.course_id)
+        uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
+
+        a = teacher.objects.get(teacher_id=uuid_without_dashes)
+        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
+        obj.append(r)
+        
+  
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+ 
+    return render(request, 'register/approve_gm.html', context)
+
+
+@csrf_exempt
+def approve_gm_save(request):
+
+    data = json.loads(request.body)
+    doc_id = data.get("doc_id")
+    status = data.get("status")
+
+    x = document.objects.get(doc_id=doc_id)
+    x.status_gm = status
+    x.save()  
+    datas = {'status':200}
+
+    return JsonResponse(datas, status=200,safe=False)
+
+def approve_mange_save(request):
+
+    data = json.loads(request.body)
+    doc_id = data.get("doc_id")
+    status = data.get("status")
+
+    x = document.objects.get(doc_id=doc_id)
+    x.status_mange = status
+    x.save()  
+    datas = {'status':200}
+
+    return JsonResponse(datas, status=200,safe=False)
