@@ -276,16 +276,14 @@
 
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
-              <label>ผู้เสนอโครงการ</label> <label style="color: red">*</label>
-              <input
-                type="text"
-                class="form-control"
-                value="{{data.rp.rp_name_seller}}"
-                id="rp_name_seller"
-                name="rp_name_seller"
-                required
-                readonly
-              />
+              <label>ผู้เสนอโครงการ </label> <label style="color: red">*</label>
+     
+              <select class="select2"  id="rp_name_seller" name="rp_name_seller" style="width: 100%" readonly>
+                <option value="{{content_regist.seller_id}}">
+                  {{data.rp.rp_name_seller}}
+                </option>
+            
+              </select>
             </div>
           </div>
 

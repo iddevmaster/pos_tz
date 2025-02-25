@@ -416,7 +416,6 @@ def payment_create(request):
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
 
-        
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
         instecent.status = 'Y'
@@ -432,7 +431,7 @@ def payment_create(request):
         register_id=register_id,
         status='D'
          )
-
+    
     u = User.objects.get(id=rp_name_seller)
 
     content_regist = register_main.objects.get(register_id=register_id)
@@ -1589,7 +1588,9 @@ def approve_internal(request):
         uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
 
         a = teacher.objects.get(teacher_id=uuid_without_dashes)
-        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th}
+        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,
+        'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,
+        'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
         obj.append(r)
         
   
@@ -1783,6 +1784,7 @@ def approve_gm_save(request):
 
     return JsonResponse(datas, status=200,safe=False)
 
+@csrf_exempt
 def approve_mange_save(request):
 
     data = json.loads(request.body)
