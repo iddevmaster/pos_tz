@@ -69,7 +69,7 @@ urlpatterns = [
     path('approv/internal/manage', register.approve_manage),
     path('approv/internal/gm', register.approve_gm),
     path('approv/save/gm', register.approve_gm_save),
-    path('approv/save/mange', register.approve_manage_save),
+    path('approv/save/mange', register.approve_mange_save),
     # Course
     path('course/', course.course_list),
     path('create_course/', course.course_create, name="CreateCourse"),

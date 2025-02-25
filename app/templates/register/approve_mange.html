@@ -10,7 +10,7 @@ window.location.href = url;
 async function accept(id,status) {
 
 
-let data = await fetch('/approv/save/manage', {
+let data = await fetch('/approv/save/mange', {
 method: 'POST',
 headers: {
     'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ function readURL(input) {
                   id="dropdownMenuButtonIcon"
                
                 
-                  onclick="accept('{{res.doc_id}}','N')"
+                  onclick="accept('{{res.doc_id}}','Y')"
                 >
                  ผ่าน
                 </button>

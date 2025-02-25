@@ -944,13 +944,12 @@ def updateteachincom(request):
 
 
 
-    # teacher_income = teacher_income_setting.objects.get(id=teach_id)
+    teacher_income = teacher_income_setting.objects.get(id=teach_id)
     
-    # teacher_income.status = 'S'
-    # teacher_income.tis_sum = sumt
-    # teacher_income.tis_compensation = sumt
-    # teacher_income.tis_compensation = sumt
-    # teacher_income.save()
+    teacher_income.status = 'S'
+    teacher_income.tis_sum = sumt
+    teacher_income.tis_compensation = sumt
+    teacher_income.save()
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)

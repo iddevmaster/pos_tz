@@ -8,10 +8,10 @@ const url = `/${slug}/${pk}`;
 window.location.href = url;
 }
 
-async function accept(id,status) {
+async function accept(id,status,status_mange) {
 
-
-let data = await fetch('/approv/save/gm', {
+if(status_mange == 'Y'){
+  let data = await fetch('/approv/save/gm', {
 method: 'POST',
 headers: {
     'Content-Type': 'application/json',
@@ -38,6 +38,19 @@ Swal.fire({
    
   
 });
+
+}else {
+
+  Swal.fire({
+      title: 'ยังไม่ผ่านการตรวจสอบ!',
+      text: 'ยังไม่ผ่านการตรวจสอบ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+}
+
+
 }
 
 
@@ -232,14 +245,14 @@ function readURL(input) {
                   id="dropdownMenuButtonIcon"
                
                
-                  onclick="accept('{{res.doc_id}}','Y')"
+                  onclick="accept('{{res.doc_id}}','Y','{{res.status_mange}}')"
                 >
                  ผ่าน
                 </button>
                 <button
                 type="button"
                 class="btn btn-danger btn-sm"
-                onclick="accept('{{res.doc_id}}','N')"
+                onclick="accept('{{res.doc_id}}','N','{{res.status_mange}}')"
               >
                 ไม่ผ่าน
               </button>

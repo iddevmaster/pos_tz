@@ -131,8 +131,58 @@ function readURL(input) {
             </td>
             <td>{{res.fname}}</td>
             <td>{{res.price}}</td>
-            <td>x</td>
-            <td>x</td>
+    
+            <td>
+              {% if res.status_mange == 'Y' %}
+              <button
+              class="btn btn-success btn-sm"
+              type="button"
+            >
+             ผ่านการอนุมัติ
+            </button>
+              {% elif res.status_mange == '' %}
+              <button
+              class="btn btn-warning btn-sm"
+              type="button"
+            >
+             รอการอนุมัติ
+            </button>
+              {% else %}
+              <button
+              class="btn btn-danger btn-sm"
+              type="button"
+            >
+             ไม่ผ่านการอนุมัติ
+            </button>
+              {% endif %}
+              </td>
+            <td>
+              {{res.status_gm}}
+            <td>
+                {% if res.status_gm == 'Y' %}
+                <button
+                class="btn btn-success btn-sm"
+                type="button"
+              >
+               ผ่านการอนุมัติ
+              </button>
+                {% elif res.status_gm == '' %}
+                <button
+                class="btn btn-warning btn-sm"
+                type="button"
+              >
+               รอการอนุมัติ
+              </button>
+                {% else %}
+                <button
+                class="btn btn-danger btn-sm"
+                type="button"
+              >
+               ไม่ผ่านการอนุมัติ
+              </button>
+                {% endif %}
+                </td>
+              <td>
             <td>
 
               <div class="btn-group me-1 mb-1">
