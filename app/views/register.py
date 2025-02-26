@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -1686,11 +1686,16 @@ def approve_internal_doc_print(request,doc_id):
     current_time = datetime.now().time()
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
     totalprice = int(getdoc.price) / totalhours 
+
+    users = User.objects.get(id=payment.user_create)
+    signa = signature.objects.filter(user_id=payment.user_create).first()
+
+    mange = User.objects.get(id=payment.user_manage)
     
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
-    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'users':users,'signa':signa,'mange':mange,
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
 
     return render(request, 'print/register_print_internal.html', context)    

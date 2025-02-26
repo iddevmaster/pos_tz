@@ -23,6 +23,7 @@ def register_print(request, rp_id):
     user_id_authen = current_user.id
     try:
         content = register_payment.objects.get(pk=rp_id)
+        
       
     except register_payment.DoesNotExist:
         content = None
@@ -48,17 +49,20 @@ def register_print(request, rp_id):
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
    
-    users = User.objects.get(id=content_regist.user_create)
-    signa = signature.objects.filter(user_id=content_regist.user_create).first()
-  
+    users = User.objects.get(id=content.user_create)
+    signa = signature.objects.filter(user_id=content.user_create).first()
+
+    mange = User.objects.get(id=content.user_manage)
+
     customer = customers.objects.get(register_id=content.register_id)
     if content_regist.ev.ev_vat == 1:
         rpi_price_default = float(
             items.rpi_price_total) + float(items.rpi_price_vat)
     else:
         rpi_price_default = items.rpi_price_total
+
     context = {'title': defaultTitle,  'data': content,'etc':obj2,
-               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa}
+               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
         if short == "yes":
@@ -333,12 +337,18 @@ def register_excel_seller_view(request,doc_id):
     current_time = datetime.now().time()
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
     totalprice = int(getdoc.price) / totalhours 
+
+
+    users = User.objects.get(id=payment.user_create)
+    signa = signature.objects.filter(user_id=payment.user_create).first()
+
+    mange = User.objects.get(id=payment.user_manage)
     
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
-    print(getdoc.price)        
-    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,
+         
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'users':users,'signa':signa,'mange':mange,
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
     return render(request, 'print/register_excel_seller_view_frame.html', context)
 

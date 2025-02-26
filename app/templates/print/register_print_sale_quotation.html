@@ -365,7 +365,9 @@
                 <div style="flex: 1;">ผู้เสนอราคา </div>
               </div>
               <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ว/ด/ป........................................ </div>
+                <div style="flex: 1;">
+                  {{time|date:"d/m/Y"}}
+                </div>
               </div>
         
             </td>
@@ -381,13 +383,13 @@
               </div>
    
               <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
+                <div style="flex: 1;">{{manger.first_name}} {{manger.last_name}}</div>
               </div>
               <div style="display: flex;text-align: center;">
                 <div style="flex: 1;">ผู้จัดการ </div>
               </div>
               <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ว/ด/ป........................................ </div>
+                <div style="flex: 1;">{{time|date:"d/m/Y"}}</div>
               </div>
             </td>
             <td colspan="3" rowspan="1">
@@ -400,13 +402,13 @@
              
               </div>
               <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
+                <div style="flex: 1;"></div>
               </div>
               <div style="display: flex;text-align: center;">
                 <div style="flex: 1;">ผู้อนุมัติสั่งซื้อ </div>
               </div>
               <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ว/ด/ป........................................ </div>
+                <div style="flex: 1;">{{time|date:"d/m/Y"}}</div>
               </div>
             </td>
           </tr>
