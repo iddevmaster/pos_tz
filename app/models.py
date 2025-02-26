@@ -142,6 +142,7 @@ class register_main(models.Model):
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
 
 
+
 class register_payment(models.Model):
     rp_id = models.AutoField(primary_key=True)
     rp_doc_number = models.CharField(
@@ -168,6 +169,8 @@ class register_payment(models.Model):
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
+    user_create = models.IntegerField(default=0, blank=False)
+    user_manage = models.IntegerField(default=0, blank=False)
 
 
 class register_payment_items(models.Model):
@@ -386,4 +389,19 @@ class document(models.Model):
     teacher_income_id = models.IntegerField(default=None, blank=False) 
     status_mange = models.CharField(max_length=1, unique=True, blank=True)
     status_gm = models.CharField(max_length=1, unique=True, blank=True)
+
+
+class signature(models.Model):
+    image_id = models.AutoField(primary_key=True)
+    image_cover = models.ImageField(
+        upload_to=generate_unique_name('images/logo'), default=None)
+    user_id = models.CharField(max_length=20, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class fact_signature(models.Model):
+    fact_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+ 
+ 
    

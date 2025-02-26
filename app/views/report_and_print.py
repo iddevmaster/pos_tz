@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -23,6 +23,7 @@ def register_print(request, rp_id):
     user_id_authen = current_user.id
     try:
         content = register_payment.objects.get(pk=rp_id)
+      
     except register_payment.DoesNotExist:
         content = None
         return render(request, '404.html')
@@ -31,20 +32,25 @@ def register_print(request, rp_id):
     except pos_machine.DoesNotExist:
         machine = None
    
-
+    # users = User.objects.get(id=content.user_create)
+    
     items = register_payment_items.objects.filter(rp_id=content.rp_id).first()
     uuid_without_dashes = str(content.register_id).replace('-', '')
     billdess = factbilldes.objects.filter(register_id=uuid_without_dashes)
     obj2 = []
     if billdess:
         for rsx in billdess:    
-            print(rsx)
+            
             x = desciption_bill.objects.get(des_id=rsx.des_id)
             v = {'des_id': x.des_id,  'name': x.name}
             obj2.append(v)
     
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
+   
+    users = User.objects.get(id=content_regist.user_create)
+    signa = signature.objects.filter(user_id=content_regist.user_create).first()
+  
     customer = customers.objects.get(register_id=content.register_id)
     if content_regist.ev.ev_vat == 1:
         rpi_price_default = float(
@@ -52,7 +58,7 @@ def register_print(request, rp_id):
     else:
         rpi_price_default = items.rpi_price_total
     context = {'title': defaultTitle,  'data': content,'etc':obj2,
-               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer}
+               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
         if short == "yes":

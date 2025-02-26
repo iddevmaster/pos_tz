@@ -1,4 +1,5 @@
-{% load static %} {% load humanize %}
+
+ {% load humanize %} {% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -229,6 +230,7 @@
             -  {{etcs.name}}<br />
             
               {% endfor %}
+  
             </td>
             <td></td>
             <td></td>
@@ -275,10 +277,45 @@
             </td>
           </tr>
           <tr>
-            <td colspan="4" rowspan="1">รายละเอียดการชำระเงิน</td>
+            <td colspan="4" rowspan="1" style="padding: 10px;">
+
+              
+      
+            
+      
+              <div style="display: flex;">
+                <div style="flex: 1;">
+                  <img
+                  src="{% static 'images/402827.png' %}"
+                  alt="IDLOGO"
+                  style="width: 200px; height: 100px"
+                />
+               
+                </div>
+      
+              </div>
+              
+       
+
+            </td>
             <td colspan="3" rowspan="1">
-              สั่งจ่ายเช็คธนาคาร นาม บจก.ไอดีไดรฟ์ เมื่อสั่งจ่ายแล้วกรุณาโทร
-              082-7513888 ส่งใบ payin ทาง Line ID : TZ00018
+              <div style="display: flex;padding-top: 5px;">
+                <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
+              </div>
+              <br>
+              <div style="display: flex;">
+                <div style="flex: 1;"> โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ สาขาสี่แยกมะลิวัลย์(ขอนแก่น) ธ.ไทยพานิชย์
+                   บัญชีเลขที่ 729-3-01791-5 </div>
+              </div>
+              <br>
+              <div style="display: flex;">
+                <div style="flex: 1;"> สั่งจ่ายเช็คธนาคาร นาม บจก.ไอดีไดรฟ์ เมื่อสั่งจ่ายแล้วกรุณาโทร
+                  082-7513888 ส่งใบ payin ทาง Line ID : TZ00018 </div>
+              </div>
+<br>
+
+           
+              
             </td>
             <td>
               <img
@@ -289,66 +326,92 @@
             </td>
           </tr>
           <tr>
-            <td colspan="4" rowspan="1">
-              โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ ธ.ไทยพานิชย์
-              สาขาสี่แยกมะลิวัลย์(ขอนแก่น) บัญชีเลขที่ <br />729-3-01791-5
-            </td>
-            <td colspan="4" rowspan="1">
-              E-mail: <br />
-              id.trainingcenter@iddrives.co.th <br />
-              idfinance@iddrives.co.th
-            </td>
+     
+            <td colspan="8" rowspan="1">
+              <div style="display: flex;padding-top: 5px;">
+                <div style="flex: 1;">E-mail:&nbsp;&nbsp;id.trainingcenter@iddrives.co.th </div>
+              </div>
+              <div style="display: flex;padding-top: 5px;">
+                <div style="flex: 1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idfinance@iddrives.co.th </div>
+              </div>
+  
+            </td>  
           </tr>
+
 
           <tr>
-            <td
-              colspan="8"
-              rowspan="1"
-              style="
-                border-left-color: white;
-                border-right-color: white;
-                border-color: white;
-              "
-            >
-              <table
-                style="
-                  text-align: center;
-                  width: 100%;
-                  border-collapse: collapse;
-                "
-                border="1"
-              >
-                <tbody>
-                  <tr>
-                    <td align="center">
-                      <br />
+            <td colspan="3" rowspan="1">
 
-                      ..................................................
+              <div style="display: flex;text-align: center;">
+             
+                <div style="flex: 1;">
+                 
+                  <img
+               
+                  
+                  src="{{signa.image_cover.url}}"
+                 
+                  alt="IDLOGO"
+                  style="width: 200px; height: 100px"
+                />
+               
+                </div>
+      
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ผู้เสนอราคา </div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ว/ด/ป........................................ </div>
+              </div>
+        
+            </td>
+            <td colspan="3" rowspan="1">
 
-                      <div>ผู้เสนอราคา</div>
-                      <div>ว/ด/ป........................................</div>
-                    </td>
-                    <td align="center">
-                      <br />
-
-                      ..................................................
-
-                      <div>ผู้จัดการ</div>
-                      <div>ว/ด/ป........................................</div>
-                    </td>
-                    <td align="center">
-                      <br />
-
-                      ..................................................
-
-                      <div>ผู้อนุมัติสั่งซื้อ</div>
-                      <div>ว/ด/ป........................................</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div style="flex: 1;text-align: center;">
+                <img
+                src="{% static 'images/wh.png' %}"
+                alt="IDLOGO"
+                style="width: 200px; height: 100px"
+              />
+             
+              </div>
+   
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ผู้จัดการ </div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ว/ด/ป........................................ </div>
+              </div>
+            </td>
+            <td colspan="3" rowspan="1">
+              <div style="flex: 1;text-align: center;">
+                <img
+                src="{% static 'images/wh.png' %}"
+                alt="IDLOGO"
+                style="width: 200px; height: 100px"
+              />
+             
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ผู้อนุมัติสั่งซื้อ </div>
+              </div>
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">ว/ด/ป........................................ </div>
+              </div>
             </td>
           </tr>
+
+        
         </tbody>
       </table>
     </div>

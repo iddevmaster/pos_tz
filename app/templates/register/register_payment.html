@@ -367,6 +367,11 @@ function validateForm() {
                 </option>
                 {% endfor %}
               </select>
+
+
+
+
+   
             </div>
           </div>
 
@@ -502,7 +507,7 @@ function validateForm() {
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>Ref 1</label>
               <input
@@ -514,7 +519,7 @@ function validateForm() {
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>Ref 2</label>
               <input
@@ -525,9 +530,30 @@ function validateForm() {
               />
             </div>
           </div>
+
+          {% if content_regist.pay_type == 2 %}
+     
+       
+          <div class="col-lg-3 col-md-6">
+            <div class="form-group">
+              <label>เลือกผู้จัดการ</label>
+              <select class="form-select" id="user_manage" name="user_manage" style="width: 100%" required>
+                <option value="">--เลือกผู้จัดการ--</option>
+                {% for res in manage %}
+                <option value="{{res.user.id}}">
+                  {{res.user.first_name}} {{res.user.last_name}} {{res.user.id}}
+                </option>
+                {% endfor %}
+              </select>
+          
+            </div>
+          </div>
+          {% else %}
+          {% endif %}
         </div>
       </div>
     </div>
+
 
     <div class="card">
       <div class="card-body">

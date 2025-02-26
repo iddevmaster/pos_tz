@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -325,6 +325,11 @@ def payment(request, register_id):
     des_bill = desciption_bill.objects.all().order_by('seq')
     regbyev = register_main.objects.filter(ev_id=content_regist.ev_id)
     total_rq_quta = 0
+
+    signature = fact_signature.objects.select_related('user').all()
+    
+    
+ 
     
     for aaa in regbyev:
         
@@ -353,7 +358,7 @@ def payment(request, register_id):
         student_data = None
     # print(content)
 
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,
+    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
 
@@ -362,6 +367,7 @@ def payment(request, register_id):
 def payment_create(request):
     now = date.today()
     # Main
+    user_id = request.user.id
     register_id = request.POST['register_id']
     rp_code_customer = request.POST['rp_code_customer']
     rp_name_customer = request.POST['rp_name_customer']
@@ -379,9 +385,10 @@ def payment_create(request):
         request.POST.get("rp_date_delivery", now.strftime("%d/%m/%Y")))
     uuid_without_dashes = str(register_id).replace('-', '')
     factbilldes.objects.filter(register_id=uuid_without_dashes).delete()  # Keeps the record with id=1
-
-   
-
+    
+    user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
+    if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
+        user_man = 0
     
     try:
         rp_quota = request.POST['rp_quota']
@@ -457,7 +464,9 @@ def payment_create(request):
         active=active,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
-        register_id=register_id
+        register_id=register_id,
+        user_create=user_id,
+        user_manage=user_man
     )
     object.refresh_from_db()
     rp_id = object.rp_id

@@ -218,13 +218,29 @@
           </tr>
 
           <tr >
-            <td colspan="5" rowspan="6" style="vertical-align: top;padding-left: 5px;">
-              หมายเหตุ <br />
-             
-              {% for etcs in etc %}
-            -  {{etcs.name}}<br />
+  
+            <td colspan="5" rowspan="6" style="padding: 10px;vertical-align: top;padding-left: 5px">
+
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
+              </div>
+      
             
-              {% endfor %}
+      
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">
+                  <img
+                  src="{% static 'images/402827.png' %}"
+                  alt="IDLOGO"
+                  style="width: 200px; height: 100px"
+                />
+               
+                </div>
+      
+              </div>
+              
+       
+
             </td>
 
             <td colspan="2">รวมเงิน</td>
