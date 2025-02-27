@@ -1381,7 +1381,7 @@ def approve_list_payment(request):
             
             ev = course_event.objects.get(ev_id=r.ev_id)
             cou = course.objects.get(pk=ev.course_id)
-            res = {'course_name':cou.course_name,'gen':ev.ev_generation,'ev_date_start':ev.ev_date_start,'ev_date_end':ev.ev_date_end,'tis_unit':r.tis_unit,'pi_id':r.pi_id,'item_code':cou.course_code,'teacher':r.teacher,'id':r.id,'tis_sum':r.tis_sum}
+            res = {'pi':r.pi_id,'course_name':cou.course_name,'gen':ev.ev_generation,'ev_date_start':ev.ev_date_start,'ev_date_end':ev.ev_date_end,'tis_unit':r.tis_unit,'pi_id':r.pi_id,'item_code':cou.course_code,'teacher':r.teacher,'id':r.id,'tis_sum':r.tis_sum}
 
             obj.append(res)    
            
@@ -1429,14 +1429,11 @@ def approve_list_payment_accept(request,pk):
     
     
     teacher_income = teacher_income_setting.objects.filter(id=pk,status='I').count()
-    
+    income = teacher_income_setting.objects.filter(id=pk,status='I').first()
     if teacher_income > 0:
-
-        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk }
-  
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk,'pi':income.pi_id }
         return render(request, 'register/register_selller_report.html',context)
     else :
-        
         return redirect("/approvebill/update/bill")
 
 # def upload_excel(request):

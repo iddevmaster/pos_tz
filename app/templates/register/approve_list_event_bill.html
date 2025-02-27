@@ -166,7 +166,15 @@ function readURL(input) {
               {{res.ev_date_end|date:"d/m/Y"}}
 
             </td>
-            <td>งานเหมา</td>
+            <td>
+
+              {% if res.pi_id == 7 %}
+
+              <span class="badge bg-success">ภายใน</span>
+              {% else %}
+              <span class="badge bg-danger">ภายนอก</span>
+              {% endif %}
+            </td>
             <td>{{res.tis_sum}}</td>
           
 

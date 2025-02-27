@@ -773,7 +773,7 @@ def saveeventadmin(request):
                 pi_id=pi,
                 crt_date=dateTimeNow(),
                 upd_date=dateTimeNow(),
-                status='Y',
+                status='W',
                 register_id='-',
             )
               content.save()
@@ -932,24 +932,33 @@ def updateteachincom(request):
 
 
     sumt = int(total) * int(it)
-   
-    content = document(
+
+
+    teacher_income = teacher_income_setting.objects.get(id=teach_id)
+
+    if teacher_income.pi_id == 7:
+         teacher_income = teacher_income_setting.objects.get(id=teach_id)
+         teacher_income.status = 'S'
+         teacher_income.tis_sum = sumt
+         teacher_income.tis_compensation = sumt
+         teacher_income.save()
+         print('if')
+
+    else:
+     print('else')
+     content = document(
             doc_number=doc_document,
             title='ขอตั้งเบิกค่าจ้างเหมา ',
             teacher_income_id=teach_id,
             price=sumt,
             created_at=dateTimeNow(),
-        )
-    content.save()
-
-
-
-    teacher_income = teacher_income_setting.objects.get(id=teach_id)
-    
-    teacher_income.status = 'S'
-    teacher_income.tis_sum = sumt
-    teacher_income.tis_compensation = sumt
-    teacher_income.save()
+         )
+     content.save()
+     teacher_income = teacher_income_setting.objects.get(id=teach_id)
+     teacher_income.status = 'S'
+     teacher_income.tis_sum = sumt
+     teacher_income.tis_compensation = sumt
+     teacher_income.save()
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)
