@@ -497,9 +497,9 @@ def calendar_event_api(request):
 def calendar_event_api2(request,id):
     user_id = request.user.id
     sss = id
-    
+    pi = ['1','2','3','4','5','6','7']
     # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
-    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id)
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi)
     
     obj = []
     
@@ -510,6 +510,7 @@ def calendar_event_api2(request,id):
        y, m, d = end.split("-")
        Y, mM, dD = start.split("-")
        te = []
+       
        teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
        evte = course_event.objects.get(ev_id=r.ev_id)
        

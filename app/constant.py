@@ -163,6 +163,7 @@ listMenu = [
         "group_value": "5lgafI",
         "group_label": "ครู - วิทยากร",
     },
+
     {
         "value": "approve/update/payment",
         "label": "แก้ไขใบเสร็จ - ใบเสนอราคา",
@@ -210,6 +211,12 @@ listMenu = [
         "label": "ราคาจ้างเหมา",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
+    },
+    {
+        "value": "finance/teacher",
+        "label": "รายการเบิกค่าตอบแทน",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
     },
     {
         "value": "finance/billing/setting",

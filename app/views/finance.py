@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -942,10 +942,10 @@ def updateteachincom(request):
          teacher_income.tis_sum = sumt
          teacher_income.tis_compensation = sumt
          teacher_income.save()
-         print('if')
+        
 
     else:
-     print('else')
+    
      content = document(
             doc_number=doc_document,
             title='ขอตั้งเบิกค่าจ้างเหมา ',
@@ -963,3 +963,55 @@ def updateteachincom(request):
 
     return JsonResponse(datas, status=200,safe=False)
 
+
+
+
+
+def withdraw_list(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+
+    
+   
+    try:
+        getteachid = fact_teacher_user.objects.get(user_id=user_id)
+        obj = []
+        pi = ['1','2','3','4','5','6','7']
+        teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi)
+        for rs in teacher_income:
+            
+            event = course_event.objects.get(ev_id=rs.ev_id)
+            cours = course.objects.get(course_id=event.course_id)
+            pay = pay_item.objects.get(id=rs.pi_id)
+
+            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':rs.pi_id,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation}
+            print(r)
+            obj.append(r)
+        
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj}
+    except fact_teacher_user.DoesNotExist:
+        getteachid = None
+        return redirect("/")
+    
+    
+
+    return render(request, 'finance/order_withdraw.html',context)

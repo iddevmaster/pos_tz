@@ -1275,9 +1275,9 @@ def update_close_the_eventend(request):
        for r in checkincome:
            
         if r.pi_id == 1 or r.pi_id == 2 or r.pi_id == 3 or r.pi_id == 4 or r.pi_id == 5 or r.pi_id == 6:
-            print('if')
+            
             instance = teacher_income_setting.objects.get(id=r.id)
-            instance.status = 'S'
+            instance.status = 'I'
             instance.save()
 
         if r.pi_id == 7 or r.pi_id == 8:
@@ -1587,17 +1587,20 @@ def approve_internal(request):
     obj = []
     content = document.objects.filter()
     for rs in content:
-        
-        teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
-        x = course_event.objects.get(ev_id=teacher_income.ev_id)
-        courses = course.objects.get(course_id=x.course_id)
-        uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
-
-        a = teacher.objects.get(teacher_id=uuid_without_dashes)
-        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,
-        'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,
+        try:
+            teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
+            x = course_event.objects.get(ev_id=teacher_income.ev_id)
+            courses = course.objects.get(course_id=x.course_id)
+            uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
+            a = teacher.objects.get(teacher_id=uuid_without_dashes)
+            r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,
         'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
-        obj.append(r)
+            obj.append(r)
+        except teacher_income_setting.DoesNotExist:
+            teacher_income = None  # Handle the case where the object does not exist
+      
+
+        
         
   
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
@@ -1765,15 +1768,19 @@ def approve_gm(request):
     content = document.objects.filter()
     
     for rs in content:
-        
-        teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
-        x = course_event.objects.get(ev_id=teacher_income.ev_id)
-        courses = course.objects.get(course_id=x.course_id)
-        uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
 
-        a = teacher.objects.get(teacher_id=uuid_without_dashes)
-        r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
-        obj.append(r)
+
+        try:
+            
+            teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
+            x = course_event.objects.get(ev_id=teacher_income.ev_id)
+            courses = course.objects.get(course_id=x.course_id)
+            uuid_without_dashes = str(teacher_income.teacher_id).replace('-', '')
+            a = teacher.objects.get(teacher_id=uuid_without_dashes)
+            r = {'doc_id':rs.doc_id,'doc_number':rs.doc_number,'title':rs.title,'price':rs.price,'ev_date_start':x.ev_date_start,'ev_date_end':x.ev_date_end,'item':courses.course_code,'course_name':courses.course_name,'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status_mange':rs.status_mange,'status_gm':rs.status_gm}
+            obj.append(r)
+        except teacher_income_setting.DoesNotExist:
+            teacher_income = None  # Handle the case where the object does not exist
         
   
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
