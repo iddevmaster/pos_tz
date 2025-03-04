@@ -172,7 +172,8 @@ urlpatterns = [
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),
 
-    path('finance/teacher', finance.withdraw_list),     
+    path('finance/teacher', finance.withdraw_list), 
+    
 
     path('description/setting/form/create', desbill.setting_form_create,
          name="description_setting_form_create"),
@@ -202,7 +203,8 @@ urlpatterns = [
 
     path('api/courseupdateeve', course.update_course_even),
     path('api/updateteachincome', finance.updateteachincom),
- 
+    path('api/saveaddon', register.addon_create),
+    path('api/deleteaddon', register.addon_delete),
    
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

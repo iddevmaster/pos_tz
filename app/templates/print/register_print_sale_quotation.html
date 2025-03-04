@@ -202,9 +202,24 @@
             <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
             <td align="right">{{items.rpi_price_discount}}</td>
             <td align="right">
-              {{rpi_price_default |floatformat:2|intcomma }}
+              {{items.rpi_price |floatformat:2|intcomma }}
             </td>
           </tr>
+          {% for add_ons in add_on %}
+          <tr>
+            <td align="center">{{ forloop.counter|add:1 }}</td>
+            <td>{{add_ons.course_code}}</td>
+            <td>{{add_ons.order_list}}</td>
+            <td align="center">{{add_ons.qty}}</td>
+            <td>{{add_ons.unit}}</td>
+            <td align="right">{{add_ons.rpi_price |floatformat:2|intcomma }}</td>
+            <td align="right">{{add_ons.rpi_price_discount}}</td>
+            <td align="right">
+              {{add_ons.rpi_price_result |floatformat:2|intcomma }}
+            </td>
+            {% endfor %}
+          </tr>
+
           {% comment %}
           <tr>
             <td>&nbsp;</td>
@@ -230,6 +245,10 @@
             -  {{etcs.name}}<br />
             
               {% endfor %}
+
+              <br />
+              {{data.rp_ref1}}<br />
+              {{data.rp_ref2}}
   
             </td>
             <td></td>

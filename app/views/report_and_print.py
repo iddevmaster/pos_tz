@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -53,7 +53,7 @@ def register_print(request, rp_id):
     signa = signature.objects.filter(user_id=content.user_create).first()
 
     mange = User.objects.get(id=content.user_manage)
-
+    dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
     customer = customers.objects.get(register_id=content.register_id)
     if content_regist.ev.ev_vat == 1:
         rpi_price_default = float(
@@ -61,7 +61,7 @@ def register_print(request, rp_id):
     else:
         rpi_price_default = items.rpi_price_total
 
-    context = {'title': defaultTitle,  'data': content,'etc':obj2,
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ

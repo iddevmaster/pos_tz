@@ -402,6 +402,17 @@ class fact_signature(models.Model):
     fact_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
- 
+class add_on(models.Model):
+    addon_id = models.AutoField(primary_key=True)
+    course_code = models.CharField(max_length=20, unique=True, blank=True)  
+    order_list = models.CharField(max_length=20, unique=True, blank=True)  
+    register_id  = models.CharField(max_length=254, blank=True, default="-")
+    unit = models.CharField(max_length=20, unique=True, blank=True)  
+    rpi_price = models.FloatField(default=0, blank=False)
+    rpi_price_discount = models.FloatField(default=0, blank=False)
+    rpi_price_result = models.FloatField(default=0, blank=False)
+    qty = models.IntegerField(default=0, blank=False)
+    status = models.CharField(max_length=20, unique=True, blank=True)  
+
  
    

@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -357,8 +357,13 @@ def payment(request, register_id):
     else:
         student_data = None
     # print(content)
+    course_list = course.objects.all()
+    uuid_without_dashes = str(register_id).replace('-', '')
+    addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+
+    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
 
@@ -1815,3 +1820,53 @@ def approve_mange_save(request):
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)
+
+
+@csrf_exempt
+def addon_create(request):
+
+    data = json.loads(request.body)
+    course_id = data.get("course_id")
+    qty = data.get("qty")
+    rpi_price = data.get("rpi_price")
+    register = data.get("register_id")
+    result = data.get("addon_price_result")
+    price_discount = data.get("price_discount")
+    
+    courses = course.objects.get(course_id=course_id)
+    uuid_without_dashes = str(register).replace('-', '')
+    add_on.objects.create(
+        course_code=courses.course_code,
+        order_list=courses.course_name,
+        qty=qty,
+        register_id=uuid_without_dashes,
+        unit='ท่าน',
+        rpi_price=rpi_price,
+        rpi_price_discount=price_discount,
+        rpi_price_result=result,
+        status="Y"
+    )
+    dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+    datas = {'status':200,'data':list(dataadd),'total_price_add_on':total_price}
+    return JsonResponse(datas, status=200,safe=False)
+
+@csrf_exempt
+def addon_delete(request):
+
+    data = json.loads(request.body)
+    addon_id = data.get("addon_id")
+    register = data.get("register_id")
+    updateeadd = add_on.objects.get(addon_id=addon_id)
+    updateeadd.status = 'N'
+    updateeadd.save()
+
+    uuid_without_dashes = str(register).replace('-', '')
+
+
+    dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+    datas = {'status':200,'data':list(dataadd),'total_price_add_on':total_price}
+    return JsonResponse(datas, status=200,safe=False)
+
+
