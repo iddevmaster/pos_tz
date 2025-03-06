@@ -24,7 +24,7 @@ def register_print(request, rp_id):
     try:
         content = register_payment.objects.get(pk=rp_id)
         
-      
+
     except register_payment.DoesNotExist:
         content = None
         return render(request, '404.html')
@@ -48,12 +48,13 @@ def register_print(request, rp_id):
     
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
-   
+    print(content.user_manage)
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
 
     mange = User.objects.get(id=content.user_manage)
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
+    
     customer = customers.objects.get(register_id=content.register_id)
     if content_regist.ev.ev_vat == 1:
         rpi_price_default = float(

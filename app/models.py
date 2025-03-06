@@ -69,6 +69,7 @@ class course(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
+    is_show_order = models.CharField(max_length=12, blank=True, default=None)
 
 
 
@@ -413,6 +414,9 @@ class add_on(models.Model):
     rpi_price_result = models.FloatField(default=0, blank=False)
     qty = models.IntegerField(default=0, blank=False)
     status = models.CharField(max_length=20, unique=True, blank=True)  
+    rp_id = models.IntegerField(default=0, blank=False)
 
- 
-   
+class fact_addon(models.Model):
+    fact_id = models.AutoField(primary_key=True)
+    rp_id = models.IntegerField(default=0, blank=False)
+    addon_id = models.IntegerField(default=0, blank=False)

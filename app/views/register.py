@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 api_id_card = api_id_card
@@ -357,7 +357,7 @@ def payment(request, register_id):
     else:
         student_data = None
     # print(content)
-    course_list = course.objects.all()
+    course_list = course.objects.filter(is_show_order='Y',cancelled=1)
     uuid_without_dashes = str(register_id).replace('-', '')
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
@@ -475,12 +475,19 @@ def payment_create(request):
     )
     object.refresh_from_db()
     rp_id = object.rp_id
+    getaddon = add_on.objects.filter(status="Y",register_id=uuid_without_dashes)
+    for add in getaddon:
+        fact_addon.objects.create(
+        rp_id=rp_id,
+        addon_id=add.addon_id,
+    )
+        
     # Create Item
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=register_id)
     ev_vat = content_regist.ev.ev_vat
     # print(ev_vat)
-
+    
     if ev_vat == 0:
         new_total = rpi_price_total
     else:
@@ -594,15 +601,23 @@ def payment_form_update(request, register_id):
         student_data = None
     # print(total_pay)
     des_bill = desciption_bill.objects.all()
-   
+    signature = fact_signature.objects.select_related('user').all()
     uuid_without_dashes = str(register_id).replace('-', '')
-   
+    course_list = course.objects.filter(is_show_order='Y',cancelled=1)
     filtered_objects = factbilldes.objects.filter(register_id=uuid_without_dashes)
     selected_bills = [obj.des_id for obj in filtered_objects]
+
+    check_bill = register_payment.objects.filter(register_id=register_id).first()
     
+    getaddon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
+
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+
+ 
+
     context1 = {'title': title,  'data': content, 'listMenuPermission': objMenu,
                 'content_regist': content_regist, 'content_course': content_course}
-    context2 = {'title': title,  'data': last_data, 'content_regist': content_regist, 'listMenuPermission': objMenu,'des_bill':des_bill,'selected_bills':selected_bills,
+    context2 = {'title': title,  'data': last_data, 'content_regist': content_regist, 'listMenuPermission': objMenu,'des_bill':des_bill,'selected_bills':selected_bills,'addon':getaddon,'course_list':course_list,'total_price_add_on':total_price,'manage':signature,'select_usermanage':check_bill.user_manage,
                 'content_course': content_course, 'student_data': student_data}
     if total_pay < 1:
         return render(request, 'register/register_payment.html', context1)
@@ -1842,7 +1857,7 @@ def addon_create(request):
         register_id=uuid_without_dashes,
         unit='ท่าน',
         rpi_price=rpi_price,
-        rpi_price_discount=price_discount,
+        rpi_price_discount=0,
         rpi_price_result=result,
         status="Y"
     )

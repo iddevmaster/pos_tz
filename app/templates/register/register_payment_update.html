@@ -1,6 +1,150 @@
 {% extends 'base.html' %} {% block content %}
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+
+function sumV() {
+   
+   let addon_qty = document.getElementById("addon_qty").value;
+   let addon_price = document.getElementById("addon_price").value;
+   let addon_price_discount = document.getElementById("addon_price_discount").value;
+   let addon_price_result = document.getElementById("addon_price_result").value;
+
+}
+function sumUnitV() {
+   let addon_qty = document.getElementById("addon_qty").value;
+   let addon_price = document.getElementById("addon_price").value;
+
+   let sum = parseFloat(addon_qty) * parseFloat(addon_price);
+   let fix = isNaN(sum) ? 0 : sum;
+  
+   // document.getElementById("addon_price_discount").value = 0;
+   document.getElementById("addon_price_result").value = fix.toFixed(2);
+ }
+
+ function sumDiscountV() {
+   let addon_qty = document.getElementById("addon_qty").value;
+   let addon_price = document.getElementById("addon_price").value;
+   let total = parseFloat(addon_qty) * parseFloat(addon_price);
+
+   let addon_price_discount =
+     document.getElementById("addon_price_discount").value;
+   let sum = parseFloat(total) - parseFloat(addon_price_discount);
+   let fix = isNaN(sum) ? 0 : sum;
+   document.getElementById("addon_price_result").value = fix.toFixed(2);
+ 
+ }
+
+
+document.addEventListener("click", async function (event) {
+  if (event.target.classList.contains("delete-btn")) {
+      let id = event.target.getAttribute("data-id"); // ดึงค่า ID
+      await setValueDeleteModal(id)
+  
+  }
+});
+async function setValueDeleteModal(id) {
+
+let register_id = document.getElementById("register_id").value;
+
+let data = await fetch('/api/deleteaddon', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({'addon_id':id,'register_id':register_id})
+})
+.then(response => response.json())
+.then(data => {
+  document.getElementById("addon_total").value = data.total_price_add_on
+
+  let products = data.data;
+  let tableBody = $("#product-table tbody");
+  tableBody.empty();  // ล้างข้อมูลเก่าก่อนใส่ใหม่
+  products.forEach((product ,index) => {
+                        tableBody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${product.course_code}</td>
+                                <td>${product.order_list}</td>
+                                <td>${product.unit}</td>
+                                <td>${product.qty}</td>
+                                <td>${product.rpi_price}</td>
+                                <td>${product.rpi_price_discount}</td>
+                                <td>${product.rpi_price_result}</td>
+                             
+                                <td>
+                                    <button class="delete-btn btn-danger" data-id="${ product.addon_id }">ลบ</button>
+                                  </td>
+                            </tr>
+                        `);
+                    });
+ }, 100);
+
+ RemoveVat()
+ 
+}
+
+async function saveAddon() {
+
+
+
+let addon_course_code = document.getElementById("addon_course_code").value;
+let addon_qty = document.getElementById("addon_qty").value;
+let addon_price = document.getElementById("addon_price").value;
+// let addon_price_discount = document.getElementById("addon_price_discount").value;
+let addon_price_result = document.getElementById("addon_price_result").value;
+let register_id = document.getElementById("register_id").value;
+
+if((addon_course_code == '') || (addon_qty == '') || (addon_price == '') || (addon_price_result == '')){
+  Swal.fire({
+      title: 'กรอกข้อมูลให้ครบถ้วน',
+      text: 'กรอกข้อมูลให้ครบถ้วน',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+return false;
+}
+
+let data = await fetch('/api/saveaddon', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({'course_id':addon_course_code,'qty':addon_qty,'rpi_price':addon_price,'register_id':register_id,'addon_price_result':addon_price_result})
+})
+.then(response => response.json())
+.then(data => {
+  document.getElementById("addon_total").value = data.total_price_add_on
+
+  let products = data.data;
+  let tableBody = $("#product-table tbody");
+  tableBody.empty();  // ล้างข้อมูลเก่าก่อนใส่ใหม่
+  products.forEach((product ,index) => {
+                        tableBody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${product.course_code}</td>
+                                <td>${product.order_list}</td>
+                                <td>${product.unit}</td>
+                                <td>${product.qty}</td>
+                                <td>${product.rpi_price}</td>
+                                <td>${product.rpi_price_discount}</td>
+                                <td>${product.rpi_price_result}</td>
+                                 <td>
+                                    <button class="delete-btn btn-danger" data-id="${ product.addon_id }">ลบ</button>
+                                  </td>
+                            </tr>
+                        `);
+                    });
+ }, 100);
+ sumVat()
+
+ var modal = bootstrap.Modal.getInstance(document.getElementById('AddonClick'));
+modal.hide();
+}
+
   function validate(evt) {
     var theEvent = evt || window.event;
 
@@ -74,6 +218,62 @@
     document.getElementById("rp_name_customer").value =
       student_firstname_th + " " + student_lastname_th;
   }
+
+
+  function validateForm() {
+
+// let rp_quota = document.getElementById("rp_quota").value;
+// let quata = document.getElementById("quata").value;
+// let selectedValues = [];  // Array to store selected values
+//   let checkboxes = document.querySelectorAll('input[name="selected_bills"]:checked');
+
+//   checkboxes.forEach((checkbox) => {
+//       selectedValues.push(checkbox.value);  // Add checked values to array
+//   });
+
+//   document.getElementById("selectedValuesInput").value = selectedValues.join(",");
+
+
+let customer_type = document.getElementById("customer_type").value;
+
+
+
+if(customer_type == '1'){
+let rp_quota = document.getElementById("rp_quota").value;
+let quata = document.getElementById("quata").value;
+
+  if(parseInt(rp_quota) > parseInt(quata)) {
+  Swal.fire({
+    title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
+    text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรบ',
+    icon: 'error',
+    confirmButtonText: 'OK'
+  });
+  return false;  
+}else {
+  return true; 
+} 
+
+}
+
+if(customer_type == '2'){
+let rp_quota = document.getElementById("rp_quota").value;
+let quata = document.getElementById("quata").value;
+  if(parseInt(rp_quota) > parseInt(quata)) {
+  Swal.fire({
+    title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
+    text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรบ',
+    icon: 'error',
+    confirmButtonText: 'OK'
+  });
+  return false;  
+}else {
+  return true; 
+} 
+}
+
+}
+
   window.onload = sumVat;
 </script>
 <div class="row">
@@ -114,9 +314,8 @@
 </div>
 
 <section class="section">
-  <form method="post" action="{% url 'CreatePayment' %}" autocomplete="off">
+  <form method="post"  onsubmit="return validateForm();" action="{% url 'CreatePayment' %}" autocomplete="off">
     {% csrf_token %}
-
 
     <div class="modal fade" id="EditClick">
       <div class="modal-dialog modal-sm">
@@ -398,7 +597,7 @@
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>Ref 1</label>
               <input
@@ -411,7 +610,7 @@
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>Ref 2</label>
               <input
@@ -423,6 +622,26 @@
               />
             </div>
           </div>
+
+          {% if content_regist.pay_type == 2 %}
+     
+    
+          <div class="col-lg-3 col-md-6">
+            <div class="form-group">
+              <label>เลือกผู้จัดการ</label>
+              <select class="form-select" id="user_manage" name="user_manage" style="width: 100%" required>
+                <option value="">--เลือกผู้จัดการ--</option>
+                {% for res in manage %}
+                <option value="{{res.user.id}}" {% if select_usermanage|slugify == res.user.id|slugify %} selected {% endif %}>
+                  {{res.user.first_name}} {{res.user.last_name}} {{res.user.id}}
+                </option>
+                {% endfor %}
+              </select>
+          
+            </div>
+          </div>
+          {% else %}
+          {% endif %}
         </div>
       </div>
     </div>
@@ -443,6 +662,82 @@
         </div>
    </div></div>
 
+
+
+   <div class="card">
+    <div class="card-body">
+      <div class="form-group">
+        
+        <button type="button" class="btn btn-primary"  
+        data-bs-toggle="modal"
+        data-bs-target="#AddonClick">
+        Add on
+        </button>
+        <button class="delete-btn" type="button" data-id="{{ addons.addon_id }}">ลบ</button>
+      </div>
+ </div>
+
+ <table class="table table-striped"   id="product-table">
+  <thead>
+    <tr>
+      <th>ลำดับ</th>
+      <th>รหัส</th>
+      <th>ชื่อ</th>
+      <th>หน่วย</th>
+      <th>จำนวน</th>
+      <th>ราคาต่อหน่วย</th>
+      <th>ส่วนลด</th>
+      <th>จำนวนเงิน</th>
+      <th>#</th>
+ 
+    </tr>
+  </thead>
+  <tbody>
+    {% for addons in addon %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td>
+        {{addons.course_code}}
+        </td>
+         <td>
+          {{addons.order_list}}
+           </td>
+           <td>
+            {{addons.unit}}
+             </td>
+             <td>
+              {{addons.qty}}
+               </td>
+             <td>
+              {{addons.rpi_price}}
+               </td>
+               <td>
+                {{addons.rpi_price_discount}}
+                 </td>
+                 <td>
+                  {{addons.rpi_price_result}}
+                   </td>
+                   <td>
+                    <button class="delete-btn btn-danger"  type="button" data-id="{{ addons.addon_id }}">ลบ</button>
+                    <div align="center">
+              
+                  
+                      <!-- <button type="button"  class="delete-btn" data-id="{{addons.addon_id}}">
+                        <i class="icon dripicons-trash" aria-hidden="true"></i>
+                      </button> -->
+                    </div>
+                  </td>
+      
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+
+
+</div>
     <div class="card">
       <div class="card-body">
         <div class="form-group">
@@ -542,6 +837,21 @@
 
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
+              <label>จำนวนเงินสินค้าเพิ่มเติม</label>
+              <label style="color: red">*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="addon_total"
+                name="addon_total"
+                value="{{total_price_add_on}}"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
               <label>รวมเงิน</label> <label style="color: red">*</label>
               {% if content_course.ev_vat == 1 %}
               <input
@@ -622,5 +932,123 @@
     </div>
   </form>
 </section>
+
+
+
+<div class="modal fade" id="AddonClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">เพิ่มรายการในบิล</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+   
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="hidden" name="des_id" id="des_id" required />
+          <div class="col-12 col-sm-12">
+            <select class="form-select"  id="addon_course_code" name="addon_course_code" style="width: 100%" required>
+              <option value="">--ITEM CODE--</option>
+              {% for res in course_list %}
+              <option value="{{res.course_id}}">
+                {{res.course_code}} {{res.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+          <div class="col-12 col-sm-12">
+            <label>จำนวน</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="addon_qty"
+              name="addon_qty"
+              onchange="sumUnitV();validate(event)"
+              onkeypress="sumUnitV();validate(event)"
+              onkeyup="sumUnitV();validate(event)"
+              value="1"
+            />
+          </div>
+
+          <div class="col-12 col-sm-12">
+            <label>ราคาต่อหน่วย</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="addon_price"
+              name="addon_price"
+              onchange="sumUnitV();validate(event)"
+              onkeypress="sumUnitV();validate(event)"
+              onkeyup="sumUnitV();validate(event)"
+            
+            />
+          </div>
+
+          <div class="col-12 col-sm-12" hidden>
+            <label>ส่วนลด</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="addon_price_discount"
+              name="addon_price_discount"
+              onchange="sumDiscountV();validate(event)"
+              onkeypress="sumDiscountV();validate(event)"
+              onkeyup="sumDiscountV();validate(event)"
+              value="0"
+            readonly
+            />
+          </div>
+
+          <div class="col-12 col-sm-12">
+            <label>ยอดรวม</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="addon_price_result"
+              name="addon_price_result"
+               onkeypress="validate(event)"
+              onkeyup="validate(event)"
+            readonly
+            />
+          </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+            type="button"
+            class="btn btn-light-success"
+            data-bs-dismiss="modal"
+          >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block" onclick="saveAddon()">Save</span>
+          </button>
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ปิด</span>
+            </button>
+          
+          </div>
+        </div>
+   
+    </div>
+  </div>
+</div>
 
 {% endblock %}
