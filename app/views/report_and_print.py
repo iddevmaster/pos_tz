@@ -51,6 +51,7 @@ def register_print(request, rp_id):
     print(content.user_manage)
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
+    signama = signature.objects.filter(user_id=content.user_manage).first()
 
     mange = User.objects.get(id=content.user_manage)
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
@@ -63,7 +64,7 @@ def register_print(request, rp_id):
         rpi_price_default = items.rpi_price_total
 
     context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,
-               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date}
+               'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
         if short == "yes":
