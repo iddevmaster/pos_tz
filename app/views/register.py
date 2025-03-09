@@ -127,6 +127,95 @@ def register_home(request):
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
     return render(request, 'register/register.html', context)
 
+@login_required(login_url='/login')
+def register_homenotevent(request):
+    title = defaultTitle
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+    try:
+        idcard_data = request.session['idcard_data']
+        Province = idcard_data['Province']
+        Amphur = idcard_data['Amphur']
+        Tumbol = idcard_data['Tumbol']
+        HomeNo = idcard_data['HomeNo']
+        Road = idcard_data['Road']
+        Moo = idcard_data['Moo']
+        Soi = idcard_data['Soi']
+        Trok = idcard_data['Trok']
+        address = str(HomeNo)
+
+        if Moo != '':
+            address += " " + str(Moo)
+        if Road != '':
+            address += " ถ." + str(Road)
+        if Soi != '':
+            address += " ซ." + str(Soi)
+
+        if Trok != '':
+            address += " " + str(Trok)
+
+    except KeyError:
+        idcard_data = None
+        Province = None
+        Amphur = None
+        Tumbol = None
+        address = ""
+    if idcard_data is not None:
+        try:
+            _location = location_thai.objects.get(
+                province_name__icontains=Province, amphur_name__icontains=Amphur, district_name__icontains=Tumbol)
+        except location_thai.DoesNotExist:
+            _location = None
+    else:
+        _location = None
+    try:
+        register_id = request.session['register_id']
+        content_regist = register_main.objects.get(register_id=register_id)
+    except KeyError:
+        content_regist = None
+    # print(register_id)
+    _date = date.today()
+    hundredDaysLater = _date + timedelta(days=365)
+    obj = []
+    
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2024, 12, 1), until=hundredDaysLater):
+        
+        _newdate = str(dt).split(" ")[0]
+        yearstart = _newdate.split("-")[0]
+        monthstart = _newdate.split("-")[1]
+        label = month_fomat(monthstart) + " " + yearstart
+        status = ['N','W','I','S','Y']
+        # print(label)
+        result = course_event.objects.select_related("course").filter(status__in=status,
+            cancelled=1, active=1, ev_date_start__month=int(monthstart), ev_date_start__year=int(yearstart), module=m.module).order_by("ev_date_start")
+        content = {"label": label, "data": result}
+        obj.append(content)
+    # print(idcard_data)
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,
+               'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
+    return render(request, 'register/register.html', context)
+
 
 @login_required(login_url='/login')
 def register_reset(request):

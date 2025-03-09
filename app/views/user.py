@@ -73,8 +73,10 @@ def category_program_form_permission(request, pk):
     cm_id = instance.pk
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id_main).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    
     objMenu = []
     for rs in list(listMenuPermission):
+        
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
         r = {'group_label': rs['group_label'],
@@ -95,7 +97,7 @@ def category_program_form_permission(request, pk):
         return redirect("/user/category/list")
     obj = []
     for rs in listMenu:
-        
+      
         try:
             category_program_permission.objects.get(page_route=rs['value'], cm_id=cm_id)
             selectMenu = True

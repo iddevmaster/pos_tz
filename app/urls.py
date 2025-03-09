@@ -7,6 +7,7 @@ from .views import course, finance, register, master_data, general, api, teacher
 urlpatterns = [
     # Register
     path('', register.register_home),
+    path('salesnotevent', register.register_homenotevent),
     path('register/', register.register_home),
     path('register/create/', register.register_create, name="CreateRegister"),
     path('register/reset', register.register_reset),

@@ -736,7 +736,7 @@ function validateForm() {
           <input type="hidden" id="selectedValuesInput" name="selected_values">
         </div>
    </div></div>
-
+   {% if content_regist.pay_type == 2 %}
 
    <div class="card">
     <div class="card-body">
@@ -806,6 +806,14 @@ function validateForm() {
   </tbody>
 </table>
 </div>
+     
+       
+   {% else %}
+
+
+   {% endif %}
+
+
   </div>
 
 

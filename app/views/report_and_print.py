@@ -52,8 +52,10 @@ def register_print(request, rp_id):
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
     signama = signature.objects.filter(user_id=content.user_manage).first()
-
-    mange = User.objects.get(id=content.user_manage)
+    try:
+        mange = User.objects.get(id=content.user_manage)
+    except User.DoesNotExist:
+        mange = None
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
     
     customer = customers.objects.get(register_id=content.register_id)

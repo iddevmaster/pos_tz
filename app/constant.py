@@ -267,6 +267,13 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+        {
+        "value": "rt/sale",
+        "label": "เปิดการขายแบบไม่มีอีเวน",
+        "group_value": "WR14515",
+        "group_label": "เปิดการขาย",
+    },
+
     
 
 ]
