@@ -189,7 +189,7 @@ def course_event_create(request):
     local = request.POST['location_id']
     address = request.POST['address']
     status = ''
-    print(local)
+    
     if checkevent == '0':
         status = 'N'
  
