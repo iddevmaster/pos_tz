@@ -186,7 +186,7 @@
       $('#cardContainer').empty(); // Clear previous cards
       $.each(response, function (index, card) {
         
-if(card.evs_status == 'S'){
+if((card.evs_status == 'S') && (card.evs_status == 'I')) {
 
   if(card.show == 1){
     var $mainCard1 = $('<div class="col-6 col-md-6 col-sm-6 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;"></div>')
