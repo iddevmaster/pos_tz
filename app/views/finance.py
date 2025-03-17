@@ -366,13 +366,13 @@ def course_teacher_event_set_income_form_create(request, ev_id):
     
          if totalpeol > 0 :
             bb = 1000 / totalpeol
-            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=bb,tis_compensation=bb)  
+            teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=0,tis_compensation=0)  
         if pi == '6':
          contentx = teacher_income_setting(
-            tis_compensation=tis_compensation,
+            tis_compensation=0,
             tis_unit=tis_unit,
             tis_quantity=tis_quantity,
-            tis_sum=tis_sum,
+            tis_sum=0,
             tis_start_date=instance.ev_date_start,
             tis_end_date=instance.ev_date_end,
             ev_id=ev_id,
@@ -975,6 +975,7 @@ def withdraw_list(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+        
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
