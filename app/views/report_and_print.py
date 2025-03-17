@@ -48,7 +48,7 @@ def register_print(request, rp_id):
     
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
-    print(content.user_manage)
+    
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
     signama = signature.objects.filter(user_id=content.user_manage).first()
