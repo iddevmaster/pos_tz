@@ -8,6 +8,8 @@ urlpatterns = [
     # Register
     path('', register.register_home),
     path('salesnotevent', register.register_homenotevent),
+    path('salesnotevent/create/', register.register_createnoevent, name="CreateRegisterNo"),
+    path('salesnotevent/reset', register.register_resetnoevent),
     path('register/', register.register_home),
     path('register/create/', register.register_create, name="CreateRegister"),
     path('register/reset', register.register_reset),

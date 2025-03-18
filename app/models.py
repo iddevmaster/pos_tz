@@ -140,6 +140,8 @@ class register_main(models.Model):
         max_length=1, blank=True, default=None)
     number_order = models.CharField(
         max_length=64, blank=True, default=None)
+    is_event = models.CharField(
+        max_length=64, blank=True, default=None)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
 
 

@@ -197,24 +197,16 @@ def register_homenotevent(request):
     # print(register_id)
     _date = date.today()
     hundredDaysLater = _date + timedelta(days=365)
+
+  
+    courses = course.objects.filter(cancelled=1, active=1,is_show_order='Y')
     obj = []
     
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2024, 12, 1), until=hundredDaysLater):
-        
-        _newdate = str(dt).split(" ")[0]
-        yearstart = _newdate.split("-")[0]
-        monthstart = _newdate.split("-")[1]
-        label = month_fomat(monthstart) + " " + yearstart
-        status = ['N','W','I','S','Y']
-        # print(label)
-        result = course_event.objects.select_related("course").filter(status__in=status,
-            cancelled=1, active=1, ev_date_start__month=int(monthstart), ev_date_start__year=int(yearstart), module=m.module).order_by("ev_date_start")
-        content = {"label": label, "data": result}
-        obj.append(content)
+
     # print(idcard_data)
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,
+    context = {'title': title,  'data': courses, 'listMenuPermission': objMenu,
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
-    return render(request, 'register/register.html', context)
+    return render(request, 'register/register_noevent.html', context)
 
 
 @login_required(login_url='/login')
@@ -230,6 +222,17 @@ def register_reset(request):
         pass
     return redirect("/")
 
+def register_resetnoevent(request):
+    try:
+        del request.session['register_id']
+    except KeyError:
+        pass
+
+    try:
+        del request.session['idcard_data']
+    except KeyError:
+        pass
+    return redirect("/salesnotevent")
 
 @login_required(login_url='/login')
 def register_create(request):
@@ -259,6 +262,7 @@ def register_create(request):
         ev_id=ev_id,
         seller_id=seller_id,
         user_update_id=seller_id,
+        is_event='Y',
         module=m.module
     )
     object.refresh_from_db()
@@ -267,6 +271,41 @@ def register_create(request):
     request.session['register_id'] = str(register_id)
     return redirect("/")
 
+@login_required(login_url='/login')
+def register_createnoevent(request):
+    current_user = request.user
+    seller_id = current_user.id
+    ev_id = request.POST['ev_id']
+    customer_type = request.POST['customer_type']
+    pay_type = request.POST['pay_type']
+    try:
+        m = user_group.objects.get(user=seller_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    if int(pay_type) == 1:
+        close_the_sale = 1
+    else:
+        close_the_sale = 0
+    object = register_main.objects.create(
+        register_number="-",
+        customer_type=customer_type,
+        customer_status=0,
+        pay_type=pay_type,
+        pay_status=1,
+        close_the_sale=close_the_sale,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        seller_id=seller_id,
+        user_update_id=seller_id,
+        is_event='N',
+        module=m.module
+    )
+    object.refresh_from_db()
+    register_id = object.register_id
+    # print(register_id)
+    request.session['register_id'] = str(register_id)
+    return redirect("/salesnotevent")
 
 @login_required(login_url='/login')
 def customer_create(request):
