@@ -386,6 +386,85 @@ def customer_create(request):
         pass
     return redirect("/register/payment/" + str(register_id))
 
+@login_required(login_url='/login')
+def customer_createno(request):
+
+    try:
+        register_id = request.session['register_id']
+        content_regist = register_main.objects.get(register_id=register_id)
+        if not content_regist:
+            return redirect("/")
+    except KeyError:
+        register_id = None
+        content_regist = None
+        return redirect("/")
+    chkcustomer = customers.objects.filter(register_id=register_id).count()
+    if chkcustomer > 0:
+        return redirect("/register/reset")
+    customer_code = "C" + str(dateTimeIntNow())
+    customer_name = request.POST['customer_name']
+    customer_tax = request.POST['customer_tax']
+    customer_phone = request.POST['customer_phone']
+    customer_email = request.POST['customer_email']
+    customer_address = request.POST['customer_address']
+    location_id = request.POST['location_id']
+    customers.objects.create(
+        customer_code=customer_code,
+        customer_name=customer_name,
+        customer_tax=customer_tax,
+        customer_phone=customer_phone,
+        customer_email=customer_email,
+        customer_address=customer_address,
+        location_id=location_id,
+        register_id=register_id
+    )
+
+    # Update Register
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    totaldata = register_main.objects.filter(
+        crt_date__month=month_current, crt_date__year=year_current).exclude(register_number="-").count()
+    running_number = treeDigit(totaldata + 1)
+    register_number = "R" + year_current_f[2:4] + "/" + \
+        str(twoDigit(month_current)) + "/" + str(running_number)
+    content = register_main.objects.get(pk=register_id)
+    content.register_number = register_number
+    content.save()
+
+    customer_type = content_regist.customer_type
+    if customer_type == 1:
+        student_firstname_th = request.POST['student_firstname_th']
+        student_lastname_th = request.POST['student_lastname_th']
+        totaldata = student.objects.filter(
+            crt_date__month=month_current, crt_date__year=year_current).count()
+        running_number = treeDigit(totaldata + 1)
+        student_code = "TZ" + str(twoDigit(month_current)) + \
+            str(running_number) + "/" + str(year_current)
+        student.objects.create(
+            student_identification_number=customer_tax,
+            student_prefix_th="",
+            student_firstname_th=student_firstname_th,
+            student_lastname_th=student_lastname_th,
+            student_prefix_eng="",
+            student_firstname_eng="",
+            student_lastname_eng="",
+            student_code=student_code,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            register_id=register_id
+        )
+
+    try:
+        del request.session['register_id']
+    except KeyError:
+        pass
+    try:
+        del request.session['idcard_data']
+    except KeyError:
+        pass
+    return redirect("/salesnotevent/payment/" + str(register_id))    
+
 
 @login_required(login_url='/login')
 def register_detail(request, register_id):
@@ -494,6 +573,78 @@ def payment(request, register_id):
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
+
+
+@login_required(login_url='/login')
+def paymentnoevent(request, register_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    title = defaultTitle
+    try:
+        content = customers.objects.select_related(
+            "register", "location").get(register_id=register_id)
+    except:
+        content = None
+        return redirect("/")
+   
+    content_regist = register_main.objects.select_related(
+        "seller").prefetch_related("student_register").get(register_id=register_id)
+    
+    des_bill = desciption_bill.objects.all().order_by('seq')
+    regbyev = register_main.objects.filter(register_id=register_id)
+    total_rq_quta = 0
+
+    signature = fact_signature.objects.select_related('user').all()
+    
+    
+ 
+    
+    for aaa in regbyev:
+        
+        try:
+            bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+             
+        except register_payment.DoesNotExist:  
+            bbbb = 0
+
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
+    # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
+
+    
+    if content_regist.customer_type == 1:
+        try:
+            student_data = student.objects.filter(
+                register_id=register_id).first()
+        except:
+            student_data = None
+    else:
+        student_data = None
+    # print(content)
+    course_list = course.objects.filter(is_show_order='Y',cancelled=1)
+    uuid_without_dashes = str(register_id).replace('-', '')
+    addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
+
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+
+    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
+               'content_regist': content_regist, 'student_data': student_data,'ev_training':content_regist,'list_user':list_user}
+    return render(request, 'register/register_noeventpayment.html', context)    
 
 
 @login_required(login_url='/login')
@@ -685,6 +836,182 @@ def payment_create(request):
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
     return redirect("/register/payment/history/" + str(register_id))
+
+
+def payment_createno(request):
+    now = date.today()
+    # Main
+    user_id = request.user.id
+    register_id = request.POST['register_id']
+    rp_code_customer = request.POST['rp_code_customer']
+    rp_name_customer = request.POST['rp_name_customer']
+    rp_tax = request.POST['rp_tax']
+    rp_name_seller = request.POST['rp_name_seller']
+    rp_name_contact = request.POST['rp_name_contact']
+    rp_branch = request.POST['rp_branch']
+    rp_address = request.POST['rp_address']
+    rp_phone = request.POST['rp_phone']
+    rp_email = request.POST['rp_email']
+
+    rp_confirm_date_price = dmytoymd(
+        request.POST.get("rp_confirm_date_price", now.strftime("%d/%m/%Y")))
+    rp_date_delivery = dmytoymd(
+        request.POST.get("rp_date_delivery", now.strftime("%d/%m/%Y")))
+    uuid_without_dashes = str(register_id).replace('-', '')
+ 
+
+    user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
+    if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
+        user_man = 0
+    
+
+
+    rp_ref1 = request.POST['rp_ref1']
+    rp_ref2 = request.POST['rp_ref2']
+    content_main = register_main.objects.get(register_id=register_id)
+    pay_type = content_main.pay_type
+    customer_type = content_main.customer_type
+    if pay_type == 1:
+        active = 1
+    else:
+        active = 0
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    totaldata = register_payment.objects.filter(
+        crt_date__month=month_current, crt_date__year=year_current).count()
+    running_number = treeDigit(totaldata + 1)
+    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+        str(twoDigit(month_current)) + "/" + str(running_number)
+    # Item
+    rpi_code = request.POST['rpi_code']
+    rpi_name = request.POST['rpi_name']
+    rpi_quantity = request.POST['rpi_quantity']
+    rpi_unit = request.POST['rpi_unit']
+    rpi_price = request.POST['rpi_price']
+    rpi_price_discount = request.POST['rpi_price_discount']
+    rpi_price_total = request.POST['rpi_price_total']
+    rpi_price_vat = request.POST['rpi_price_vat']
+    rpi_price_result = request.POST['rpi_price_result']
+
+    if pay_type == 1:
+        instecent = register_main.objects.get(register_id=register_id)
+        instecent.status = 'Y'
+        instecent.save()
+       
+
+    if pay_type == 2:
+        instecent = register_main.objects.get(register_id=register_id)
+        instecent.status = 'N'
+        instecent.save()
+        dtaf = event_register.objects.create(
+        ev_id=instecent.ev_id,
+        register_id=register_id,
+        status='D'
+         )
+    
+    u = User.objects.get(id=rp_name_seller)
+
+    content_regist = register_main.objects.get(register_id=register_id)
+    content_regist.seller_id = rp_name_seller
+    content_regist.save()
+    # Crate Main
+    object = register_payment.objects.create(
+        rp_doc_number=rp_doc_number,
+        rp_code_customer=rp_code_customer,
+        rp_name_customer=rp_name_customer,
+        rp_tax=rp_tax,
+        rp_name_seller=u.first_name+' '+u.last_name,
+        rp_name_contact=rp_name_contact,
+        rp_branch=rp_branch,
+        rp_address=rp_address,
+        rp_phone=rp_phone,
+        rp_email=rp_email,
+        rp_confirm_date_price=rp_confirm_date_price,
+        rp_date_delivery=rp_date_delivery,
+        rp_quota=rp_quota,
+        rp_ref1=rp_ref1,
+        rp_ref2=rp_ref2,
+        active=active,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        register_id=register_id,
+        user_create=user_id,
+        user_manage=user_man
+    )
+    object.refresh_from_db()
+
+    # Create Item
+    content_regist = register_main.objects.select_related(
+        "ev").get(register_id=register_id)
+    ev_vat = content_regist.ev.ev_vat
+    # print(ev_vat)
+    
+    if ev_vat == 0:
+        new_total = rpi_price_total
+    else:
+        new_total = float(rpi_price_total) - float(rpi_price_vat)
+    register_payment_items.objects.create(
+        rpi_code=rpi_code,
+        rpi_name=rpi_name,
+        rpi_quantity=rpi_quantity,
+        rpi_unit=rpi_unit,
+        rpi_price=rpi_price,
+        rpi_price_discount=rpi_price_discount,
+        rpi_price_total=new_total,
+        rpi_price_vat=rpi_price_vat,
+        rpi_price_result=rpi_price_result,
+        rpi_pay=rpi_price_result,
+        rp_id=rp_id,
+        register_id=register_id
+    )
+
+    # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
+    check_bill = register_payment.objects.filter(
+        register_id=register_id).exclude(rp_id=rp_id)
+    if check_bill.count() >= 1 and pay_type == 2:
+        check_bill.update(active=0)
+
+    # ตรวจสอบว่ามีการอนุมัติให้แก้ไขหรือยัง จากนั้นให้ทำการเปลี่ยน complete เป็น 1 ทันที
+    content_approve = register_applove.objects.filter(
+        register_id=register_id, doc_type=1, status=1, complete=0)
+    if content_approve.count() > 0:
+        content_approve.update(complete=1)
+        if pay_type == 2:
+            content_main.close_the_sale = 0
+            content_main.save()
+
+    # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
+    if customer_type == 1:
+        # Delete ข้อมูลนักเรียนเก่าทิ้ง
+        content = student.objects.get(register_id=register_id)
+        content.delete()
+
+        student_firstname_th = request.POST['student_firstname_th']
+        student_lastname_th = request.POST['student_lastname_th']
+        totaldata = student.objects.filter(
+            crt_date__month=month_current, crt_date__year=year_current).count()
+        running_number = treeDigit(totaldata + 1)
+        student_code = "TZ" + str(twoDigit(month_current)) + \
+            str(running_number) + "/" + str(year_current)
+        student.objects.create(
+            student_identification_number=rp_tax,
+            student_prefix_th="",
+            student_firstname_th=student_firstname_th,
+            student_lastname_th=student_lastname_th,
+            student_prefix_eng="",
+            student_firstname_eng="",
+            student_lastname_eng="",
+            student_code=student_code,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+            register_id=register_id
+        )
+   
+
+    messages.success(request, "ทำรายการสำเร็จ !")
+    # return redirect("/register/management")
+    return redirect("/salesnotevent/payment/history/" + str(register_id))
 
 
 @login_required(login_url='/login')

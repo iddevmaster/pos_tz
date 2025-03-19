@@ -102,6 +102,14 @@ function calen() {
         document.getElementById('eventModalLabel').innerText = info.event.title;
       document.getElementById("evs_id").value = info.event.extendedProps.evs_id
       document.getElementById("evs_status").value = info.event.extendedProps.evs_status
+
+
+      if(info.event.extendedProps.evs_status){
+        document.getElementById("bt_confirm").style.display = "none";
+      }else {
+        document.getElementById("bt_confirm").style.display = "block";
+      }
+      
         const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
         eventModal.show();
 
@@ -138,7 +146,7 @@ function calen() {
       document.getElementById('eventModalLabel').innerText = info.event.title;
       document.getElementById("evs_id").value = info.event.extendedProps.evs_id
       document.getElementById("evs_status").value = info.event.extendedProps.evs_status
-      console.log(info.event.extendedProps.evs_status)
+   
   
       if(info.event.extendedProps.evs_status){
         document.getElementById("bt_confirm").style.display = "none";
