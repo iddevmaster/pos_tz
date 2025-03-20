@@ -14,6 +14,7 @@ urlpatterns = [
          register.customer_createno, name="CreateCustomerNo"),
     path('salesnotevent/payment/<str:register_id>', register.paymentnoevent),
     path('salesnotevent/payment/create/', register.payment_createno, name="CreatePaymentno"),
+    path('salesnotevent/payment/history/<str:register_id>', register.payment_historyno),
     path('register/', register.register_home),
     path('register/create/', register.register_create, name="CreateRegister"),
     path('register/reset', register.register_reset),
@@ -149,6 +150,9 @@ urlpatterns = [
     path('report/register/export/approve_list',
          report_and_print.register_report_approve),
     path('register/print/<slug:rp_id>', report_and_print.register_print),
+
+    path('salesnotevent/print/<slug:rp_id>', report_and_print.register_printnoev),
+
     path('register/excel/seller', report_and_print.register_excel_seller),
     path('register/excel/seller/accpept/<slug:ev_id>', report_and_print.register_excel_seller_accept),
     path('register/excel/quotation', report_and_print.register_excel_quotation),

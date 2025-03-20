@@ -820,9 +820,9 @@ function validateForm() {
               <input
                 type="text"
                 class="form-control"
-                value="{{content_course.course.course_code}}"
+                value="{{course.course_code}}"
                 id="rpi_code"
-                name="rpi_code"
+                name="rpi_code" readonly
               />
             </div>
           </div>
@@ -891,7 +891,8 @@ function validateForm() {
                 value="{{content_course.ev_price }}"
                 onchange="sumUnit();validate(event)"
                 onkeypress="sumUnit();validate(event)"
-                onkeyup="sumUnit();validate(event)"
+                onkeyup="sumUnit();validate(event)" 
+                required
               />
             </div>
           </div>

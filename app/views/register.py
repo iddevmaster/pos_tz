@@ -102,10 +102,11 @@ def register_home(request):
         _location = None
     try:
         register_id = request.session['register_id']
+      
         content_regist = register_main.objects.get(register_id=register_id)
     except KeyError:
         content_regist = None
-    # print(register_id)
+    
     _date = date.today()
     hundredDaysLater = _date + timedelta(days=365)
     obj = []
@@ -250,6 +251,9 @@ def register_create(request):
         close_the_sale = 1
     else:
         close_the_sale = 0
+
+    
+    event = course_event.objects.get(pk=ev_id)
     object = register_main.objects.create(
         register_number="-",
         customer_type=customer_type,
@@ -260,6 +264,7 @@ def register_create(request):
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         ev_id=ev_id,
+        course_id=event.course_id,
         seller_id=seller_id,
         user_update_id=seller_id,
         is_event='Y',
@@ -275,7 +280,8 @@ def register_create(request):
 def register_createnoevent(request):
     current_user = request.user
     seller_id = current_user.id
-    ev_id = request.POST['ev_id']
+    course = request.POST['course_id']
+    print(course)
     customer_type = request.POST['customer_type']
     pay_type = request.POST['pay_type']
     try:
@@ -297,6 +303,7 @@ def register_createnoevent(request):
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         seller_id=seller_id,
+        course_id=course,
         user_update_id=seller_id,
         is_event='N',
         module=m.module
@@ -625,7 +632,7 @@ def paymentnoevent(request, register_id):
     
     list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
-
+    print(content_regist.course_id)
     
     if content_regist.customer_type == 1:
         try:
@@ -639,10 +646,10 @@ def paymentnoevent(request, register_id):
     course_list = course.objects.filter(is_show_order='Y',cancelled=1)
     uuid_without_dashes = str(register_id).replace('-', '')
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
-
+    course_c = course.objects.get(is_show_order='Y',cancelled=1,course_id=content_regist.course_id)
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
-
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
+    
+    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'course':course_c,
                'content_regist': content_regist, 'student_data': student_data,'ev_training':content_regist,'list_user':list_user}
     return render(request, 'register/register_noeventpayment.html', context)    
 
@@ -852,7 +859,9 @@ def payment_createno(request):
     rp_address = request.POST['rp_address']
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
-
+    vat = request.POST['vat']
+    
+    
     rp_confirm_date_price = dmytoymd(
         request.POST.get("rp_confirm_date_price", now.strftime("%d/%m/%Y")))
     rp_date_delivery = dmytoymd(
@@ -902,14 +911,9 @@ def payment_createno(request):
 
     if pay_type == 2:
         instecent = register_main.objects.get(register_id=register_id)
-        instecent.status = 'N'
+        instecent.status = 'Y'
         instecent.save()
-        dtaf = event_register.objects.create(
-        ev_id=instecent.ev_id,
-        register_id=register_id,
-        status='D'
-         )
-    
+
     u = User.objects.get(id=rp_name_seller)
 
     content_regist = register_main.objects.get(register_id=register_id)
@@ -929,7 +933,7 @@ def payment_createno(request):
         rp_email=rp_email,
         rp_confirm_date_price=rp_confirm_date_price,
         rp_date_delivery=rp_date_delivery,
-        rp_quota=rp_quota,
+        rp_quota=0,
         rp_ref1=rp_ref1,
         rp_ref2=rp_ref2,
         active=active,
@@ -940,16 +944,17 @@ def payment_createno(request):
         user_manage=user_man
     )
     object.refresh_from_db()
-
+    rp_id = object.rp_id
     # Create Item
-    content_regist = register_main.objects.select_related(
-        "ev").get(register_id=register_id)
-    ev_vat = content_regist.ev.ev_vat
-    # print(ev_vat)
+    content_regist = register_main.objects.get(register_id=register_id)
+
+  
     
-    if ev_vat == 0:
+    if vat == '0':
+       
         new_total = rpi_price_total
     else:
+       
         new_total = float(rpi_price_total) - float(rpi_price_vat)
     register_payment_items.objects.create(
         rpi_code=rpi_code,
@@ -982,31 +987,7 @@ def payment_createno(request):
             content_main.save()
 
     # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
-    if customer_type == 1:
-        # Delete ข้อมูลนักเรียนเก่าทิ้ง
-        content = student.objects.get(register_id=register_id)
-        content.delete()
 
-        student_firstname_th = request.POST['student_firstname_th']
-        student_lastname_th = request.POST['student_lastname_th']
-        totaldata = student.objects.filter(
-            crt_date__month=month_current, crt_date__year=year_current).count()
-        running_number = treeDigit(totaldata + 1)
-        student_code = "TZ" + str(twoDigit(month_current)) + \
-            str(running_number) + "/" + str(year_current)
-        student.objects.create(
-            student_identification_number=rp_tax,
-            student_prefix_th="",
-            student_firstname_th=student_firstname_th,
-            student_lastname_th=student_lastname_th,
-            student_prefix_eng="",
-            student_firstname_eng="",
-            student_lastname_eng="",
-            student_code=student_code,
-            crt_date=dateTimeNow(),
-            upd_date=dateTimeNow(),
-            register_id=register_id
-        )
    
 
     messages.success(request, "ทำรายการสำเร็จ !")
@@ -1135,6 +1116,64 @@ def payment_history(request, register_id):
     context = {'title': title,  'data': obj, 'main': main, 'list_user': list_user, 'listMenuPermission': objMenu,
                'content_approve': content_approve, 'content_approve_p': content_approve_p}
     return render(request, 'register/register_payment_history.html', context)
+
+
+@login_required(login_url='/login')
+def payment_historyno(request, register_id):
+    title = defaultTitle
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        main = register_main.objects.get(register_id=register_id)
+    except:
+        main = None
+        return redirect("/")
+
+    # ตรวจสอบว่ามีการอนุมัติยัง
+    try:
+        content_approve = register_applove.objects.filter(
+            register_id=register_id, doc_type=1, status=1, complete=0).order_by("-crt_date").first()
+    except:
+        content_approve = None
+    # ตรวจสอบว่ามีการร้องขออนุมัติไปล่าสุดหรือยัง
+    try:
+        content_approve_p = register_applove.objects.filter(
+            register_id=register_id, doc_type=1, status=0, complete=0).order_by("-crt_date").first()
+    except:
+        content_approve_p = None
+
+    content = register_payment.objects.filter(
+        register_id=register_id).order_by("-rp_id")
+    if len(content) < 1:
+        return redirect("/register/payment/" + str(register_id))
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).exclude(pk=user_id)
+    obj = []
+    for r in content:
+        items = register_payment_items.objects.filter(rp_id=r.rp_id).first()
+        res = {'main': r, 'items': items}
+        obj.append(res)
+    context = {'title': title,  'data': obj, 'main': main, 'list_user': list_user, 'listMenuPermission': objMenu,
+               'content_approve': content_approve, 'content_approve_p': content_approve_p}
+    return render(request, 'register/register_paymentno_history.html', context)
 
 
 @login_required(login_url='/login')

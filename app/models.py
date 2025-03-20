@@ -142,6 +142,7 @@ class register_main(models.Model):
         max_length=64, blank=True, default=None)
     is_event = models.CharField(
         max_length=64, blank=True, default=None)
+    course = models.ForeignKey(course, on_delete=models.CASCADE)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
 
 

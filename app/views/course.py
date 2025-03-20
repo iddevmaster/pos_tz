@@ -20,9 +20,12 @@ def course_list(request):
      # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
+      
         cm_id = u.cm
+        
     except user_detail.DoesNotExist:
         cm_id = 0
+          
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
     for rs in list(listMenuPermission):
@@ -31,8 +34,10 @@ def course_list(request):
         r = {'group_label': rs['group_label'],
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
+       
     try:
         m = user_group.objects.get(user=user_id)
+        
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
@@ -605,10 +610,7 @@ def calendar_event_apizs(request):
     obj = []
     sff = []
     for r in content:
-        
-    
-     
-    
+ 
         end = str(r.ev_date_end)
       
         y, m, d = end.split("-")
@@ -627,7 +629,7 @@ def calendar_event_apizs(request):
         delta = r.ev_date_end - r.ev_date_start
         days_difference = delta.days + 1
      
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference}
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference,'evs_status':r.status}
         obj.append(res)
        
     return JsonResponse(obj, safe=False)

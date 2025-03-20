@@ -66,13 +66,13 @@
 			  </label> <label style="color: red">*</label>
               <select
                 class="select2"
-                id="ev_id"
-                name="ev_id"
+                id="course_id"
+                name="course_id"
                 required
               >
                 <option value="">-เลือกหลักสูตรและวันที่อบรม-</option>
                 {% for res in data %}
-                <option value="{{res.course_id}}">
+                <option value="{{res.course_id}}" {% if content_regist.course_id == res.course_id %} selected {% endif %}>
                   {{res.course_code}} {{res.course_name}}  
                 </option>
                 {% endfor %}
