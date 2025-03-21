@@ -20,6 +20,8 @@ function sumV() {
    
     // document.getElementById("addon_price_discount").value = 0;
     document.getElementById("addon_price_result").value = fix.toFixed(2);
+
+    sumVat();
   }
 
   function sumDiscountV() {
@@ -117,6 +119,7 @@ body: JSON.stringify({'course_id':addon_course_code,'qty':addon_qty,'rpi_price':
 })
 .then(response => response.json())
 .then(data => {
+  console.log(data.total_price_add_on);
   document.getElementById("addon_total").value = data.total_price_add_on
 
   let products = data.data;
@@ -188,6 +191,9 @@ function validateForm() {
   function sumUnit() {
     let rpi_quantity = document.getElementById("rpi_quantity").value;
     let rpi_price = document.getElementById("rpi_price").value;
+
+
+    
     let sum = parseFloat(rpi_quantity) * parseFloat(rpi_price);
     let fix = isNaN(sum) ? 0 : sum;
     document.getElementById("rpi_price_discount").value = 0;
@@ -207,69 +213,183 @@ function validateForm() {
     sumVat();
   }
   function sumVat() {
-   
-    let ev_vat = document.getElementById("vat").value;
-    let rpi_price_total = document.getElementById("rpi_price_total").value;
- 
-       document.getElementById("rpi_price_total").value = parseFloat(rpi_price_total);
-    let rpi_price_total_all = document.getElementById("rpi_price_total").value;
     
+    let pay_type = document.getElementById("pay_type").value;
+    let ev_vat = document.getElementById("vat").value;
+  
+    let rpi_price_total_all = document.getElementById("rpi_price_total").value;
+  
     let sum;
     let rpi_price_result;
-    if (parseInt(ev_vat) == 1) {
-      
-      sum = (parseFloat(rpi_price_total_all) * 100) / 107;
-      console.log(parseFloat(rpi_price_total_all))
-      rpi_price_result = parseFloat(rpi_price_total_all)  - parseFloat(sum);
-      
-      let fix = isNaN(sum) ? 0 : sum;
-      let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
-      
-      document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
-  
-      document.getElementById("rpi_price_result").value = rpi_price_total_all;
-    } else {
-      sum = (parseFloat(rpi_price_total) * 7) / 100;
-      rpi_price_result = parseFloat(rpi_price_total) + parseFloat(sum);
 
-      let fix = isNaN(sum) ? 0 : sum;
-      let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
-      document.getElementById("rpi_price_vat").value = fix.toFixed(2);
-      document.getElementById("rpi_price_result").value = fix2.toFixed(2);
+    if(parseInt(pay_type) == 1){
+
+      
+
+if (parseInt(ev_vat) == 1) {
+  let rpi_quantity = document.getElementById("rpi_quantity").value;
+  let rpi_price = document.getElementById("rpi_price").value;
+  let addontotal = document.getElementById("addon_total").value;
+  let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+  
+  sum = (parseFloat(total_and_addon) * 100) / 107;
+ 
+  rpi_price_result = parseFloat(total_and_addon)  - parseFloat(sum);
+  
+  let fix = isNaN(sum) ? 0 : sum;
+  let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+  document.getElementById("before_price_vat").value = fix.toFixed(2);
+  document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
+  document.getElementById("rpi_price_result").value = total_and_addon.toFixed(2);
+  document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+}else {
+
+  let rpi_quantity = document.getElementById("rpi_quantity").value;
+  let rpi_price = document.getElementById("rpi_price").value;
+  let addontotal = document.getElementById("addon_total").value;
+  let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+
+  sum = (parseFloat(total_and_addon) * 7) / 100;
+  rpi_price_result = parseFloat(total_and_addon) + parseFloat(sum);
+  
+  let fix = isNaN(sum) ? 0 : sum;
+  let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+  document.getElementById("before_price_vat").value = total_and_addon.toFixed(2);
+  document.getElementById("rpi_price_vat").value = fix.toFixed(2);
+  document.getElementById("rpi_price_result").value = fix2.toFixed(2);
+  document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+
+}
+    }else {
+      console.log('เครดิต');
+
+      if (parseInt(ev_vat) == 1) {
+        
+        let rpi_quantity = document.getElementById("rpi_quantity").value;
+        let rpi_price = document.getElementById("rpi_price").value;
+        let addontotal = document.getElementById("addon_total").value;
+        let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+        
+        sum = (parseFloat(total_and_addon) * 100) / 107;
+       
+        rpi_price_result = parseFloat(total_and_addon)  - parseFloat(sum);
+        
+        let fix = isNaN(sum) ? 0 : sum;
+        let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+        document.getElementById("before_price_vat").value = fix.toFixed(2);
+        document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
+        document.getElementById("rpi_price_result").value = total_and_addon.toFixed(2);
+        document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+      } else {
+        
+        let rpi_quantity = document.getElementById("rpi_quantity").value;
+        let rpi_price = document.getElementById("rpi_price").value;
+        let addontotal = document.getElementById("addon_total").value;
+        let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+  
+        sum = (parseFloat(total_and_addon) * 7) / 100;
+        rpi_price_result = parseFloat(total_and_addon) + parseFloat(sum);
+        
+        let fix = isNaN(sum) ? 0 : sum;
+        let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+        document.getElementById("before_price_vat").value = total_and_addon.toFixed(2);
+        document.getElementById("rpi_price_vat").value = fix.toFixed(2);
+        document.getElementById("rpi_price_result").value = fix2.toFixed(2);
+        document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+      }
     }
+
   }
 
+
   function RemoveVat() {
+    
+    let pay_type = document.getElementById("pay_type").value;
+    let ev_vat = document.getElementById("vat").value;
+  
+    let rpi_price_total_all = document.getElementById("rpi_price_total").value;
+  
+    let sum;
+    let rpi_price_result;
 
-   let ev_vat = document.getElementById("ev_vat").value;
-   
-   let rpi_price_total = document.getElementById("rpi_price").value;
-   let addontotal = document.getElementById("addon_total").value;
+    if(parseInt(pay_type) == 1){
 
-      document.getElementById("rpi_price_total").value = parseFloat(rpi_price_total) + parseFloat(addontotal);
-   let rpi_price_total_all = document.getElementById("rpi_price_total").value;
-   let sum;
-   let rpi_price_result;
-   if (parseInt(ev_vat) == 1) {
-     
-     sum = (parseFloat(rpi_price_total_all) * 100) / 107;
-     rpi_price_result = parseFloat(rpi_price_total_all)  - parseFloat(sum);
+      
 
-     let fix = isNaN(sum) ? 0 : sum;
-     let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
-     document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
-     document.getElementById("before_price_vat").value = fix.toFixed(2);
-     document.getElementById("rpi_price_result").value = rpi_price_total_all;
-   } else {
-     sum = (parseFloat(rpi_price_total) * 7) / 100;
-     rpi_price_result = parseFloat(rpi_price_total) + parseFloat(sum);
+if (parseInt(ev_vat) == 1) {
+  let rpi_quantity = document.getElementById("rpi_quantity").value;
+  let rpi_price = document.getElementById("rpi_price").value;
+  let addontotal = document.getElementById("addon_total").value;
+  let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+  
+  sum = (parseFloat(total_and_addon) * 100) / 107;
+ 
+  rpi_price_result = parseFloat(total_and_addon)  - parseFloat(sum);
+  
+  let fix = isNaN(sum) ? 0 : sum;
+  let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+  document.getElementById("before_price_vat").value = fix.toFixed(2);
+  document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
+  document.getElementById("rpi_price_result").value = total_and_addon.toFixed(2);
+  document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+}else {
 
-     let fix = isNaN(sum) ? 0 : sum;
-     let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
-     document.getElementById("rpi_price_vat").value = fix.toFixed(2);
-     document.getElementById("rpi_price_result").value = fix2.toFixed(2);
-   }
- }
+  let rpi_quantity = document.getElementById("rpi_quantity").value;
+  let rpi_price = document.getElementById("rpi_price").value;
+  let addontotal = document.getElementById("addon_total").value;
+  let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+
+  sum = (parseFloat(total_and_addon) * 7) / 100;
+  rpi_price_result = parseFloat(total_and_addon) + parseFloat(sum);
+  
+  let fix = isNaN(sum) ? 0 : sum;
+  let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+  document.getElementById("before_price_vat").value = total_and_addon.toFixed(2);
+  document.getElementById("rpi_price_vat").value = fix.toFixed(2);
+  document.getElementById("rpi_price_result").value = fix2.toFixed(2);
+  document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+
+}
+    }else {
+      console.log('เครดิต');
+
+      if (parseInt(ev_vat) == 1) {
+        
+        let rpi_quantity = document.getElementById("rpi_quantity").value;
+        let rpi_price = document.getElementById("rpi_price").value;
+        let addontotal = document.getElementById("addon_total").value;
+        let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+        
+        sum = (parseFloat(total_and_addon) * 100) / 107;
+       
+        rpi_price_result = parseFloat(total_and_addon)  - parseFloat(sum);
+        
+        let fix = isNaN(sum) ? 0 : sum;
+        let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+        document.getElementById("before_price_vat").value = fix.toFixed(2);
+        document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
+        document.getElementById("rpi_price_result").value = total_and_addon.toFixed(2);
+        document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+      } else {
+        
+        let rpi_quantity = document.getElementById("rpi_quantity").value;
+        let rpi_price = document.getElementById("rpi_price").value;
+        let addontotal = document.getElementById("addon_total").value;
+        let total_and_addon = (parseFloat(rpi_quantity) * parseFloat(rpi_price)) + parseFloat(addontotal);
+  
+        sum = (parseFloat(total_and_addon) * 7) / 100;
+        rpi_price_result = parseFloat(total_and_addon) + parseFloat(sum);
+        
+        let fix = isNaN(sum) ? 0 : sum;
+        let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
+        document.getElementById("before_price_vat").value = total_and_addon.toFixed(2);
+        document.getElementById("rpi_price_vat").value = fix.toFixed(2);
+        document.getElementById("rpi_price_result").value = fix2.toFixed(2);
+        document.getElementById("rpi_price_total").value = total_and_addon.toFixed(2);
+      }
+    }
+
+  }
 
   function setBillName() {
     let student_firstname_th = document.getElementById(
@@ -404,6 +524,14 @@ function validateForm() {
           name="ev_vat"
           value="{{content_course.ev_vat}}"
         />
+
+        <input
+        type="text"
+        class="form-control"
+        id="pay_type"
+        name="pay_type"
+        value="{{content_regist.pay_type}}"
+      />
         <div class="row">
           {% if content_regist.customer_type == 1 %}
           <div class="col-lg-4 col-md-6">
@@ -670,7 +798,7 @@ function validateForm() {
 
           {% if content_regist.pay_type == 2 %}
      
-       
+  
           <div class="col-lg-3 col-md-6">
             <div class="form-group">
               <label>เลือกผู้จัดการ</label>
@@ -691,7 +819,7 @@ function validateForm() {
       </div>
     </div>
 
-{% comment %} 
+
     <div class="card">
       <div class="card-body">
         <div class="form-group">
@@ -708,7 +836,7 @@ function validateForm() {
         </div>
    </div>
   </div>
-   {% if content_regist.pay_type == 2 %}
+
 
    <div class="card">
     <div class="card-body">
@@ -780,13 +908,10 @@ function validateForm() {
 </div>
      
        
-   {% else %}
 
 
-   {% endif %}
 
-
-  </div> {% endcomment %}
+  </div> 
 
 
 
@@ -813,6 +938,7 @@ function validateForm() {
       value="{{content_regist.customer_type}}"
       
     />
+    
         <div class="row">
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
@@ -913,7 +1039,7 @@ function validateForm() {
             </div>
           </div>
 
-          {% comment %} <div class="col-lg-4 col-md-6">
+       <div class="col-lg-4 col-md-6">
             <div class="form-group">
               <label>จำนวนเงินสินค้าเพิ่มเติม</label>
               <label style="color: red">*</label>
@@ -926,7 +1052,7 @@ function validateForm() {
                 readonly
               />
             </div>
-          </div> {% endcomment %}
+          </div> 
 
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
@@ -943,7 +1069,7 @@ function validateForm() {
           </div>
 
 
-          {% if content_course.ev_vat == 1 %}
+          
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
               <label>ราคาก่อนรวมภาษีมูลค่าเพิ่ม 7&#37;</label>
@@ -957,7 +1083,7 @@ function validateForm() {
               />
             </div>
           </div>
-          {% endif %}
+     
 
           <div class="col-lg-4 col-md-6">
             <div class="form-group">

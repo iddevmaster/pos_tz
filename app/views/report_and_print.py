@@ -76,6 +76,75 @@ def register_print(request, rp_id):
 
 
 @login_required(login_url='/login')
+def register_printnoev(request, rp_id):
+    
+    short = request.GET.get('short', 'no')
+    current_user = request.user
+    user_id_authen = current_user.id
+    try:
+        content = register_payment.objects.get(pk=rp_id)
+        
+
+    except register_payment.DoesNotExist:
+        content = None
+        return render(request, '404.html')
+    try:
+        machine = pos_machine.objects.filter(user=user_id_authen).last()
+    except pos_machine.DoesNotExist:
+        machine = None
+   
+    # users = User.objects.get(id=content.user_create)
+    
+    items = register_payment_items.objects.filter(rp_id=content.rp_id).first()
+    uuid_without_dashes = str(content.register_id).replace('-', '')
+ 
+
+    billdess = factbilldes.objects.filter(register_id=uuid_without_dashes)
+    obj2 = []
+    if billdess:
+        for rsx in billdess:    
+            
+            x = desciption_bill.objects.get(des_id=rsx.des_id)
+            v = {'des_id': x.des_id,  'name': x.name}
+            obj2.append(v)
+
+    
+    content_regist = register_main.objects.get(register_id=content.register_id)
+    
+    users = User.objects.get(id=content.user_create)
+    signa = signature.objects.filter(user_id=content.user_create).first()
+    signama = signature.objects.filter(user_id=content.user_manage).first()
+    try:
+        mange = User.objects.get(id=content.user_manage)
+    except User.DoesNotExist:
+        mange = None
+    dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
+    
+    customer = customers.objects.get(register_id=content.register_id)
+    rpi_price_rpi_pri = items.rpi_price * items.rpi_quantity 
+    # ราคารวม  rpi_price  สินค้า
+    if items.vat == '1':
+        rpi_total = items.rpi_price_total + items.rpi_price_vat
+    else:
+        rpi_total = items.rpi_price_total
+    # ราคารวม  ช่องแนวนอน
+   
+    print(rpi_total)
+    # ราคาก่อนvat
+    rpi_price_default = items.rpi_price_total  
+
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'rpi_total':rpi_total,
+               'items': items, "content_regist": content_regist,'rpi_price_rpi_pri':rpi_price_rpi_pri, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
+    if content_regist.pay_type == 1:
+        # ถ้าเป็นใบเสร็จอย่างย่อ
+        if short == "yes":
+            return render(request, 'print/register_print_bill_short.html', context)
+        return render(request, 'print/register_print_billno.html', context)
+    return render(request, 'print/register_print_sale_quotationno.html', context)
+
+
+
+@login_required(login_url='/login')
 def register_selller_report(request):
     user_id = request.user.id
     try:

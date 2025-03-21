@@ -573,6 +573,7 @@ def payment(request, register_id):
     # print(content)
     course_list = course.objects.filter(is_show_order='Y',cancelled=1)
     uuid_without_dashes = str(register_id).replace('-', '')
+    
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
@@ -860,8 +861,9 @@ def payment_createno(request):
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
     vat = request.POST['vat']
-    
-    
+    bills = request.POST.getlist("selected_bills", [])
+
+
     rp_confirm_date_price = dmytoymd(
         request.POST.get("rp_confirm_date_price", now.strftime("%d/%m/%Y")))
     rp_date_delivery = dmytoymd(
@@ -902,6 +904,10 @@ def payment_createno(request):
     rpi_price_total = request.POST['rpi_price_total']
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
+    addon_total = request.POST['addon_total']
+
+    print(addon_total)
+    
 
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
@@ -953,9 +959,13 @@ def payment_createno(request):
     if vat == '0':
        
         new_total = rpi_price_total
+   
+        
     else:
        
         new_total = float(rpi_price_total) - float(rpi_price_vat)
+       
+    
     register_payment_items.objects.create(
         rpi_code=rpi_code,
         rpi_name=rpi_name,
@@ -968,8 +978,16 @@ def payment_createno(request):
         rpi_price_result=rpi_price_result,
         rpi_pay=rpi_price_result,
         rp_id=rp_id,
-        register_id=register_id
+        register_id=register_id,
+        vat=vat,
     )
+
+
+    for bill in bills:
+        dtaf = factbilldes.objects.create(
+        register_id=uuid_without_dashes,
+        des_id=bill
+    )    
 
     # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
     check_bill = register_payment.objects.filter(
