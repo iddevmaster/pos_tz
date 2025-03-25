@@ -216,7 +216,8 @@ def register_excel_seller(request):
         str(date.today().month) + "-" + "01"
     default_end = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(lastday)
-
+    event = int(request.POST.get('event', 1))
+ 
     if date_range is not None:
         start, end = format_daterange(date_range)
         if start == end:
@@ -278,13 +279,19 @@ def register_excel_seller(request):
         seller_param = str(u.first_name) + " " + str(u.last_name)
     if customer_name != None:
         content = content.filter(Q(customer_name__icontains=customer_name))
+    if event == 1:
+        content = content.filter(register__ev__ev_id__isnull=False)
+    else :
+        content = content.filter(register__ev__ev_id__isnull=True)
+    
     obj = []
     total_sum = 0
     for r in content:
-        # print(r.register_id)
+        
+        
         payment_list = register_payment_items.objects.select_related('rp').filter(
             register_id=r.register).order_by("-rp__rp_id").first()
-
+        
         if payment_list is not None:
             rpi_price_result = payment_list.rpi_price_result
         else:
@@ -483,10 +490,10 @@ def register_excel_quotation(request):
     generation = request.POST.get('qgeneration', 0)
     seller = int(request.POST.get('qseller', 0))
     customer_name = request.POST.get('qcustomer_name', None)
-
+    event = int(request.POST.get('event', 1))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=2, active=1,register__module=m.module)
-
+    print(content)
     lastday = lastDateOfmonth(
         date.today().year, date.today().month, date.today().day)
     default_start = str(date.today().year) + "-" + \
@@ -533,10 +540,15 @@ def register_excel_quotation(request):
         seller_param = str(u.first_name) + " " + str(u.last_name)
     if customer_name != None:
         content = content.filter(Q(rp_name_customer__icontains=customer_name))
+    if event == 1:
+        content = content.filter(register__ev__ev_id__isnull=False)
+    else :
+        content = content.filter(register__ev__ev_id__isnull=True)    
     obj = []
+    print(content)
     total_sum = 0
     for r in content:
-        # print(r.register_id)
+        print(r.register_id)
         customer_list = customers.objects.filter(
             register=r.register_id).select_related('location').first()
         payment_list = register_payment_items.objects.filter(
@@ -552,6 +564,8 @@ def register_excel_quotation(request):
         res = {'main': r, 'customer_list': customer_list,
                'course_list': course_list, 'payment_list': payment_list}
         obj.append(res)
+
+    
     # print(total_sum)
     param = {'total_data': len(content), 'range_param': range_param, 'close_the_sale_param': close_the_sale_param,
              'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
@@ -618,7 +632,7 @@ def register_excel_bill(request):
     generation = request.POST.get('qgeneration', 0)
     seller = int(request.POST.get('qseller', 0))
     customer_name = request.POST.get('qcustomer_name', None)
-
+    event = int(request.POST.get('event', 1))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=1, active=1,register__module=m.module)
 
@@ -628,6 +642,8 @@ def register_excel_bill(request):
         str(date.today().month) + "-" + "01"
     default_end = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(lastday)
+
+        
     if date_range is not None:
         start, end = format_daterange(date_range)
         if start == end:
@@ -669,6 +685,10 @@ def register_excel_bill(request):
         seller_param = str(u.first_name) + " " + str(u.last_name)
     if customer_name != None:
         content = content.filter(Q(rp_name_customer__icontains=customer_name))
+    if event == 1:
+        content = content.filter(register__ev__ev_id__isnull=False)
+    else :
+        content = content.filter(register__ev__ev_id__isnull=True)
     obj = []
     total_sum = 0
     for r in content:
