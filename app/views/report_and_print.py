@@ -216,7 +216,7 @@ def register_excel_seller(request):
         str(date.today().month) + "-" + "01"
     default_end = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(lastday)
-    event = int(request.POST.get('event', 1))
+    event = int(request.POST.get('event', 0))
  
     if date_range is not None:
         start, end = format_daterange(date_range)
@@ -281,8 +281,9 @@ def register_excel_seller(request):
         content = content.filter(Q(customer_name__icontains=customer_name))
     if event == 1:
         content = content.filter(register__ev__ev_id__isnull=False)
-    else :
+    if event == 2:
         content = content.filter(register__ev__ev_id__isnull=True)
+
     
     obj = []
     total_sum = 0

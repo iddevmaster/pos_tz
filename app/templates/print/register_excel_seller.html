@@ -119,6 +119,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>ราคาที่ปิดการขาย</td>
       <td>วันที่เปิดการขาย</td>
       <td>วันที่ปิดการขาย</td>
+      <td>ประเภท</td>
     </tr>
     {% for res in data %}
     <tr>
@@ -161,6 +162,13 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       </td>
       <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
       <td>{{res.customer_list.register.upd_date|date:"d/m/Y H:i"}}</td>
+      <td>
+        {% if res.customer_list.register.ev_id %}
+        <span>มี Event</span>
+        {% else %}
+        <span>ไม่มี Event</span>
+        {% endif %}
+      </td>
       {% endfor %}
     </tr>
     <tr>

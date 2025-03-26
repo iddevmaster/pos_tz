@@ -133,6 +133,12 @@ listMenu = [
         "group_value": "pRem5",
         "group_label": "หลักสูตร",
     },
+     {
+        "value": "calendar_event_all",
+        "label": "ปฏิทินหลักสูตรอบรมทั้งหมด",
+        "group_value": "pRem5",
+        "group_label": "หลักสูตร",
+    },
     {
         "value": "teachers",
         "label": "ครู - วิทยากร",

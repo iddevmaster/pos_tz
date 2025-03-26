@@ -93,9 +93,10 @@ urlpatterns = [
     path('course/event/teachers/list/<slug:ev_id>', course.course_teacher_event_list),
     path('calendar_event/', course.calendar_event),
     path('calendar_event_staff/', course.calendar_event_staff),
+    path('calendar_event_all/', course.calendar_event_all),
     path('calendar_event_api/', course.calendar_event_api),
     path('calendar_event_apieve/', course.calendar_event_apizs),
-
+    path('calendar_event_apiall/', course.calendar_event_apiall),
 
     #     teacher
     path('teachers/', teacher.teacher_list),
