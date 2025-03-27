@@ -109,20 +109,21 @@ WSGI_APPLICATION = 'trainingzenter.wsgi.application'
 
 
 DATABASES = {
-    'default': {
+       'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'postz',
+        'NAME': 'backup',
         'USER': 'root',
-        'HOST': '27.254.149.244',
+        'HOST': '27.254.149.247',
         'PASSWORD': '@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
-            
         }
     }
 }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
