@@ -491,7 +491,7 @@ def register_excel_quotation(request):
     generation = request.POST.get('qgeneration', 0)
     seller = int(request.POST.get('qseller', 0))
     customer_name = request.POST.get('qcustomer_name', None)
-    event = int(request.POST.get('event', 1))
+    event = int(request.POST.get('event', 0))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=2, active=1,register__module=m.module)
     print(content)
@@ -543,7 +543,7 @@ def register_excel_quotation(request):
         content = content.filter(Q(rp_name_customer__icontains=customer_name))
     if event == 1:
         content = content.filter(register__ev__ev_id__isnull=False)
-    else :
+    if event == 2:
         content = content.filter(register__ev__ev_id__isnull=True)    
     obj = []
     print(content)
@@ -633,7 +633,7 @@ def register_excel_bill(request):
     generation = request.POST.get('qgeneration', 0)
     seller = int(request.POST.get('qseller', 0))
     customer_name = request.POST.get('qcustomer_name', None)
-    event = int(request.POST.get('event', 1))
+    event = int(request.POST.get('event', 0))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=1, active=1,register__module=m.module)
 
@@ -688,7 +688,7 @@ def register_excel_bill(request):
         content = content.filter(Q(rp_name_customer__icontains=customer_name))
     if event == 1:
         content = content.filter(register__ev__ev_id__isnull=False)
-    else :
+    if event == 2:
         content = content.filter(register__ev__ev_id__isnull=True)
     obj = []
     total_sum = 0
