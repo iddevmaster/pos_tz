@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -359,6 +359,69 @@ def course_event_delete(request):
     print(params)
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
+
+
+def conditionlist(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+    title = defaultTitle
+
+    result = course.objects.filter(
+        cancelled=1, module=m.module).order_by("-course_id")
+    context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
+
+    return render(request, 'condition/condition.html', context)    
+
+
+def conditioncreate(request,course_id):
+    print(course_id)
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html') 
+    title = defaultTitle
+
+   
+    result = condition.objects.select_related("course").filter()
+   
+    context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
+
+    return render(request, 'condition/condition_id.html', context)    
+
 
 
 @login_required(login_url='/login')

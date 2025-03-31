@@ -424,3 +424,15 @@ class fact_addon(models.Model):
     fact_id = models.AutoField(primary_key=True)
     rp_id = models.IntegerField(default=0, blank=False)
     addon_id = models.IntegerField(default=0, blank=False)
+
+
+class condition(models.Model):
+    condition_id = models.AutoField(primary_key=True)
+    student = models.IntegerField(default=0, blank=False)
+    price = models.FloatField(default=0, blank=False)
+    type = models.CharField(max_length=20, unique=True, blank=True)  
+    hour = models.CharField(max_length=20, unique=True, blank=True)
+    type_add = models.CharField(max_length=20, unique=True, blank=True)
+    course = models.ForeignKey(course, on_delete=models.CASCADE)
+
+

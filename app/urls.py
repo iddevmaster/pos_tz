@@ -98,6 +98,9 @@ urlpatterns = [
     path('calendar_event_apieve/', course.calendar_event_apizs),
     path('calendar_event_apiall/', course.calendar_event_apiall),
 
+    path('condition/management/', course.conditionlist),
+    path('condition/management/<slug:course_id>', course.conditioncreate),
+
     #     teacher
     path('teachers/', teacher.teacher_list),
     path('teachersoutsource/', teacher.teacher_list),
