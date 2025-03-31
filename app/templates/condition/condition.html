@@ -72,14 +72,14 @@
           <tr>
             
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{ res.course_name }}</td>
-            <td>{{ res.course_code }}</td>
+            <td>{{ res.course.course_name }}</td>
+            <td>{{ res.course.course_code }}</td>
             <td>
               <div align="center">
                 <button
                   type="button"
                   class="btn btn-warning"
-                  onclick="window.location.href='/condition/management/{{res.course_id}}'"
+                  onclick="window.location.href='/condition/management/{{res.conhead_id}}'"
                 >
                   <i class="icon dripicons-document-edit"></i> เพิ่มเงื่อนไข
                 </button>

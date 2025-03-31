@@ -99,7 +99,7 @@ urlpatterns = [
     path('calendar_event_apiall/', course.calendar_event_apiall),
 
     path('condition/management/', course.conditionlist),
-    path('condition/management/<slug:course_id>', course.conditioncreate),
+    path('condition/management/<slug:conhead_id>', course.conditioncreate),
 
     #     teacher
     path('teachers/', teacher.teacher_list),

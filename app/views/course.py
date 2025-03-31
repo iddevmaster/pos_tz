@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -384,15 +384,15 @@ def conditionlist(request):
         return render(request, '404.html') 
     title = defaultTitle
 
-    result = course.objects.filter(
-        cancelled=1, module=m.module).order_by("-course_id")
+   
+    result = conhead.objects.select_related("course").filter()
     context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
 
     return render(request, 'condition/condition.html', context)    
 
 
-def conditioncreate(request,course_id):
-    print(course_id)
+def conditioncreate(request,conhead_id):
+    print(conhead_id)
     user_id = request.user.id
     # Menu
     try:
@@ -416,7 +416,7 @@ def conditioncreate(request,course_id):
     title = defaultTitle
 
    
-    result = condition.objects.select_related("course").filter()
+    result = condition.objects.select_related("course").filter(conhead=conhead_id)
    
     context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
 

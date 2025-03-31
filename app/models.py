@@ -425,7 +425,12 @@ class fact_addon(models.Model):
     rp_id = models.IntegerField(default=0, blank=False)
     addon_id = models.IntegerField(default=0, blank=False)
 
-
+class conhead(models.Model):
+    conhead_id = models.AutoField(primary_key=True) 
+    name = models.CharField(max_length=20, unique=True, blank=True)
+    is_active = models.CharField(max_length=20, unique=True, blank=True)
+    course = models.ForeignKey(course, on_delete=models.CASCADE)
+    
 class condition(models.Model):
     condition_id = models.AutoField(primary_key=True)
     student = models.IntegerField(default=0, blank=False)
@@ -434,5 +439,7 @@ class condition(models.Model):
     hour = models.CharField(max_length=20, unique=True, blank=True)
     type_add = models.CharField(max_length=20, unique=True, blank=True)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
+    conhead = models.ForeignKey(conhead, on_delete=models.CASCADE)
+
 
 
