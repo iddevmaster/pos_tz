@@ -384,9 +384,11 @@ def conditionlist(request):
         return render(request, '404.html') 
     title = defaultTitle
 
-   
+    
+    resulta = course.objects.filter(
+            cancelled=1, active=1).order_by("-course_id")
     result = conhead.objects.select_related("course").filter()
-    context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
+    context = {'title': title, 'listMenuPermission': objMenu, 'data': result, 'dataa': resulta}
 
     return render(request, 'condition/condition.html', context)    
 
@@ -952,3 +954,16 @@ def update_course_even(request):
     content.save()
 
     return JsonResponse({"status": "ok"}, status=200)      
+
+
+
+@csrf_exempt
+def conditionhead(request):
+    data = json.loads(request.body)
+    id = data.get("id")
+  
+    content = []
+    content = conhead.objects.select_related("course").filter(course=id,is_active='Y').values("conhead_id", "name","course__course_code")
+
+
+    return JsonResponse(list(content), status=200, safe=False)     
