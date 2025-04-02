@@ -6,11 +6,170 @@
   function setValueDeleteModal(id) {
     document.getElementById("id_delete").value = id;
   }
+  function setValueEditModal(id,name) {
+    document.getElementById('id').value = id;
+    document.getElementById('name').value = name;
+  
+  }
 
+  function CheckSelect() {
+   let course_id =  document.getElementById('course_id').value
+   console.log(course_id);
+   if(!course_id){
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: 'เลือกหลักสูตรก่อนที่จะเพิ่มข้อมูล',
+  });
+  return false;
+   }
+
+   let myModal = new bootstrap.Modal(document.getElementById('AddClick'));
+   myModal.show();
+
+  
+  }
+
+  async function createcondition() {
+
+    let course_id =  document.getElementById('course_id').value
+
+    let names = document.getElementById('names').value
+    let data = await fetch('/api/condition/createcondition', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({'course_id':course_id,'name':names})
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Display response
+          let myModal = bootstrap.Modal.getInstance(document.getElementById('AddClick')); // Get the existing modal instance
+          if (myModal) {
+              myModal.hide(); // Hide the modal
+          }
+       
+      })
+
+      
+
+
+      await reload()
+
+  }
+  
+  async function save() {
+
+    Swal.fire({
+      title: 'Saving...',
+      text: 'Please wait while we save your data.',
+      allowOutsideClick: false,
+      didOpen: () => {
+          Swal.showLoading();
+      }
+  });
+
+    const ids = document.getElementById('id').value
+    const name = document.getElementById('name').value
+    let data = await fetch('/api/condition/savecondition', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({'id':ids,'name':name})
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Display response
+        
+      })
+      await reload()
+
+  }
+
+
+  
+  async function reload() {
+    const as = document.getElementById('course_ids').value
+    let data = await fetch('/api/condition/conditionhead', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({'id':as})
+      })
+      .then(response => response.json())
+      .then(data => {
+        $('#json-table-body').empty(); // Clear previous cards
+          // Display response
+          console.log(data)
+          let jsonData = data;
+  
+      const tableBody = document.getElementById('json-table-body');
+      jsonData.forEach((item,index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td>${index + 1}</td>
+              <td align="center">${item.name}</td>
+              <td align="center">${item.course__course_code}</td>
+    
+              <td>
+          <div align="center">
+  
+  
+                       <button
+                    type="button"
+                    onclick="setValueEditModal('${item.conhead_id}','${item.name}')"
+                    class="btn btn-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#EditClick"
+                  >
+                       <i class="icon dripicons-document-edit"></i>
+                    แก้ไข
+                  </button>
+                      <button
+                    type="button"
+                    onclick="setValueDeleteModal('${item.conhead_id}')"
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#DeleteClick"
+                  >
+                    <i class="icon dripicons-trash" aria-hidden="true"></i>
+                    ลบ
+                  </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="window.location.href='/condition/management/${item.conhead_id}'"
+            >
+              <i class="icon dripicons-document-edit"></i> จัดการเงื่อนไข
+            </button>
+          </div>
+        </td>
+             
+          `;
+          tableBody.appendChild(row);
+      });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Saved!',
+        text: 'Your data has been successfully saved.',
+        timer: 2000,
+        showConfirmButton: false
+    });
+  
+      })
+    
+  }
 
   async function myFunction(selectElement) {
   
     const selectedValue = selectElement.value;
+
+    document.getElementById('course_ids').value = selectElement.value;
 
    let data = await fetch('/api/condition/conditionhead', {
     method: 'POST',
@@ -36,12 +195,34 @@
   
             <td>
         <div align="center">
+
+
+                     <button
+                  type="button"
+                  onclick="setValueEditModal('${item.conhead_id}','${item.name}')"
+                  class="btn btn-warning"
+                  data-bs-toggle="modal"
+                  data-bs-target="#EditClick"
+                >
+                     <i class="icon dripicons-document-edit"></i>
+                  แก้ไข
+                </button>
+                    <button
+                  type="button"
+                  onclick="setValueDeleteModal('${item.conhead_id}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteClick"
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button>
           <button
             type="button"
-            class="btn btn-warning"
+            class="btn btn-primary"
             onclick="window.location.href='/condition/management/${item.conhead_id}'"
           >
-            <i class="icon dripicons-document-edit"></i> เพิ่มเงื่อนไข
+            <i class="icon dripicons-document-edit"></i> จัดการเงื่อนไข
           </button>
         </div>
       </td>
@@ -49,12 +230,7 @@
         `;
         tableBody.appendChild(row);
     });
-    // this.calen();
-    // window.location.reload();
-    //    return data.status
 
-  
-    
     })
       
   }
@@ -102,6 +278,18 @@
               {% endfor %}
             </select>
           </div>
+
+          <div class="col-lg-12 col-md-12">
+              <div class="btn-group mb-3">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  onclick="CheckSelect()"
+                >
+                  <i class="icon dripicons-plus" aria-hidden="true"></i>
+                  เพิ่มข้อมูล
+                </button>
+              </div>
        
     </div>
     <div class="card-body">
@@ -184,5 +372,105 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="EditClick">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title white" id="myModalLabel19">รายละเอียดการอบรม</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+     
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="des_id" id="des_id" required />
+            <div class="col-12 col-sm-12">
+              <div class="form-check">
+                  <input class="form-control" type="text" name="name"  id="name">
+                  <input class="form-control" type="text" name="id"  id="id">
+                  <input class="form-control" type="text" name="course_ids"  id="course_ids">
+              </div>
+  
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary ml-1" onclick="save()"
+                 data-bs-dismiss="modal"
+              >
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">บันทึก</span>
+              </button>
+              <button
+                type="button"
+                class="btn btn-light-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">ปิด</span>
+              </button>
+            
+            </div>
+          </div>
+     
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="AddClick">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title white" id="myModalLabel19">เพิ่ม หัวข้อเงื่อนไข</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+     
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="des_id" id="des_id" required />
+            <div class="col-12 col-sm-12">
+              <div class="form-check">
+                  <input class="form-control" type="text" name="names"  id="names" value="">
+                 
+              </div>
+  
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary ml-1" onclick="createcondition()"
+              
+
+              >
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">บันทึก</span>
+              </button>
+              <button
+                type="button"
+                class="btn btn-light-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">ปิด</span>
+              </button>
+            
+            </div>
+          </div>
+     
+      </div>
+    </div>
+  </div>
+  
 </section>
 {% endblock %}

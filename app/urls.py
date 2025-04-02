@@ -223,6 +223,7 @@ urlpatterns = [
     path('api/deleteaddon', register.addon_delete),
 
     path('api/condition/conditionhead', course.conditionhead),
+    path('api/condition/createcondition', course.conditionheadcreate),
    
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

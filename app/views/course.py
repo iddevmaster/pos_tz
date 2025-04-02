@@ -961,9 +961,34 @@ def update_course_even(request):
 def conditionhead(request):
     data = json.loads(request.body)
     id = data.get("id")
-  
+    print(id);
     content = []
     content = conhead.objects.select_related("course").filter(course=id,is_active='Y').values("conhead_id", "name","course__course_code")
 
 
     return JsonResponse(list(content), status=200, safe=False)     
+@csrf_exempt
+def conditionheadsave(request):
+    data = json.loads(request.body)
+    id = data.get("id")
+    name = data.get("name")
+    content = conhead.objects.get(pk=id)
+    content.name = name
+    content.save()
+
+    return JsonResponse(id, status=200, safe=False)   
+
+@csrf_exempt
+def conditionheadcreate(request):
+    data = json.loads(request.body)
+    course_id = data.get("course_id")
+    name = data.get("name")
+
+    content = conhead(
+        name=name,
+        course_id=course_id,
+        is_active='Y',
+     )
+    content.save()
+
+    return JsonResponse(course_id, status=200, safe=False)     
