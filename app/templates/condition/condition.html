@@ -31,11 +31,46 @@
   
   }
 
+  async function detcondition() {
+
+
+    let id_delete =  document.getElementById('id_delete').value
+
+    let data = await fetch('/api/condition/deletecondition', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({'course_id':course_id,'name':names})
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Display response
+       
+console.log(data)
+      })
+
+      await reload()
+
+
+
+  }
+
   async function createcondition() {
 
     let course_id =  document.getElementById('course_id').value
+    let names =  document.getElementById('names').value
 
-    let names = document.getElementById('names').value
+    if(names == ''){
+    Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'กรอกข้อมูลด้วยครับ',
+    });
+      return false;
+    }
+
+ 
     let data = await fetch('/api/condition/createcondition', {
       method: 'POST',
       headers: {
@@ -83,6 +118,12 @@
       .then(response => response.json())
       .then(data => {
           // Display response
+
+
+          let myModal = bootstrap.Modal.getInstance(document.getElementById('EditClick')); // Get the existing modal instance
+          if (myModal) {
+              myModal.hide(); // Hide the modal
+          }
         
       })
       await reload()
@@ -297,7 +338,7 @@
         <thead>
           <tr>
             <th>ลำดับ</th>
-            <th>หลักสูตร</th>
+            <th>ชื่อเงื่อนไข</th>
             <th>ITEM Code</th>
  
             <th>#</th>
@@ -362,7 +403,7 @@
                 <i class="bx bx-x d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">ยกเลิก</span>
               </button>
-              <button type="submit" class="btn btn-primary ml-1">
+              <button type="submit" class="btn btn-primary ml-1"  onclick="detcondition()">
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">ยืนยันการลบ</span>
               </button>
@@ -391,17 +432,18 @@
           <div class="modal-body">
             {% csrf_token %}
             <input type="hidden" name="des_id" id="des_id" required />
+            <input class="form-control" type="hidden" name="course_ids"  id="course_ids">
+            <input class="form-control" type="hidden" name="id"  id="id">
             <div class="col-12 col-sm-12">
+              ชื่อเงื่อนไข  <label style="color: red"> *</label>
               <div class="form-check">
-                  <input class="form-control" type="text" name="name"  id="name">
-                  <input class="form-control" type="text" name="id"  id="id">
-                  <input class="form-control" type="text" name="course_ids"  id="course_ids">
+                <input class="form-control" type="text" name="name"  id="name">        
               </div>
   
             </div>
             <div class="modal-footer">
               <button type="submit" class="btn btn-primary ml-1" onclick="save()"
-                 data-bs-dismiss="modal"
+                data-bs-dismiss="modal"
               >
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">บันทึก</span>
@@ -443,6 +485,7 @@
             <input type="hidden" name="des_id" id="des_id" required />
             <div class="col-12 col-sm-12">
               <div class="form-check">
+                ชื่อเงื่อนไข  <label style="color: red"> *</label>
                   <input class="form-control" type="text" name="names"  id="names" value="">
                  
               </div>

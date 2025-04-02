@@ -224,7 +224,10 @@ urlpatterns = [
 
     path('api/condition/conditionhead', course.conditionhead),
     path('api/condition/createcondition', course.conditionheadcreate),
-   
+    path('api/condition/savecondition', course.conditionheadsave),
+    path('api/condition/deletecondition', course.conditionheaddel),
+
+    
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.MEDIA_ROOT)

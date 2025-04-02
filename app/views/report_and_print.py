@@ -45,7 +45,7 @@ def register_print(request, rp_id):
             x = desciption_bill.objects.get(des_id=rsx.des_id)
             v = {'des_id': x.des_id,  'name': x.name}
             obj2.append(v)
-    
+
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=content.register_id)
     

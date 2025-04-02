@@ -394,7 +394,7 @@ def conditionlist(request):
 
 
 def conditioncreate(request,conhead_id):
-    print(conhead_id)
+    
     user_id = request.user.id
     # Menu
     try:
@@ -419,8 +419,11 @@ def conditioncreate(request,conhead_id):
 
    
     result = condition.objects.select_related("course").filter(conhead=conhead_id)
+    gethead = condition.objects.get(conhead=conhead_id)
+    conu = course.objects.get(pk=gethead.course_id)
    
-    context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
+
+    context = {'title': title, 'listMenuPermission': objMenu, 'data': result,'course_name':conu}
 
     return render(request, 'condition/condition_id.html', context)    
 
@@ -961,7 +964,6 @@ def update_course_even(request):
 def conditionhead(request):
     data = json.loads(request.body)
     id = data.get("id")
-    print(id);
     content = []
     content = conhead.objects.select_related("course").filter(course=id,is_active='Y').values("conhead_id", "name","course__course_code")
 
@@ -992,3 +994,12 @@ def conditionheadcreate(request):
     content.save()
 
     return JsonResponse(course_id, status=200, safe=False)     
+
+@csrf_exempt
+def conditionheaddel(request):
+    data = json.loads(request.body)
+    id = data.get("id")
+    content = conhead.objects.get(pk=id)
+
+
+    return JsonResponse(content, status=200, safe=False)  
