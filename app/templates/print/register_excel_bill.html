@@ -123,7 +123,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>รวม</td>
       <td>สถานะการขาย</td>
       <td>ชื่อผู้ขาย</td>
-      <td>ประเภท</td>
+      <td>ประเภท</td>  <td>STM โอน</td>
+
     </tr>
     {% for res in data %}
     <tr>
@@ -174,8 +175,10 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
         {% endif %}
    
       </td>
+      <td>{{res.payment_list.stmdate}}</td>
       {% endfor %}
     </tr>
+   
     <tr style="font-weight: bold">
       <td colspan="10" align="right">จำนวนยอดทั้งหมด</td>
       <td align="right">{{total_sum|floatformat:2|intcomma}}</td>

@@ -511,6 +511,8 @@ function validateForm() {
               />
             </div>
           </div>
+
+          
           
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
@@ -715,8 +717,48 @@ function validateForm() {
           </div>
           {% else %}
           {% endif %}
+
+          {% if content_regist.pay_type == 1 %}
+
+          <div class="col-lg-3 col-md-6">
+            <div class="form-group">
+              <label>STM โอน </label>
+              <input
+              type="datetime-local"
+              class="form-control"
+              id="stmdate"
+              name="stmdate"
+              format-value="yyyy-MM-ddTHH:mm" 
+              required
+            />
+            </div>
+          </div>
+
+         
+
+          <div class="col-lg-3 col-md-6">
+            <div class="form-group">
+              <label>หมายเหตุ</label>
+              <input
+              type="text"
+              class="form-control"
+              id="stmetc"
+              name="stmetc"
+            />
+            </div>
+          </div>
+
+          {% endif %}
+
+       
         </div>
+
+        
+
+        
       </div>
+
+      
     </div>
 
 

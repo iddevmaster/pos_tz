@@ -670,6 +670,8 @@ def payment_create(request):
     rp_address = request.POST['rp_address']
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
+    stmda = request.POST.get('stmdate')
+    etc= request.POST.get('stmetc')
     bills = request.POST.getlist("selected_bills", [])
     rp_confirm_date_price = dmytoymd(
         request.POST.get("rp_confirm_date_price", now.strftime("%d/%m/%Y")))
@@ -791,7 +793,11 @@ def payment_create(request):
         rpi_price_result=rpi_price_result,
         rpi_pay=rpi_price_result,
         rp_id=rp_id,
-        register_id=register_id
+        register_id=register_id,
+        stmdate=stmda,
+        stmetc=etc,
+
+        
     )
 
     # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
@@ -861,6 +867,8 @@ def payment_createno(request):
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
     vat = request.POST['vat']
+    stmda = request.POST.get('stmdate')
+    etc= request.POST.get('stmetc')
     bills = request.POST.getlist("selected_bills", [])
 
 
@@ -870,7 +878,6 @@ def payment_createno(request):
         request.POST.get("rp_date_delivery", now.strftime("%d/%m/%Y")))
     uuid_without_dashes = str(register_id).replace('-', '')
  
-
     user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
     if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
         user_man = 0
@@ -980,6 +987,8 @@ def payment_createno(request):
         rp_id=rp_id,
         register_id=register_id,
         vat=vat,
+        stmdate=stmda,
+        stmetc=etc,
     )
 
 

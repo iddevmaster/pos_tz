@@ -193,6 +193,8 @@ class register_payment_items(models.Model):
     rp = models.ForeignKey(
         register_payment, on_delete=models.CASCADE)
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
+    stmdate = models.DateTimeField(blank=True, null=True)
+    stmetc = models.CharField(max_length=64, blank=True, default=None)
 
 
 class customers(models.Model):
