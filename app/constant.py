@@ -268,6 +268,12 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+        {
+        "value": "report/register/export/bill/today",
+        "label": "รายงานข้อมูลใบเสร็จรประจำวัน",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
     {
         "value": "report/register/export/learning_status",
         "label": "รายงานจบ/ไม่จบหลักสูตร",
