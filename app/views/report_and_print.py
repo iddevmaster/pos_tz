@@ -785,22 +785,24 @@ def register_excel_billtoday(request):
         str(date.today().month) + "-" + "01"
     default_end = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(lastday)
-
+    default_today = str(date.today().year) + "-" + \
+        str(date.today().month) + "-" + str(date.today().day)
+    print(default_today)
         
     if date_range is not None:
         start, end = format_daterange(date_range)
         if start == end:
             content = content.filter(
-                register__crt_date__date=start)
+                register__crt_date__date=default_today)
         else:
             content = content.filter(
-                register__crt_date__date__gte=start, register__crt_date__date__lte=end)
+                register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
         range_param = date_range
     else:
         content = content.filter(
-            register__crt_date__date__gte=default_start, register__crt_date__date__lte=default_end)
-        range_param = str(ymdtodmy(default_start)) + \
-            " - " + str(ymdtodmy(default_end))
+            register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
+        range_param = str(ymdtodmy(default_today)) + \
+            " - " + str(ymdtodmy(default_today))
 
     close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
     # close_the_sale_param = "ทุกประเภท"
