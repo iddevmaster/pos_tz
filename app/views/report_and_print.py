@@ -787,7 +787,7 @@ def register_excel_billtoday(request):
         str(date.today().month) + "-" + str(lastday)
     default_today = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(date.today().day)
-    print(default_today)
+
         
     if date_range is not None:
         start, end = format_daterange(date_range)
