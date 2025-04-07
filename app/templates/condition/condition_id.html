@@ -1,13 +1,134 @@
-{% extends 'base.html' %} {% block content %} {% load humanize %}
+{% extends 'base.html' %} 
+{% block content %} 
+  {% load humanize static %}
+  {% load ex_functions %}
 <script>
   function setValueDeleteModal(id) {
     document.getElementById("id_delete").value = id;
+    document.getElementById("conhead_id").value = id;
   }
 
+  function setValueUpdateModal(condition_id,type,student,price,hour,action) {
+
+document.getElementById("type_id_update").value = type;
+document.getElementById("condition_update").value = condition_id;
+const a = document.getElementById("is_type_condition").value;
+if(a == 1){
+  document.getElementById("price_update").value = price;
+}
+if(a == 2){
+  document.getElementById("hour_update").value = hour;
+  document.getElementById("action_update").value = action;
+}
+document.getElementById("student_update").value = student;
+
+  }
+       
 
   function myFunction(id) {
    alert('ok');
   }
+
+  
+
+
+
+function allowOnlyNumbers(event) {
+
+if (
+event.key === "Backspace" || 
+event.key === "Tab" || 
+event.key === "ArrowLeft" || 
+event.key === "ArrowRight" || 
+event.key === "Delete"
+) {
+return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+event.preventDefault(); // Block other characters
+return false; // Prevent default behavior
+}
+
+
+setTimeout(() => {
+const it = document.getElementById("student").value;
+if (it.charAt(0) == "0") {
+if (it.charAt(1)) {
+let result = removeFirstCharacter(it);
+document.getElementById("student").value = result 
+}
+}
+}, 20);
+}
+
+
+function allowOnlyNumbers2(event) {
+
+if (
+event.key === "Backspace" || 
+event.key === "Tab" || 
+event.key === "ArrowLeft" || 
+event.key === "ArrowRight" || 
+event.key === "Delete"
+) {
+return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+event.preventDefault(); // Block other characters
+return false; // Prevent default behavior
+}
+
+
+setTimeout(() => {
+const it = document.getElementById("price").value;
+if (it.charAt(0) == "0") {
+if (it.charAt(1)) {
+let result = removeFirstCharacter(it);
+document.getElementById("price").value = result 
+}
+}
+}, 20);
+}
+
+
+function allowOnlyNumbers3(event) {
+
+if (
+event.key === "Backspace" || 
+event.key === "Tab" || 
+event.key === "ArrowLeft" || 
+event.key === "ArrowRight" || 
+event.key === "Delete"
+) {
+return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+event.preventDefault(); // Block other characters
+return false; // Prevent default behavior
+}
+
+
+setTimeout(() => {
+const it = document.getElementById("hour").value;
+if (it.charAt(0) == "0") {
+if (it.charAt(1)) {
+let result = removeFirstCharacter(it);
+document.getElementById("hour").value = result 
+}
+}
+}, 20);
+}
+
+
+function removeFirstCharacter(str) {
+  return str.substring(1);
+}
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -27,6 +148,8 @@
     </nav>
   </div>
 </div>
+
+
 
 <section class="section">
   <div class="card">
@@ -48,6 +171,15 @@
       </div>
 
     </div>
+
+    <input
+    type="hidden"
+    class="form-control"
+    id="is_type_condition"
+    name="is_type_condition"
+    value="{{coursea.course.is_type_condition}}"
+  />
+
     <div class="card-body">
      <span style="font-size:20px;"> {{course_name.course_name}}</span>    -  <span style="font-size:20px;"> {{course_name.course_code}}</span>
       <table class="table table-striped" id="table1">
@@ -56,33 +188,49 @@
             <th>ลำดับ</th>
             <th>เครื่องหมาย</th>
             <th>จำนวนนักเรียนที่กำหนด</th>
-            <th>บาท / ขั่วโมง</th>
-            <th>ชั่วโมง</th>
+            <th>ชั่วโมงล่ะ / บาท</th>
+            <th>เพิ่มชั่วโมง</th>
             <th>#</th>
           </tr>
         </thead>
         <tbody>
           {% for res in data %}
           <tr>
-            
+          
             <td align="center">{{ forloop.counter }}</td>
-            <td> มากกว่า </td>
-            <td>1 คน</td>
+            <td> 
+              
+          
+              {% if res.type == '1' %}
+                {{"> มากกว่า"}}
+              {% elif res.type == '2' %}
+              {{"< น้อยกว่า"}}
+       
+              {% else %}
+              {{"= เท่ากับ"}}
+              {% endif %}
+            
+            
+            </td>
+            <td>{{res.student}}  คน</td>
          
-            <td>100 บาท</td>
-            <td>0</td>
+            <td>{{res.price}} บาท</td>
+            <td>{{res.hour}} </td>
             <td>
               <div align="center">
                 <button
                   type="button"
+                  onclick="setValueUpdateModal('{{res.condition_id}}','{{res.type}}','{{res.student}}','{{res.price}}','{{res.hour}}','{{res.action}}')"
                   class="btn btn-warning"
-                  onclick="window.location.href='/teacher/form/update/{{res.teacher_id}}'"
+                  data-bs-toggle="modal"
+                  data-bs-target="#EditClick"
                 >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
+                <i class="icon dripicons-document-edit"></i> แก้ไข
+                  
                 </button>
                 <button
                   type="button"
-                  onclick="setValueDeleteModal('{{res.teacher_id}}')"
+                  onclick="setValueDeleteModal('{{res.condition_id}}')"
                   class="btn btn-danger"
                   data-bs-toggle="modal"
                   data-bs-target="#DeleteClick"
@@ -93,47 +241,267 @@
               </div>
             </td>
           </tr>
-
-
-          <tr>
-            
-            <td align="center">{{ forloop.counter }}</td>
-            <td> มากกว่า </td>
-            <td>2 คน</td>
-         
-            <td>150 บาท</td>
-            <td>0</td>
-            <td>
-              <div align="center">
-                <button
-                  type="button"
-                  class="btn btn-warning"
-                  onclick="window.location.href='/teacher/form/update/{{res.teacher_id}}'"
-                >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
-                </button>
-                
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.teacher_id}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
-                  <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
-                </button>
-              </div>
-            </td>
-          </tr>
-
-
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
+
+  <div
+  class="modal fade text-left"
+  id="CreateClick"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel160"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document"
+  >
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title white" id="myModalLabel160">เพิ่มข้อมูล</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form action="{% url 'CreateConditioneEvent' %}" method="post" autocomplete="off" >
+    
+        {% csrf_token %}
+        <div class="modal-body">
+
+        <input type="hidden" name="conhead_id" id="conhead_id" value="{{conhead_id}}" />
+        <input
+        type="hidden"
+        class="form-control"
+        id="type_condition"
+        name="type_condition"
+        value="{{coursea.course.is_type_condition}}"
+      />
+
+          <div class="form-group">
+            <label>เครื่องหมาย</label>
+            <select class="form-control" name="type_id" id="type_id" required>
+              <option value="1">มากกว่า  </option>
+              <option value="2">น้อยกว่า </option>
+              <option value="3">เท่ากับ</option>
+            </select>
+          </div>
+          {% if coursea.course.is_type_condition == '2' %}
+          <div class="form-group">
+            <label>เพิ่ม/ลด ชั่วโมง</label>
+            <select class="form-control" name="action" id="action" required>
+              <option value="1">เพิ่ม </option>
+              <option value="0">ลด </option>
+          
+            </select>
+          </div>
+          {% else %}
+          {% endif %}
+          <div class="form-group">
+            <label>จำนวนนักเรียน</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="student"
+              name="student"
+              required
+              placeholder="1"
+              onkeydown="allowOnlyNumbers(event)" 
+            />
+          </div>
+
+
+          {% if coursea.course.is_type_condition == '1' %}
+        
+          <div class="form-group">
+            <label>ราคา/บาท</label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="price"
+              name="price"
+              required
+              value="0"
+              placeholder="0"
+              onkeydown="allowOnlyNumbers2(event)" 
+            />
+          </div>
+          {% else %}
+          
+          <div class="form-group">
+            <label>ชั่วโมง </label>
+            <label style="color: red">*</label>
+            <input
+              type="text"
+              class="form-control"
+              id="hour"
+              name="hour"
+              required
+              value="0"
+              placeholder="0"
+              onkeydown="allowOnlyNumbers3(event)" 
+            />
+          </div>
+          {% endif %}
+        
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-light-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">บันทึก</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<div
+class="modal fade text-left"
+id="EditClick"
+tabindex="-1"
+role="dialog"
+aria-labelledby="myModalLabel160"
+aria-hidden="true"
+>
+<div
+  class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+  role="document"
+>
+  <div class="modal-content">
+    <div class="modal-header bg-primary">
+      <h5 class="modal-title white" id="myModalLabel160">แก้ไขข้อมูล</h5>
+      <button
+        type="button"
+        class="close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      >
+        <i data-feather="x"></i>
+      </button>
+    </div>
+    <form action="{% url 'UpdateConditioneEvent' %}" method="post" autocomplete="off" >
+  
+      {% csrf_token %}
+      <div class="modal-body">
+
+      <input type="hidden" name="conhead_id" id="conhead_id" value="{{conhead_id}}" />
+      <input
+      type="hidden"
+      class="form-control"
+      id="type_condition"
+      name="type_condition"
+      value="{{coursea.course.is_type_condition}}"
+    />
+    <input type="hidden" name="condition_id" id="condition_update" />
+
+        <div class="form-group">
+          <label>เครื่องหมาย</label>
+          <select class="form-control" name="type_id" id="type_id_update" required>
+            <option value="1">มากกว่า </option>
+            <option value="2">น้อยกว่า </option>
+            <option value="3">เท่ากับ</option>
+          </select>
+        </div>
+
+        {% if coursea.course.is_type_condition == '2' %}
+        <div class="form-group">
+          <label>เพิ่ม/ลด ชั่วโมง</label>
+          <select class="form-control" name="action" id="action_update" required>
+            <option value="1">เพิ่ม </option>
+            <option value="0">ลด </option>
+          </select>
+        </div>
+        {% else %}
+        {% endif %}
+        <div class="form-group">
+          <label>จำนวนนักเรียน</label>
+          <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="student_update"
+            name="student"
+            required
+            placeholder="1"
+            onkeydown="allowOnlyNumbers(event)" 
+          />
+        </div>
+
+
+        {% if coursea.course.is_type_condition == '1' %}
+      
+        <div class="form-group">
+          <label>ราคา/บาท</label>
+          <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="price_update"
+            name="price"
+            required
+            value="0"
+            placeholder="0"
+            onkeydown="allowOnlyNumbers2(event)" 
+          />
+        </div>
+        {% else %}
+        
+        <div class="form-group">
+          <label>เพิ่ม/ชั่วโมง </label>
+          <label style="color: red">*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="hour_update"
+            name="hour"
+            required
+            value="0"
+            placeholder="0"
+            onkeydown="allowOnlyNumbers3(event)" 
+          />
+        </div>
+        {% endif %}
+      
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-light-secondary"
+          data-bs-dismiss="modal"
+        >
+          <i class="bx bx-x d-block d-sm-none"></i>
+          <span class="d-none d-sm-block">ยกเลิก</span>
+        </button>
+        <button type="submit" class="btn btn-primary ml-1">
+          <i class="bx bx-check d-block d-sm-none"></i>
+          <span class="d-none d-sm-block">บันทึก</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
   
   {% comment %} Delete {% endcomment %}
   <div class="modal fade" id="DeleteClick">
@@ -150,10 +518,11 @@
             <i data-feather="x"></i>
           </button>
         </div>
-        <form action="{% url 'teacher_form_delete' %}" method="post">
+        <form action="{% url 'conditionr_form_delete' %}" method="post">
           <div class="modal-body">
             {% csrf_token %}
             <input type="hidden" name="id" id="id_delete" required />
+            <input type="hidden" name="conhead_id" id="conhead_id" value="{{conhead_id}}" />
             <div align="center">
               <h4>ยืนยันการลบข้อมูล</h4>
             </div>

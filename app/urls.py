@@ -86,6 +86,7 @@ urlpatterns = [
     path('course/event', course.course_event_list),
     path('course/event/create', course.course_event_create,
          name="CreateCourseEvent"),
+         
     path('course/event/update', course.course_event_update,
          name="UpdateCourseEvent"),
     path('course/event/delete/', course.course_event_delete,
@@ -100,7 +101,12 @@ urlpatterns = [
 
     path('condition/management/', course.conditionlist),
     path('condition/management/<slug:conhead_id>', course.conditioncreate),
-   
+    path('condition/form/delete', course.condition_form_delete,
+         name="conditionr_form_delete"),
+    path('condition/form/save', course.condition_form_save,
+         name="CreateConditioneEvent"),     
+     path('condition/form/update', course.condition_form_update,
+         name="UpdateConditioneEvent"),
 
     #     teacher
     path('teachers/', teacher.teacher_list),

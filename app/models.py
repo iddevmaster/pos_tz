@@ -70,8 +70,8 @@ class course(models.Model):
     cancelled = models.IntegerField(default=1, blank=False)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
     is_show_order = models.CharField(max_length=12, blank=True, default=None)
-
-
+    is_type_condition = models.CharField(max_length=12, blank=True, default=None)
+    is_show_condition = models.CharField(max_length=12, blank=True, default=None)
 
 # ev_vat  0  =ไม่รวม Vat,1 = รวม Vat
 
@@ -442,6 +442,7 @@ class condition(models.Model):
     type_add = models.CharField(max_length=20, unique=True, blank=True)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
     conhead = models.ForeignKey(conhead, on_delete=models.CASCADE)
+    action = models.CharField(max_length=20, unique=True, blank=True)
 
 
 

@@ -386,7 +386,7 @@ def conditionlist(request):
 
     
     resulta = course.objects.filter(
-            cancelled=1, active=1).order_by("-course_id")
+            cancelled=1, active=1,is_show_condition='Y').order_by("-course_id")
     result = conhead.objects.select_related("course").filter()
     context = {'title': title, 'listMenuPermission': objMenu, 'data': result, 'dataa': resulta}
 
@@ -419,16 +419,123 @@ def conditioncreate(request,conhead_id):
 
    
     result = condition.objects.select_related("course").filter(conhead=conhead_id)
-    gethead = condition.objects.get(conhead=conhead_id)
-    conu = course.objects.get(pk=gethead.course_id)
-   
+    conheadx = conhead.objects.select_related("course").get(conhead_id=conhead_id)
+    
 
-    context = {'title': title, 'listMenuPermission': objMenu, 'data': result,'course_name':conu}
+    try:
+        instance = condition.objects.filter(conhead=conhead_id)[:1].get()
+        conu = course.objects.get(pk=instance.course_id)
+    except condition.DoesNotExist:
+        instance = []
+        conu = []
+        context = {'title': title, 'listMenuPermission': objMenu, 'data': result,'course_name':conu,'conhead_id':conhead_id,'coursea':conheadx}
+        return render(request, 'condition/condition_id.html', context)   
+
+    context = {'title': title, 'listMenuPermission': objMenu, 'data': result,'course_name':conu,'conhead_id':conhead_id,'coursea':conheadx}
 
     return render(request, 'condition/condition_id.html', context)    
 
+def condition_form_delete(request):
+    
+    user_id = request.user.id
+
+    id = request.POST['id']
+    conhead_id = request.POST['conhead_id']
+    instance = condition.objects.filter(condition_id=id)[:1].get()
+    instance.delete()
+    # Menu
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/condition/management/" + str(conhead_id))    
 
 
+def condition_form_save(request):
+    user_id = request.user.id
+
+
+    conhead_id = request.POST['conhead_id']
+    type_condition = request.POST['type_condition']
+    
+    
+    instance = course.objects.get(course_id=conhead_id)
+    if type_condition == '1':
+        student = request.POST['student']
+        price = request.POST['price']
+        type_id = request.POST['type_id']
+        
+
+        content = condition(
+            student = student,
+            price = price,
+            type = type_id,
+            course_id = instance.course_id,
+            hour = 0,
+            type_add = type_condition,
+            conhead_id = conhead_id,
+            action = 1
+        )
+        content.save()
+    else:
+        
+        hour = request.POST['hour']
+        student = request.POST['student']
+        type_id = request.POST['type_id']
+        action = request.POST['action']
+        content = condition(
+            student = student,
+            price = 0,
+            type = type_id,
+            course_id = instance.course_id,
+            hour = hour,
+            type_add = type_condition,
+            conhead_id = conhead_id,
+            action = action
+        )
+        content.save()
+        
+ 
+
+
+    # Menu
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/condition/management/" + str(conhead_id))  
+
+def condition_form_update(request):
+    user_id = request.user.id
+
+
+    conhead_id = request.POST['conhead_id']
+    condition_id = request.POST['condition_id']
+    type_condition = request.POST['type_condition']
+    instance = course.objects.get(course_id=conhead_id)
+    if type_condition == '1':
+        student = request.POST['student']
+        price = request.POST['price']
+        type_id = request.POST['type_id']
+        
+
+        content = condition.objects.get(condition_id=condition_id)
+        content.student = student
+        content.price = price
+        content.type = type_id
+        content.save()
+    else:
+        
+        hour = request.POST['hour']
+        student = request.POST['student']
+        type_id = request.POST['type_id']
+        action = request.POST['action']
+        content = condition.objects.get(condition_id=condition_id)
+        content.student = student
+        content.hour = hour
+        content.type = type_id,
+        content.action = action,
+        content.save()
+        
+
+    # Menu
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/condition/management/" + str(conhead_id)) 
+  
 @login_required(login_url='/login')
 def calendar_event(request):
     user_id = request.user.id
