@@ -99,14 +99,18 @@ urlpatterns = [
     path('calendar_event_apieve/', course.calendar_event_apizs),
     path('calendar_event_apiall/', course.calendar_event_apiall),
 
+
+
     path('condition/management/', course.conditionlist),
     path('condition/management/<slug:conhead_id>', course.conditioncreate),
     path('condition/form/delete', course.condition_form_delete,
          name="conditionr_form_delete"),
     path('condition/form/save', course.condition_form_save,
          name="CreateConditioneEvent"),     
-     path('condition/form/update', course.condition_form_update,
+    path('condition/form/update', course.condition_form_update,
          name="UpdateConditioneEvent"),
+
+    path('api/updateeventcondition', course.condition_form_update_event),
 
     #     teacher
     path('teachers/', teacher.teacher_list),
@@ -157,6 +161,8 @@ urlpatterns = [
          report_and_print.register_report_quotation),
     path('report/register/export/bill', report_and_print.register_report_bill),
     path('report/register/export/bill/today', report_and_print.register_report_billtoday),
+    path('report/summarize/export/bill/today', report_and_print.register_report_billtoday_summarize),
+
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',
@@ -170,6 +176,7 @@ urlpatterns = [
     path('register/excel/quotation', report_and_print.register_excel_quotation),
     path('register/excel/bill', report_and_print.register_excel_bill),
     path('register/excel/bill/today', report_and_print.register_excel_billtoday),
+    path('summarize/excel/bill/today', report_and_print.register_excel_billtoday_summarize),
     path('register/excel/learning_status',
          report_and_print.register_excel_learn_status),
     path('certificate/print/<slug:student_id>',
