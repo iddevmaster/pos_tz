@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required 
 from django.db.models import Q, Count
 # from django.http import HttpResponse, response
 from datetime import date, timedelta
-from dateutil import rrule
+from dateutil import rrule 
 import json
 from datetime import datetime
+
+from django.db.models import Count, Sum, F
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
 from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on
@@ -913,87 +915,114 @@ def register_excel_billtoday_summarize(request):
         m = None
         return render(request, '404.html')
     
-    date_range = request.POST.get('date_range', None)
-    # close_the_sale = int(request.POST.get('qclose_the_sale', -1))
-    course_id = int(request.POST.get('qcourse', 0))
-    generation = request.POST.get('qgeneration', 0)
-    seller = int(request.POST.get('qseller', 0))
-    customer_name = request.POST.get('qcustomer_name', None)
-    event = int(request.POST.get('event', 0))
-    content = register_payment.objects.select_related(
-        'register').filter(register__pay_type=1, active=1,register__module=m.module)
+    # date_range = request.POST.get('date_range', None)
 
-    lastday = lastDateOfmonth(
-        date.today().year, date.today().month, date.today().day)
-    default_start = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + "01"
-    default_end = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + str(lastday)
+    # course_id = int(request.POST.get('qcourse', 0))
+    # generation = request.POST.get('qgeneration', 0)
+    # seller = int(request.POST.get('qseller', 0))
+    # customer_name = request.POST.get('qcustomer_name', None)
+    # event = int(request.POST.get('event', 0))
+    # content = register_payment.objects.select_related(
+    #     'register').filter(register__pay_type=1, active=1,register__module=m.module)
+
+    # lastday = lastDateOfmonth(
+    #     date.today().year, date.today().month, date.today().day)
+    # default_start = str(date.today().year) + "-" + \
+    #     str(date.today().month) + "-" + "01"
+    # default_end = str(date.today().year) + "-" + \
+    #     str(date.today().month) + "-" + str(lastday)
     default_today = str(date.today().year) + "-" + \
         str(date.today().month) + "-" + str(date.today().day)
 
-        
-    if date_range is not None:
-        start, end = format_daterange(date_range)
-        if start == end:
-            content = content.filter(
-                register__crt_date__date=default_today)
-        else:
-            content = content.filter(
-                register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
-        range_param = date_range
-    else:
-        content = content.filter(
-            register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
-        range_param = str(ymdtodmy(default_today)) + \
+    range_param = str(ymdtodmy(default_today)) + \
             " - " + str(ymdtodmy(default_today))
 
-    close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
+    queryset = (
+        register_payment.objects
+        .filter(active=1)
+        .annotate(related_register_id=F('register__register_id')) 
+        .filter(register__pay_type=1, register__crt_date__date=default_today)
+        .values('items__rpi_code', 'items__rpi_name', 'items__rpi_code')
+        .annotate(
+            total_bill=Count('items__rpi_code'),
+            total=Sum('items__rpi_price_total'),
+            dis=Sum('items__rpi_price_discount'),
+            vat=Sum('items__rpi_price_vat'),
+            result=Sum('items__rpi_price_result'),
+        )
+    )
 
-    course_param = "ทุกหลักสูตร"
-    if course_id != 0:
-        content = content.filter(register__ev__course_id=course_id)
-        c = course.objects.get(course_id=course_id)
-        course_param = str(c.course_code) + " " + str(c.course_name)
-    generation_param = "ทุกรุ่น"
-    if generation:
-        content = content.filter(register__ev__ev_generation=generation)
-        generation_param = generation
-    seller_param = "ทุกคน"
-    if seller != 0:
-        content = content.filter(register__seller_id=seller)
-        u = User.objects.get(id=seller)
-        seller_param = str(u.first_name) + " " + str(u.last_name)
-    if customer_name != None:
-        content = content.filter(Q(rp_name_customer__icontains=customer_name))
-    if event == 1:
-        content = content.filter(register__ev__ev_id__isnull=False)
-    if event == 2:
-        content = content.filter(register__ev__ev_id__isnull=True)
-    obj = []
-    total_sum = 0
-    for r in content:
-        print(r.register_id)
-        customer_list = customers.objects.filter(
-            register=r.register_id).select_related('location').first()
-        payment_list = register_payment_items.objects.filter(
-            rp_id=r.rp_id).order_by("-rp__rp_id").first()
-        if payment_list is not None:
-            rpi_price_result = payment_list.rpi_price_result
-        else:
-            rpi_price_result = 0
-        total_sum += rpi_price_result
+   
+    print(queryset)
+    total = 0.0  # Initialize to 0.0
+    for r in queryset:
+        if r['result'] is not None:
+            total += r['result']
+            print(total)
 
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.register.ev_id).first()
-        res = {'main': r, 'customer_list': customer_list,
-               'course_list': course_list, 'payment_list': payment_list}
-        obj.append(res)
-    # print(total_sum)
-    param = {'total_data': len(content), 'range_param': range_param, 'close_the_sale_param': close_the_sale_param,
-             'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
-    context = {'title': defaultTitle, 'data': obj,
-               'param': param, 'total_sum': total_sum}
+    context = {'sales_data': list(queryset),'total_sum':total,'today':range_param}
+        
+    # if date_range is not None:
+    #     start, end = format_daterange(date_range)
+    #     if start == end:
+    #         content = content.filter(
+    #             register__crt_date__date=default_today)
+    #     else:
+    #         content = content.filter(
+    #             register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
+    #     range_param = date_range
+    # else:
+    #     content = content.filter(
+    #         register__crt_date__date__gte=default_today, register__crt_date__date__lte=default_today)
+    #     range_param = str(ymdtodmy(default_today)) + \
+    #         " - " + str(ymdtodmy(default_today))
+
+    # close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
+
+    # course_param = "ทุกหลักสูตร"
+    # if course_id != 0:
+    #     content = content.filter(register__ev__course_id=course_id)
+    #     c = course.objects.get(course_id=course_id)
+    #     course_param = str(c.course_code) + " " + str(c.course_name)
+    # generation_param = "ทุกรุ่น"
+    # if generation:
+    #     content = content.filter(register__ev__ev_generation=generation)
+    #     generation_param = generation
+    # seller_param = "ทุกคน"
+    # if seller != 0:
+    #     content = content.filter(register__seller_id=seller)
+    #     u = User.objects.get(id=seller)
+    #     seller_param = str(u.first_name) + " " + str(u.last_name)
+    # if customer_name != None:
+    #     content = content.filter(Q(rp_name_customer__icontains=customer_name))
+    # if event == 1:
+    #     content = content.filter(register__ev__ev_id__isnull=False)
+    # if event == 2:
+    #     content = content.filter(register__ev__ev_id__isnull=True)
+    # obj = []
+    # total_sum = 0
+    # for r in content:
+    #     print(r.register_id)
+    #     customer_list = customers.objects.filter(
+    #         register=r.register_id).select_related('location').first()
+    #     payment_list = register_payment_items.objects.filter(
+    #         rp_id=r.rp_id).order_by("-rp__rp_id").first()
+    #     if payment_list is not None:
+    #         rpi_price_result = payment_list.rpi_price_result
+    #     else:
+    #         rpi_price_result = 0
+    #     total_sum += rpi_price_result
+
+    #     course_list = course_event.objects.select_related(
+    #         'course').filter(ev_id=r.register.ev_id).first()
+    #     res = {'main': r, 'customer_list': customer_list,
+    #            'course_list': course_list, 'payment_list': payment_list}
+    #     obj.append(res)
+    # # print(total_sum)
+    # param = {'total_data': len(content), 'range_param': range_param, 'close_the_sale_param': close_the_sale_param,
+    #          'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
+    # context = {'title': defaultTitle, 'data': obj,
+    #            'param': param, 'total_sum': total_sum}
     return render(request, 'print/register_excel_bill_today_summary.html', context)    
 
 

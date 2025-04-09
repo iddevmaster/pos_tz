@@ -192,7 +192,7 @@ class register_payment_items(models.Model):
     rpi_pay = models.FloatField(default=0, blank=False)
     vat = models.CharField(max_length=64, blank=True, default=None)
     rp = models.ForeignKey(
-        register_payment, on_delete=models.CASCADE)
+        register_payment, on_delete=models.CASCADE , related_name='items')
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
     stmdate = models.DateTimeField(blank=True, null=True)
     stmetc = models.CharField(max_length=64, blank=True, default=None)
