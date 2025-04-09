@@ -68,120 +68,98 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 >
   <tbody>
     <tr style="font-weight: bold">
-      <td colspan="2">{{param.range_param}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="font-weight: bold">
-      <td>สถานะการขาย : {{param.close_the_sale_param}}</td>
-      <td>หลักสูตร : {{param.course_param}}</td>
-      <td>รุ่น : {{param.generation_param}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="font-weight: bold">
-      <td>ชื่อผู้ขาย : {{param.seller_param}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td colspan="2"></td>
+      <td>
+        <table>  <!-- Nested Table -->
+        <tr>
+          <td> บริษัท ไอดีไดร์ฟ จำกัด </td>
+        </tr>
+      
+    
+      </table>
+</td>
+      <td colspan="3"> ศูนย์เทรนนิ่งเซ็นเตอร์ สาขาที่   18 </td>
+      <td colspan="4"></td>
+    
+  
     </tr>
 
     <tr style="font-weight: bold">
-      <td>เลขที่ใบเสนอราคา</td>
-      <td>เลขที่ทะเบียนลูกค้า</td>
-      <td>ชื่อลูกค้า</td>
-      <td>หลักสูตร</td>
-      <td>รุ่นของการอบรม</td>
-      <td>วันที่ออกใบเสนอราคา</td>
-      <td>วันที่ปิดใบเสนอราคา</td>
-      <td>มูลค่าสินค้า</td>
+      <td  colspan="2"></td>
+
+      <td colspan="4">
+        <table>  <!-- Nested Table -->
+          <tr>
+            <td> รายงานยอดขายประจำวัน ตาม Item code </td>
+          </tr>
+         
+        </table>
+      </td>
+      <td colspan="7"></td>
+   
+ 
+    </tr>
+    <tr style="font-weight: bold">
+      <td  colspan="2"></td>
+
+      <td>
+        <table>  <!-- Nested Table -->
+          <tr>
+            <td> {{today}} </td>
+          </tr>
+          <tr>
+            <td> สถานะการขาย : ปิดการขาย </td>
+          </tr>
+          <tr>
+            <td>หลักสูตร : ทุกหลักสูตร</td>
+          </tr>
+          <tr>
+            <td> รุ่น : ทุกรุ่น</td>
+          </tr>
+        </table>
+
+
+      </td>
+      <td colspan="7"></td>
+   
+ 
+    </tr>
+
+    <tr style="font-weight: bold">
+      <td>ลำดับ</td>
+      <td>จำนวนใบเสร็จรับเงิน</td>
+      <td>หลักสูตร  item code</td>
+      <td>มูลค่าสินค้ารวม</td>
       <td>ส่วนลดราคา</td>
       <td>ภาษีมูลค่าเพิ่ม</td>
-      <td>รวม</td>
-      <td>สถานะการขาย</td>
-      <td>ชื่อผู้ขาย</td>
-      <td>ประเภท</td>  <td>STM โอน</td>
+      <td>รวมทั้งหมด</td>
+      <td>มูลค่าสินค้า</td>
+      <td>SQ เลขที่</td>
+      <td>ใบกำกับภาษี เลขที่ </td>
+
 
     </tr>
-    {% for res in data %}
+
+    {% for item in sales_data %}
     <tr>
-      <td>{{res.main.rp_doc_number}}</td>
-      <td>{{res.customer_list.customer_code}}</td>
-      <td>{{res.customer_list.customer_name}}</td>
-      <td>
-        {{res.course_list.course.course_code}}
-        {{res.course_list.course.course_name}}
-      </td>
-      <td align="center">{{res.course_list.ev_generation}}</td>
-      <td>{{res.main.crt_date|date:"d/m/Y H:i"}}</td>
-      <td>{{res.main.upd_date|date:"d/m/Y H:i"}}</td>
-      <td align="right">
-        {{res.payment_list.rpi_price_total|floatformat:2|intcomma}}
-      </td>
-      <td align="right">
-        {{res.payment_list.rpi_price_discount|floatformat:2|intcomma}}
-      </td>
-      <td align="right">
-        {{res.payment_list.rpi_price_vat|floatformat:2|intcomma }}
-      </td>
-      <td align="right">
-        {{res.payment_list.rpi_price_result|floatformat:2|intcomma}}
-      </td>
-      <td>
-        {% if res.main.register.close_the_sale == 1 %}
-
-        <span>ปิดการขาย - ขายสำเร็จ</span>
-        {% elif res.main.register.close_the_sale == 2 %}
-
-        <span>ปิดการขาย - ขายไม่สำเร็จ</span>
-        {% else %}
-        <span>กำลังขาย</span>
-
-        {% endif %}
-      </td>
-      <td>{{res.main.rp_name_seller}}</td>
-
-
-
-      <td>
-
-        {% if res.customer_list.register.ev_id %}
-        <span>มี Event</span>
-        {% else %}
-        <span>ไม่มี Event</span>
-        {% endif %}
-   
-      </td>
-      <td>{{res.payment_list.stmdate}}</td>
-      {% endfor %}
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.total_bill }}</td>
+        <td>{{ item.items__rpi_name }} {{ item.items__rpi_code }}</td>
+  
+        <td>{{ item.total |floatformat:2|intcomma}} </td>
+        <td>{{ item.dis |floatformat:2|intcomma}}</td>
+        <td>{{ item.vat |floatformat:2|intcomma }}</td>
+        <td>{{ item.result |floatformat:2|intcomma }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
-   
+    {% endfor %}
+
     <tr style="font-weight: bold">
-      <td colspan="10" align="right">จำนวนยอดทั้งหมด</td>
+      <td colspan="6" align="right">จำนวนยอดทั้งหมด</td>
       <td align="right">{{total_sum|floatformat:2|intcomma}}</td>
+      <td></td>
       <td></td>
       <td></td>
     </tr>
