@@ -135,7 +135,8 @@ urlpatterns = [
 
   
 
-
+    path('register/report/event/all', register.report_register),
+    path('register/report/event/all/list/<slug:evs_id>', register.report_register_list),
 
 
     path('projectlist/', project.project_list),

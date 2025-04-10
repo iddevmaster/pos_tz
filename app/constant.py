@@ -292,6 +292,18 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+    {
+        "value": "register/report/event/all",
+        "label": "รายงานผู้เข้าอบรม",
+        "group_value": "naSt14",
+        "group_label": "ทะเบียนเข้าอบรม",
+    },
+    {
+        "value": "register/event/all",
+        "label": "ทะเบียนผู้เข้าอบรม",
+        "group_value": "naSt14",
+        "group_label": "ทะเบียนเข้าอบรม",
+    },
         {
         "value": "rt/sale",
         "label": "เปิดการขายแบบไม่มีอีเวน",
