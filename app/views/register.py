@@ -16,8 +16,9 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
+from ..constant import prefixEng,prefixThai
 
 api_id_card = api_id_card
 
@@ -1368,6 +1369,168 @@ def student_form_create(request, register_id):
 
 
 @login_required(login_url='/login')
+def register_form_create(request, ev_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content,'prefixEng':prefixEng,'prefixThai':prefixThai
+}
+    return render(request, 'register/register_form_create.html', context)
+
+
+@login_required(login_url='/login')
+def register_form_store(request, ev_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    student_prefix_th = request.POST['student_prefix_th']
+    student_prefix_eng = request.POST['student_prefix_eng']
+    student_identification_number = request.POST['student_identification_number']
+    student_firstname_th = request.POST['student_firstname_th']
+    student_lastname_th = request.POST['student_lastname_th']
+    student_firstname_eng = request.POST['student_firstname_eng']
+    student_lastname_eng = request.POST['student_lastname_eng']
+
+    training.objects.create(
+                student_identification_number=student_identification_number,
+                student_prefix_th=student_prefix_th,
+                student_firstname_th=student_firstname_th,
+                student_lastname_th=student_lastname_th,
+                student_prefix_eng=student_prefix_eng,
+                student_firstname_eng=student_firstname_eng,
+                student_lastname_eng=student_lastname_eng,
+                student_code='xxxxx',
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                ev_id=ev_id
+            )
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content
+}
+    return redirect("/register/event/teacher/list/" + str(ev_id))  
+
+
+@login_required(login_url='/login')
+def register_form_update(request, ev_id,training_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    student_prefix_th = request.POST['student_prefix_th']
+    student_prefix_eng = request.POST['student_prefix_eng']
+    student_identification_number = request.POST['student_identification_number']
+    student_firstname_th = request.POST['student_firstname_th']
+    student_lastname_th = request.POST['student_lastname_th']
+    student_firstname_eng = request.POST['student_firstname_eng']
+    student_lastname_eng = request.POST['student_lastname_eng']
+
+
+    instance = training.objects.get(training_id=training_id)
+    instance.student_identification_number = student_identification_number
+    instance.student_prefix_th = student_prefix_th
+    instance.student_firstname_th = student_firstname_th
+    instance.student_lastname_th = student_lastname_th
+    instance.student_prefix_eng = student_prefix_eng
+    instance.student_firstname_eng = student_firstname_eng
+    instance.student_lastname_eng = student_lastname_eng
+    instance.upd_date = dateTimeNow()
+    instance.save()
+    # training.objects.create(
+    #             student_identification_number=student_identification_number,
+    #             student_prefix_th=student_prefix_th,
+    #             student_firstname_th=student_firstname_th,
+    #             student_lastname_th=student_lastname_th,
+    #             student_prefix_eng=student_prefix_eng,
+    #             student_firstname_eng=student_firstname_eng,
+    #             student_lastname_eng=student_lastname_eng,
+    #             student_code='xxxxx',
+    #             crt_date=dateTimeNow(),
+    #             upd_date=dateTimeNow(),
+    #             ev_id=ev_id
+    #         )
+
+#     context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content
+# }
+    return redirect("/register/event/teacher/list/" + str(ev_id))    
+
+
+@login_required(login_url='/login')
+def register_form_show(request, ev_id,training_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    data = training.objects.get(training_id=training_id)
+    evs = course_event.objects.get(ev_id=ev_id)
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':data,'course':evs,'prefixEng':prefixEng,'prefixThai':prefixThai
+}
+   
+    return render(request, 'register/register_form_update.html', context)
+
+
+@login_required(login_url='/login')
 def student_form_update(request, student_id):
     user_id = request.user.id
     # Menu
@@ -1470,6 +1633,15 @@ def student_delete(request):
     content.delete()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/register/studentlist/" + str(register_id))
+
+@login_required(login_url='/login')
+def register_delete(request):
+    ev_id = request.POST['ev_id']
+    training_id = request.POST['training_id']
+    content = training.objects.get(training_id=training_id)
+    content.delete()
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/register/event/teacher/list/" + str(ev_id))
 
 
 @login_required(login_url='/login')
@@ -2146,6 +2318,180 @@ def approve_internal(request):
   
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
     return render(request, 'register/approve_list_documentsinternal.html', context)
+
+
+@login_required(login_url='/login')
+def report_register(request):
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+      
+
+        
+        
+  
+    context = {'title': title, 'listMenuPermission': objMenu}
+    return render(request, 'register/register_report_all.html', context)
+
+
+@login_required(login_url='/login')
+def report_register_re(request):
+    title = defaultTitle
+    user_id = request.user.id
+   
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+      
+
+        
+        
+  
+    context = {'title': title, 'listMenuPermission': objMenu}
+    return render(request, 'register/register_report_all_re.html', context)
+
+
+@login_required(login_url='/login')
+def report_register_teacher(request):
+    title = defaultTitle
+    user_id = request.user.id
+
+
+    try:
+        m = fact_teacher_user.objects.get(user_id=user_id)
+        
+    except fact_teacher_user.DoesNotExist:
+        m = None
+        return redirect("/")
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    context = {'title': title, 'listMenuPermission': objMenu}
+    return render(request, 'register/register_report_all_re.html', context)
+
+
+@login_required(login_url='/login')
+def report_register_list(request,evs_id):
+    title = defaultTitle
+    user_id = request.user.id
+
+ 
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+      
+   
+    c_evet = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,pk=evs_id)
+    print(c_evet.ev_training)
+    mains  = training.objects.filter(ev=evs_id)
+    obj = []
+    count = 0
+    for rs in list(mains):
+        count += 1
+        r = {'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
+        obj.append(r)
+    
+    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
+    return render(request, 'register/register_report_all_list.html', context)
+
+
+
+@login_required(login_url='/login')
+def report_register_listteacher(request,evs_id):
+    title = defaultTitle
+    user_id = request.user.id
+
+ 
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+      
+   
+    c_evet = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,pk=evs_id)
+    print(c_evet.ev_training)
+    mains  = training.objects.filter(ev=evs_id)
+    obj = []
+    count = 0
+    for rs in list(mains):
+        count += 1
+        r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
+        obj.append(r)
+    
+    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
+    return render(request, 'register/register_report_all_list.html', context)
 
 @login_required(login_url='/login')
 def approve_internal_doc(request,doc_id):

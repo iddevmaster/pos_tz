@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -356,7 +356,7 @@ def course_event_delete(request):
         "cancelled":0
     }
     # response = requests.get(api_url, headers=headers, params=params)
-    print(params)
+    
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
 
@@ -792,6 +792,79 @@ def calendar_event_apiall(request):
        
     return JsonResponse(obj, safe=False)
 
+def calendar_event_apiteacher(request):
+    user_id = request.user.id
+    
+    x = fact_teacher_user.objects.get(user_id=user_id)
+  
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    start = request.GET.get('start', None)
+    end = request.GET.get('end', None)
+    _date = date.today()
+    if start is not None and end is not None:
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        sobj = str(start).split("T")[0]
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        eobj = str(end).split("T")[0]
+    else:
+        sobj = _date + timedelta(days=0)
+        eobj = _date + timedelta(days=60)
+    status = ['W','Y','I','S']
+
+
+    ev_group = []
+    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    data = teacher_income_setting.objects.filter(teacher=x.teacher_id)
+    if data.count() > 0:
+        for x in data:
+            ev_group.append(x.ev_id)
+            
+    content = course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status,ev_id__in=ev_group)
+   
+    obj = []
+    sff = []
+    for r in content:
+        
+    
+     
+    
+        end = str(r.ev_date_end)
+      
+        y, m, d = end.split("-")
+       
+        
+
+        col = r.status
+        if col == 'W' :
+         t = '#4be01b'
+        elif col == 'Y': 
+         t = '#4be01b'  
+        elif col == 'I': 
+         t = '#4be01b'  
+        elif col == 'S': 
+         t = '#4be01b'    
+        else:
+         t = '#4be01b'
+        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
+   
+   
+        
+        
+       
+    #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
+    #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
+        delta = r.ev_date_end - r.ev_date_start
+        days_difference = delta.days + 1
+     
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")",'start': r.ev_date_start,'evs_id':r.ev_id}
+        obj.append(res)
+       
+    return JsonResponse(obj, safe=False)
 
 
 

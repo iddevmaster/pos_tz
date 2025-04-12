@@ -98,8 +98,7 @@ urlpatterns = [
     path('calendar_event_api/', course.calendar_event_api),
     path('calendar_event_apieve/', course.calendar_event_apizs),
     path('calendar_event_apiall/', course.calendar_event_apiall),
-
-
+    path('calendar_event_apiteacher/', course.calendar_event_apiteacher),
 
     path('condition/management/', course.conditionlist),
     path('condition/management/<slug:conhead_id>', course.conditioncreate),
@@ -133,11 +132,18 @@ urlpatterns = [
     path('approvlicen/form/de', teacher.teacher_appv_de,
          name="approvlicen_form_de"),
 
-  
-
+    path('register/event/all', register.report_register_re),
+    path('register/event/teacher', register.report_register_teacher),
     path('register/report/event/all', register.report_register),
     path('register/report/event/all/list/<slug:evs_id>', register.report_register_list),
 
+    path('register/event/teacher/list/<slug:evs_id>', register.report_register_listteacher),
+    path('register/student/form/create/<str:ev_id>', register.register_form_create),
+    path('register/student/form/store/<str:ev_id>', register.register_form_store ,name="StoreStudent"),
+    path('register/student/form/show/<str:ev_id>/<str:training_id>', register.register_form_show ,name="ShowStudent"),
+    path('register/student/form/update/<str:ev_id>/<str:training_id>', register.register_form_update),
+    path('register/student/delete',
+         register.register_delete, name="RegisterFormDelete"),
 
     path('projectlist/', project.project_list),
     path('projectlist/event/delete/', project.project_event_delete,

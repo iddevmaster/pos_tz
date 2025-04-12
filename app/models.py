@@ -447,3 +447,25 @@ class condition(models.Model):
 
 
 
+class training(models.Model):
+    training_id = models.AutoField(primary_key=True)
+    student_identification_number = models.CharField(
+        max_length=24, blank=True, default=None)
+    student_prefix_th = models.CharField(
+        max_length=48, blank=True, default=None)
+    student_firstname_th = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_lastname_th = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_prefix_eng = models.CharField(
+        max_length=48, blank=True, default=None)
+    student_firstname_eng = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_lastname_eng = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_learning_status = models.IntegerField(default=0, blank=False)
+    student_code = models.CharField(max_length=64, blank=True, default=None)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+    ev = models.ForeignKey(
+        course_event, on_delete=models.CASCADE)

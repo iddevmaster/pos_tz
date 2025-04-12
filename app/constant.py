@@ -300,7 +300,13 @@ listMenu = [
     },
     {
         "value": "register/event/all",
-        "label": "ทะเบียนผู้เข้าอบรม",
+        "label": "ลงทะเบียนผู้เข้าอบรมทุกหลักสูตร",
+        "group_value": "naSt14",
+        "group_label": "ทะเบียนเข้าอบรม",
+    },
+     {
+        "value": "register/event/teacher",
+        "label": "ลงทะเบียนผู้เข้าอบรม (หน้างาน)",
         "group_value": "naSt14",
         "group_label": "ทะเบียนเข้าอบรม",
     },
