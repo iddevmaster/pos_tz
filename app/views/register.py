@@ -2288,9 +2288,7 @@ def upload_excel_ev(request):
                         upd_date=dateTimeNow(),
                         ev_id=ev
                     )   
-              
-        
-                    
+                     
                 datas= {'status':'success'}
                 return JsonResponse(datas, status=200,safe=False)
             else:
@@ -2436,7 +2434,7 @@ def report_register_re(request):
         
   
     context = {'title': title, 'listMenuPermission': objMenu}
-    return render(request, 'register/register_report_all_re.html', context)
+    return render(request, 'register/register_report_all.html', context)
 
 
 @login_required(login_url='/login')

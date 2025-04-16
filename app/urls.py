@@ -135,9 +135,11 @@ urlpatterns = [
     path('register/event/all', register.report_register_re),
     path('register/event/teacher', register.report_register_teacher),
     path('register/report/event/all', register.report_register),
-    path('register/report/event/all/list/<slug:evs_id>', register.report_register_list),
-
+    path('register/event/all/report/list/<slug:evs_id>', register.report_register_list),
     path('register/event/teacher/list/<slug:evs_id>', register.report_register_listteacher),
+
+
+
     path('register/student/form/create/<str:ev_id>', register.register_form_create),
     path('register/student/form/store/<str:ev_id>', register.register_form_store ,name="StoreStudent"),
     path('register/student/form/show/<str:ev_id>/<str:training_id>', register.register_form_show ,name="ShowStudent"),
