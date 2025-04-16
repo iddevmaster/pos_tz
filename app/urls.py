@@ -235,6 +235,7 @@ urlpatterns = [
     path('api/saveevenet', finance.saveeventadmin),
     path('api/evenetdel', finance.evenetdel),
     path('api/upload/uploadfilestu', register.upload_excel),
+    path('api/upload/uploadfileev', register.upload_excel_ev),
     path('api/studentlist', register.listdata),
     path('api/tests', register.tests),
     path('api/data', register.testsdata),

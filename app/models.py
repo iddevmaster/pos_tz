@@ -458,7 +458,7 @@ class training(models.Model):
     student_lastname_th = models.CharField(
         max_length=128, blank=True, default=None)
     student_prefix_eng = models.CharField(
-        max_length=48, blank=True, default=None)
+        max_length=100, blank=True, default=None)
     student_firstname_eng = models.CharField(
         max_length=128, blank=True, default=None)
     student_lastname_eng = models.CharField(

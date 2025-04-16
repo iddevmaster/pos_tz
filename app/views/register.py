@@ -2244,6 +2244,64 @@ def upload_excel(request):
             return JsonResponse({"error": 'x'}, status=400,safe=False)
 
   return JsonResponse({"error": "Only POST method is allowed"}, status=405)  
+
+
+def upload_excel_ev(request):
+
+  ev = request.POST.get('ev_id')  # Get text input from FormData
+  
+
+  if request.method == "POST" and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+        try:
+            # Parse JSON data from the request body
+            workbook = openpyxl.load_workbook(excel_file)
+            worksheet = workbook.active
+
+            month_current = request.GET.get('qmonths', date.today().month)
+            year_current = request.GET.get('qyear', date.today().year)
+
+
+            row_count = sum(1 for row in worksheet.iter_rows()) # count data จาก excel
+            excel_data = []
+          
+           
+      
+            if ev:
+                for row_index, row in enumerate(worksheet.iter_rows(values_only=True)):
+                    if row_index > 0:
+
+                        if row[0]:  # Assuming the first column is not empty
+                            res = {'รหัสบัตร':row[0],'นาม':row[1],'ชื่อ':row[2],'นามสกุล':row[3],'นามอัง':row[4],'Name':row[5],'LastName':row[6]}
+                            excel_data.append(res) 
+                            student_code = "TZ" + str(twoDigit(month_current)) + "/" + str(year_current)
+                            training.objects.create(
+                        student_identification_number=row[0],
+                        student_prefix_th=row[1],
+                        student_firstname_th=row[2],
+                        student_lastname_th=row[3],
+                        student_prefix_eng=row[4],
+                        student_firstname_eng=row[5],
+                        student_lastname_eng=row[6],
+                        student_code=student_code,
+                        crt_date=dateTimeNow(),
+                        upd_date=dateTimeNow(),
+                        ev_id=ev
+                    )   
+              
+        
+                    
+                datas= {'status':'success'}
+                return JsonResponse(datas, status=200,safe=False)
+            else:
+                datas= {'status':'fail','text':'โค๊วต้าเกินกว่ากำหนด'}
+                return JsonResponse(datas, status=200,safe=False)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": 'x'}, status=400,safe=False)
+
+  return JsonResponse({"error": "Only POST method is allowed"}, status=405)  
+
+
 @csrf_exempt
 def listdata(request):
 

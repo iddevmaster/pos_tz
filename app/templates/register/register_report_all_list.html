@@ -78,15 +78,15 @@ async function calltohub(datas) {
 
             const formData = new FormData();
             const fileInput = document.getElementById('excel_file');
-            const register_id = document.getElementById('register_id').value;
+            const ev_id = document.getElementById('ev_id').value;
           
-            formData.append('register', register_id);
+            formData.append('ev_id', ev_id);
             formData.append('excel_file', fileInput.files[0]);
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
           
 
-            const ex = await fetch('/api/upload/uploadfilestu', {
+            const ex = await fetch('/api/upload/uploadfileev', {
 method: 'POST',
 body:formData
 })
@@ -95,7 +95,7 @@ body:formData
     // Display response
 
 if(data.status == 'success'){
-  window.location.reload();
+  // window.location.reload();
 }else {
 
   Swal.fire({
@@ -248,10 +248,10 @@ fileInput.value = ''; // Clear the selected file
           </div>
         </div>
         <input
-        type="hidden"
-        name="register_id"
-        id="register_id"
-        value="{{register_id}}"
+        type="text"
+        name="ev_id"
+        id="ev_id"
+        value="{{main_data.ev_id}}"
        
       />
         <div class="col-lg-9 col-md-9">
@@ -296,6 +296,16 @@ fileInput.value = ''; // Clear the selected file
              <label for="excel_file" class="file-button">Import to Excel:</label>
            
               </form> -->
+
+              <form  id="uploadForm" method="post">
+                {% csrf_token %}
+            
+          
+
+              <input type="file" id="excel_file" name="excel_file"  accept=".xlsx, .xls" onchange="uploadFile(event)">
+             <label for="excel_file" class="file-button">Import to Excel:</label>
+           
+              </form>
 
               <button
               type="submit"
