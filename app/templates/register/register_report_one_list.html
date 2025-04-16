@@ -261,7 +261,7 @@ fileInput.value = ''; // Clear the selected file
                <button
                 type="button"
                 class="btn btn-primary"
-                onclick="window.location.href='/register/all/student/form/create/{{main_data.ev_id}}'"
+                onclick="window.location.href='/register/student/form/create/{{main_data.ev_id}}'"
               >
                 <i class="icon dripicons-plus" aria-hidden="true"></i>
                 เพิ่มข้อมูล
@@ -383,7 +383,7 @@ fileInput.value = ''; // Clear the selected file
                 <button
                   type="button"
                   class="btn btn-warning"
-                  onclick="window.location.href='/register/all/student/form/show/{{main_data.ev_id}}/{{res.training_id}}'"
+                  onclick="window.location.href='/register/student/form/show/{{main_data.ev_id}}/{{res.training_id}}'"
                 >
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
@@ -439,7 +439,7 @@ fileInput.value = ''; // Clear the selected file
           <i data-feather="x"></i>
         </button>
       </div>
-      <form action="{% url 'RegisterFormDeleteAll' %}" method="post">
+      <form action="{% url 'RegisterFormDelete' %}" method="post">
         <div class="modal-body">
           {% csrf_token %}
           <input type="hidden" name="training_id" id="training_id_delete" />

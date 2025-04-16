@@ -1395,6 +1395,33 @@ def register_form_create(request, ev_id):
 }
     return render(request, 'register/register_form_create.html', context)
 
+@login_required(login_url='/login')
+def register_form_createall(request, ev_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content,'prefixEng':prefixEng,'prefixThai':prefixThai
+}
+    return render(request, 'register/register_form_all_create.html', context)
+
 
 @login_required(login_url='/login')
 def register_form_store(request, ev_id):
@@ -1443,6 +1470,53 @@ def register_form_store(request, ev_id):
 }
     return redirect("/register/event/teacher/list/" + str(ev_id))  
 
+@login_required(login_url='/login')
+def register_form_storeall(request, ev_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    student_prefix_th = request.POST['student_prefix_th']
+    student_prefix_eng = request.POST['student_prefix_eng']
+    student_identification_number = request.POST['student_identification_number']
+    student_firstname_th = request.POST['student_firstname_th']
+    student_lastname_th = request.POST['student_lastname_th']
+    student_firstname_eng = request.POST['student_firstname_eng']
+    student_lastname_eng = request.POST['student_lastname_eng']
+
+    training.objects.create(
+                student_identification_number=student_identification_number,
+                student_prefix_th=student_prefix_th,
+                student_firstname_th=student_firstname_th,
+                student_lastname_th=student_lastname_th,
+                student_prefix_eng=student_prefix_eng,
+                student_firstname_eng=student_firstname_eng,
+                student_lastname_eng=student_lastname_eng,
+                student_code='xxxxx',
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                ev_id=ev_id
+            )
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content
+}
+  
+    return redirect("/register/event/all/report/list/" + str(ev_id))  
 
 @login_required(login_url='/login')
 def register_form_update(request, ev_id,training_id):
@@ -1502,6 +1576,64 @@ def register_form_update(request, ev_id,training_id):
 # }
     return redirect("/register/event/teacher/list/" + str(ev_id))    
 
+@login_required(login_url='/login')
+def register_form_updateall(request, ev_id,training_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+   
+    content = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,ev_id=ev_id)
+    student_prefix_th = request.POST['student_prefix_th']
+    student_prefix_eng = request.POST['student_prefix_eng']
+    student_identification_number = request.POST['student_identification_number']
+    student_firstname_th = request.POST['student_firstname_th']
+    student_lastname_th = request.POST['student_lastname_th']
+    student_firstname_eng = request.POST['student_firstname_eng']
+    student_lastname_eng = request.POST['student_lastname_eng']
+
+
+    instance = training.objects.get(training_id=training_id)
+    instance.student_identification_number = student_identification_number
+    instance.student_prefix_th = student_prefix_th
+    instance.student_firstname_th = student_firstname_th
+    instance.student_lastname_th = student_lastname_th
+    instance.student_prefix_eng = student_prefix_eng
+    instance.student_firstname_eng = student_firstname_eng
+    instance.student_lastname_eng = student_lastname_eng
+    instance.upd_date = dateTimeNow()
+    instance.save()
+    # training.objects.create(
+    #             student_identification_number=student_identification_number,
+    #             student_prefix_th=student_prefix_th,
+    #             student_firstname_th=student_firstname_th,
+    #             student_lastname_th=student_lastname_th,
+    #             student_prefix_eng=student_prefix_eng,
+    #             student_firstname_eng=student_firstname_eng,
+    #             student_lastname_eng=student_lastname_eng,
+    #             student_code='xxxxx',
+    #             crt_date=dateTimeNow(),
+    #             upd_date=dateTimeNow(),
+    #             ev_id=ev_id
+    #         )
+
+#     context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':content
+# }
+    return redirect("/register/event/all/report/list/" + str(ev_id))   
+
 
 @login_required(login_url='/login')
 def register_form_show(request, ev_id,training_id):
@@ -1528,6 +1660,33 @@ def register_form_show(request, ev_id,training_id):
 }
    
     return render(request, 'register/register_form_update.html', context)
+
+
+@login_required(login_url='/login')
+def register_form_showall(request, ev_id,training_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    data = training.objects.get(training_id=training_id)
+    evs = course_event.objects.get(ev_id=ev_id)
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'main_data':data,'course':evs,'prefixEng':prefixEng,'prefixThai':prefixThai
+}
+   
+    return render(request, 'register/register_form_all_update.html', context)
 
 
 @login_required(login_url='/login')
@@ -1643,6 +1802,15 @@ def register_delete(request):
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/register/event/teacher/list/" + str(ev_id))
 
+
+@login_required(login_url='/login')
+def register_deleteall(request):
+    ev_id = request.POST['ev_id']
+    training_id = request.POST['training_id']
+    content = training.objects.get(training_id=training_id)
+    content.delete()
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/register/event/all/report/list/" + str(ev_id))
 
 @login_required(login_url='/login')
 def student_create_idcard(request):
@@ -2502,7 +2670,7 @@ def report_register_list(request,evs_id):
     count = 0
     for rs in list(mains):
         count += 1
-        r = {'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
+        r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
         obj.append(r)
     
     context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
@@ -2547,7 +2715,7 @@ def report_register_listteacher(request,evs_id):
         obj.append(r)
     
     context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
-    return render(request, 'register/register_report_all_list.html', context)
+    return render(request, 'register/register_report_one_list.html', context)
 
 @login_required(login_url='/login')
 def approve_internal_doc(request,doc_id):
