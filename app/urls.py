@@ -139,6 +139,7 @@ urlpatterns = [
     path('register/event/teacher/list/<slug:evs_id>', register.report_register_listteacher),
 
 
+    path('register/report/event/all/report/list/<slug:evs_id>', register.report_register_listall),
 
     path('register/student/form/create/<str:ev_id>', register.register_form_create),
     path('register/student/form/store/<str:ev_id>', register.register_form_store ,name="StoreStudent"),

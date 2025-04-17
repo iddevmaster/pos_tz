@@ -2677,9 +2677,8 @@ def report_register_list(request,evs_id):
     return render(request, 'register/register_report_all_list.html', context)
 
 
-
 @login_required(login_url='/login')
-def report_register_listteacher(request,evs_id):
+def report_register_listall(request,evs_id):
     title = defaultTitle
     user_id = request.user.id
 
@@ -2715,7 +2714,49 @@ def report_register_listteacher(request,evs_id):
         obj.append(r)
     
     context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count,'api_id_card': api_id_card}
+    return render(request, 'register/register_report_listall.html', context)
+
+@login_required(login_url='/login')
+def report_register_listteacher(request,evs_id):
+    title = defaultTitle
+    user_id = request.user.id
+
+
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+      
+   
+    c_evet = course_event.objects.select_related(
+        "course").get(active=1, cancelled=1,pk=evs_id)
+    print(c_evet.ev_training)
+    mains  = training.objects.filter(ev=evs_id)
+    obj = []
+    count = 0
+    for rs in list(mains):
+        count += 1
+        r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
+        obj.append(r)
+    
+    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count,'api_id_card': api_id_card}
     return render(request, 'register/register_report_one_list.html', context)
+
+
+
 
 @login_required(login_url='/login')
 def approve_internal_doc(request,doc_id):
