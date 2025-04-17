@@ -2673,7 +2673,7 @@ def report_register_list(request,evs_id):
         r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
         obj.append(r)
     
-    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
+    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count,'api_id_card': api_id_card}
     return render(request, 'register/register_report_all_list.html', context)
 
 
@@ -2714,7 +2714,7 @@ def report_register_listteacher(request,evs_id):
         r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
         obj.append(r)
     
-    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count}
+    context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count,'api_id_card': api_id_card}
     return render(request, 'register/register_report_one_list.html', context)
 
 @login_required(login_url='/login')
@@ -2973,6 +2973,41 @@ def addon_delete(request):
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
     datas = {'status':200,'data':list(dataadd),'total_price_add_on':total_price}
+    return JsonResponse(datas, status=200,safe=False)
+
+
+
+@csrf_exempt
+def insertcard(request):
+
+    data = json.loads(request.body)
+    ev_id = data.get("ev_id")
+    student_identification_number = data.get("student_identification_number")
+    student_prefix_th = data.get("student_prefix_th")
+    student_firstname_th = data.get("student_firstname_th")
+    student_lastname_th = data.get("student_lastname_th")
+    student_prefix_eng = data.get("student_prefix_eng")
+    student_firstname_eng = data.get("student_firstname_eng")
+    student_lastname_eng = data.get("student_lastname_eng")
+    # check ev student_identification_number
+    check = training.objects.filter(student_identification_number=student_identification_number,ev=ev_id)
+    checkcount = check.count()
+    
+    if checkcount == 0:
+        training.objects.create(
+                student_identification_number=student_identification_number,
+                student_prefix_th=student_prefix_th,
+                student_firstname_th=student_firstname_th,
+                student_lastname_th=student_lastname_th,
+                student_prefix_eng=student_prefix_eng,
+                student_firstname_eng=student_firstname_eng,
+                student_lastname_eng=student_lastname_eng,
+                student_code='xxxxx',
+                crt_date=dateTimeNow(),
+                upd_date=dateTimeNow(),
+                ev_id=ev_id
+            )
+    datas = {'status':200,'data':data}
     return JsonResponse(datas, status=200,safe=False)
 
 

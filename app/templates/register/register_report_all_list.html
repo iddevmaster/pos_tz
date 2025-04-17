@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %} {% load humanize %}
+{% extends 'base.html' %} {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -56,11 +56,48 @@ async function calltohub(datas) {
   async function load_dataTest() {
     let myObject = await fetch("{{api_id_card}}");
     let jsondata = await myObject.text();
-    var data = jsondata.substr(13, jsondata.length - 14);
-    //let jdata = JSON.parse(data);
 
-    document.getElementById("result_id_card").value = data;
-    document.getElementById("read_id_card").submit();
+    var data = jsondata.substr(13, jsondata.length - 14);
+    let jdata = JSON.parse(data);
+    console.log(jdata);
+    if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
+      Swal.fire({
+      title: 'บันทึกไม่สำเร็จ',
+      text: data.text,
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+    }else {
+    
+     let ev = document.getElementById("ev_id").value
+     let student_identification_number = jdata?.CitizenNo;
+     let student_prefix_th = jdata?.TitleNameTh;
+     let student_firstname_th = jdata?.FirstNameTh;
+     let student_lastname_th = jdata?.LastNameTh;
+     let student_prefix_eng = jdata?.TitleNameEn;
+     let student_firstname_eng = jdata?.FirstNameEn;
+     let student_lastname_eng = jdata?.LastNameEn;
+    
+     const ex = await fetch('/api/card/register', {
+              method: 'POST',
+              body:JSON.stringify({'ev_id':ev,'student_identification_number':student_identification_number,'student_prefix_th':student_prefix_th,'student_firstname_th':student_firstname_th,'student_lastname_th':student_lastname_th,'student_prefix_eng':student_prefix_eng,'student_firstname_eng':student_firstname_eng,'student_lastname_eng':student_lastname_eng})
+            })
+            .then(response => response.json())
+            .then(data => {
+              window.location.reload();
+  
+            })
+
+    //   document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
+    // document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
+    // document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
+    // document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
+    // document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
+    // document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
+    }
+
+
   }
 
   async function RecallApi(data) {
@@ -296,6 +333,18 @@ fileInput.value = ''; // Clear the selected file
              <label for="excel_file" class="file-button">Import to Excel:</label>
            
               </form> -->
+              <a class="btn btn-warning" href="{{api_id_card}}" target="_blank">
+                เปิดสิทธิ์
+              </a>
+              <button
+              type="submit"
+              class="btn btn-info"
+              form="create_form_idcard"
+              onclick="start_read_test()"
+            >
+              <i class="icon dripicons-card" aria-hidden="true"></i>
+              เครื่องอ่านบัตร
+            </button>
 
               <form  id="uploadForm" method="post">
                 {% csrf_token %}

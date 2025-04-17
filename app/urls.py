@@ -261,6 +261,8 @@ urlpatterns = [
     path('api/condition/deletecondition', course.conditionheaddel),
 
     
+    path('api/card/register', register.insertcard),
+
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.MEDIA_ROOT)
