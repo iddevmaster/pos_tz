@@ -37,14 +37,16 @@ $(document).ready(function () {
 
 
 async function handleSelectChangeCondition(t) {
-              const ev_id = document.getElementById("ev_id");
+ 
+const ev_id = document.getElementById("ev_id");
+         
 
 let data = await fetch('/api/updateeventcondition', {
   method: 'POST',
   headers: {
       'Content-Type': 'application/json',
   },
-  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':t.value})
+  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':t.value,'condition_type':1})
   })
   .then(response => response.json())
   .then(data => {
@@ -55,19 +57,53 @@ console.log(data);
 
 }
 
-function handleClick(myRadio) {
+async function handleClick(myRadio) {
   
-console.log(myRadio.value)
+const ev_id = document.getElementById("ev_id");
   const myDiv = document.getElementById("myDiv");
+  
 
   if(myRadio.value == 0){
+          const option = document.createElement("option");
+      option.value = 0;
     myDiv.classList.remove("visible");
     myDiv.classList.add("hidden");
+let data = await fetch('/api/updateeventcondition', {
+  method: 'POST',
+  headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':0,'condition_type':0})
+  })
+  .then(response => response.json())
+  .then(data => {
+console.log(data);
+  })
+
+    
   }
 
   if(myRadio.value == 1){
+      const option = document.createElement("option");
+      option.value = 0;
+
     myDiv.classList.remove("hidden");
     myDiv.classList.add("visible");
+
+
+    let data = await fetch('/api/updateeventcondition', {
+  method: 'POST',
+  headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':0,'condition_type':1})
+  })
+  .then(response => response.json())
+  .then(data => {
+console.log(data);
+  })
+
+
   }
 
 }
@@ -216,16 +252,29 @@ function calen() {
         },
       },
       eventClick: function (info) {
+       
 
-      console.log(info.event.extendedProps)
+
+            let data = fetch('/calendar_event_api_totalbill/', {
+  method: 'POST',
+  headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({'ev_id':info.event.extendedProps.evs_id})
+  })
+  .then(response => response.json())
+  .then(data => {
+
+    document.getElementById("bill").innerText = data
+  })
+  
       document.getElementById('count_day').value = info.event.extendedProps.count_day;
      
       const radio1 = document.getElementById("inlineRadio1");
       const radio2 = document.getElementById("inlineRadio2");
 
 
-    
-console.log(info.event.extendedProps.condition_id)
+  
       const a = info.event.extendedProps.condition_type;
       if(a == 0){
         radio2.checked = false;
@@ -244,15 +293,17 @@ console.log(info.event.extendedProps.condition_id)
       }
 
       const myArray = info.event.extendedProps.condition;
-
+      console.log(info.event.extendedProps)
 
     // Get the select element
     const selectElement = document.getElementById("mySelect");
+    console.log(selectElement)
 
     // Loop through the array and create options
     myArray.forEach(item => {
       // Create a new option element
       const option = document.createElement("option");
+
       // Set the option's value (required)
       option.value = item.conhead_id;
       // Set the option's text (what the user sees)
@@ -1007,7 +1058,7 @@ CheckHourbeforeSave()
           </div>
           <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
           <input type="hidden" name="teacher_id" id="teacher_id" required />
-          <!-- <div class="col-12 col-lg-12 col-md-12">
+         <div class="col-12 col-lg-12 col-md-12">
             <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0" onclick="handleClick(this);" checked>
               <label class="form-check-label" for="inlineRadio1">ไม่มีเงื่อนไข</label>
@@ -1020,10 +1071,16 @@ CheckHourbeforeSave()
 
          <div class="col-12 col-lg-12 col-md-12"  id="myDiv" class="hidden">
           <select id="mySelect"  class="form-select" aria-label="Default select example" onchange="handleSelectChangeCondition(this)">
-            <option select value="0">Open this select menu</option>
+            <option select value="0">เลือกเงื่อนไขที่กำหนด</option>
           </select>
         
-       </div> -->
+       </div> 
+
+         <div class="col-12 col-lg-12 col-md-12">
+        <span class="font-default"  > จำนวนนักเรียนปัจจุบันที่มี คือ <span class="font-default"  style="color: red" id="bill"> </span> คน</span>
+         </div>
+
+       
 
          
           <div class="col-12 col-lg-12 col-md-12">

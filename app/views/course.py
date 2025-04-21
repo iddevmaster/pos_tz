@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Count, Sum, Value
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -637,11 +637,12 @@ def calendar_event_api(request):
         "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
    
     obj = []
-  
+
     sff = []
     for r in content:
+        
         conditiondata = []
-        if r.condition_type == '1' :
+        if r :
             getcondition = conhead.objects.filter(course_id=r.course_id,is_active='Y')
             for cond in list(getcondition):
                  resx = {'conhead_id':cond.conhead_id,'name':cond.name}
@@ -1197,14 +1198,44 @@ def condition_form_update_event(request):
     data = json.loads(request.body)
     ev_id = data.get("ev_id")
     condition_id = data.get("condition_id")
-    
+    condition_type = data.get("condition_type")
+
 
     content = course_event.objects.get(pk=ev_id)
     content.condition_id = condition_id
-    content.condition_type = '1'
+    content.condition_type = condition_type
     content.save()
   
 
     return JsonResponse(data, status=200, safe=False)  
+
+
+@csrf_exempt
+def calendar_event_api_totalbill(request):
+    data = json.loads(request.body)
+    user_id = request.user.id
+    ev_id = data.get("ev_id")
+  
+
+    obj = []
+
+   
+    regbyev = register_main.objects.filter(ev_id=ev_id)
+    
+    total_rq_quta = 0
+
+
+    
+    for aaa in regbyev:
+        print(aaa)
+        try:
+            bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+            if bbbb:
+             total_rq_quta += bbbb.rp_quota
+        except register_payment.DoesNotExist:  
+            bbbb = 0
+
+
+    return JsonResponse(total_rq_quta, safe=False)
 
     

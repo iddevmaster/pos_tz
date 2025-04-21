@@ -100,6 +100,8 @@ urlpatterns = [
     path('calendar_event_apiall/', course.calendar_event_apiall),
     path('calendar_event_apiteacher/', course.calendar_event_apiteacher),
 
+    path('calendar_event_api_totalbill/', course.calendar_event_api_totalbill),
+
     path('condition/management/', course.conditionlist),
     path('condition/management/<slug:conhead_id>', course.conditioncreate),
     path('condition/form/delete', course.condition_form_delete,
