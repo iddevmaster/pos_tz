@@ -149,7 +149,7 @@ def billing_cycle_result(request):
     # day_current = 10
     b = billing_cycle_setting.objects.filter(module=m.module)
     start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module, tis_end_date__year=year_current,status='S').annotate(month=TruncMonth('tis_start_date'))
+        ev__module=m.module, tis_end_date__year=year_current,status='I').annotate(month=TruncMonth('tis_start_date'))
    
     start_content = start_content.values('month').annotate(
         order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('-month')
@@ -187,13 +187,13 @@ def billing_cycle_result(request):
                 tis_end_date__day__lte=day_end,
                 tis_end_date__month=month,
                 tis_end_date__year=year_current,
-                status="S"
+                status="I"
             )
             if teacher_current != None and teacher_current != '':
                 instance = instance.filter(teacher=teacher_current)
             tis_group = f"{day_start} - {day_end}"
             if day_current >= day_end and instance.count() >= 1:
-                instance.update(active=1, tis_group=tis_group,
+                instance.update(active=1, tis_group=tis_group,status='S',
                                 upd_date=dateTimeNow())
         obj2 = []
         content = teacher_income_setting.objects.filter(
