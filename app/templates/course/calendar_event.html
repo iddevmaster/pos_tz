@@ -1058,7 +1058,7 @@ CheckHourbeforeSave()
           </div>
           <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
           <input type="hidden" name="teacher_id" id="teacher_id" required />
-         <div class="col-12 col-lg-12 col-md-12">
+         {% comment %} <div class="col-12 col-lg-12 col-md-12">
             <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0" onclick="handleClick(this);" checked>
               <label class="form-check-label" for="inlineRadio1">ไม่มีเงื่อนไข</label>
@@ -1074,17 +1074,14 @@ CheckHourbeforeSave()
             <option select value="0">เลือกเงื่อนไขที่กำหนด</option>
           </select>
         
-       </div> 
+       </div>  {% endcomment %}
 
          <div class="col-12 col-lg-12 col-md-12">
         <span class="font-default"  > จำนวนนักเรียนปัจจุบันที่มี คือ <span class="font-default"  style="color: red" id="bill"> </span> คน</span>
          </div>
 
        
-
-         
           <div class="col-12 col-lg-12 col-md-12">
-           
             <span class="font-default"  style="color: red"> หมายเหตุ *</span>
          </div>
          <div class="col-12 col-lg-12 col-md-12">

@@ -2165,7 +2165,8 @@ def update_close_the_eventend(request):
             instance2 = teacher_income_setting.objects.get(id=r.id)
             instance2.status = 'I'
             instance2.save()
-        
+
+
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/processevent")    
 

@@ -243,6 +243,12 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+     {
+        "value": "finance/teacher/one",
+        "label": "ค่าตอบแทน",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
 
     {
         "value": "billing/setting/form/create",

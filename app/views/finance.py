@@ -1005,7 +1005,7 @@ def withdraw_list(request):
             pay = pay_item.objects.get(id=rs.pi_id)
 
             r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':rs.pi_id,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation}
-            print(r)
+        
             obj.append(r)
         
         context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj}
@@ -1016,3 +1016,85 @@ def withdraw_list(request):
     
 
     return render(request, 'finance/order_withdraw.html',context)
+
+
+
+def withdraw_list_one(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+        
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+
+    
+   
+    try:
+        getteachid = fact_teacher_user.objects.get(user_id=user_id)
+        obj = []
+        pi = ['1','2']
+        teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi)
+        for rs in teacher_income:
+            
+            event = course_event.objects.get(ev_id=rs.ev_id)
+            cours = course.objects.get(course_id=event.course_id)
+            pay = pay_item.objects.get(id=rs.pi_id)
+
+            start = str(event.ev_date_start)
+            end = str(event.ev_date_end)
+            y, m, d = end.split("-")
+            Y, mM, dD = start.split("-")
+            day_of_week = event.ev_date_start.weekday()
+
+            if day_of_week:
+             try:
+                
+                if day_of_week == 0:
+                    dt = "จ"
+                elif day_of_week == 1: 
+                    dt = "อ"  
+                elif day_of_week == 2:
+                    dt = "พ"  
+                elif day_of_week == 3: 
+                    dt = "พฤ" 
+                elif day_of_week == 4: 
+                    dt = "ศ"
+                elif day_of_week == 5:
+                    dt = "ส"
+                elif day_of_week == 6:   
+                    dt = "อา"           
+             except ValueError:
+                dt = "-"
+            else:
+             dt = "-"
+
+            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation}
+        
+            obj.append(r)
+        
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj}
+    except fact_teacher_user.DoesNotExist:
+        getteachid = None
+        return redirect("/")
+    
+    
+
+    return render(request, 'finance/teachers_withdraw.html',context)
+
+  

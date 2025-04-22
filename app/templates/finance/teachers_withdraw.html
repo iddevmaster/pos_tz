@@ -1,0 +1,93 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  .center-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 130px;
+    background-color: #f0f0f0;
+    /* Light gray background */
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    /* Blue color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+  }
+</style>
+<script>
+
+
+
+</script>
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>เบิกค่าตอบแทน</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          เบิกค่าตอบแทน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<input type="hidden" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
+
+<div class="row"  id="cardContainer">
+  {% for res in data %}
+<div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card mb-3">
+  
+  <div class="row g-0">
+     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style=" padding: 15px;  border-right: 3px solid #f5ecea;">
+       <p class="card-text" style="text-align: center;">{{res.daynum}}</p>
+       <p class="card-text" style="text-align: center;">{{res.day}}</p>
+      </div>
+      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
+        <div class="card-body">
+          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span> จำนวนผู้อบรม x คน</span>
+          <p>
+
+          {{res.tis_compensation}} / {{res.tis_quantity}} -
+              {% if res.tis_unit == 'hour' %}
+              ชั่วโมง
+              {% elif res.tis_unit == 'day' %}
+              วัน
+              {% else %}
+              งาน
+              {% endif %}  / {{res.pi}}
+          </p>
+        </div>
+        
+      </div>
+      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;display: grid ;">
+   
+       
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+   {% endfor %}
+</div>
+
+
+
+{% endblock %}

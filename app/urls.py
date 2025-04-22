@@ -223,8 +223,8 @@ urlpatterns = [
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),
 
-    path('finance/teacher', finance.withdraw_list), 
-    
+#     path('finance/teacher', finance.withdraw_list), 
+    path('finance/teacher', finance.withdraw_list_one),
 
     path('description/setting/form/create', desbill.setting_form_create,
          name="description_setting_form_create"),
