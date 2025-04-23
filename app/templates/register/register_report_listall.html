@@ -211,6 +211,7 @@ fileInput.value = ''; // Clear the selected file
                 { },
                 { },
                 { },
+                { },
                
             
             ];
@@ -387,7 +388,25 @@ fileInput.value = ''; // Clear the selected file
     <div class="card-body">
     
       <div> 
+
       <table class="table table-striped" id="myTable">
+
+
+            <thead hidden>
+          <tr >
+            <th>ลำดับ</th>
+            <th>รหัสบัตร ปชช./ Passport</th>
+            <th>ชื่อ - นามสกุล ภาษาไทย</th>
+            <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+            <th>วันที่ทำรายการ</th>
+           
+        
+             <th colspan="6" hidden>หลักสูตร : {{main_data.course.course_name}}    วันอบรม {{main_data.ev_date_start |date:"d/m/Y"}} ถึง
+      {{main_data.ev_date_end|date:"d/m/Y"}} รุ่นที่ {{main_data.ev_generation}}</th>
+     
+          </tr>
+        </thead>
+
         <thead>
           <tr>
             <th>ลำดับ</th>
@@ -396,15 +415,12 @@ fileInput.value = ''; // Clear the selected file
             <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
             <th>วันที่ทำรายการ</th>
            
-           
-            <th hidden>รหัสบัตร ปชช./ Passport</th>
+            <th hidden>ลำดับ</th>
             <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
-            <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
-            <th hidden>รหัสหลักสูตร</th>
-            <th hidden>ชื่อหลักสูตร</th>
-            <th hidden>วันที่เริ่มต้น</th>
-            <th hidden>วันที่สิ้นสุด</th>
-            <th hidden>ลายเซ็น</th>
+                <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+            <th hidden>รหัสบัตร ปชช./ Passport</th>
+            <th hidden>ลายเซ็นภาคเช้า</th>
+            <th hidden>ลายเซ็นภาคบ่าย</th>
           </tr>
         </thead>
         <tbody>
@@ -451,18 +467,13 @@ fileInput.value = ''; // Clear the selected file
               </div>
             </td> -->
         
-        
-            <td hidden>{{res.student_identification_number}}</td>
+            <td hidden>{{forloop.counter}}</td>
+          
             <td hidden> {{res.student_prefix_th}}{{res.student_firstname_th}}
               {{res.student_lastname_th}}</td>
-              <td hidden>
-                {{res.student_prefix_eng}} {{res.student_firstname_eng}}
-                {{res.student_lastname_eng}}
-              </td>
-            <td hidden>{{main_data.course.course_code}}</td>
-            <td hidden>{{main_data.course.course_name}}</td>
-            <td hidden>{{main_data.ev_date_start |date:"d/m/Y"}}</td>
-            <td hidden>{{main_data.ev_date_end|date:"d/m/Y"}}</td>
+              <td hidden> {{res.student_prefix_eng}}{{res.student_firstname_eng}}
+              {{res.student_lastname_eng}}</td>
+            <td hidden>{{res.student_identification_number}}</td>
           </tr>
           {% endfor %}
         </tbody>
