@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -159,6 +159,8 @@ def billing_cycle_result(request):
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
+  
+
   
     for r1 in start_content:
         total_month_sum = r1['order_sum']
@@ -1049,8 +1051,18 @@ def withdraw_list_one(request):
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
         pi = ['1','2']
-        teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi)
+        teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         for rs in teacher_income:
+            print(rs.ev)
+            regbyev = register_main.objects.filter(ev_id=rs.ev)
+            total_rq_quta = 0
+            for aaa in regbyev:
+                try:
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    if bbbb:
+                        total_rq_quta += bbbb.rp_quota
+                except register_payment.DoesNotExist:  
+                        bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
             cours = course.objects.get(course_id=event.course_id)
@@ -1084,7 +1096,7 @@ def withdraw_list_one(request):
             else:
              dt = "-"
 
-            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation}
+            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta}
         
             obj.append(r)
         

@@ -62,8 +62,10 @@
       </div>
       <div class="col-9 col-md-9 col-sm-9 col-xs-9">
         <div class="card-body">
-          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span> จำนวนผู้อบรม x คน</span>
+          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span> จำนวนผู้อบรม {{res.total_rq_quta}} คน</span>
           <p>
+
+
 
           {{res.tis_compensation}} / {{res.tis_quantity}} -
               {% if res.tis_unit == 'hour' %}
@@ -75,12 +77,8 @@
               {% endif %}  / {{res.pi}}
           </p>
         </div>
-        
-      </div>
-      <div class="col-2 col-md-2 col-sm-2 col-xs-2" style="padding: 5px;display: grid ;">
-   
-       
-      </div>
+
+
     </div>
   </div>
 </div>
