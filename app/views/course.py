@@ -902,7 +902,7 @@ def calendar_event_api2(request,id):
         te.append(fs)  
         
         
-       nextdayend = addDay(1, int(y), int(m), int(d))
+       nextdayend = addDay(0, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
        
        
