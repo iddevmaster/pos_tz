@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1053,7 +1053,7 @@ def withdraw_list_one(request):
         pi = ['1','2']
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         for rs in teacher_income:
-            print(rs.ev)
+         
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -1065,6 +1065,17 @@ def withdraw_list_one(request):
                         bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
+           
+            
+            if event.condition_type == 1:
+                # เ
+                #  print(event.condition_id)
+                #  print(total_rq_quta)
+                 icont = condition.objects.filter(conhead=event.condition_id)
+                 for iconts in icont:
+                     print(iconts.student)
+                     print(total_rq_quta)
+            
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
 

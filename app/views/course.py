@@ -3,7 +3,8 @@ from django.http.response import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
-from django.db.models import Count, Sum, Value
+
+from django.db.models import Count, Sum, Value, F
 from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
@@ -874,7 +875,7 @@ def calendar_event_api2(request,id):
     sss = id
     pi = ['1','2','3','4','5','6','7']
     # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
-    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi)
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi).order_by(F('crt_date').desc())
     
     obj = []
     
@@ -888,12 +889,14 @@ def calendar_event_api2(request,id):
        
        teach = teacher_income_setting.objects.filter(ev_id=r.ev_id)
        evte = course_event.objects.get(ev_id=r.ev_id)
-       
+   
 
        for x in teach: 
        
         a = teacher.objects.get(teacher_id=x.teacher_id)
         pa = pay_item.objects.filter(id=x.pi_id).first()
+
+
    
 
        
