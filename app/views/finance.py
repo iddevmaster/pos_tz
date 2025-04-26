@@ -1053,7 +1053,8 @@ def withdraw_list_one(request):
         pi = ['1','2']
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         for rs in teacher_income:
-         
+            
+          
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -1065,17 +1066,39 @@ def withdraw_list_one(request):
                         bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
-           
-            
-            if event.condition_type == 1:
+            select = 0
+            price = 0
+            if  event.condition_type == 1 and int(rs.pi_id) == 1:
+
                 # เ
                 #  print(event.condition_id)
-                #  print(total_rq_quta)
-                 icont = condition.objects.filter(conhead=event.condition_id)
-                 for iconts in icont:
-                     print(iconts.student)
-                     print(total_rq_quta)
-            
+                
+                print('วิทยากร')    
+                type_condition = course.objects.get(course_id=event.course_id)
+               
+                icont = condition.objects.filter(conhead=event.condition_id)
+                for iconts in icont:
+                     typet = iconts.type
+                     if typet == '1':
+                        if iconts.student > total_rq_quta:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '2':
+                    
+                        if iconts.student < total_rq_quta:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '3':
+                        if iconts.student == total_rq_quta: 
+                            select = iconts.condition_id
+                            break  
+            else :    
+             print('ไม่ใช่วิทยากร')         
+           
+            if select != 0:
+             totalselect = condition.objects.get(condition_id=select)
+             price = int(rs.tis_quantity) * (totalselect.price)
+             print(rs.tis_quantity)    
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
 
