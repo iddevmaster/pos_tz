@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1052,12 +1052,14 @@ def withdraw_list_one(request):
         obj = []
         pi = ['1','2']
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
+        requirements = 'ไม่มี'
+        name_con = '-'
         for rs in teacher_income:
-            
-          
             regbyev = register_main.objects.filter(ev_id=rs.ev)
+            
             total_rq_quta = 0
             for aaa in regbyev:
+                
                 try:
                     bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
                     if bbbb:
@@ -1068,13 +1070,13 @@ def withdraw_list_one(request):
             event = course_event.objects.get(ev_id=rs.ev_id)
             select = 0
             price = 0
-            if  event.condition_type == 1 and int(rs.pi_id) == 1:
-
-                # เ
-                #  print(event.condition_id)
-                
-                print('วิทยากร')    
-                type_condition = course.objects.get(course_id=event.course_id)
+            tis_compensation = 0
+            if event.condition_type == 1:
+                requirements = 'มี'
+          
+            if int(rs.pi_id) == 1:
+             if  event.condition_type == 1:  # เช็คว่า วิทยากร มีเงื่อนไขไหม
+               
                
                 icont = condition.objects.filter(conhead=event.condition_id)
                 for iconts in icont:
@@ -1092,22 +1094,37 @@ def withdraw_list_one(request):
                         if iconts.student == total_rq_quta: 
                             select = iconts.condition_id
                             break  
+             if select != 0:
+              totalselect = condition.objects.get(condition_id=select)
+              price = int(rs.tis_quantity) * (totalselect.price)
+              head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
+              name_con = head.name
+              tis_compensation = totalselect.price
+              print('เลือกเงื่อนไข')
+              print('เลือกเงื่อนไข2',totalselect.conhead)
+             else:
+                print('วิทนากร ที่ไม่มีเงื่อนไข')   
+                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                tis_compensation = rs.tis_compensation
+                       
             else :    
-             print('ไม่ใช่วิทยากร')         
-           
-            if select != 0:
-             totalselect = condition.objects.get(condition_id=select)
-             price = int(rs.tis_quantity) * (totalselect.price)
-             print(rs.tis_quantity)    
+             print('ไม่ใช่วิทยากร')  
+             price = int(rs.tis_quantity) * (rs.tis_compensation)          
+             tis_compensation = rs.tis_compensation
+
+              
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
-
+            print(price)
+            
             start = str(event.ev_date_start)
+            print(start)
             end = str(event.ev_date_end)
             y, m, d = end.split("-")
             Y, mM, dD = start.split("-")
             day_of_week = event.ev_date_start.weekday()
 
+          
             if day_of_week:
              try:
                 
@@ -1130,7 +1147,7 @@ def withdraw_list_one(request):
             else:
              dt = "-"
 
-            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta}
+            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)
         

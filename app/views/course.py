@@ -458,6 +458,7 @@ def condition_form_save(request):
     
     
     instance = course.objects.get(course_id=conhead_id)
+    print(instance)
     if type_condition == '1':
         student = request.POST['student']
         price = request.POST['price']
@@ -480,7 +481,7 @@ def condition_form_save(request):
         hour = request.POST['hour']
         student = request.POST['student']
         type_id = request.POST['type_id']
-        action = request.POST['action']
+    
         content = condition(
             student = student,
             price = 0,
@@ -528,8 +529,8 @@ def condition_form_update(request):
         content = condition.objects.get(condition_id=condition_id)
         content.student = student
         content.hour = hour
-        content.type = type_id,
-        content.action = action,
+        content.type = type_id
+        content.action = action
         content.save()
         
 

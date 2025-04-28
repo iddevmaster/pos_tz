@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% block content %}{% load humanize %} 
 <style>
   .center-div {
     display: flex;
@@ -62,7 +62,7 @@
       </div>
       <div class="col-9 col-md-9 col-sm-9 col-xs-9">
         <div class="card-body">
-          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span> จำนวนผู้อบรม {{res.total_rq_quta}} คน</span>
+          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span style="color:red"> จำนวนผู้อบรม {{res.total_rq_quta}} คน</span>
           <p>
 
           {{res.tis_compensation}} / {{res.tis_quantity}} -
@@ -73,7 +73,17 @@
               {% else %}
               งาน
               {% endif %}  / {{res.pi}}
+
+              เงื่อนไข: {{res.requirements}} - {{res.name_con}}
           </p>
+             <span> รายได้ค่าตอบแทน: 
+  
+       
+          </span>  
+          <span style="color:red">
+  
+          {{ res.price |floatformat:2|intcomma }}
+          </span>  
         </div>
 
 
