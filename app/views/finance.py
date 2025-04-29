@@ -1051,10 +1051,12 @@ def withdraw_list_one(request):
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
         pi = ['1','2']
+        totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         requirements = 'ไม่มี'
         name_con = '-'
         for rs in teacher_income:
+            print(rs.ev)
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
@@ -1068,6 +1070,7 @@ def withdraw_list_one(request):
                         bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
+            
             select = 0
             price = 0
             tis_compensation = 0
@@ -1123,9 +1126,10 @@ def withdraw_list_one(request):
             y, m, d = end.split("-")
             Y, mM, dD = start.split("-")
             day_of_week = event.ev_date_start.weekday()
-
-          
+           
+           
             if day_of_week:
+             print('if',day_of_week)
              try:
                 
                 if day_of_week == 0:
@@ -1145,13 +1149,13 @@ def withdraw_list_one(request):
              except ValueError:
                 dt = "-"
             else:
-             dt = "-"
-
+             dt = "จ"
+            totalp += price
             r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)
         
-        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj}
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp}
     except fact_teacher_user.DoesNotExist:
         getteachid = None
         return redirect("/")

@@ -49,10 +49,21 @@
   </div>
 </div>
 <input type="hidden" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
+<div class="row"  id="cardContainer">
+
+<div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card">
+    <div class="card-body">
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมทั้งหมด : </span><span style="font-size: 24px;color:red">{{total_all}}</span></p>
+      <button type="button" class="btn btn-primary">เบิกค่าตอบแทน</button>
+    </div>
+  </div>
+</div>
+
 
 <div class="row"  id="cardContainer">
   {% for res in data %}
-<div class="col-6 col-md-6 col-sm-12 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+<div class="col-12 col-md-6 col-sm-12 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
   <div class="card mb-3">
   
   <div class="row g-0">
