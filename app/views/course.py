@@ -876,12 +876,12 @@ def calendar_event_api2(request,id):
     sss = id
     pi = ['1','2','3','4','5','6','7']
     # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
-    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi).order_by(F('crt_date').desc())
+    content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi).order_by(F('ev__ev_date_start').desc())
     
     obj = []
     
     for r in content:  
-    
+       print(r.ev.ev_date_start)
        start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        y, m, d = end.split("-")
@@ -912,9 +912,10 @@ def calendar_event_api2(request,id):
        
        pay = pay_item.objects.filter(id=r.pi_id).first()
        
-        
+       
     
        day_of_week = r.ev.ev_date_start.weekday()
+       
 
        if day_of_week:
             try:
@@ -936,7 +937,7 @@ def calendar_event_api2(request,id):
             except ValueError:
                 dt = "-"
        else:
-            dt = "-"
+            dt = "จ"
      
 
        col = r.status
@@ -948,7 +949,7 @@ def calendar_event_api2(request,id):
        eve = course_event.objects.get(ev_id=r.ev_id)
        loc = location_thai.objects.get(location_id=eve.location_id)
      
-  
+       print(dt)
        res = {'address':eve.address,'prov':loc.province_name,'amphur_name':loc.amphur_name,'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show}
 
        obj.append(res)      

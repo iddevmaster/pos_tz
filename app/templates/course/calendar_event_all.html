@@ -58,84 +58,7 @@ body: JSON.stringify({'id':document.getElementById("id_delete").value})
 
   
 
-function calen() {
 
-    var calendarEl = document.getElementById("calendar");
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      headerToolbar: {
-        left: "prev,next today",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-      },
-      {% comment %} initialDate: "2020-09-12", {% endcomment %}
-      locale: "th",
-      buttonIcons: false, // show the prev/next text
-      weekNumbers: true,
-      navLinks: true, // can click day/week names to navigate views
-      editable: false,
-      dayMaxEvents: true, // allow "more" link when too many events
-      events: {
-        url: "/calendar_event_apiall/",
-        failure: function () {
-          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
-        },
-      },
-      eventClick: function (info) {
-
-    $('#cardContainer').empty(); // Clear previous cards
-        document.getElementById('eventModalLabel').innerText = info.event.title;
-
-        document.getElementById("ev_id").value = info.event.extendedProps.evs_id
-
-
-        document.getElementById("ev_hour").innerText = info.event.extendedProps.ev_hour
-        document.getElementById("ev_hour_two").innerText = info.event.extendedProps.ev_hour_two
-        document.getElementById("ev_hour_three").innerText = info.event.extendedProps.ev_hour_three
-
-
-        document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
-        document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
-        document.getElementById("ev_people_three").innerText = info.event.extendedProps.ev_people_three
-        
-        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-        eventModal.show();
-
-
-
-
-
-    let jsonData = info.event.extendedProps.data
-
-
-    const tableBody = document.getElementById('json-table-body');
-            jsonData.forEach((item,index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
-                    <td>${item.pi_name}</td>
-                    <td>${item.compensation}</td>
-                    <td>${item.tis_quantity}} </td>  
-                    <td>${item.tis_sum}</td>
-                    <td>#</td>  
-                `;
-                tableBody.appendChild(row);
-            });
-
-            // Add new JSON data dynamically
-            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
-
-    
- // Populate modal with event data
-
-},
-      
-    });
-    calendar.render();
- 
-
-}
   document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
 
@@ -167,15 +90,6 @@ function calen() {
         document.getElementById("ev_id").value = info.event.extendedProps.evs_id
 
 
-        document.getElementById("ev_hour").innerText = info.event.extendedProps.ev_hour
-        document.getElementById("ev_hour_two").innerText = info.event.extendedProps.ev_hour_two
-        document.getElementById("ev_hour_three").innerText = info.event.extendedProps.ev_hour_three
-
-
-        document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
-        document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
-        document.getElementById("ev_people_three").innerText = info.event.extendedProps.ev_people_three
-        
         const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
         eventModal.show();
 
@@ -190,9 +104,9 @@ function calen() {
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
-                  <td>${item.compensation} / ชั่วโมง</td>
-                    <td>${item.tis_quantity} </td>  
-                    <td>${item.tis_sum}</td>
+                  <td> - </td>
+                    <td> -   </td>  
+                    <td> - </td>
                       <td><span style="color:#ea7731">รอการยืนยัน</span></td>
                     <td>       </td>  
                 `;
@@ -201,9 +115,9 @@ function calen() {
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
-                  <td>${item.compensation} / ชั่วโมง</td>
-                    <td>${item.tis_quantity} </td>  
-                    <td>${item.tis_sum}</td>
+                  <td> - </td>
+                    <td> - </td>  
+                    <td> - </td>
                       <td><span style="color:#0ba252">ยืนยัน</span></td>
                     <td>       </td>  
                 `;
@@ -606,77 +520,11 @@ CheckHourbeforeSave()
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="row">
-              <div class="col-12 col-lg-6 col-md-6">
-                ตำแหน่ง / หน้าที่ / รายการ: *   <label style="color: red"> *</label> 
-                <select class="form-select"  id="py" name="py" onchange="handleSelectChangePy(this)">
-                  <option value="" disabled>
-                    เลือก
-                   </option>
-                  {% for listpositions in listposition %}
-                  <option value="{{ listpositions.id }}">
-                     {{ listpositions }}
-                  </option>
-              {% endfor %}
-                </select>
-            </div>
-            <div class="col-12 col-lg-6 col-md-6">
-              ค่าตอบแทน:   <label style="color: red"> *</label> 
-              <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
-        
-          </div>
-
-          
-      <div class="col-12 col-lg-6 col-md-6">
-        จำนวนต่อหน่วย *:   <label style="color: red"> *</label> 
-        <select class="form-select" id="tis_unit" name="tis_unit">
-          <option value="hour">
-             ชั่วโมง
-          </option>
-        </select>
-    </div>
-
-      <div class="col-12 col-lg-6 col-md-6">
-        หน่วย:   <label style="color: red"> *</label> 
-        <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" required />
-    </div>
-
-    <div class="col-12 col-lg-6 col-md-6">
-      รวม: *   <label style="color: red"> *</label> 
-      <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0"  readonly/>
-  </div>
-
-    <div class="col-6 col-lg-6 col-md-6">
-      ครู - วิทยากร:   <label style="color: red"> *</label> 
-    <select id="select-example teacher" class="form-select select2" onchange="handleSelectChange(this)" name="teacher" style="width: 100%;">
-      {% for teachers in teacher %}
-      <option value="">
-      เลือก
-     </option>
-      <option value="{{ teachers.teacher_id }}">
-         {{ teachers}}
-      </option>
-    {% endfor %}
-    </select>
-    </div> 
-
-          </div>
+ 
           <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
           <input type="hidden" name="teacher_id" id="teacher_id" required />
 
 
-          <div class="col-12 col-lg-12 col-md-12">
-            <label style="color: red">หมายเหตุ *</label> 
-         </div>
-         <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงวิทยากร <span id="ev_hour"></span>  ชั่วโมง </label>    <label style="color: red">จำนวน <span id="ev_people"></span> ท่าน </label> 
-         </div>
-         <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
-         </div>
-         <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red">จำนวนชั่วโมงผู้ช่วยวิทยากร <span id="ev_hour_three"></span>  ชั่วโมง</label>  <label style="color: red">จำนวน <span id="ev_people_three"></span> ท่าน </label> 
-         </div>
 
  
       <table class="table table-bordered table-striped">
