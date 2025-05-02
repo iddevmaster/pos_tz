@@ -182,6 +182,7 @@ urlpatterns = [
     path('report/register/export/bill', report_and_print.register_report_bill),
     path('report/register/export/bill/today', report_and_print.register_report_billtoday),
     path('report/summarize/export/bill/today', report_and_print.register_report_billtoday_summarize),
+    path('report/teacher/export', report_and_print.register_report_compensation),
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),

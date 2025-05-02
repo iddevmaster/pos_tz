@@ -55,7 +55,8 @@
   <div class="card">
     <div class="card-body">
       <p class="card-text"><span style="font-size: 24px;"> ยอดรวมทั้งหมด : </span><span style="font-size: 24px;color:red">{{total_all}}</span></p>
-      <button type="button" class="btn btn-primary">เบิกค่าตอบแทน</button>
+      <button type="button" class="btn btn-danger" onclick="withdraw()">เบิกค่าตอบแทน</button>
+      <button type="button" class="btn btn-primary" onclick="gotoReportwith()">หน้ารายการขอเบิก</button>
     </div>
   </div>
 </div>
@@ -105,6 +106,17 @@
    {% endfor %}
 </div>
 
+<script scope>
+function withdraw(){
 
+  alert('ok');
+}
+
+function gotoReportwith(){
+
+alert('ok');
+}
+
+</script>
 
 {% endblock %}

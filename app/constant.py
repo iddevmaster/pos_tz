@@ -298,6 +298,12 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+     {
+        "value": "report/teacher/export",
+        "label": "รายงานค่าตอบแทน",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
     {
         "value": "register/report/event/all",
         "label": "รายงานผู้เข้าอบรม",

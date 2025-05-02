@@ -149,7 +149,7 @@ def billing_cycle_result(request):
     # day_current = 10
     b = billing_cycle_setting.objects.filter(module=m.module)
     start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module, tis_end_date__year=year_current,status='I').annotate(month=TruncMonth('tis_start_date'))
+        ev__module=m.module, tis_end_date__year=year_current,status='S').annotate(month=TruncMonth('tis_start_date'))
    
     start_content = start_content.values('month').annotate(
         order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('-month')
@@ -166,6 +166,7 @@ def billing_cycle_result(request):
         total_month_sum = r1['order_sum']
         defaultdata = r1['month']  # y-m-d
         month = defaultdata.month
+        print(month)
         get_last_day = last_day_of_month(
             datetime.date(int(year_current), month, 1))
         last_day = get_last_day.day
@@ -177,8 +178,9 @@ def billing_cycle_result(request):
         for r2 in b:
             day_start = r2.bcs_start_day
             day_end = r2.bcs_end_day
+            tis_group = f"{day_start} - {day_end}"
+            
 
-          
             # ถ้าเดือนสุดท้ายน้อยกว่าค่า day_end ที่ตั้งไว้ ให้เอาเดือนสุดท้ายมาตั้งใหม่
             if last_day <= day_end:
                 day_end = last_day
@@ -191,9 +193,12 @@ def billing_cycle_result(request):
                 tis_end_date__year=year_current,
                 status="I"
             )
+            # for a in instance:
+            #      print(a.ev_id)
+          
             if teacher_current != None and teacher_current != '':
                 instance = instance.filter(teacher=teacher_current)
-            tis_group = f"{day_start} - {day_end}"
+            # day_current
             if day_current >= day_end and instance.count() >= 1:
                 instance.update(active=1, tis_group=tis_group,status='S',
                                 upd_date=dateTimeNow())
@@ -206,15 +211,18 @@ def billing_cycle_result(request):
             order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('tis_group')
 
         for r3 in group_content:
-            # print(r['tis_group']  + ' ' +  thai_months[month-1])
+
+           
             order_sum = r3['order_sum']
             tis_group = r3['tis_group']
             teachers = content.filter(tis_group=tis_group)
             new_data = {'tis_group': tis_group,
                         'order_sum': order_sum, 'teachers': teachers}
+            
             obj2.append(new_data)
         final = {'month': thai_months[month-1],
                  'total_month_sum': total_month_sum, 'content': obj2}
+
         obj.append(final)
 
     context = {'title': defaultTitle, 'data': obj,

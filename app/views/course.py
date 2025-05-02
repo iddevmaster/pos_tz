@@ -481,6 +481,7 @@ def condition_form_save(request):
         hour = request.POST['hour']
         student = request.POST['student']
         type_id = request.POST['type_id']
+        action = request.POST['action']
     
         content = condition(
             student = student,
