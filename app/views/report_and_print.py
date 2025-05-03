@@ -1,19 +1,22 @@
 from django.shortcuts import render, redirect
+from datetime import date
+import datetime
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
+from ..functions import dateTimeNow, last_day_of_month
 from django.contrib.auth.decorators import login_required 
 from django.db.models import Q, Count
 # from django.http import HttpResponse, response
 from datetime import date, timedelta
 from dateutil import rrule 
 import json
-from datetime import datetime
-
+from ..constant import defaultTitle, thai_months,unitPayChoices
+from django.db.models.functions import TruncMonth
 from django.db.models import Count, Sum, F
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -664,15 +667,11 @@ def register_report_billtoday(request):
     return render(request, 'report/register_report_billtoday.html', context)   
 
 
+
 @login_required(login_url='/login')
 def register_report_compensation(request):
     user_id = request.user.id
-    try:
-        m = user_group.objects.get(user=user_id)
-    except user_group.DoesNotExist:
-        m = None
-        return render(request, '404.html')
-     # Menu
+    # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
@@ -687,7 +686,14 @@ def register_report_compensation(request):
         r = {'group_label': rs['group_label'],
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
-    
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # month_current = date.today().month
+
+
     result = teacher.objects.filter(cancelled=1).order_by("-crt_date")
     lastday = lastDateOfmonth(
         date.today().year, date.today().month, date.today().day)
@@ -697,10 +703,26 @@ def register_report_compensation(request):
         str(date.today().month) + "/" + str(date.today().year)
     daterange = str(default_start) + " - " + str(default_end)
 
-    print(result)
-    context = {'title': defaultTitle,  'listMenuPermission': objMenu,
-               'list_user': result, 'daterange': daterange}
-    return render(request, 'report/register_report_teacher.html', context)
+
+    year_current = request.GET.get('qyear', date.today().year)
+    teacher_current = request.GET.get('qteacher', None)
+    day_current = date.today().day
+    # day_current = 10
+    b = billing_cycle_setting.objects.filter(module=m.module)
+    start_content = teacher_income_setting.objects.filter(
+        ev__module=m.module, tis_start_date__gte='2025-04-01',tis_end_date__lte='2025-04-30',status='S')
+
+    list_teacher = teacher.objects.filter(
+        module=m.module, cancelled=1, active=1)
+    obj = []
+  
+    print(start_content)
+    
+
+
+    context = {'title': defaultTitle, 'data': start_content, 'list_user': result,'daterange': daterange,
+               'listMenuPermission': objMenu, 'list_teacher': list_teacher}
+    return render(request, 'report/billing_cycle_result.html', context)
     
 
 @login_required(login_url='/login')

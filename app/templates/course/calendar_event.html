@@ -36,6 +36,8 @@ $(document).ready(function () {
 });
 
 
+
+
 async function handleSelectChangeCondition(t) {
  
 const ev_id = document.getElementById("ev_id");
@@ -50,7 +52,7 @@ let data = await fetch('/api/updateeventcondition', {
   })
   .then(response => response.json())
   .then(data => {
-console.log(data);
+console.log('update');
   })
   
   
@@ -61,11 +63,10 @@ async function handleClick(myRadio) {
   
 const ev_id = document.getElementById("ev_id");
   const myDiv = document.getElementById("myDiv");
-  
+  console.log(myRadio.value);
 
   if(myRadio.value == 0){
-          const option = document.createElement("option");
-      option.value = 0;
+         
     myDiv.classList.remove("visible");
     myDiv.classList.add("hidden");
 let data = await fetch('/api/updateeventcondition', {
@@ -77,16 +78,13 @@ let data = await fetch('/api/updateeventcondition', {
   })
   .then(response => response.json())
   .then(data => {
-console.log(data);
+    console.log('update');
   })
 
     
   }
 
   if(myRadio.value == 1){
-      const option = document.createElement("option");
-      option.value = 0;
-
     myDiv.classList.remove("hidden");
     myDiv.classList.add("visible");
 
@@ -100,7 +98,7 @@ console.log(data);
   })
   .then(response => response.json())
   .then(data => {
-console.log(data);
+console.log('update');
   })
 
 
@@ -254,7 +252,28 @@ function calen() {
       eventClick: function (info) {
        
 
-    
+        let timerInterval;
+Swal.fire({
+  title: "Auto close alert!",
+  html: "I will close in <b></b> milliseconds.",
+  timer: 2000,
+  timerProgressBar: true,
+  didOpen: () => {
+    Swal.showLoading();
+    const timer = Swal.getPopup().querySelector("b");
+    timerInterval = setInterval(() => {
+      timer.textContent = `${Swal.getTimerLeft()}`;
+    }, 100);
+  },
+  willClose: () => {
+    clearInterval(timerInterval);
+  }
+}).then((result) => {
+  /* Read more about handling dismissals below */
+  if (result.dismiss === Swal.DismissReason.timer) {
+    console.log("I was closed by the timer");
+  }
+});
 
 
 
@@ -267,23 +286,28 @@ function calen() {
   })
   .then(response => response.json())
   .then(data => {
+   
+    document.getElementById("condition_id").value = data.condition_id
+    document.getElementById("condition_type").value = data.condition_type
+    document.getElementById("bill").innerText = data.total_rq_quta
 
-    document.getElementById("bill").innerText = data
+    
+ 
   })
   
+  setTimeout(() => {
+ 
+
+
       document.getElementById('count_day').value = info.event.extendedProps.count_day;
-
-
-   
-
 
       const radio1 = document.getElementById("inlineRadio1");
       const radio2 = document.getElementById("inlineRadio2");
-
-
+      const condition_type = document.getElementById("condition_type").value;
+      const condition_id = document.getElementById("condition_id").value;
+     
   
-      const a = info.event.extendedProps.condition_type;
-      if(a == 0){
+      if(condition_type == 0){
         radio2.checked = false;
         radio1.checked = true;
         const myDiv = document.getElementById("myDiv");
@@ -291,7 +315,7 @@ function calen() {
         myDiv.classList.add("hidden");
       }
     
-      if(a == 1){
+      if(condition_type == 1){
         radio2.checked = true;
         radio1.checked = false;
         const myDiv = document.getElementById("myDiv");
@@ -299,20 +323,32 @@ function calen() {
         myDiv.classList.add("visible");
       }
 
-      const myArray = info.event.extendedProps.condition;
-      console.log(info.event.extendedProps)
 
+
+ 
+    let wtf = info.event.extendedProps.condition
+    
+
+    let myArray = []; // initialize an empty array
+    let myObject = {conhead_id:0,name:"เลือกเงื่อนไข"}; // create an object
+    myArray.push(myObject); // add the object to the array
+   
+    for (let i = 0; i < info.event.extendedProps.condition.length; i++) {
+    
+      let ffff = {conhead_id:info.event.extendedProps.condition[i].conhead_id,name:info.event.extendedProps.condition[i].name}; 
+      myArray.push(ffff); 
+    }
+  
     // Get the select element
     const selectElement = document.getElementById("mySelect");
-    const option = document.createElement("option");
-
-    option.value = "";
-    option.textContent = "";
-    selectElement.value = "";
-    selectElement.textContent = "";
+    while (selectElement.options.length > 0) {
+      selectElement.remove(0);
+    }
+    
 
     // Loop through the array and create options
     myArray.forEach(item => {
+      const option = document.createElement("option");
       // Create a new option element
   
 
@@ -321,16 +357,11 @@ function calen() {
       // Set the option's text (what the user sees)
       option.textContent = item.name;  //  or option.innerText = item.text;
 
-      // Append the option to the select element
-
-      if (item.conhead_id === info.event.extendedProps.condition_id) {
-        option.selected = true; // Pre-select the option
-      }
-
       selectElement.appendChild(option);
     });
+   
+ selectElement.value = condition_id;
 
-  
         
     $('#cardContainer').empty(); // Clear previous cards
    
@@ -428,14 +459,15 @@ function calen() {
 
     
  // Populate modal with event data
-
+}, 1000);
 },
       
     });
     calendar.render();
   });
 
-  
+
+
 
   async function save() {
 
@@ -1070,6 +1102,10 @@ CheckHourbeforeSave()
           </div>
           <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
           <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+          <input type="hidden" name="condition_id" id="condition_id"  />
+          <input type="hidden" name="condition_type" id="condition_type"  />
+
        <div class="col-12 col-lg-12 col-md-12">
             <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0" onclick="handleClick(this);" checked>
@@ -1083,7 +1119,7 @@ CheckHourbeforeSave()
 
          <div class="col-12 col-lg-12 col-md-12"  id="myDiv" class="hidden">
           <select id="mySelect"  class="form-select" aria-label="Default select example" onchange="handleSelectChangeCondition(this)">
-            <option select value="0">เลือกเงื่อนไขที่กำหนด</option>
+           
           </select>
         
        </div> 

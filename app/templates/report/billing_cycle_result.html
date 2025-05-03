@@ -1,0 +1,263 @@
+{% extends 'base.html' %} 
+{% block content %} 
+  {% load humanize static %}
+  {% load ex_functions %}
+<script>
+  function tableDisplay(id) {
+    var element = document.getElementById(id);
+    if (element.style.display === "flex") {
+      element.style.display = "none";
+    } else {
+      element.style.display = "flex";
+    }
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    setModuleValue("new_value");
+  });
+
+  function default_date() {
+    const d = new Date();
+    let month = d.getMonth() + 1;
+    let year = d.getFullYear();
+    let formattedNumberMonth = month.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+
+    const url = new URL(location.href);
+    //alert(url.searchParams.get("qteacher"));
+    let qyear = url.searchParams.get("qyear");
+
+    if (qyear !== null) {
+      document.getElementById("qyear").value = qyear;
+    } else {
+      document.getElementById("qyear").value = year;
+    }
+  }
+
+  window.onload = default_date;
+  $(document).ready(function () {
+    let qteacher = new URLSearchParams(window.location.search).get("qteacher");
+    $(".select2").select2({
+      allowClear: true,
+    });
+    if (qteacher) {
+      $(".select2").val(qteacher).trigger("change");
+    }
+  });
+
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
+</script>
+
+
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายงานค่าตอบแทน</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          รายงานค่าตอบแทน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="post"
+        action="/finance/billing/result"
+        autocomplete="off"
+        target="iframe_target"
+      >
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-4 col-md-6 mb-4">
+       
+            <label for="exampleFormControlInput1" class="form-label">วันที่ค้นหา</label>
+            <input
+              type="text"
+              class="form-control daterange"
+              id="date_range"
+              name="date_range"
+              required
+              value="{{daterange}}"
+            />
+          </div>
+
+   
+
+          <div class="col-lg-4 col-md-6 mb-4">
+            <label for="exampleFormControlInput1" class="form-label">ครู-วิทยากร</label>
+            <select class="form-select select2" id="qseller" name="qseller">
+              <option value="0">---วิทยากร-ครูฝึก---</option>
+              {% for res2 in list_user %}
+              <option value="{{res2.teacher_id}}">
+               {{res2}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+        
+        <div class="form-goup" align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-warning"
+            onclick="window.location.href='/register/export/bill'"
+          >
+            <i class="icon dripicons-clockwise"></i>
+            รีเซ็ต
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+</section>
+
+<section class="section">
+  <!-- <form method="get" action="/finance/billing/result" autocomplete="off">
+    <div class="row" style="padding-top: 5px; padding-bottom: 15px">
+      <div class="col-lg-3 col-md-6">
+        <label>ปี</label>
+        <input
+          type="number"
+          class="form-control"
+          id="qyear"
+          name="qyear"
+          required
+          placeholder="ปี (ค.ศ.)"
+        />
+      </div>
+      <div class="col-lg-6 col-md-6 mb-4">
+        <label>ครู/วิทยากรทั้งหมด</label>
+        <select class="form-select select2" id="qteacher" name="qteacher">
+          <option value="">--ครู/วิทยากรทั้งหมด--</option>
+          {% for t in list_teacher %}
+          <option value="{{t.teacher_id}}">
+            {{t.teacher_firstname_th}} {{t.teacher_lastname_th}}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div style="padding-top: 30px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+        </div>
+      </div>
+    </div>
+  </form> -->
+
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group row">
+        <div class="col-lg-2">
+          <h3>xx</h3>
+        </div>
+        <div class="col-lg-1">
+          <input
+          type="button"
+          onclick="tableToExcel('content-{{r.month}}', 'รายงานการขาย')"
+          value="Export to Excel"
+          style="height: 35px"
+        />
+        </div>
+        <div class="col-lg-9" align="right">
+          <button
+            class="btn btn-light"
+           
+          >
+            <h1>x</h1>
+          </button>
+          
+        </div>
+    
+
+
+        
+      </div>
+      <div id="content-{{r.month}}" > 
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>รอบบิล</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>ตำแหน่ง</th>
+              <th>หลักสูตร</th>
+              <th>วันที่สอน</th>
+              <th>ค่าตอบแทน</th>
+              <th>จำนวนต่อหน่วย</th>
+              <th>หน่วย</th>
+              <th>สุทธิ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for res in data %}
+            <tr>
+              <td align="center">{{ forloop.counter }}</td>
+              <td align="center">{{ res.tis_group }}</td>
+              <td align="center">{{ forloop.counter }}</td>
+              <td align="center">{{ res.pi }}</td>
+              <td align="center">{{ res.pi }}</td>
+              <td align="center">{{ res.tis_start_date }} - {{ res.tis_end_date }}</td>
+              <td align="center"> {{ res.tis_compensation }}</td>
+              <td align="center">  {{ res.tis_quantity }} </td>
+              <td align="center">  {{res.tis_unit}}</td>
+              <td align="center">  {{res.tis_sum}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+</section>
+
+{% endblock %}

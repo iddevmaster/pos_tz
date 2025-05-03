@@ -1221,19 +1221,13 @@ def calendar_event_api_totalbill(request):
     data = json.loads(request.body)
     user_id = request.user.id
     ev_id = data.get("ev_id")
-  
 
-    obj = []
-
-   
+    content = course_event.objects.get(ev_id=ev_id)
     regbyev = register_main.objects.filter(ev_id=ev_id)
-    
     total_rq_quta = 0
-
-
     
     for aaa in regbyev:
-        print(aaa)
+        
         try:
             bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
             if bbbb:
@@ -1242,6 +1236,7 @@ def calendar_event_api_totalbill(request):
             bbbb = 0
 
 
-    return JsonResponse(total_rq_quta, safe=False)
+    data = {'total_rq_quta':total_rq_quta,'condition_id':content.condition_id,'condition_type':content.condition_type}
+    return JsonResponse(data, status=200, safe=False)  
 
     

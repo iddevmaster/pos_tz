@@ -171,10 +171,7 @@ def billing_cycle_result(request):
             datetime.date(int(year_current), month, 1))
         last_day = get_last_day.day
 
-        
-        # print(thai_months[i-1])
-        # เช็คและตัดรอบบิล
-
+   
         for r2 in b:
             day_start = r2.bcs_start_day
             day_end = r2.bcs_end_day
