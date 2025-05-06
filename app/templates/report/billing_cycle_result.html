@@ -225,32 +225,30 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>#</th>
-              <th>รอบบิล</th>
-              <th>ชื่อ-นามสกุล</th>
-              <th>ตำแหน่ง</th>
-              <th>หลักสูตร</th>
-              <th>วันที่สอน</th>
-              <th>ค่าตอบแทน</th>
-              <th>จำนวนต่อหน่วย</th>
-              <th>หน่วย</th>
-              <th>สุทธิ</th>
+              <th>ลำดับ</th>
+              <th>Event งาน(ชื่อหลักสูตร)</th>
+              <th>วันที่จัดอบรม</th>
+              <th>ครูฝึก</th>
+              <th>ชั่วโมง / วัน</th>
+              <th>ภาษีที่จ่าย</th>
+              <th>เป็นเงิน</th>
             </tr>
           </thead>
           <tbody>
             {% for res in data %}
             <tr>
               <td align="center">{{ forloop.counter }}</td>
-              <td align="center">{{ res.tis_group }}</td>
-              <td align="center">{{ forloop.counter }}</td>
+              <td align="center">{{ res.course_name }}</td>
+              <td align="center">{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
               <td align="center">{{ res.pi }}</td>
-              <td align="center">{{ res.pi }}</td>
-              <td align="center">{{ res.tis_start_date }} - {{ res.tis_end_date }}</td>
-              <td align="center"> {{ res.tis_compensation }}</td>
-              <td align="center">  {{ res.tis_quantity }} </td>
-              <td align="center">  {{res.tis_unit}}</td>
-              <td align="center">  {{res.tis_sum}}</td>
+              <td align="center">{{ res.tis_quantity }} / {{res.tis_unit}}</td>
+              <td align="center">xxxx</td>
+              <td align="center">{{res.price}}</td>
+              <!-- <td align="center">{{res.requirements}}</td> -->
+             
             </tr>
+          
+          
             {% endfor %}
           </tbody>
         </table>
@@ -260,4 +258,15 @@
  
 </section>
 
+<iframe
+id="iframe_target"
+name="iframe_target"
+src="/report/teacher/export/withdraw"
+style="height: 500px; width: 100%; border: thin; background-color: #fff"
+></iframe>
+
+
 {% endblock %}
+
+
+

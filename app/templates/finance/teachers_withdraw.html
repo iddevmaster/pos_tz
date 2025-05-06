@@ -48,7 +48,7 @@
     </nav>
   </div>
 </div>
-<input type="hidden" class="form-control" name="teacher_id" id="teacher_id" value="{{teacher_id}}" />
+<input type="hidden" class="form-control" name="user_id" id="user_id" value="{{user_id}}" />
 <div class="row"  id="cardContainer">
 
 <div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
@@ -107,14 +107,26 @@
 </div>
 
 <script scope>
-function withdraw(){
+function gotoReportwith(){
 
   alert('ok');
 }
 
-function gotoReportwith(){
+async function withdraw() {
 
-alert('ok');
+  const user_id = document.getElementById("user_id").value
+
+let data = await fetch('/api/sendwithdraw', {
+  method: 'POST',
+  headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({'user_id':user_id})
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('save',data);
+  })
 }
 
 </script>

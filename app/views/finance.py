@@ -971,7 +971,22 @@ def updateteachincom(request):
     return JsonResponse(datas, status=200,safe=False)
 
 
+@csrf_exempt
+def sendwithdraw(request):
 
+    data = json.loads(request.body)
+    user_id = data.get("user_id")
+   
+    user = fact_teacher_user.objects.get(user_id=user_id)
+    teacher_income = teacher_income_setting.objects.filter(teacher=user.teacher_id,status="I",active=0)
+    for r3 in teacher_income:
+     teacher_income = teacher_income_setting.objects.get(id=r3.id)
+     teacher_income.status = 'S'
+     teacher_income.active = 1
+     teacher_income.save()
+
+    datas = {'status':200}
+    return JsonResponse(datas, status=200,safe=False)
 
 
 def withdraw_list(request):
@@ -1026,6 +1041,7 @@ def withdraw_list(request):
 
 
 
+
 def withdraw_list_one(request):
     user_id = request.user.id
     # Menu
@@ -1055,13 +1071,13 @@ def withdraw_list_one(request):
     try:
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
-        pi = ['1','2']
+        pi = ['1','2','3','4','5','6','7','8']
         totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         requirements = 'ไม่มี'
         name_con = '-'
         for rs in teacher_income:
-            print(rs.ev)
+            
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
@@ -1079,18 +1095,24 @@ def withdraw_list_one(request):
             select = 0
             price = 0
             tis_compensation = 0
-            if event.condition_type == 1:
+         
+            if int(event.condition_type) == 1:
+                
                 requirements = 'มี'
-          
             if int(rs.pi_id) == 1:
-             if  event.condition_type == 1:  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-               
-               
+           
+             if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
                 icont = condition.objects.filter(conhead=event.condition_id)
+                
                 for iconts in icont:
+                    
                      typet = iconts.type
+                      
                      if typet == '1':
-                        if iconts.student > total_rq_quta:
+                        print('1',iconts.type) 
+                        print('1',iconts.student) 
+                        print('1',total_rq_quta) 
+                        if total_rq_quta > iconts.student:
                             select = iconts.condition_id
                             break
                      elif typet == '2':
@@ -1099,34 +1121,48 @@ def withdraw_list_one(request):
                             select = iconts.condition_id
                             break
                      elif typet == '3':
+                        
                         if iconts.student == total_rq_quta: 
                             select = iconts.condition_id
                             break  
+             print('วิทยากร',select)         
              if select != 0:
+              
               totalselect = condition.objects.get(condition_id=select)
               price = int(rs.tis_quantity) * (totalselect.price)
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
               name_con = head.name
               tis_compensation = totalselect.price
-              print('เลือกเงื่อนไข')
-              print('เลือกเงื่อนไข2',totalselect.conhead)
+              
              else:
-                print('วิทนากร ที่ไม่มีเงื่อนไข')   
                 price = int(rs.tis_quantity) * (rs.tis_compensation)    
                 tis_compensation = rs.tis_compensation
-                       
+               
+        
             else :    
-             print('ไม่ใช่วิทยากร')  
-             price = int(rs.tis_quantity) * (rs.tis_compensation)          
-             tis_compensation = rs.tis_compensation
+            
+             if int(rs.pi_id) == 2:
 
+              price = int(rs.tis_quantity) * (rs.tis_compensation)  
+              tis_compensation = rs.tis_compensation        
+              
+             elif int(rs.pi_id) == 3:
+            
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 4:
+              
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+          
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
-            print(price)
+         
             
             start = str(event.ev_date_start)
-            print(start)
+          
             end = str(event.ev_date_end)
             y, m, d = end.split("-")
             Y, mM, dD = start.split("-")
@@ -1134,7 +1170,7 @@ def withdraw_list_one(request):
            
            
             if day_of_week:
-             print('if',day_of_week)
+             
              try:
                 
                 if day_of_week == 0:
@@ -1160,7 +1196,7 @@ def withdraw_list_one(request):
         
             obj.append(r)
         
-        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp}
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp,'user_id':user_id}
     except fact_teacher_user.DoesNotExist:
         getteachid = None
         return redirect("/")
@@ -1168,5 +1204,8 @@ def withdraw_list_one(request):
     
 
     return render(request, 'finance/teachers_withdraw.html',context)
+
+
+
 
   
