@@ -48,7 +48,14 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 </style>
 
 <div style="padding-bottom: 65px">
-  <div style="float: left">ทั้งหมด <strong>xxxxxxxxxxxxxxxxx </strong>รายการ</div>
+  <div style="float: left">
+  <input
+      type="button"
+       onclick="window.open('/register/print/{{res.main.rp_id}}','','width=950,height=650'); return false;"
+      value="Print"
+      style="height: 35px"
+    />
+  </div>
   <div style="float: right">
     <input
       type="button"
@@ -60,9 +67,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 </div>
 
 
-
-
 <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
+{{date_range}}  {{teacher_id}}
   <tbody>
 
     <tr style="font-weight: bold">
@@ -98,8 +104,9 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     {% endfor %}
 
     <tr>
-      <td colspan="6">รวมเป็นค่าตอบแทน</td>
-      <td colspan="1">xxxxxxxxxxxx</td>
+      <td colspan="5">รวมเป็นค่าตอบแทน</td>
+      <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
     </tr>
     
     <tr>

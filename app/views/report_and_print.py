@@ -671,6 +671,9 @@ def register_report_billtoday(request):
 @login_required(login_url='/login')
 def register_report_compensation(request):
     user_id = request.user.id
+    date_range = request.POST.get('date_range', None)
+    teacher_id = request.POST.get('teacher_id', None)
+
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -716,9 +719,8 @@ def register_report_compensation(request):
         module=m.module, cancelled=1, active=1)
     obj = []
 
-
-
-    teacher_income = teacher_income_setting.objects.filter(status='I')
+    teacher_income = teacher_income_setting.objects.filter(status='I',teacher=teacher_id)
+    print(teacher_income)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
@@ -814,6 +816,11 @@ def register_report_compensation(request):
 @login_required(login_url='/login')
 def register_report_compensation_withdraw(request):
     user_id = request.user.id
+    
+    date_range = request.POST.get('date_range', None)
+    teacher_id = request.POST.get('teacher_id', None)
+
+
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -847,21 +854,13 @@ def register_report_compensation_withdraw(request):
     daterange = str(default_start) + " - " + str(default_end)
 
 
-    year_current = request.GET.get('qyear', date.today().year)
-    teacher_current = request.GET.get('qteacher', None)
-    day_current = date.today().day
-    # day_current = 10
-    b = billing_cycle_setting.objects.filter(module=m.module)
-    start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module,status='I')
-
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
 
 
 
-    teacher_income = teacher_income_setting.objects.filter(status='I')
+    teacher_income = teacher_income_setting.objects.filter(status='I',teacher=teacher_id)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
@@ -918,8 +917,7 @@ def register_report_compensation_withdraw(request):
              else:
                 price = int(rs.tis_quantity) * (rs.tis_compensation)    
                 tis_compensation = rs.tis_compensation
-               
-        
+            
             else :    
         
              if int(rs.pi_id) == 2:
@@ -949,8 +947,8 @@ def register_report_compensation_withdraw(request):
 
 
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,
-               'listMenuPermission': objMenu, 'list_teacher': list_teacher}
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,
+            'list_teacher': list_teacher}
     return render(request, 'print/report_withdraw.html', context)    
 
 @login_required(login_url='/login')
