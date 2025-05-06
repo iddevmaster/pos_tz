@@ -183,6 +183,9 @@ urlpatterns = [
     path('report/register/export/bill/today', report_and_print.register_report_billtoday),
     path('report/summarize/export/bill/today', report_and_print.register_report_billtoday_summarize),
     path('report/teacher/export', report_and_print.register_report_compensation),
+    path('report/teacher/export/withdraw', report_and_print.register_report_compensation_withdraw),
+
+    
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
@@ -266,6 +269,8 @@ urlpatterns = [
 
     
     path('api/card/register', register.insertcard),
+    path('api/sendwithdraw', finance.sendwithdraw),
+    
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
