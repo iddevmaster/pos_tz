@@ -112,6 +112,7 @@ class course_event(models.Model):
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
     condition_id = models.IntegerField(default=0, blank=False)
     condition_type = models.IntegerField(default=0, blank=False)
+    number_code = models.CharField(max_length=256, blank=True, default=None)
    
     
 # customer_type  1  = บุคคล ,2 = บริษัท
