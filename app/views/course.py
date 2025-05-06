@@ -195,6 +195,9 @@ def course_event_create(request):
     local = request.POST['location_id']
     address = request.POST['address']
     status = ''
+    now = datetime.datetime.now()
+    time_string = now.strftime("%H%M%S")
+    number_code = 'EV'+ ev_date_end + time_string + course_id
     
     if checkevent == '0':
         status = 'N'
@@ -230,6 +233,7 @@ def course_event_create(request):
         limit_price=limitprice,
         limit_price_workhelp=limit_price_workhelp,
         status=status,
+        number_code=number_code,
         location_id=local,
         address=address,
         ev_training=ev_training,

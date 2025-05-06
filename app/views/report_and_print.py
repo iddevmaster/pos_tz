@@ -942,13 +942,14 @@ def register_report_compensation_withdraw(request):
             pay = pay_item.objects.get(id=rs.pi_id)
 
             totalp += price
+            
             r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)
 
 
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,
                'listMenuPermission': objMenu, 'list_teacher': list_teacher}
     return render(request, 'print/report_withdraw.html', context)    
 
