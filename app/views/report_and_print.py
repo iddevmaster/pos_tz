@@ -82,12 +82,12 @@ def register_print(request, rp_id):
 @login_required(login_url='/login')
 def register_print_witdraw(request, teacher_id, start, end):
     
-  
+   context = {'num_iterations': 34}
    print(teacher_id)
 
    print(start)
    print(end)
-   return render(request, 'print/register_print_witdraw.html')
+   return render(request, 'print/register_print_witdraw.html',context)
 
 
 @login_required(login_url='/login')
