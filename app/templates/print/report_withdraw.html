@@ -51,7 +51,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   <div style="float: left">
   <input
       type="button"
-       onclick="window.open('/register/print/{{res.main.rp_id}}','','width=950,height=650'); return false;"
+       onclick="window.open('/teacher/print/witdraw/{{teacher_id}}/{{start}}/{{end}}','','width=950,height=650'); return false;"
       value="Print"
       style="height: 35px"
     />
@@ -68,7 +68,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
 
 <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
-{{date_range}}  {{teacher_id}}
+{{start}} {{end}}  {{teacher_id}}
   <tbody>
 
     <tr style="font-weight: bold">

@@ -184,7 +184,7 @@ urlpatterns = [
     path('report/summarize/export/bill/today', report_and_print.register_report_billtoday_summarize),
     path('report/teacher/export', report_and_print.register_report_compensation),
     path('report/teacher/export/withdraw', report_and_print.register_report_compensation_withdraw),
-
+    path('teacher/print/witdraw/<uuid:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
     
 
     path('report/register/export/learning_status',
@@ -192,9 +192,9 @@ urlpatterns = [
     path('report/register/export/approve_list',
          report_and_print.register_report_approve),
     path('register/print/<slug:rp_id>', report_and_print.register_print),
+    
 
     path('salesnotevent/print/<slug:rp_id>', report_and_print.register_printnoev),
-
     path('register/excel/seller', report_and_print.register_excel_seller),
     path('register/excel/seller/accpept/<slug:ev_id>', report_and_print.register_excel_seller_accept),
     path('register/excel/quotation', report_and_print.register_excel_quotation),

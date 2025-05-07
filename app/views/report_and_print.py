@@ -79,6 +79,16 @@ def register_print(request, rp_id):
         return render(request, 'print/register_print_bill.html', context)
     return render(request, 'print/register_print_sale_quotation.html', context)
 
+@login_required(login_url='/login')
+def register_print_witdraw(request, teacher_id, start, end):
+    
+  
+   print(teacher_id)
+
+   print(start)
+   print(end)
+   return render(request, 'print/register_print_witdraw.html')
+
 
 @login_required(login_url='/login')
 def register_printnoev(request, rp_id):
@@ -499,7 +509,7 @@ def register_excel_quotation(request):
     event = int(request.POST.get('event', 0))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=2, active=1,register__module=m.module)
-    print(content)
+    
     lastday = lastDateOfmonth(
         date.today().year, date.today().month, date.today().day)
     default_start = str(date.today().year) + "-" + \
@@ -720,7 +730,6 @@ def register_report_compensation(request):
     obj = []
 
     teacher_income = teacher_income_setting.objects.filter(status='I',teacher=teacher_id)
-    print(teacher_income)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
@@ -820,7 +829,8 @@ def register_report_compensation_withdraw(request):
     date_range = request.POST.get('date_range', None)
     teacher_id = request.POST.get('teacher_id', None)
 
-
+    start = None
+    end = None
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -859,12 +869,21 @@ def register_report_compensation_withdraw(request):
     obj = []
 
 
+   
+    content = teacher_income_setting.objects.select_related('ev').filter(status='I',teacher=teacher_id)
+    
+    if date_range is not None:
+        start, end = format_daterange(date_range)
+        if start == end:
+            content = content.filter(ev__ev_date_start__gte=start)
+        else:
+            content = content.filter(ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
 
-    teacher_income = teacher_income_setting.objects.filter(status='I',teacher=teacher_id)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
-    for rs in teacher_income:
+
+    for rs in content:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -948,7 +967,7 @@ def register_report_compensation_withdraw(request):
 
 
     context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,
-            'list_teacher': list_teacher}
+            'list_teacher': list_teacher,'start':start,'end':end}
     return render(request, 'print/report_withdraw.html', context)    
 
 @login_required(login_url='/login')
