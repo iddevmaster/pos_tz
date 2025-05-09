@@ -1082,21 +1082,28 @@ def register_report_compensation_withdraw_onemorefitter(request):
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
-    
+    totalp = 0
+    sumtax = 0
+    select = 0
+    price = 0
+    cou = 0        
+    tis_compensation = 0
 
-    
+    print(date_range)
     if date_range is not None:
         start, end = format_daterange(date_range)
+        content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=uuid_without_dashes)
+        print('if')
+        cou = content.count()
         if start == end:
             content = content.filter(ev__ev_date_start__gte=start)
         else:
             content = content.filter(ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
 
-    requirements = 'ไม่มี'
-    name_con = '-'
-    totalp = 0
-    sumtax = 0
-    for rs in content:
+        requirements = 'ไม่มี'
+        name_con = '-'
+    
+        for rs in content:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
@@ -1110,10 +1117,7 @@ def register_report_compensation_withdraw_onemorefitter(request):
                         bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
-            select = 0
-            price = 0
-            
-            tis_compensation = 0
+         
          
             if int(event.condition_type) == 1:
                 requirements = 'มี'
@@ -1185,7 +1189,7 @@ def register_report_compensation_withdraw_onemorefitter(request):
 
 
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':content.count(),
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':cou,
             'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax}
     return render(request, 'print/report_withdraw.html', context)    
 
