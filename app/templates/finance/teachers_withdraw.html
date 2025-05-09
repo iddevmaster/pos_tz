@@ -105,7 +105,7 @@
 </div>
    {% endfor %}
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script scope>
 function gotoReportwith(){
 
@@ -125,8 +125,17 @@ let data = await fetch('/api/sendwithdraw', {
   })
   .then(response => response.json())
   .then(data => {
-    console.log('save',data);
+    Swal.fire({
+      title: 'บันทึก',
+      text: 'บันทึกสำเร็จ',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
   })
+
+  setTimeout(function() { 
+    window.location.reload();
+   }, 1000);
 }
 
 </script>

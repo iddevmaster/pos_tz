@@ -112,6 +112,7 @@ urlpatterns = [
          name="UpdateConditioneEvent"),
 
     path('api/updateeventcondition', course.condition_form_update_event),
+    path('api/savetax', desbill.savetax),
 
     #     teacher
     path('teachers/', teacher.teacher_list),
@@ -185,8 +186,10 @@ urlpatterns = [
     path('report/teacher/export', report_and_print.register_report_compensation),
     path('report/teacher/export/withdraw', report_and_print.register_report_compensation_withdraw),
     path('teacher/print/witdraw/<uuid:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
-    
 
+    path('report/teacher/export/onemore', report_and_print.register_report_compensation_withdraw_onemore),
+    path('report/teacher/export/withdraw/onemore', report_and_print.register_report_compensation_withdraw_onemorefitter),
+  
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',
@@ -236,6 +239,8 @@ urlpatterns = [
          name="description_setting_form_delete"),
     path('description/setting/form/update', desbill.setting_form_update,
          name="description_setting_form_update"), 
+    path('tax/setting/form/create', desbill.setting_form_tax,
+         name="tax_setting_form_create"),
          
     path('api/sequence/up', desbill.up),
     path('api/sequence/down', desbill.down),     

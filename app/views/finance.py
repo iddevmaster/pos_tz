@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -976,13 +976,16 @@ def sendwithdraw(request):
 
     data = json.loads(request.body)
     user_id = data.get("user_id")
-   
+    taxs = tax_setting.objects.get(tax_id=1)
+ 
+
     user = fact_teacher_user.objects.get(user_id=user_id)
     teacher_income = teacher_income_setting.objects.filter(teacher=user.teacher_id,status="I",active=0)
     for r3 in teacher_income:
      teacher_income = teacher_income_setting.objects.get(id=r3.id)
      teacher_income.status = 'S'
      teacher_income.active = 1
+     teacher_income.tax = taxs.tax
      teacher_income.save()
 
     datas = {'status':200}

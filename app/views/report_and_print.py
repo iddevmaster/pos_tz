@@ -16,7 +16,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count, Sum, F
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
 
 
@@ -822,6 +822,69 @@ def register_report_compensation(request):
                'listMenuPermission': objMenu, 'list_teacher': list_teacher}
     return render(request, 'report/billing_cycle_result.html', context)
 
+
+
+@login_required(login_url='/login')
+def register_report_compensation_withdraw_onemore(request):
+    user_id = request.user.id
+    date_range = request.POST.get('date_range', None)
+    teacher_id = request.POST.get('teacher_id', None)
+    teac = fact_teacher_user.objects.get(user_id=user_id)
+    uuid_without_dashes = str(teac.teacher_id).replace('-', '')
+
+    
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # month_current = date.today().month
+
+
+    result = teacher.objects.filter(cancelled=1).order_by("-crt_date")
+    lastday = lastDateOfmonth(
+        date.today().year, date.today().month, date.today().day)
+    default_start = "01" + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    default_end = str(lastday) + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    daterange = str(default_start) + " - " + str(default_end)
+
+
+    year_current = request.GET.get('qyear', date.today().year)
+    teacher_current = request.GET.get('qteacher', None)
+    day_current = date.today().day
+    # day_current = 10
+    b = billing_cycle_setting.objects.filter(module=m.module)
+    start_content = teacher_income_setting.objects.filter(
+        ev__module=m.module,status='I')
+
+    list_teacher = teacher.objects.filter(
+        module=m.module, cancelled=1, active=1)
+    obj = []
+
+
+
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,
+               'listMenuPermission': objMenu}
+    return render(request, 'report/billing_cycle_result_one.html', context)
+
+
 @login_required(login_url='/login')
 def register_report_compensation_withdraw(request):
     user_id = request.user.id
@@ -870,7 +933,7 @@ def register_report_compensation_withdraw(request):
 
 
    
-    content = teacher_income_setting.objects.select_related('ev').filter(status='I',teacher=teacher_id)
+    content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=teacher_id)
     
     if date_range is not None:
         start, end = format_daterange(date_range)
@@ -882,10 +945,12 @@ def register_report_compensation_withdraw(request):
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
-
+    sumtax = 0
     for rs in content:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
+            
             total_rq_quta = 0
+            
             for aaa in regbyev:
                 try:
                     bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
@@ -897,6 +962,7 @@ def register_report_compensation_withdraw(request):
             event = course_event.objects.get(ev_id=rs.ev_id)
             select = 0
             price = 0
+            
             tis_compensation = 0
          
             if int(event.condition_type) == 1:
@@ -959,15 +1025,168 @@ def register_report_compensation_withdraw(request):
             pay = pay_item.objects.get(id=rs.pi_id)
 
             totalp += price
-            
-            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
+         
+            taxall = price * (rs.tax / 100)
+            sumtax += taxall
+           
+            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall}
         
             obj.append(r)
 
 
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,
-            'list_teacher': list_teacher,'start':start,'end':end}
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,'cou':content.count(),
+            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax}
+    return render(request, 'print/report_withdraw.html', context)    
+
+
+
+@login_required(login_url='/login')
+def register_report_compensation_withdraw_onemorefitter(request):
+    user_id = request.user.id
+    
+    date_range = request.POST.get('date_range', None)
+    teac = fact_teacher_user.objects.get(user_id=user_id)
+    uuid_without_dashes = str(teac.teacher_id).replace('-', '')
+
+
+    start = None
+    end = None
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # month_current = date.today().month
+
+
+    result = teacher.objects.filter(cancelled=1).order_by("-crt_date")
+
+
+
+    list_teacher = teacher.objects.filter(
+        module=m.module, cancelled=1, active=1)
+    obj = []
+    
+
+    
+    if date_range is not None:
+        start, end = format_daterange(date_range)
+        if start == end:
+            content = content.filter(ev__ev_date_start__gte=start)
+        else:
+            content = content.filter(ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
+
+    requirements = 'ไม่มี'
+    name_con = '-'
+    totalp = 0
+    sumtax = 0
+    for rs in content:
+            regbyev = register_main.objects.filter(ev_id=rs.ev)
+            
+            total_rq_quta = 0
+            
+            for aaa in regbyev:
+                try:
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    if bbbb:
+                        total_rq_quta += bbbb.rp_quota
+                except register_payment.DoesNotExist:  
+                        bbbb = 0
+            
+            event = course_event.objects.get(ev_id=rs.ev_id)
+            select = 0
+            price = 0
+            
+            tis_compensation = 0
+         
+            if int(event.condition_type) == 1:
+                requirements = 'มี'
+            if int(rs.pi_id) == 1:
+           
+             if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
+                icont = condition.objects.filter(conhead=event.condition_id)
+                for iconts in icont:
+        
+                     typet = iconts.type
+                      
+                     if typet == '1':
+                    
+                        if total_rq_quta > iconts.student:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '2':
+                    
+                        if iconts.student < total_rq_quta:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '3':
+                        
+                        if iconts.student == total_rq_quta: 
+                            select = iconts.condition_id
+                            break  
+             print('วิทยากร',select)
+             if select != 0:
+              
+              totalselect = condition.objects.get(condition_id=select)
+              price = int(rs.tis_quantity) * (totalselect.price)
+              head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
+              name_con = head.name
+              tis_compensation = totalselect.price
+          
+             else:
+                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                tis_compensation = rs.tis_compensation
+            
+            else :    
+        
+             if int(rs.pi_id) == 2:
+
+              price = int(rs.tis_quantity) * (rs.tis_compensation)  
+              tis_compensation = rs.tis_compensation        
+              
+             elif int(rs.pi_id) == 3:
+            
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 4:
+              
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+          
+              
+            cours = course.objects.get(course_id=event.course_id)
+            pay = pay_item.objects.get(id=rs.pi_id)
+
+            totalp += price
+         
+            taxall = price * (rs.tax / 100)
+            sumtax += taxall
+           
+            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall}
+        
+            obj.append(r)
+
+
+
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':content.count(),
+            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax}
     return render(request, 'print/report_withdraw.html', context)    
 
 @login_required(login_url='/login')

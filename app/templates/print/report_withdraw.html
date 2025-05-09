@@ -46,7 +46,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     background-color: green;
   }
 </style>
-
+{% if cou > 1 %}
 <div style="padding-bottom: 65px">
   <div style="float: left">
   <input
@@ -68,7 +68,6 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
 
 <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
-{{start}} {{end}}  {{teacher_id}}
   <tbody>
 
     <tr style="font-weight: bold">
@@ -78,7 +77,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td colspan="10" align="center">รายการ การตั้งเบิกค่าตอบแทน ชื่อ บุญเขต เรืองเจริญธรรม รหัสพนักงาน 513020825-7 </td>
     </tr>
     <tr style="font-weight: bold">
-      <td colspan="10" align="center">ระหว่างวันที่ 21-03-2568 ถึง 20-04-2568 </td>
+     
+      <td colspan="10" align="center">ระหว่างวันที่ {{start}} ถึง {{end}} </td>
     </tr>
     <tr>
       <td>ลำดับ</td>
@@ -89,6 +89,10 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>ภาษีที่จ่าย</td>
       <td>เป็นเงิน</td>
     </tr>
+
+
+
+ 
     {% for res in data %}
     <tr>
       <td align="center">{{ forloop.counter }}</td>
@@ -96,7 +100,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="center">{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
       <td align="center">{{ res.pi }}</td>
       <td align="center">{{ res.tis_quantity }} / {{res.tis_unit}}</td>
-      <td align="center">{{res.price|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.price|floatformat:2|intcomma }}</td>
       <!-- <td align="center">{{res.requirements}}</td> -->
      
@@ -105,11 +109,11 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
     <tr>
       <td colspan="5">รวมเป็นค่าตอบแทน</td>
-      <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{sumtax|floatformat:2|intcomma }}</td>
       <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
     </tr>
     
-    <tr>
+    <!-- <tr>
       <td colspan="8">
         <table style="width: 100%; border-collapse: collapse" border="1">
           <tbody>
@@ -191,6 +195,8 @@ padding-top: 10px;
           </tbody>
         </table>
       </td>
-    </tr>
+    </tr> -->
   </tbody>
 </table>
+{% else %}
+{% endif %} 

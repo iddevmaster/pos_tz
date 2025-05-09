@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บริษัท ไทยโลจิส จำกัด</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .document {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header h2 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-top: 0;
+        }
+        
+        .document-info {
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+        
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .page {
+            page-break-after: always;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        @media print {
+            .page {
+                min-height: auto;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <div class="page">
+            <div class="header">
+                <h1>บริษัท ไทยโลจิส จำกัด</h1>
+                <h2>ศูนย์บริการ TZ เซ็นเตอร์</h2>
+            </div>
+            
+            <div class="document-info">
+                <p>รายงาน การใช้น้ำมันเชื้อเพลิงรถยนต์ xxxxxxxxxxxxxxxxxxx ทะเบียนรถ xxxxxxxxxxxxxxxx</p>
+                <p>ประจำวันที่ xxxxxxxxxx ถึง xxxxxxxxxxxx</p>
+            </div>
+            
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>Event รๅๅๅๅ</th>
+                        <th>วันที่ใช้งาน</th>
+                        <th>ผู้ใช้</th>
+                        <th>จำนวน / วัน</th>
+                        <th>กิโลที่วิ่ง</th>
+                        <th>เป็นเงิน</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Table rows will be generated via JavaScript -->
+                </tbody>
+                <tfoot id="signatureFooter">
+                  <!-- Signature row will be added via JavaScript -->
+              </tfoot>
+            </table>
+        </div>
+        
+    </div>
+
+
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Sample data - replace with actual data source
+          const sampleData = [];
+          for (let i = 1; i <= 50; i++) {
+              sampleData.push({
+                  id: i,
+                  event: "test",
+                  date: "test",
+                  user: "test",
+                  amount: "test",
+                  distance: "test",
+                  price: "test"
+              });
+          }
+
+          const rowsPerPage = 17; // Maximum rows per page (matching the image)
+          const tableBody = document.getElementById('tableBody');
+          const signatureFooter = document.getElementById('signatureFooter');
+          const documentContainer = document.querySelector('.document');
+          
+          // Clear any existing content
+          tableBody.innerHTML = '';
+          
+          // Function to create a page
+          function createPage(isFirst = false) {
+              if (!isFirst) {
+                  const page = document.createElement('div');
+                  page.className = 'page';
+
+                  // For non-first pages, recreate header and table header
+                  const header = document.createElement('div');
+                  header.className = 'header';
+                  header.innerHTML = `
+                      <h1>บริษัท ไทยโลจิส จำกัด</h1>
+                      <h2>ศูนย์บริการ TZ เซ็นเตอร์</h2>
+                  `;
+                  
+                  const docInfo = document.createElement('div');
+                  docInfo.className = 'document-info';
+                  docInfo.innerHTML = `
+                      <p>รายงาน การใช้น้ำมันเชื้อเพลิงรถยนต์ xxxxxxxxxxxxxxxxxxx ทะเบียนรถ xxxxxxxxxxxxxxxx</p>
+                      <p>ประจำวันที่ xxxxxxxxxx ถึง xxxxxxxxxxxx</p>
+                  `;
+                  
+                  const newTable = document.createElement('table');
+                  newTable.innerHTML = `
+                      <thead>
+                          <tr>
+                              <th>ลำดับ</th>
+                              <th>Event รายละเอียด(สรุป)</th>
+                              <th>วันที่ใช้งาน</th>
+                              <th>ผู้ใช้</th>
+                              <th>จำนวน / วัน</th>
+                              <th>กิโลที่วิ่ง</th>
+                              <th>เป็นเงิน</th>
+                          </tr>
+                      </thead>
+                  `;
+                  
+                  const newTableBody = document.createElement('tbody');
+                  newTable.appendChild(newTableBody);
+                  
+                  const newFooter = document.createElement('tfoot');
+                  newTable.appendChild(newFooter);
+                  
+                  page.appendChild(header);
+                  page.appendChild(docInfo);
+                  page.appendChild(newTable);
+                  
+                  documentContainer.appendChild(page);
+                  
+                  return {
+                      body: newTableBody,
+                      footer: newFooter
+                  };
+              }
+              
+              return {
+                  body: tableBody,
+                  footer: signatureFooter
+              };
+          }
+          
+          // Function to add signature row
+          function addSignatureRow(footerElement) {
+              footerElement.innerHTML = `
+                  <tr class="signature-row">
+                      <td colspan="2">
+                          <img src="/api/placeholder/60/60" alt="IDLOGO">
+                          <div class="signature-text">
+                              ผู้ดูแล ระบบ TZ<br>
+                              ผู้รายงาน
+                          </div>
+                      </td>
+                      <td colspan="2">
+                          <img src="/api/placeholder/60/60" alt="IDLOGO">
+                          <div class="signature-text">
+                              ผู้จัดการ
+                          </div>
+                      </td>
+                      <td colspan="1">
+                          <img src="/api/placeholder/60/60" alt="IDLOGO">
+                          <div class="signature-text">
+                              ผู้จัดการ
+                          </div>
+                      </td>
+                      <td colspan="2">
+                          <img src="/api/placeholder/60/60" alt="IDLOGO">
+                          <div class="signature-text">
+                              ผู้จัดการ
+                          </div>
+                      </td>
+                  </tr>
+              `;
+          }
+          
+          // Function to populate table with data
+          function populateTable() {
+              let currentPage = createPage(true);
+              let currentBody = currentPage.body;
+              let currentFooter = currentPage.footer;
+              let currentRowsOnPage = 0;
+              
+              sampleData.forEach((row, index) => {
+                  if (currentRowsOnPage >= rowsPerPage) {
+                      // Add signature to current page
+                      addSignatureRow(currentFooter);
+                      
+                      // Create new page
+                      currentPage = createPage();
+                      currentBody = currentPage.body;
+                      currentFooter = currentPage.footer;
+                      currentRowsOnPage = 0;
+                  }
+                  
+                  const tr = document.createElement('tr');
+                  tr.innerHTML = `
+                      <td>${row.id}</td>
+                      <td>${row.event}</td>
+                      <td>${row.date}</td>
+                      <td>${row.user}</td>
+                      <td>${row.amount}</td>
+                      <td>${row.distance}</td>
+                      <td>${row.price}</td>
+                  `;
+                  
+                  currentBody.appendChild(tr);
+                  currentRowsOnPage++;
+              });
+              
+              // Add signature to the last page
+              addSignatureRow(currentFooter);
+          }
+          
+          // Initialize table
+          populateTable();
+      });
+  </script>
+</body>
+</html>
