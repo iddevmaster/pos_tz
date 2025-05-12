@@ -185,7 +185,7 @@ urlpatterns = [
     path('report/summarize/export/bill/today', report_and_print.register_report_billtoday_summarize),
     path('report/teacher/export', report_and_print.register_report_compensation),
     path('report/teacher/export/withdraw', report_and_print.register_report_compensation_withdraw),
-    path('teacher/print/witdraw/<uuid:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
+    path('teacher/print/witdraw/<str:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
 
     path('report/teacher/export/onemore', report_and_print.register_report_compensation_withdraw_onemore),
     path('report/teacher/export/withdraw/onemore', report_and_print.register_report_compensation_withdraw_onemorefitter),
