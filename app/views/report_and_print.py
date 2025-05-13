@@ -14,10 +14,11 @@ import json
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from django.db.models.functions import TruncMonth
 from django.db.models import Count, Sum, F
+
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
 from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new
 
 
 @login_required(login_url='/login')
@@ -82,13 +83,18 @@ def register_print(request, rp_id):
 @login_required(login_url='/login')
 def register_print_witdraw(request, teacher_id, start, end):
 
- 
+    start_new = ymdtodmy_new(start)
+    end_new = ymdtodmy_new(end)
+
+    print(start_new)
+    print(end_new)
     obj = []
     list_teacher = teacher.objects.get(teacher_id=teacher_id,cancelled=1, active=1)
 
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=teacher_id,ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
-    
-
+    uuid_without_dashes = str(teacher_id).replace('-', '')
+    factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+    getdatauser = User.objects.get(pk=factuser.user_id)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
@@ -182,8 +188,8 @@ def register_print_witdraw(request, teacher_id, start, end):
 
 
 
-    context = {'title': defaultTitle, 'data': obj,'list_teacher':list_teacher,'cou':content.count(),'totalp':totalp,
-             'start':start,'end':end,'sumtax':sumtax}
+    context = {'title': defaultTitle, 'data': obj,'list_teacher':list_teacher,'cou':content.count(),'totalp':totalp,'getdatauser':getdatauser,
+             'start_new':start_new,'end_new':end_new,'sumtax':sumtax}
     return render(request, 'print/register_print_witdraw.html',context)
 
 
@@ -954,6 +960,7 @@ def register_report_compensation_withdraw_onemore(request):
 
 
     result = teacher.objects.filter(cancelled=1).order_by("-crt_date")
+   
     lastday = lastDateOfmonth(
         date.today().year, date.today().month, date.today().day)
     default_start = "01" + "/" + \
@@ -974,10 +981,11 @@ def register_report_compensation_withdraw_onemore(request):
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
+   
+    teacher_one = teacher.objects.get(teacher_id=teac.teacher_id,cancelled=1)
 
 
-
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'teacher_one':teacher_one,
                'listMenuPermission': objMenu}
     return render(request, 'report/billing_cycle_result_one.html', context)
 
@@ -991,6 +999,8 @@ def register_report_compensation_withdraw(request):
 
     start = None
     end = None
+    start_new = None
+    end_new = None
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -1023,23 +1033,31 @@ def register_report_compensation_withdraw(request):
         str(date.today().month) + "/" + str(date.today().year)
     daterange = str(default_start) + " - " + str(default_end)
 
-
+    
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
     obj = []
 
     teacher_one = None
+    getdatauser = None
    
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=teacher_id)
     if teacher_id is not None:
         teacher_one = teacher.objects.get(teacher_id=teacher_id)
+        uuid_without_dashes = str(teacher_id).replace('-', '')
+        factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+        getdatauser = User.objects.get(pk=factuser.user_id)
+
+       
     if date_range is not None:
         start, end = format_daterange(date_range)
+        start_new ,end_new = format_daterange_new(date_range)
+      
         if start == end:
             content = content.filter(ev__ev_date_start__gte=start)
         else:
             content = content.filter(ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
-
+    print(start)
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
@@ -1134,14 +1152,14 @@ def register_report_compensation_withdraw(request):
 
 
     context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,'cou':content.count(),
-            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax,'teacher_one':teacher_one}
+            'list_teacher': list_teacher,'start':start,'end':end,'start_new':start_new,'end_new':end_new,'sumtax':sumtax,'teacher_one':teacher_one,'getdatauser':getdatauser}
     return render(request, 'print/report_withdraw.html', context)    
 
 
 
 @login_required(login_url='/login')
 def register_report_compensation_withdraw_onemorefitter(request):
-    print('ok')
+   
     user_id = request.user.id
     
     date_range = request.POST.get('date_range', None)
@@ -1151,6 +1169,8 @@ def register_report_compensation_withdraw_onemorefitter(request):
 
     start = None
     end = None
+    start_new = None
+    end_new = None
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -1187,12 +1207,16 @@ def register_report_compensation_withdraw_onemorefitter(request):
     price = 0
     cou = 0        
     tis_compensation = 0
-
-    print(date_range)
+    teacher_one = None
+    getdatauser = None
+   
     if date_range is not None:
         start, end = format_daterange(date_range)
+        start_new ,end_new = format_daterange_new(date_range)
         content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=uuid_without_dashes)
-     
+        teacher_one = teacher.objects.get(teacher_id=uuid_without_dashes)
+        factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+        getdatauser = User.objects.get(pk=factuser.user_id)
         cou = content.count()
         if start == end:
             content = content.filter(ev__ev_date_start__gte=start)
@@ -1286,11 +1310,11 @@ def register_report_compensation_withdraw_onemorefitter(request):
         
             obj.append(r)
 
+        
 
-
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':cou,
-            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax}
-    return render(request, 'print/report_withdraw.html', context)    
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':cou,'teacher_one':teacher_one,
+            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax,'getdatauser':getdatauser,'start_new':start_new,'end_new':end_new}
+    return render(request, 'print/report_withdraw_one.html', context)    
 
 @login_required(login_url='/login')
 def register_report_billtoday_summarize(request):

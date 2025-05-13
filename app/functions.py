@@ -72,6 +72,17 @@ def ymdtodmy(date):
     return format_data
 
 
+def ymdtodmy_new(date):
+    # 31/02/2022
+    x = date.split('-')
+    year = x[0]
+    month = x[1]
+    day = x[2]
+    format_data = day + '/' + month + '/' + year
+    return format_data
+
+
+
 def format_daterange(value: str):
     format_replace = value.replace(" ", "")
     date = format_replace.split('-')
@@ -86,6 +97,23 @@ def format_daterange(value: str):
     month_end = end_date[1]
     year_end = end_date[2]
     result_end_date = year_end + '-' + month_end + '-' + day_end
+
+    return (result_start_date, result_end_date)
+
+def format_daterange_new(value: str):
+    format_replace = value.replace(" ", "")
+    date = format_replace.split('-')
+    start_date = date[0].split('/')
+    end_date = date[1].split('/')
+    day_start = start_date[0]
+    month_start = start_date[1]
+    year_start = start_date[2]
+    result_start_date =  day_start  + '/' + month_start + '/' + year_start
+
+    day_end = end_date[0]
+    month_end = end_date[1]
+    year_end = end_date[2]
+    result_end_date = day_end + '/' + month_end + '/' + year_end
 
     return (result_start_date, result_end_date)
 
