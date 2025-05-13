@@ -1028,10 +1028,11 @@ def register_report_compensation_withdraw(request):
         module=m.module, cancelled=1, active=1)
     obj = []
 
-
+    teacher_one = None
    
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=teacher_id)
-    
+    if teacher_id is not None:
+        teacher_one = teacher.objects.get(teacher_id=teacher_id)
     if date_range is not None:
         start, end = format_daterange(date_range)
         if start == end:
@@ -1133,7 +1134,7 @@ def register_report_compensation_withdraw(request):
 
 
     context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'totalp':totalp,'date_range':date_range,'teacher_id':teacher_id,'cou':content.count(),
-            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax}
+            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax,'teacher_one':teacher_one}
     return render(request, 'print/report_withdraw.html', context)    
 
 
