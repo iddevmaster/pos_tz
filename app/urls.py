@@ -186,9 +186,11 @@ urlpatterns = [
     path('report/teacher/export', report_and_print.register_report_compensation),
     path('report/teacher/export/withdraw', report_and_print.register_report_compensation_withdraw),
     path('teacher/print/witdraw/<str:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
-
     path('report/teacher/export/onemore', report_and_print.register_report_compensation_withdraw_onemore),
     path('report/teacher/export/withdraw/onemore', report_and_print.register_report_compensation_withdraw_onemorefitter),
+
+    path('report/withdraw/all/summary', report_and_print.register_report_summary),
+    path('report/withdraw/all/summary/withdraw', report_and_print.register_report_summary_withdraw),
   
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),

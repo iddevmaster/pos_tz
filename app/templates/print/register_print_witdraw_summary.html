@@ -1,0 +1,280 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}}</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
+  <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
+  <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
+  <script type="text/javascript">
+    function myFunction() {
+      var monney = "{{items.rpi_price_result }}";
+      var thaibath = ArabicNumberToText(monney);
+      document.getElementById("result").innerHTML = thaibath;
+    }
+
+    function RunDate() {
+      const today = new Date();
+      var time = today.getHours() + ":" + today.getMinutes();
+      const result = today.toLocaleDateString("th-TH", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      //  document.getElementById("showdate1").innerHTML = result;
+      //  document.getElementById("showdate2").innerHTML = result;
+      document.getElementById("showdate3").innerHTML =
+        " วันที่ " + result + " เวลา " + time;
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: "Sarabun", sans-serif;
+      font-size: 12px;
+      left: 0;
+      position: relative;
+    }
+
+    .table-head {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-title {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-detail {
+      position: relative;
+      bottom: 70px;
+    }
+
+    .table-footer {
+      position: relative;
+      bottom: 50px;
+    }
+
+    tr {
+      height: 35px;
+    }
+
+
+    .footer {
+      position: relative;
+      bottom: 60px;
+    }
+
+    .cutword {
+      white-space: nowrap;
+      width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+{% comment %} window.print() {% endcomment %}
+
+<body onLoad="myFunction();window.print();RunDate();">
+  <div class="page">
+    <br>
+    <br>
+    <table style="width: 100%" border="0" class="table-head">
+      <tbody>
+        <tr>
+
+          <td colspan="3" style="vertical-align: middle" align="center">
+            <div style="font-size: 24px;margin-left: 150px;"><strong>บริษัท ไอดีไดรฟ์ จำกัด</strong></div>
+
+            <div style="font-size: 18px;margin-left: 150px;"><strong>ศูนย์เทรนนิ่ง TZ เซ็นเตอร์</strong></div>
+          </td>
+
+          <td colspan="1" style="vertical-align: middle" align="right">
+            <div>เลขที่ <strong>...................</strong></div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div align="center">
+              <div style="font-size: 18px;">
+                รายงาน การตั้งเบิกค่าตอบแทน ชื่อ {{list_teacher.teacher_firstname_th}} {{list_teacher.teacher_lastname_th}} รหัสพนักงาน {{getdatauser}}
+              </div>
+            </div>
+
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div align="center">
+              <div style="font-size: 18px;">
+                วันที่ {{start_new}} ถึง {{end_new}}
+              </div>
+            </div>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
+      <tbody>
+        <tr>
+          <td colspan="8" style="text-align: center;font-size: 18px;"><strong>รายได้จากงานฝึกอบรม</strong></td>
+        </tr>
+        <tr>
+          <td>ลำดับ</td>
+          <td>Event งาน(ชื่อหลักสูตร)</td>
+          <td>วันที่จัดอบรม</td>
+          <td>ครูฝึก</td>
+          <td>ชั่วโมง / วัน</td>
+          <td>ภาษีที่จ่าย</td>
+          <td>เป็นเงิน</td>
+        </tr>
+
+        {% for res in data %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ res.course_name }}</td>
+          <td>{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
+          <td>{{ res.pi }}</td>
+          <td>{{ res.tis_quantity }} / {{res.tis_unit}}</td>
+          <td>{{res.tax|floatformat:2|intcomma }}</td>
+          <td>{{res.price|floatformat:2|intcomma }}</td>
+
+        </tr>
+        {% endfor %}
+
+
+        <tr>
+          <td colspan="3">รวมเป็นค่าตอบแทน</td>
+          <td></td>
+          <td></td>
+          <td>{{sumtax|floatformat:2|intcomma }}</td>
+          <td>{{totalp|floatformat:2|intcomma }}</td>
+  
+        </tr>
+        <tr>
+          <td colspan="2" rowspan="1" style="
+                width: 25%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/1740458201733.jpg" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ชื่อ.........................</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ผู้ขอตั้งเบิก </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป 15/05/2568
+              </div>
+            </div>
+          </td>
+          <td colspan="2" rowspan="1" style="
+                width: 25%;padding-top: 60px;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ชื่อ.........................</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ผู้ตรวจสอบ </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">หัวหน้าสาขา </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป 15/05/2568
+              </div>
+            </div>
+          </td>
+
+          <td colspan="2" rowspan="1" style="
+                  width: 25%;padding-top: 60px;
+              ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ชื่อ.........................</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ผู้อนุมัติ </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ผอ หรือ ผจก ศูนย์เทรนนิ่ง </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป 15/05/2568
+              </div>
+            </div>
+          </td>
+
+          <td colspan="2" rowspan="1" style="
+                  width: 25%;padding-top: 60px;
+              ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ชื่อ.........................</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ผู้อนุมัติ </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">ฝ่ายบุคคล </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป 15/05/2568
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

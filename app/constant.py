@@ -305,6 +305,12 @@ listMenu = [
         "group_label": "รายงาน",
     },
     {
+        "value": "report/withdraw/all/summary",
+        "label": "รายงานใบปะหน้า",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+    {
         "value": "report/teacher/export/onemore",
         "label": "รายงานค่าตอบแทนตัวเอง",
         "group_value": "WRltr2",
