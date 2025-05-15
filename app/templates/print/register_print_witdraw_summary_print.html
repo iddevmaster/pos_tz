@@ -1,0 +1,155 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}}</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
+  <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
+  <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
+  <script type="text/javascript">
+    function myFunction() {
+      var monney = "{{items.rpi_price_result }}";
+      var thaibath = ArabicNumberToText(monney);
+      document.getElementById("result").innerHTML = thaibath;
+    }
+
+    function RunDate() {
+      const today = new Date();
+      var time = today.getHours() + ":" + today.getMinutes();
+      const result = today.toLocaleDateString("th-TH", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      //  document.getElementById("showdate1").innerHTML = result;
+      //  document.getElementById("showdate2").innerHTML = result;
+      document.getElementById("showdate3").innerHTML =
+        " วันที่ " + result + " เวลา " + time;
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: "Sarabun", sans-serif;
+      font-size: 12px;
+      left: 0;
+      position: relative;
+    }
+
+    .table-head {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-title {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-detail {
+      position: relative;
+      bottom: 70px;
+    }
+
+    .table-footer {
+      position: relative;
+      bottom: 50px;
+    }
+
+    tr {
+      height: 35px;
+    }
+
+
+    .footer {
+      position: relative;
+      bottom: 60px;
+    }
+
+    .cutword {
+      white-space: nowrap;
+      width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+{% comment %} window.print() {% endcomment %}
+
+<body onLoad="myFunction();window.print();RunDate();">
+  <div class="page">
+    <br>
+    <br>
+    <table style="width: 100%" border="0" class="table-head">
+      <tbody>
+        <tr>
+
+          <td colspan="3" style="vertical-align: middle" align="center">
+            <div style="font-size: 24px"><strong>บริษัท ไอดีไดรฟ์ จำกัด</strong></div>
+
+            <div style="font-size: 18px"><strong>ศูนย์เทรนนิ่ง TZ เซ็นเตอร์</strong></div>
+                <div style="font-size: 16px">สรุปรายงานการตั้งเบิกค่าตอบแทน</div>
+          </td>
+
+         
+        </tr>
+       
+        <tr>
+          <td colspan="4">
+            <div align="center">
+              <div style="font-size: 14px;">
+                วันที่ {{start}} ถึง {{end}}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
+      <tbody>
+        <tr>
+          <td colspan="8" style="text-align: center;font-size: 18px;"><strong>รายได้จากงานฝึกอบรม</strong></td>
+        </tr>
+         <tr>
+      <td>ลำดับ</td>
+      <td>รหัสพนักงาน</td>
+      <td>ชื่อ-สกุล</td>
+      <td>ภาษี   ณ ที่จ่าย</td>
+      <td>รวมเป็นเงิน</td>
+
+    </tr>
+
+        {% for res in result_dict %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td align="center">{{res.username}}</td>
+      <td align="center">{{res.name}}</td>
+      <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.price|floatformat:2|intcomma }}</td>
+     
+      <!-- <td align="center">{{res.requirements}}</td> -->
+    </tr>
+    {% endfor %}
+
+
+        <tr>
+          <td colspan="3">รวมเป็นค่าตอบแทน</td>
+
+        
+          <td>{{sumtax|floatformat:2|intcomma }}</td>
+          <td>{{totalp|floatformat:2|intcomma }}</td>
+  
+        </tr>
+      
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

@@ -191,7 +191,8 @@ urlpatterns = [
 
     path('report/withdraw/all/summary', report_and_print.register_report_summary),
     path('report/withdraw/all/summary/withdraw', report_and_print.register_report_summary_withdraw),
-  
+    path('teacher/print/all/summary/<str:start>/<str:end>', report_and_print.register_report_summary_print),
+ 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',

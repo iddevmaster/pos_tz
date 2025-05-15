@@ -7,10 +7,9 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 ></script>
 <script type="text/javascript">
     function details(id,start,end) {
-   console.log(id);
-   console.log(start);
-   console.log(end);
-   window.open('http://127.0.0.1:8000/teacher/print/witdraw/'+id+'/'+start+'/'+end,'_blank');
+   let origin = location.origin;
+   let u = '/teacher/print/witdraw/'
+   window.open(origin+u+id+'/'+start+'/'+end,'_blank');
 
     }
   var tableToExcel = (function () {
@@ -58,7 +57,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   <div style="float: left">
   <input
       type="button"
-       onclick="window.open('/teacher/print/witdraw/{{teacher_id}}/{{start}}/{{end}}','','width=950,height=650'); return false;"
+       onclick="window.open('/teacher/print/all/summary/{{start}}/{{end}}','','width=950,height=650'); return false;"
       value="Print"
       style="height: 35px"
     />

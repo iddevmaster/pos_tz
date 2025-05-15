@@ -1182,6 +1182,133 @@ def register_report_summary(request):
     return render(request, 'report/billing_cycle_result_summary.html', context) 
 
 
+
+@login_required(login_url='/login')
+def register_report_summary_print(request, start, end):
+
+
+  
+    
+
+
+    start_new = None
+    end_new = None
+    obj = []
+    #   start, end = format_daterange(date_range)
+    #     start_new ,end_new = format_daterange_new(date_range)
+
+
+    content = teacher_income_setting.objects.select_related('ev').filter(status='S',ev__ev_date_start__gte=start,ev__ev_date_end__lte=end).order_by('teacher_id')
+    requirements = 'ไม่มี'
+    name_con = '-'
+    totalp = 0
+    sumtax = 0
+    for rs in content:
+            regbyev = register_main.objects.filter(ev_id=rs.ev)
+            total_rq_quta = 0
+            for aaa in regbyev:
+                try:
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    if bbbb:
+                        total_rq_quta += bbbb.rp_quota
+                except register_payment.DoesNotExist:  
+                        bbbb = 0
+            event = course_event.objects.get(ev_id=rs.ev_id)
+            select = 0
+            price = 0
+            tis_compensation = 0
+            if int(event.condition_type) == 1:
+                requirements = 'มี'
+            if int(rs.pi_id) == 1:
+           
+             if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
+                icont = condition.objects.filter(conhead=event.condition_id)
+                for iconts in icont:
+        
+                     typet = iconts.type
+                      
+                     if typet == '1':
+                    
+                        if total_rq_quta > iconts.student:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '2':
+                    
+                        if iconts.student < total_rq_quta:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '3':
+                        
+                        if iconts.student == total_rq_quta: 
+                            select = iconts.condition_id
+                            break  
+             
+             if select != 0:
+              
+              totalselect = condition.objects.get(condition_id=select)
+              price = int(rs.tis_quantity) * (totalselect.price)
+              head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
+              name_con = head.name
+              tis_compensation = totalselect.price
+          
+             else:
+                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                tis_compensation = rs.tis_compensation
+            else :    
+        
+             if int(rs.pi_id) == 2:
+
+              price = int(rs.tis_quantity) * (rs.tis_compensation)  
+              tis_compensation = rs.tis_compensation        
+              
+             elif int(rs.pi_id) == 3:
+            
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 4:
+              
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+          
+              
+            cours = course.objects.get(course_id=event.course_id)
+            pay = pay_item.objects.get(id=rs.pi_id)
+
+            totalp += price
+         
+            taxall = price * (rs.tax / 100)
+            sumtax += taxall
+           
+            r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall}
+        
+            obj.append(r)   
+
+
+ 
+
+    result_dict = {}
+    for item in obj:
+            teacher_one = teacher.objects.get(teacher_id=item["teacher"])
+            uuid_without_dashes = str(item["teacher"]).replace('-', '')
+            factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+            getdatauser = User.objects.get(pk=factuser.user_id)
+            item_id = item["teacher"]
+            name = teacher_one
+            qty = item["price"]
+            ta = item["tax"]
+            if item_id not in result_dict:
+                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,'name':name,'username':getdatauser.username}
+            result_dict[item_id]["price"] += qty
+            result_dict[item_id]["tax"] += ta
+
+    result_list = list(result_dict.values())
+    print(start)
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':end,'sumtax':sumtax,'totalp':totalp}
+  
+    return render(request, 'print/register_print_witdraw_summary_print.html', context)    
+
+
 @login_required(login_url='/login')
 def register_report_summary_withdraw(request):
 
