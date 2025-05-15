@@ -120,9 +120,10 @@
       <td>ลำดับ</td>
       <td>รหัสพนักงาน</td>
       <td>ชื่อ-สกุล</td>
-      <td>ภาษี   ณ ที่จ่าย</td>
-      <td>รวมเป็นเงิน</td>
-
+      <td>รายได้ทั้งหมด</td>
+      <td>หัก ณ ที่จ่าย</td>
+      <td>รายได้สุทธิ</td>
+  
     </tr>
 
         {% for res in result_dict %}
@@ -130,8 +131,9 @@
       <td align="center">{{ forloop.counter }}</td>
       <td align="center">{{res.username}}</td>
       <td align="center">{{res.name}}</td>
-      <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.price|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
+       <td align="center">{{res.total }} </td>
      
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
@@ -140,10 +142,10 @@
 
         <tr>
           <td colspan="3">รวมเป็นค่าตอบแทน</td>
-
+  <td>{{totalp|floatformat:2|intcomma }}</td>
         
           <td>{{sumtax|floatformat:2|intcomma }}</td>
-          <td>{{totalp|floatformat:2|intcomma }}</td>
+          <td>{{totalall|floatformat:2|intcomma }}</td>
   
         </tr>
       

@@ -1203,6 +1203,7 @@ def register_report_summary_print(request, start, end):
     name_con = '-'
     totalp = 0
     sumtax = 0
+    totalall = 0
     for rs in content:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
@@ -1297,14 +1298,19 @@ def register_report_summary_print(request, start, end):
             name = teacher_one
             qty = item["price"]
             ta = item["tax"]
+         
+            total = item["price"] -item["tax"]
+            aaaa = total
+
             if item_id not in result_dict:
-                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,'name':name,'username':getdatauser.username}
+                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,"total":0,'name':name,'username':getdatauser.username}
             result_dict[item_id]["price"] += qty
             result_dict[item_id]["tax"] += ta
+            result_dict[item_id]["total"] += aaaa
 
     result_list = list(result_dict.values())
-    print(start)
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':end,'sumtax':sumtax,'totalp':totalp}
+    totalall = totalp - sumtax
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':end,'sumtax':sumtax,'totalp':totalp,'totalall':totalall}
   
     return render(request, 'print/register_print_witdraw_summary_print.html', context)    
 
@@ -1314,7 +1320,6 @@ def register_report_summary_withdraw(request):
 
     date_range = request.POST.get('date_range', None)
   
-   
 
 
     start = None
@@ -1329,6 +1334,7 @@ def register_report_summary_withdraw(request):
     name_con = '-'
     totalp = 0
     sumtax = 0
+    totalall = 0
     if date_range is not None:
         start, end = format_daterange(date_range)
         start_new ,end_new = format_daterange_new(date_range)
@@ -1417,6 +1423,7 @@ def register_report_summary_withdraw(request):
             taxall = price * (rs.tax / 100)
             sumtax += taxall
            
+           
             r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall}
         
             obj.append(r)   
@@ -1441,15 +1448,18 @@ def register_report_summary_withdraw(request):
             name = teacher_one
             qty = item["price"]
             ta = item["tax"]
+            total = item["price"] -item["tax"]
+            aaaa = total
             if item_id not in result_dict:
-                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,'name':name,'username':getdatauser.username}
+                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,"total":0,'name':name,'username':getdatauser.username}
             result_dict[item_id]["price"] += qty
             result_dict[item_id]["tax"] += ta
+            result_dict[item_id]["total"] += aaaa
 
     result_list = list(result_dict.values())
-
+    totalall = totalp - sumtax
       
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':end}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':end,'sumtax':sumtax,'totalp':totalp,'totalall':totalall}
   
     return render(request, 'print/report_withdraw_summary.html', context)    
 
