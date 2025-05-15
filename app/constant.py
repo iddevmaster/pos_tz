@@ -306,7 +306,7 @@ listMenu = [
     },
     {
         "value": "report/withdraw/all/summary",
-        "label": "รายงานใบปะหน้า",
+        "label": "สรุปรายชื่อค้างจ่ายครูฝึก",
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },

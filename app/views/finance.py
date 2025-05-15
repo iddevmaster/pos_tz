@@ -122,6 +122,7 @@ def billing_cycle_setting_form_delete(request):
 @login_required(login_url='/login')
 def billing_cycle_result(request):
     user_id = request.user.id
+    
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -146,13 +147,17 @@ def billing_cycle_result(request):
     year_current = request.GET.get('qyear', date.today().year)
     teacher_current = request.GET.get('qteacher', None)
     day_current = date.today().day
+
+   
     # day_current = 10
     b = billing_cycle_setting.objects.filter(module=m.module)
+
     start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module, tis_end_date__year=year_current,status='S').annotate(month=TruncMonth('tis_start_date'))
-   
+        ev__module=m.module, tis_end_date__year=year_current,status='I').annotate(month=TruncMonth('tis_start_date'))
+    
     start_content = start_content.values('month').annotate(
         order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('-month')
+    
     if teacher_current != None and teacher_current != '':
         start_content = start_content.filter(teacher=teacher_current)
     # print(content)
@@ -160,27 +165,30 @@ def billing_cycle_result(request):
         module=m.module, cancelled=1, active=1)
     obj = []
   
-
+   
   
     for r1 in start_content:
+        
         total_month_sum = r1['order_sum']
         defaultdata = r1['month']  # y-m-d
         month = defaultdata.month
-        print(month)
+        
         get_last_day = last_day_of_month(
             datetime.date(int(year_current), month, 1))
         last_day = get_last_day.day
-
+        print(last_day)
    
         for r2 in b:
             day_start = r2.bcs_start_day
             day_end = r2.bcs_end_day
             tis_group = f"{day_start} - {day_end}"
-            
-
+         
+     
             # ถ้าเดือนสุดท้ายน้อยกว่าค่า day_end ที่ตั้งไว้ ให้เอาเดือนสุดท้ายมาตั้งใหม่
             if last_day <= day_end:
+                
                 day_end = last_day
+        
             instance = teacher_income_setting.objects.filter(
                 ev__module=m.module,
                 active=0,
@@ -188,14 +196,14 @@ def billing_cycle_result(request):
                 tis_end_date__day__lte=day_end,
                 tis_end_date__month=month,
                 tis_end_date__year=year_current,
-                status="I"
+                status="S"
             )
             # for a in instance:
             #      print(a.ev_id)
-          
+           
             if teacher_current != None and teacher_current != '':
                 instance = instance.filter(teacher=teacher_current)
-            # day_current
+            # day_current  วันปัจจุบัน มากกว่า รึเท่ากับ 
             if day_current >= day_end and instance.count() >= 1:
                 instance.update(active=1, tis_group=tis_group,status='S',
                                 upd_date=dateTimeNow())
@@ -208,8 +216,6 @@ def billing_cycle_result(request):
             order_count=Count('id'), order_sum=Sum('tis_sum')).order_by('tis_group')
 
         for r3 in group_content:
-
-           
             order_sum = r3['order_sum']
             tis_group = r3['tis_group']
             teachers = content.filter(tis_group=tis_group)
@@ -973,20 +979,95 @@ def updateteachincom(request):
 
 @csrf_exempt
 def sendwithdraw(request):
-
+    day_current = date.today().day
     data = json.loads(request.body)
     user_id = data.get("user_id")
+    year_current = request.GET.get('qyear', date.today().year)
     taxs = tax_setting.objects.get(tax_id=1)
+
+    bill = billing_cycle_setting.objects.filter()
+    user = fact_teacher_user.objects.get(user_id=user_id)
+    check_income = teacher_income_setting.objects.filter(teacher=user.teacher_id,status="I",active=0)
+
+    select_bill = 0
+    
+
+    for check in check_income:
+        end_date = check.tis_end_date
+        tis_group = ''
+        end_day = end_date.day
+        end_month = end_date.month
+        
+        get_last_day = last_day_of_month(
+            datetime.date(int(year_current), end_month, 1))
+        last_day = get_last_day.day
+       
+        for bills in bill:
+            start = bills.bcs_start_day
+            end = bills.bcs_end_day
+                # เช็คว่าอยู่ในรอบต้นเดือน รึ ปลายเดือน
+            if start <= end_day <= end: 
+                select_bill = bills.id
+                break
+        if select_bill == 1:
+            billone = billing_cycle_setting.objects.get(id=1)
+            start = billone.bcs_start_day
+            end = billone.bcs_end_day
+            tis_group = f"{start} - {end}"
+        else :  
+            billone = billing_cycle_setting.objects.get(id=2)
+            start = billone.bcs_start_day
+            end = last_day
+            tis_group = f"{start} - {end}"
+      
+
+        teacher_income = teacher_income_setting.objects.get(id=check.id)
+        teacher_income.tis_group = tis_group
+        teacher_income.status = 'S'
+        teacher_income.active = 1
+        teacher_income.tax = taxs.tax
+        teacher_income.save()
+            # ถ้าเดือนสุดท้ายน้อยกว่าค่า day_end ที่ตั้งไว้ ให้เอาเดือนสุดท้ายมาตั้งใหม่
+            # if last_day <= day_end:
+                
+            #     day_end = last_day
+        
+            # instance = teacher_income_setting.objects.filter(
+            #     active=0,
+            #     tis_start_date__day__gte=day_start,
+            #     tis_end_date__day__lte=day_end,
+            #     tis_end_date__month=month,
+            #     tis_end_date__year=year_current,
+            #     status="I"
+            # )
+    
+    
+            # day_current  วันปัจจุบัน มากกว่า รึเท่ากับ 
+            # if day_current >= day_end and instance.count() >= 1:
+            #     instance.update(active=1, tis_group=tis_group,status='S',
+            #                     upd_date=dateTimeNow())
+        # obj2 = []
+     
+
+   
  
 
-    user = fact_teacher_user.objects.get(user_id=user_id)
-    teacher_income = teacher_income_setting.objects.filter(teacher=user.teacher_id,status="I",active=0)
-    for r3 in teacher_income:
-     teacher_income = teacher_income_setting.objects.get(id=r3.id)
-     teacher_income.status = 'S'
-     teacher_income.active = 1
-     teacher_income.tax = taxs.tax
-     teacher_income.save()
+    # user = fact_teacher_user.objects.get(user_id=user_id)
+    # teacher_income = teacher_income_setting.objects.filter(teacher=user.teacher_id,status="I",active=0)
+    # teacher_income = teacher_income_setting.objects.filter(
+    #             active=0,
+    #             tis_start_date__day__gte=day_start,
+    #             tis_end_date__day__lte=day_end,
+    #             tis_end_date__month=month,
+    #             tis_end_date__year=year_current,
+    #             status="I"
+    #         )
+    # for r3 in teacher_income:
+    #  teacher_income = teacher_income_setting.objects.get(id=r3.id)
+    #  teacher_income.status = 'S'
+    #  teacher_income.active = 1
+    #  teacher_income.tax = taxs.tax
+    #  teacher_income.save()
 
     datas = {'status':200}
     return JsonResponse(datas, status=200,safe=False)
