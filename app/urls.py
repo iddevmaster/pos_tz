@@ -188,11 +188,13 @@ urlpatterns = [
     path('teacher/print/witdraw/<str:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
     path('report/teacher/export/onemore', report_and_print.register_report_compensation_withdraw_onemore),
     path('report/teacher/export/withdraw/onemore', report_and_print.register_report_compensation_withdraw_onemorefitter),
+    
 
     path('report/withdraw/all/summary', report_and_print.register_report_summary),
     path('report/withdraw/all/summary/withdraw', report_and_print.register_report_summary_withdraw),
     path('teacher/print/all/summary/<str:start>/<str:end>', report_and_print.register_report_summary_print),
     path('teacher/print/all/overdue/<str:year>/<str:m>', report_and_print.register_report_summary_print_overdue),
+    path('teacher/print/overdue/<str:teacher_id>/<str:year>/<str:m>', report_and_print.register_report_summary_print_overdue_one),
  
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),

@@ -6,10 +6,10 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   type="text/javascript"
 ></script>
 <script type="text/javascript">
-    function details(id,start,end) {
+    function details(id,year,m) {
    let origin = location.origin;
-   let u = '/teacher/print/witdraw/'
-   window.open(origin+u+id+'/'+start+'/'+end,'_blank');
+   let u = '/teacher/print/overdue/'
+   window.open(origin+u+id+'/'+year+'/'+m,'_blank');
 
     }
   var tableToExcel = (function () {
@@ -105,7 +105,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="center">{{res.price|floatformat:2|intcomma }}</td>
          <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
             <td align="center">{{res.total|floatformat:2|intcomma }}</td>
-       <td align="center"><button type="button" onclick="details('{{res.Id}}','{{start}}','{{end}}')">
+       <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
             คลิกดูรายละเอียด
           </button></td>
       <!-- <td align="center">{{res.requirements}}</td> -->

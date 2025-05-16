@@ -1344,6 +1344,137 @@ def register_report_summary_print_overdue(request, year, m):
 
     return render(request, 'print/register_print_witdraw_overdue_print.html', context)    
 
+
+def register_report_summary_print_overdue_one(request,teacher_id, year, m):
+
+  
+    obj = []
+    list_teacher = teacher.objects.get(teacher_id=teacher_id,cancelled=1, active=1)
+
+    end = None
+    start_new = None
+    end_new = None
+    obj = []
+
+    day_current_day = date.today().day
+    
+ 
+    bill = billing_cycle_setting.objects.get(id=2)
+    start = bill.bcs_start_day
+    get_last_day = last_day_of_month(
+            datetime.date(int(year), int(m), 1))
+    last_day = get_last_day.day
+
+
+    content = teacher_income_setting.objects.select_related('ev').filter(status='S',active=0,tis_start_date__day__gte=start,teacher_id=teacher_id,
+                tis_end_date__day__lte=last_day,
+                tis_end_date__month=m,
+                tis_end_date__year=year).order_by('teacher_id')
+    
+    uuid_without_dashes = str(teacher_id).replace('-', '')
+    factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+    getdatauser = User.objects.get(pk=factuser.user_id)
+    requirements = 'ไม่มี'
+    name_con = '-'
+    totalp = 0
+    sumtax = 0
+    total = 0
+    totalall = 0
+    for rs in content:
+            regbyev = register_main.objects.filter(ev_id=rs.ev)
+            
+            total_rq_quta = 0
+            
+            for aaa in regbyev:
+                try:
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    if bbbb:
+                        total_rq_quta += bbbb.rp_quota
+                except register_payment.DoesNotExist:  
+                        bbbb = 0
+            
+            event = course_event.objects.get(ev_id=rs.ev_id)
+            select = 0
+            price = 0
+            
+            tis_compensation = 0
+         
+            if int(event.condition_type) == 1:
+                requirements = 'มี'
+            if int(rs.pi_id) == 1:
+           
+             if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
+                icont = condition.objects.filter(conhead=event.condition_id)
+                for iconts in icont:
+        
+                     typet = iconts.type
+                      
+                     if typet == '1':
+                    
+                        if total_rq_quta > iconts.student:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '2':
+                    
+                        if iconts.student < total_rq_quta:
+                            select = iconts.condition_id
+                            break
+                     elif typet == '3':
+                        
+                        if iconts.student == total_rq_quta: 
+                            select = iconts.condition_id
+                            break  
+             
+             if select != 0:
+              
+              totalselect = condition.objects.get(condition_id=select)
+              price = int(rs.tis_quantity) * (totalselect.price)
+              head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
+              name_con = head.name
+              tis_compensation = totalselect.price
+          
+             else:
+                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                tis_compensation = rs.tis_compensation
+            
+            else :    
+        
+             if int(rs.pi_id) == 2:
+
+              price = int(rs.tis_quantity) * (rs.tis_compensation)  
+              tis_compensation = rs.tis_compensation        
+              
+             elif int(rs.pi_id) == 3:
+            
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 4:
+              
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+          
+              
+            cours = course.objects.get(course_id=event.course_id)
+            pay = pay_item.objects.get(id=rs.pi_id)
+
+            totalp += price
+         
+            taxall = price * (rs.tax / 100)
+            sumtax += taxall
+            total = price - taxall
+            totalall += total
+            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'total':total}
+        
+            obj.append(r)
+
+
+
+    context = {'title': defaultTitle, 'data': obj,'list_teacher':list_teacher,'cou':content.count(),'totalp':totalp,'getdatauser':getdatauser,'m':month_fomat(m),'year':year,
+             'start_new':start,'end_new':last_day,'sumtax':sumtax,'totalall':totalall}
+    return render(request, 'print/register_print_overdue_one.html',context)
+
+
 @login_required(login_url='/login')
 def register_report_summary_print(request, start, end):
 
