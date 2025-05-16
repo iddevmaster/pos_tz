@@ -2,12 +2,30 @@
 
 
 
+<script>
 
 
+  function default_date() {
+    const d = new Date();
+    let month = d.getMonth() + 1;
+    let year = d.getFullYear();
+    let formattedNumberMonth = month.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
 
+    const url = new URL(location.href);
+    //alert(url.searchParams.get("qteacher"));
+    let qyear = url.searchParams.get("qyear");
 
-
-
+    if (qyear !== null) {
+      document.getElementById("qyear").value = qyear;
+    } else {
+      document.getElementById("qyear").value = year;
+    }
+  }
+  window.onload = default_date;
+</script>
 
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -45,15 +63,33 @@
          
           <div class="col-lg-4 col-md-6 mb-4">
              <label for="exampleFormControlInput1" class="form-label">วันที่ค้นหา</label>
-            <input
-              type="text"
-              class="form-control daterange"
-              id="date_range"
-              name="date_range"
-              required
-              value="{{daterange}}"
-            />
+          <input
+          type="number"
+          class="form-control"
+          id="qyear"
+          name="qyear"
+          required
+          placeholder="ปี (ค.ศ.)"
+        />
           </div>
+
+
+               <div class="col-lg-4 col-md-6 mb-4">
+             <label for="exampleFormControlInput1" class="form-label">เดือน</label>
+                <select name="monthss" id="monthss">
+                  {% for value, display in thai_months %}
+        <option value="{{ value }}"  {% if value == current_month %}selected{% endif %} >
+            {{ display }}
+        </option>
+    {% endfor %}
+  
+            </select>
+
+            
+   
+          </div>
+
+
 
  
 

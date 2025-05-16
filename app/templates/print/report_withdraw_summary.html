@@ -57,7 +57,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   <div style="float: left">
   <input
       type="button"
-       onclick="window.open('/teacher/print/all/summary/{{start}}/{{end}}','','width=950,height=650'); return false;"
+       onclick="window.open('/teacher/print/all/overdue/{{year_current}}/{{m}}','','width=950,height=650'); return false;"
       value="Print"
       style="height: 35px"
     />
@@ -83,17 +83,16 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     </tr>
     <tr style="font-weight: bold">
      
-      <td colspan="10" align="center">ระหว่างวันที่  {{start_new}} ถึง {{end_new}} </td>
+      <td colspan="10" align="center">ระหว่างวันที่  {{start}} {{day_current_m}} {{year_current}} ถึง {{end}} {{day_current_m}} {{year_current}} </td>
     </tr>
     <tr>
       <td>ลำดับ</td>
       <td>รหัสพนักงาน</td>
       <td>ชื่อ-สกุล</td>
-      <td>รวมค่าตอบแทน        ค้าง 21-30 เมย.68</td>
-      <td>รายได้ทั้งหมด</td>
+      <td>รวมค่าตอบแทน        ค้าง {{start}}-{{end}} {{day_current_m}} {{year_current}} </td>
+    
       <td>หัก ณ ที่จ่าย</td>
       <td>รายได้สุทธิ</td>
-
     </tr>
 
 
@@ -112,14 +111,13 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
     {% endfor %}
-
-    <tr>
+    {% comment %} <tr>
       <td colspan="3">รวมเป็นค่าตอบแทน</td>
        <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
       <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
       <td colspan="1">{{sumtax|floatformat:2|intcomma }}</td>
       <td colspan="1">{{totalall|floatformat:2|intcomma }}</td>
-    </tr>
+    </tr> {% endcomment %}
     
 
     <!-- <tr>

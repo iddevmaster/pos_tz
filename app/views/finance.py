@@ -176,7 +176,7 @@ def billing_cycle_result(request):
         get_last_day = last_day_of_month(
             datetime.date(int(year_current), month, 1))
         last_day = get_last_day.day
-        print(last_day)
+        
    
         for r2 in b:
             day_start = r2.bcs_start_day
@@ -1024,7 +1024,6 @@ def sendwithdraw(request):
         teacher_income = teacher_income_setting.objects.get(id=check.id)
         teacher_income.tis_group = tis_group
         teacher_income.status = 'S'
-        teacher_income.active = 1
         teacher_income.tax = taxs.tax
         teacher_income.save()
             # ถ้าเดือนสุดท้ายน้อยกว่าค่า day_end ที่ตั้งไว้ ให้เอาเดือนสุดท้ายมาตั้งใหม่
