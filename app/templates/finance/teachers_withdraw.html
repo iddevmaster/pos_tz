@@ -113,29 +113,36 @@ function gotoReportwith(){
 }
 
 async function withdraw() {
-
-  const user_id = document.getElementById("user_id").value
-
-let data = await fetch('/api/sendwithdraw', {
-  method: 'POST',
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({'user_id':user_id})
-  })
-  .then(response => response.json())
-  .then(data => {
     Swal.fire({
-      title: 'บันทึก',
-      text: 'บันทึกสำเร็จ',
-      icon: 'success',
+      title: 'ยังไม่เปิดให้บริการ',
+      text: 'การเบิกถอนเงิน',
+      icon: 'error',
       confirmButtonText: 'OK'
     });
-  })
+  return false
 
-  setTimeout(function() { 
-    window.location.reload();
-   }, 1000);
+//   const user_id = document.getElementById("user_id").value
+
+// let data = await fetch('/api/sendwithdraw', {
+//   method: 'POST',
+//   headers: {
+//       'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify({'user_id':user_id})
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     Swal.fire({
+//       title: 'บันทึก',
+//       text: 'บันทึกสำเร็จ',
+//       icon: 'success',
+//       confirmButtonText: 'OK'
+//     });
+//   })
+
+//   setTimeout(function() { 
+//     window.location.reload();
+//    }, 1000);
 }
 
 </script>

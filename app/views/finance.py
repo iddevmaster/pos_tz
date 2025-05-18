@@ -1157,10 +1157,10 @@ def withdraw_list_one(request):
         pi = ['1','2','3','4','5','6','7','8']
         totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
-        requirements = 'ไม่มี'
+        
         name_con = '-'
         for rs in teacher_income:
-            
+            requirements = 'ไม่มี'
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
@@ -1178,47 +1178,87 @@ def withdraw_list_one(request):
             select = 0
             price = 0
             tis_compensation = 0
-         
+
+            
+
             if int(event.condition_type) == 1:
                 
                 requirements = 'มี'
             if int(rs.pi_id) == 1:
            
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                icont = condition.objects.filter(conhead=event.condition_id)
                 
-                for iconts in icont:
-                    
-                     typet = iconts.type
-                      
-                     if typet == '1':
-                        print('1',iconts.type) 
-                        print('1',iconts.student) 
-                        print('1',total_rq_quta) 
+                checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
+                checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
+                checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+          
+                if checkcourse_con.is_type_condition == '1':
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('student')
+                   for iconts in icont:
+                      typet = iconts.type
+                      if iconts.type_add == '1': 
+                       if typet == '1':
                         if total_rq_quta > iconts.student:
                             select = iconts.condition_id
                             break
-                     elif typet == '2':
+                       elif typet == '2':
                     
                         if iconts.student < total_rq_quta:
                             select = iconts.condition_id
                             break
-                     elif typet == '3':
-                        
+                       elif typet == '3':
                         if iconts.student == total_rq_quta: 
                             select = iconts.condition_id
-                            break  
-             print('วิทยากร',select)         
+                            break   
+
+                else : 
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
+                   for iconts in icont:
+                     if iconts.action == '0': 
+                        print('เช็คลบก่อนน',iconts.action)
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
+                     elif iconts.action == '1':  
+                        print('เช็คบวกที่หลัง',iconts.action) 
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
+                     for checkcons in checkcon:
+                        if total_rq_quta > checkcons.student:
+                            select = checkcons.condition_id
+                            
+                            break
+                        else:
+                           select = 0
+                          
+             
+                
              if select != 0:
               
               totalselect = condition.objects.get(condition_id=select)
-              price = int(rs.tis_quantity) * (totalselect.price)
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
-              name_con = head.name
-              tis_compensation = totalselect.price
-              
+              checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+              if checkcourse_con.is_type_condition == '1':
+                 print('คิดนักเรียน')
+                 price = int(rs.tis_quantity) * (totalselect.price)
+                 name_con = head.name
+                 tis_compensation = totalselect.price
+              else:   
+                 
+                 if totalselect.action == '1':
+                    tis_quantity = int(rs.tis_quantity) + int(totalselect.hour)
+                    price = int(rs.tis_compensation) * (tis_quantity)
+                    tis_compensation = rs.tis_compensation
+                    name_con = head.name
+                    print('คิดชั่วโมง',tis_quantity)
+                 else :
+                    price = int(rs.tis_quantity) * (totalselect.price)
+                    name_con = head.name
+                    tis_compensation = totalselect.price
+                    
+
+
              else:
-                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                
+                price = int(rs.tis_quantity) * (rs.tis_compensation)  
+                name_con = '-'
                 tis_compensation = rs.tis_compensation
                
         
@@ -1275,6 +1315,7 @@ def withdraw_list_one(request):
             else:
              dt = "จ"
             totalp += price
+            print(totalp)
             r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)

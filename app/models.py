@@ -58,7 +58,7 @@ class user_detail(models.Model):
     cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-class course(models.Model):
+class  course(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_code = models.CharField(max_length=128, blank=True, default=None)
     course_name = models.CharField(max_length=128, blank=True, default=None)
