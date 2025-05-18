@@ -425,11 +425,13 @@ def conditioncreate(request,conhead_id):
    
     result = condition.objects.select_related("course").filter(conhead=conhead_id)
     conheadx = conhead.objects.select_related("course").get(conhead_id=conhead_id)
-    
-
+  
+   
     try:
-        instance = condition.objects.filter(conhead=conhead_id)[:1].get()
-        conu = course.objects.get(pk=instance.course_id)
+        instance = condition.objects.filter(conhead=conheadx)[:1].get()
+       
+        conu = course.objects.get(pk=conheadx.course_id)
+        
     except condition.DoesNotExist:
         instance = []
         conu = []
