@@ -2842,7 +2842,7 @@ def approve_internal_doc_print(request,doc_id):
 
     users = User.objects.get(id=payment.user_create)
     signa = signature.objects.filter(user_id=payment.user_create).first()
-
+    print(payment)
     mange = User.objects.get(id=payment.user_manage)
     
     running_number = treeDigit(totaldata + 1)

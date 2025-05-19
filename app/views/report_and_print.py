@@ -490,8 +490,8 @@ def register_excel_seller_accept(request,ev_id):
    
     month_current = date.today().month
     year_current = date.today().year
-    year_current_f = str(int(date.today().year) + 543)
-    current_time = datetime.now().time()
+   
+
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
