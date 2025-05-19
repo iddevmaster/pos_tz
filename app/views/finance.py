@@ -1154,7 +1154,7 @@ def withdraw_list_one(request):
     try:
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
-        pi = ['1','2','3','4','5','6','7','8']
+        pi = ['1','2','3','4','5','6']
         totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         

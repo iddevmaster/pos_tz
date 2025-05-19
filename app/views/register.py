@@ -2257,7 +2257,7 @@ def approve_list_payment(request):
         obj = []
         pi_id = ['7','8']   
         
-        content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='I')
+        content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='Y')
         
         for r in content:  
             
@@ -2310,8 +2310,8 @@ def approve_list_payment_accept(request,pk):
     
     
     
-    teacher_income = teacher_income_setting.objects.filter(id=pk,status='I').count()
-    income = teacher_income_setting.objects.filter(id=pk,status='I').first()
+    teacher_income = teacher_income_setting.objects.filter(id=pk,status='Y').count()
+    income = teacher_income_setting.objects.filter(id=pk,status='Y').first()
     if teacher_income > 0:
         context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk,'pi':income.pi_id }
         return render(request, 'register/register_selller_report.html',context)
@@ -2948,9 +2948,34 @@ def approve_gm_save(request):
     doc_id = data.get("doc_id")
     status = data.get("status")
 
-    x = document.objects.get(doc_id=doc_id)
-    x.status_gm = status
-    x.save()  
+  
+    if status == 'Y':
+        x = document.objects.get(doc_id=doc_id)
+        fi = teacher_income_setting.objects.get(id=x.teacher_income_id)
+        eve = course_event.objects.get(ev_id=fi.ev.ev_id)
+        eve.status = 'S'
+        fi.status = 'S'
+        fi.active = 1
+        fi.save()
+        eve.save()
+
+        x.status_gm = status
+        x.save()  
+
+    else :    
+        x = document.objects.get(doc_id=doc_id)
+        fi = teacher_income_setting.objects.get(id=x.teacher_income_id)
+        eve = course_event.objects.get(ev_id=fi.ev.ev_id)
+        eve.status = 'W'
+        fi.status = 'Y'
+        fi.active = 1
+        fi.save()
+        eve.save()
+        
+        x.status_gm = status
+        x.save()  
+
+
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)

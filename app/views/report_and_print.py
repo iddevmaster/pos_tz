@@ -490,6 +490,7 @@ def register_excel_seller_accept(request,ev_id):
    
     month_current = date.today().month
     year_current = date.today().year
+    day_current = date.today().today
    
 
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
@@ -498,7 +499,7 @@ def register_excel_seller_accept(request,ev_id):
             str(running_number) + "/" + str(year_current)
  
     
-    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'pi':tincome.pi_id,
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'pi':tincome.pi_id,'day':day_current,'month_current':month_fomat(month_current),'year_current':year_current,
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':student_code,'teach_in_come':ev_id}
     return render(request, 'print/register_excel_seller_accept.html', context)
 
