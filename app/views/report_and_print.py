@@ -1427,13 +1427,31 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
              if select != 0:
               
               totalselect = condition.objects.get(condition_id=select)
-              price = int(rs.tis_quantity) * (totalselect.price)
+              
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
-              name_con = head.name
-              tis_compensation = totalselect.price
-          
+              checkcourse_con = course.objects.get(course_id=head.course.course_id)
+              
+    
+              if checkcourse_con.is_type_condition == '1':
+                 print('คิดนักเรียน')
+                 price = int(rs.tis_quantity) * (totalselect.price)
+                 name_con = head.name
+                 tis_compensation = totalselect.price
+              else:   
+                 
+                 if totalselect.action == '1':
+                    tis_quantity = int(rs.tis_quantity) + int(totalselect.hour)
+                    price = int(rs.tis_compensation) * (tis_quantity)
+                    tis_compensation = rs.tis_compensation
+                    name_con = head.name
+                 else :
+                    price = int(rs.tis_quantity) * (totalselect.price)
+                    name_con = head.name
+                    tis_compensation = totalselect.price
              else:
-                price = int(rs.tis_quantity) * (rs.tis_compensation)    
+                
+                price = int(rs.tis_quantity) * (rs.tis_compensation)  
+                name_con = '-'
                 tis_compensation = rs.tis_compensation
             
             else :    
