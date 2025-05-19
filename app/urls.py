@@ -195,7 +195,11 @@ urlpatterns = [
     path('teacher/print/all/summary/<str:start>/<str:end>', report_and_print.register_report_summary_print),
     path('teacher/print/all/overdue/<str:year>/<str:m>', report_and_print.register_report_summary_print_overdue),
     path('teacher/print/overdue/<str:teacher_id>/<str:year>/<str:m>', report_and_print.register_report_summary_print_overdue_one),
+
+    path('report/withdraw/all/summary/teacher', report_and_print.register_report_summary_teacher),
+    path('report/withdraw/all/withdraw', report_and_print.register_report_summary_teacher_withdraw),
  
+
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',

@@ -325,6 +325,12 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+     {
+        "value": "report/withdraw/all/summary/teacher",
+        "label": "สรุปรายชื่อครูฝึกตั้งเบิก",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
     {
         "value": "report/teacher/export/onemore",
         "label": "รายงานค่าตอบแทนตัวเอง",
