@@ -1207,7 +1207,6 @@ def register_report_summary_print_overdue(request, year, m):
     obj = []
 
 
-  
 
     start = None
     end = None
@@ -1659,46 +1658,76 @@ def register_report_summary_withdraw(request):
             if int(event.condition_type) == 1:
                 requirements = 'มี'
             if int(rs.pi_id) == 1:
-           
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                icont = condition.objects.filter(conhead=event.condition_id)
-                for iconts in icont:
-        
-                     typet = iconts.type
-                      
-                     if typet == '1':
-                    
+                
+                checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
+                checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
+                checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+          
+                if checkcourse_con.is_type_condition == '1':
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('student')
+                   for iconts in icont:
+                      typet = iconts.type
+                      if iconts.type_add == '1': 
+                       if typet == '1':
                         if total_rq_quta > iconts.student:
                             select = iconts.condition_id
                             break
-                     elif typet == '2':
+                       elif typet == '2':
                     
                         if iconts.student < total_rq_quta:
                             select = iconts.condition_id
                             break
-                     elif typet == '3':
-                        
+                       elif typet == '3':
                         if iconts.student == total_rq_quta: 
                             select = iconts.condition_id
-                            break  
+                            break   
+
+                else : 
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
+                   for iconts in icont:
+                     if iconts.action == '0': 
+                        print('เช็คลบก่อนน',iconts.action)
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
+                     elif iconts.action == '1':  
+                        print('เช็คบวกที่หลัง',iconts.action) 
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
+                     for checkcons in checkcon:
+                        if total_rq_quta > checkcons.student:
+                            select = checkcons.condition_id
+                            
+                            break
+                        else:
+                           select = 0
+           
              
              if select != 0:
-              
               totalselect = condition.objects.get(condition_id=select)
-              price = int(rs.tis_quantity) * (totalselect.price)
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
-              name_con = head.name
-              tis_compensation = totalselect.price
-          
+              checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+              if checkcourse_con.is_type_condition == '1':
+                 price = int(rs.tis_quantity) * (totalselect.price)
+                 name_con = head.name
+                 tis_compensation = totalselect.price
+              else:   
+                 if totalselect.action == '1':
+                    tis_quantity = int(rs.tis_quantity) + int(totalselect.hour)
+                    price = int(rs.tis_compensation) * (tis_quantity)
+                    tis_compensation = rs.tis_compensation
+                    name_con = head.name
+                 else :
+                    price = int(rs.tis_quantity) * (totalselect.price)
+                    name_con = head.name
+                    tis_compensation = totalselect.price
              else:
                 price = int(rs.tis_quantity) * (rs.tis_compensation)    
                 tis_compensation = rs.tis_compensation
-            
             else :    
         
              if int(rs.pi_id) == 2:
 
-              price = int(rs.tis_quantity) * (rs.tis_compensation)  
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              print(price) 
               tis_compensation = rs.tis_compensation        
               
              elif int(rs.pi_id) == 3:
@@ -1714,7 +1743,7 @@ def register_report_summary_withdraw(request):
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
-
+            print(price)
             totalp += price
          
             taxall = price * (rs.tax / 100)

@@ -1247,7 +1247,7 @@ def withdraw_list_one(request):
                     price = int(rs.tis_compensation) * (tis_quantity)
                     tis_compensation = rs.tis_compensation
                     name_con = head.name
-                    print('คิดชั่วโมง',tis_quantity)
+                    
                  else :
                     price = int(rs.tis_quantity) * (totalselect.price)
                     name_con = head.name
