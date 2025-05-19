@@ -76,7 +76,7 @@
 
                <div class="col-lg-4 col-md-6 mb-4">
              <label for="exampleFormControlInput1" class="form-label">เดือน</label>
-                <select name="monthss" id="monthss">
+                <select name="monthss" id="monthss" class="form-control">
                   {% for value, display in thai_months %}
         <option value="{{ value }}"  {% if value == current_month %}selected{% endif %} >
             {{ display }}
