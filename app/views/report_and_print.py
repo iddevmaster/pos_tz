@@ -1661,8 +1661,7 @@ def register_report_summary_teacher_withdraw(request):
  
     m_n = month_select_now
     m_l = int(month_select_now) - 1
-    print(m_n)
-    print(m_l)
+ 
     day_same_m = request.POST.get('monthss', date.today().month)
  
     day_current_m = request.POST.get('monthss', date.today().month - 1)
@@ -1682,20 +1681,20 @@ def register_report_summary_teacher_withdraw(request):
         str(m_l) + "-" + "21"
     default_end = str(date.today().year) + "-" + \
         str(m_n) + "-" + "20"
-    print(default_start)
-    print(default_end)
+    
+
+    get_last_day_m = last_day_of_month(
+            datetime.date(int(year_current), m_l, 1))
+    last_day_m = get_last_day_m.day
    
-    tis_group_l = f"21 - {last_day}"
+    tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
+    print(tis_group_l)
+
 
     day_current_day = date.today().day
 
-    totalp = 0
-    totalp_f = 0
-    sumtaxall = 0
-    sumtaxl = 0
-    sumtaxf = 0
-    totalall = 0
+  
     result_dict = {}
     customer_order_counts = teacher_income_setting.objects.filter(status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end).values('teacher').distinct()
     
@@ -1709,9 +1708,17 @@ def register_report_summary_teacher_withdraw(request):
         code = getdatauser
         name = teacher_one
         
-        lassssst = teacher_income_setting.objects.filter(tis_group=tis_group_l,teacher=customer_order['teacher'],status='S',tis_end_date__gte='2025-04-21',tis_end_date__lte='2025-05-20')
-        print('last',lassssst)
+        lassssst = teacher_income_setting.objects.filter(tis_group=tis_group_l,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
+        
+        price = 0
+        totalp = 0
+        totalp_f = 0
+        sumtaxall = 0
+        sumtaxl = 0
+        sumtaxf = 0
+        totalall = 0
         for rs in lassssst:
+            
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -1724,7 +1731,8 @@ def register_report_summary_teacher_withdraw(request):
             
             event = course_event.objects.get(ev_id=rs.ev_id)
             select = 0
-            price = 0
+            
+            print(price)
             tis_compensation = 0
             if int(event.condition_type) == 1:
                 requirements = 'มี'
@@ -1757,10 +1765,10 @@ def register_report_summary_teacher_withdraw(request):
                    icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
                    for iconts in icont:
                      if iconts.action == '0': 
-                        print('เช็คลบก่อนน',iconts.action)
+                        
                         checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
                      elif iconts.action == '1':  
-                        print('เช็คบวกที่หลัง',iconts.action) 
+                         
                         checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
                      for checkcons in checkcon:
                         if total_rq_quta > checkcons.student:
@@ -1797,7 +1805,7 @@ def register_report_summary_teacher_withdraw(request):
              if int(rs.pi_id) == 2:
 
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
-              print(price) 
+              
               tis_compensation = rs.tis_compensation        
               
              elif int(rs.pi_id) == 3:
@@ -1813,13 +1821,13 @@ def register_report_summary_teacher_withdraw(request):
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
-            print(price)
+            
             totalp += price
          
             taxall = price * (rs.tax / 100)
             sumtaxl += taxall
-        first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte='2025-04-21',tis_end_date__lte='2025-05-20')
-        print('f',first)
+        first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
+       
         for rs in first:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
@@ -1925,25 +1933,19 @@ def register_report_summary_teacher_withdraw(request):
             pay = pay_item.objects.get(id=rs.pi_id)
             
             totalp_f += price
-         
             taxall = price * (rs.tax / 100)
             sumtaxf += taxall
-           
-  
-
         if item_id not in result_dict:
-                
                 aa = totalp_f + totalp
                 sumtaxall = sumtaxl + sumtaxf
                 totalall = aa - sumtaxall
-                
                 result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
             
     
 
 
     result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(day_current_m),'current_m':month_fomat(day_same_m),'year_current':year_current}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current}
   
     return render(request, 'print/report_withdraw_summary_teacher.html', context)   
 
@@ -2000,7 +2002,6 @@ def register_report_summary_withdraw(request):
                 requirements = 'มี'
             if int(rs.pi_id) == 1:
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                
                 checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
                 checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
                 checkcourse_con = course.objects.get(course_id=checkhead.course_id)
@@ -2028,10 +2029,8 @@ def register_report_summary_withdraw(request):
                    icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
                    for iconts in icont:
                      if iconts.action == '0': 
-                        print('เช็คลบก่อนน',iconts.action)
                         checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
                      elif iconts.action == '1':  
-                        print('เช็คบวกที่หลัง',iconts.action) 
                         checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
                      for checkcons in checkcon:
                         if total_rq_quta > checkcons.student:
@@ -2041,7 +2040,6 @@ def register_report_summary_withdraw(request):
                         else:
                            select = 0
            
-             
              if select != 0:
               totalselect = condition.objects.get(condition_id=select)
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
