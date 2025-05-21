@@ -66,6 +66,7 @@ def course_create(request):
         course_name=course_name,
         course_name_eng=course_name_eng,
         active=active,
+        is_show_order='N',
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         module=m.module)
