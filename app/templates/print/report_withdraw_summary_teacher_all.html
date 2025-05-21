@@ -55,26 +55,9 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   }
 </style>
 
-<div style="padding-bottom: 65px">
-  <div style="float: left">
-  <input
-      type="button"
-       onclick="window.open('/report/withdraw/all/summary/teacher/{{year_current}}/{{m}}','','width=950,height=650'); return false;"
-      value="Print"
-      style="height: 35px"
-    />
-  </div>
-  <div style="float: right">
-    <input
-      type="button"
-      onclick="tableToExcel('testTable', 'รายงานการขาย')"
-      value="Export to Excel"
-      style="height: 35px"
-    />
-  </div>
-</div>
 
-<table style="width: 100%; border-collapse: collapse" border="1" class="table-detail" id="testTable">
+
+<table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
   <tbody>
     <tr style="font-weight: bold">
       <td colspan="10" align="center">บริษัท ไอดีไดร์ฟ จำกัด</td>
@@ -108,9 +91,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="center">{{res.total|floatformat:2|intcomma }}</td>
       <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.totalall|floatformat:2|intcomma }}</td>
-       <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
-            คลิกดูรายละเอียด
-          </button></td>
+
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
     {% endfor %}
