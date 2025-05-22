@@ -188,7 +188,12 @@ def register_print_witdraw(request, teacher_id, start, end):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
-          
+
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
@@ -926,6 +931,12 @@ def register_report_compensation(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -1152,6 +1163,11 @@ def register_report_compensation_withdraw(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot 
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -1333,6 +1349,11 @@ def register_report_summary_print_overdue(request, year, m):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -1499,7 +1520,12 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
           
-              
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
+
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
 
@@ -1607,6 +1633,11 @@ def register_report_summary_print(request, start, end):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot 
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -1817,6 +1848,11 @@ def register_report_summary_teacher_all(request, year, m):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot 
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -2377,6 +2413,12 @@ def register_report_summary_withdraw(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -2558,7 +2600,11 @@ def register_report_compensation_withdraw_onemorefitter(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
-          
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)

@@ -1154,7 +1154,7 @@ def withdraw_list_one(request):
     try:
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
-        pi = ['1','2','3','4','5','6']
+        pi = ['1','2','3','4','5']
         totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         
@@ -1228,8 +1228,7 @@ def withdraw_list_one(request):
                         else:
                            select = 0
                           
-             
-                
+ 
              if select != 0:
               
               totalselect = condition.objects.get(condition_id=select)
@@ -1265,7 +1264,6 @@ def withdraw_list_one(request):
             else :    
             
              if int(rs.pi_id) == 2:
-
               price = int(rs.tis_quantity) * (rs.tis_compensation)  
               tis_compensation = rs.tis_compensation        
               
@@ -1275,9 +1273,15 @@ def withdraw_list_one(request):
               tis_compensation = rs.tis_compensation
 
              elif int(rs.pi_id) == 4:
-              
+            
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
           
               
             cours = course.objects.get(course_id=event.course_id)
