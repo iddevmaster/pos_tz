@@ -1278,7 +1278,7 @@ def withdraw_list_one(request):
               tis_compensation = rs.tis_compensation
              elif int(rs.pi_id) == 5:
               
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
@@ -1319,7 +1319,7 @@ def withdraw_list_one(request):
             else:
              dt = "จ"
             totalp += price
-            print(totalp)
+            
             r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)

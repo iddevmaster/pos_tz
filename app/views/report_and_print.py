@@ -1328,32 +1328,34 @@ def register_report_summary_print_overdue(request, year, m):
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
               name_con = head.name
               tis_compensation = totalselect.price
-          
+              print(price)
              else:
                 price = int(rs.tis_quantity) * (rs.tis_compensation)    
                 tis_compensation = rs.tis_compensation
-            
+                print(price)
             else :    
         
              if int(rs.pi_id) == 2:
-
+                
               price = int(rs.tis_quantity) * (rs.tis_compensation)  
               tis_compensation = rs.tis_compensation        
-              
+              print(price)
              elif int(rs.pi_id) == 3:
             
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
-
+              print(price)
              elif int(rs.pi_id) == 4:
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+              print(price)
              elif int(rs.pi_id) == 5:
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
+              print(price)
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -1521,7 +1523,7 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
               tis_compensation = rs.tis_compensation
           
              elif int(rs.pi_id) == 5:
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
@@ -1686,70 +1688,48 @@ def register_report_summary_print(request, start, end):
 
 
 @login_required(login_url='/login')
-def register_report_summary_teacher_all(request, year, m):
+def register_report_summary_teacher_all(request ,teacher_id, year, m):
 
-    month_select_now = request.POST.get('monthss', date.today().month)
+    month_select_now = request.POST.get('monthss', m)
     
     m_n = month_select_now
     m_l = int(month_select_now) - 1
- 
-    day_same_m = request.POST.get('monthss', date.today().month)
- 
-    day_current_m = request.POST.get('monthss', date.today().month - 1)
 
-    year_current = request.GET.get('qyear', date.today().year)
-    
-    start = None
-    end = None
-    start_new = None
-    end_new = None
+
     obj = []
 
     get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(day_current_m), 1))
+            datetime.date(int(year), int(m), 1))
     last_day = get_last_day.day
-    default_start = str(date.today().year) + "-" + \
+    default_start = str(year) + "-" + \
         str(m_l) + "-" + "21"
-    default_end = str(date.today().year) + "-" + \
+    default_end = str(year) + "-" + \
         str(m_n) + "-" + "20"
     
-
+    print(default_start)
+    print(default_end)
     get_last_day_m = last_day_of_month(
-            datetime.date(int(year_current), m_l, 1))
+            datetime.date(int(year), m_l, 1))
     last_day_m = get_last_day_m.day
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
-    print(tis_group_l)
 
 
     day_current_day = date.today().day
 
   
-    result_dict = {}
-    customer_order_counts = teacher_income_setting.objects.filter(status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end).values('teacher').distinct()
     
-   
-    for customer_order in customer_order_counts:
-        item_id = customer_order['teacher']
-        teacher_one = teacher.objects.get(teacher_id=customer_order['teacher'])
-        uuid_without_dashes = str(customer_order["teacher"]).replace('-', '')
-        factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
-        getdatauser = User.objects.get(pk=factuser.user_id)
-        code = getdatauser
-        name = teacher_one
-        
-        lassssst = teacher_income_setting.objects.filter(tis_group=tis_group_l,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
-        
-        price = 0
-        totalp = 0
-        totalp_f = 0
-        sumtaxall = 0
-        sumtaxl = 0
-        sumtaxf = 0
-        totalall = 0
-        for rs in lassssst:
-            
+    customer_order_counts = teacher_income_setting.objects.filter(status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,teacher=teacher_id)
+    price = 0
+    totalp = 0
+    totalp_f = 0
+    sumtaxall = 0
+    sumtaxl = 0
+    sumtaxf = 0
+    totalall = 0
+    name_con = '-'
+    for rs in customer_order_counts:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -1762,8 +1742,6 @@ def register_report_summary_teacher_all(request, year, m):
             
             event = course_event.objects.get(ev_id=rs.ev_id)
             select = 0
-            
-            print(price)
             tis_compensation = 0
             if int(event.condition_type) == 1:
                 requirements = 'มี'
@@ -1848,146 +1826,37 @@ def register_report_summary_teacher_all(request, year, m):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+
              elif int(rs.pi_id) == 5:
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
-              tis_compensation = all / tot 
-          
+              tis_compensation = all / tot
               
+           
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
             
             totalp += price
+            
          
             taxall = price * (rs.tax / 100)
             sumtaxl += taxall
-        first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
-       
-        for rs in first:
-            regbyev = register_main.objects.filter(ev_id=rs.ev)
-            total_rq_quta = 0
-            for aaa in regbyev:
-                try:
-                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
-                    if bbbb:
-                        total_rq_quta += bbbb.rp_quota
-                except register_payment.DoesNotExist:  
-                        bbbb = 0
-            
-            event = course_event.objects.get(ev_id=rs.ev_id)
-            select = 0
-            price = 0
-            tis_compensation = 0
-            if int(event.condition_type) == 1:
-                requirements = 'มี'
-            if int(rs.pi_id) == 1:
-             if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                
-                checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
-                checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
-                checkcourse_con = course.objects.get(course_id=checkhead.course_id)
-          
-                if checkcourse_con.is_type_condition == '1':
-                   icont = condition.objects.filter(conhead=event.condition_id).order_by('student')
-                   for iconts in icont:
-                      typet = iconts.type
-                      if iconts.type_add == '1': 
-                       if typet == '1':
-                        if total_rq_quta > iconts.student:
-                            select = iconts.condition_id
-                            break
-                       elif typet == '2':
-                    
-                        if iconts.student < total_rq_quta:
-                            select = iconts.condition_id
-                            break
-                       elif typet == '3':
-                        if iconts.student == total_rq_quta: 
-                            select = iconts.condition_id
-                            break   
-
-                else : 
-                   icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
-                   for iconts in icont:
-                     if iconts.action == '0': 
-                        print('เช็คลบก่อนน',iconts.action)
-                        checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
-                     elif iconts.action == '1':  
-                        print('เช็คบวกที่หลัง',iconts.action) 
-                        checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
-                     for checkcons in checkcon:
-                        if total_rq_quta > checkcons.student:
-                            select = checkcons.condition_id
-                            
-                            break
-                        else:
-                           select = 0
-           
-             
-             if select != 0:
-              totalselect = condition.objects.get(condition_id=select)
-              head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
-              checkcourse_con = course.objects.get(course_id=checkhead.course_id)
-              if checkcourse_con.is_type_condition == '1':
-                 price = int(rs.tis_quantity) * (totalselect.price)
-                 name_con = head.name
-                 tis_compensation = totalselect.price
-              else:   
-                 if totalselect.action == '1':
-                    tis_quantity = int(rs.tis_quantity) + int(totalselect.hour)
-                    price = int(rs.tis_compensation) * (tis_quantity)
-                    tis_compensation = rs.tis_compensation
-                    name_con = head.name
-                 else :
-                    price = int(rs.tis_quantity) * (totalselect.price)
-                    name_con = head.name
-                    tis_compensation = totalselect.price
-             else:
-                price = int(rs.tis_quantity) * (rs.tis_compensation)    
-                tis_compensation = rs.tis_compensation
-            else :    
+            totalall = totalp - taxall
+   
+            r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':totalall}
         
-             if int(rs.pi_id) == 2:
+            obj.append(r)   
 
-              price = int(rs.tis_quantity) * (rs.tis_compensation) 
-              print(price) 
-              tis_compensation = rs.tis_compensation        
-              
-             elif int(rs.pi_id) == 3:
-            
-              price = int(rs.tis_quantity) * (rs.tis_compensation) 
-              tis_compensation = rs.tis_compensation
+       
+        
+ 
 
-             elif int(rs.pi_id) == 4:
-              
-              price = int(rs.tis_quantity) * (rs.tis_compensation) 
-              tis_compensation = rs.tis_compensation
-          
-              
-            cours = course.objects.get(course_id=event.course_id)
-            pay = pay_item.objects.get(id=rs.pi_id)
-            
-            totalp_f += price
-            taxall = price * (rs.tax / 100)
-            sumtaxf += taxall
-        if item_id not in result_dict:
-                aa = totalp_f + totalp
-                sumtaxall = sumtaxl + sumtaxf
-                totalall = aa - sumtaxall
-                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
-            
-    
-
-
-    result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n}
+    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl}
   
 
-  
-    return render(request, 'print/report_withdraw_summary_teacher_all.html', context)   
-
-
+    return render(request, 'print/register_print_witdrawa_one_lasted.html',context)
+   
 @login_required(login_url='/login')
 def register_report_summary_teacher_withdraw(request):
 
@@ -2024,7 +1893,7 @@ def register_report_summary_teacher_withdraw(request):
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
-    print(tis_group_l)
+    
 
 
     day_current_day = date.today().day
@@ -2152,6 +2021,16 @@ def register_report_summary_teacher_withdraw(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
+              
+              
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation 
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -2262,6 +2141,12 @@ def register_report_summary_teacher_withdraw(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
+             elif int(rs.pi_id) == 5:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
+              all = 1000 
+              price = all / tot
+              tis_compensation = all / tot
+              print('5',price)  
           
               
             cours = course.objects.get(course_id=event.course_id)
@@ -2401,24 +2286,26 @@ def register_report_summary_withdraw(request):
              if int(rs.pi_id) == 2:
 
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
-              print(price) 
+              print('2',price) 
               tis_compensation = rs.tis_compensation        
               
              elif int(rs.pi_id) == 3:
             
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              print('3',price) 
               tis_compensation = rs.tis_compensation
 
              elif int(rs.pi_id) == 4:
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
-
+              print('4',price) 
              elif int(rs.pi_id) == 5:
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
+              print('5',price) 
           
               
             cours = course.objects.get(course_id=event.course_id)
