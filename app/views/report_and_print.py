@@ -1540,11 +1540,12 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
             r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'total':total}
         
             obj.append(r)
-
+    today = datetime.date.today()
+    us_format = today.strftime("%d/%m/%Y")
 
 
     context = {'title': defaultTitle, 'data': obj,'list_teacher':list_teacher,'cou':content.count(),'totalp':totalp,'getdatauser':getdatauser,'m':month_fomat(m),'year':year,
-             'start_new':start,'end_new':last_day,'sumtax':sumtax,'totalall':totalall}
+             'start_new':start,'end_new':last_day,'sumtax':sumtax,'totalall':totalall,'today':us_format}
     return render(request, 'print/register_print_overdue_one.html',context)
 
 
@@ -1706,8 +1707,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     default_end = str(year) + "-" + \
         str(m_n) + "-" + "20"
     
-    print(default_start)
-    print(default_end)
+  
     get_last_day_m = last_day_of_month(
             datetime.date(int(year), m_l, 1))
     last_day_m = get_last_day_m.day
@@ -1717,6 +1717,12 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
 
 
     day_current_day = date.today().day
+    today = datetime.date.today()
+    us_format = today.strftime("%d/%m/%Y")
+  
+
+
+   
 
   
     
@@ -1850,9 +1856,12 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
 
        
         
- 
+    teacher_one = teacher.objects.get(teacher_id=teacher_id)
+    uuid_without_dashes = str(teacher_id).replace('-', '')
+    factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+    getdatauser = User.objects.get(pk=factuser.user_id)
 
-    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl}
+    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format}
   
 
     return render(request, 'print/register_print_witdrawa_one_lasted.html',context)
