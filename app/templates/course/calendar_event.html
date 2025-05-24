@@ -147,6 +147,7 @@ setTimeout(() => {
 
 function calen() {
 
+      
     var calendarEl = document.getElementById("calendar");
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -228,6 +229,15 @@ function calen() {
 
 }
   document.addEventListener("DOMContentLoaded", function () {
+
+          var events = [
+                { title: 'Meeting 1', start: '2025-05-27T09:00:00' },
+                { title: 'Meeting 2', start: '2025-05-27T10:00:00' },
+                { title: 'Meeting 3', start: '2025-05-27T11:00:00' },
+                { title: 'Meeting 4', start: '2025-05-27T12:00:00' },
+                { title: 'Meeting 5', start: '2025-05-27T13:00:00' }
+            ];
+            
     var calendarEl = document.getElementById("calendar");
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -242,16 +252,15 @@ function calen() {
       weekNumbers: true,
       navLinks: true, // can click day/week names to navigate views
       editable: false,
-      dayMaxEvents: true, // allow "more" link when too many events
       events: {
         url: "/calendar_event_api/",
         failure: function () {
           document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
         },
       },
+      initialView: 'dayGridMonth',
+      dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
       eventClick: function (info) {
-       
-
         let timerInterval;
 Swal.fire({
   title: "รอสักครู่",
@@ -960,6 +969,11 @@ CheckHourbeforeSave()
 .clickable-header {
   cursor: pointer; /* Indicate that the header is clickable */
 }
+
+    #calendar {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
