@@ -47,7 +47,8 @@
       weekNumbers: true,
         navLinks: true, // can click day/week names to navigate views
           editable: false,
-            dayMaxEvents: true, // allow "more" link when too many events
+          initialView: 'dayGridMonth',
+          dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
               events: {
 
     url: "/api/calendar_event_api2/" + teacher,
@@ -175,8 +176,8 @@
     weekNumbers: true,
     navLinks: true, // can click day/week names to navigate views
     editable: false,
-    dayMaxEvents: true, // allow "more" link when too many events
-
+    initialView: 'dayGridMonth',
+    dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
     events: {
 
     url: "/api/calendar_event_api2/" + teacher,
