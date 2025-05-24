@@ -914,7 +914,7 @@ def calendar_event_api2(request,id):
         te.append(fs)  
         
         
-       nextdayend = addDay(0, int(y), int(m), int(d))
+       nextdayend = addDay(1, int(y), int(m), int(d))
        result = course.objects.filter(course_id=r.ev.course_id).first()
        
        
@@ -957,9 +957,9 @@ def calendar_event_api2(request,id):
        eve = course_event.objects.get(ev_id=r.ev_id)
        loc = location_thai.objects.get(location_id=eve.location_id)
      
-       print(dt)
-       res = {'address':eve.address,'prov':loc.province_name,'amphur_name':loc.amphur_name,'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show}
-
+      
+       res = {'address':eve.address,'prov':loc.province_name,'amphur_name':loc.amphur_name,'teach':te,'daynum':dD,'day':dt,'evs_status':r.status,'start': r.ev.ev_date_start,'end':dmytoymd(nextdayend),'course_id':(r.ev.course_id),'evs_id':(r.id),'title': str(result.course_name) + " (รุ่นที่ " + str(r.ev.ev_generation)+") ตำแหน่ง"+ str(pay),'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','show':evte.is_show,'end_day':r.ev.ev_date_end}
+       print(res)
        obj.append(res)      
        
     return JsonResponse(obj, safe=False)
