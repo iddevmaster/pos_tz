@@ -317,13 +317,10 @@
     setTimeout(() => {
       const it = document.getElementById("ev_hour").value;
       if (it.charAt(0) == "0") {
-
         if (it.charAt(1)) {
           let result = removeFirstCharacter(it);
           document.getElementById("ev_hour").value = result
         }
-
-       
         // return it.slice(0); // Removes the first character
       }
 
