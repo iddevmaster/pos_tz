@@ -1868,8 +1868,8 @@ def register_report_summary_teacher_all_month(request , year, m):
     month_select_now = request.POST.get('monthss', date.today().month)
     
  
-    m_n = month_select_now
-    m_l = int(month_select_now) - 1
+    m_n = m
+    m_l = int(m) - 1
  
     day_same_m = request.POST.get('monthss', date.today().month)
  
@@ -1888,13 +1888,13 @@ def register_report_summary_teacher_all_month(request , year, m):
     t_a_before_tax = 0
     t_a_t_tax = 0
     get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(day_current_m), 1))
+            datetime.date(int(year), int(m), 1))
     last_day = get_last_day.day
-    default_start = str(date.today().year) + "-" + \
+    default_start = str(year) + "-" + \
         str(m_l) + "-" + "21"
-    default_end = str(date.today().year) + "-" + \
+    default_end = str(year) + "-" + \
         str(m_n) + "-" + "20"
-    
+
 
     get_last_day_m = last_day_of_month(
             datetime.date(int(year_current), m_l, 1))
