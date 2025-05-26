@@ -102,7 +102,7 @@
           <td colspan="4">
             <div align="center">
               <div style="font-size: 14px;">
-                วันที่ {{start}} ถึง {{end}}
+                ระหว่างวันที่  {{tis_group_l}} {{old_m}} {{year_current}} ถึง {{tis_group_f}} {{current_m}} {{year_current}}
               </div>
             </div>
           </td>
@@ -116,41 +116,44 @@
         <tr>
           <td colspan="8" style="text-align: center;font-size: 18px;"><strong>รายได้จากงานฝึกอบรม</strong></td>
         </tr>
-         <tr>
+        <tr>
       <td>ลำดับ</td>
       <td>รหัสพนักงาน</td>
       <td>ชื่อ-สกุล</td>
-   <td>รวมค่าตอบแทน        ค้าง 21-30 เมย.68</td>
-      
-      <td>รายได้ทั้งหมด</td>
+      <td>รวมค่าตอบแทน        ค้าง {{tis_group_l}} {{old_m}} {{year_current}} </td>
+      <td>รวมค่าตอบแทน    {{tis_group_f}} {{current_m}} {{year_current}}</td>
+      <td>รวมเป็นเงิน</td>
       <td>หัก ณ ที่จ่าย</td>
       <td>รายได้สุทธิ</td>
-  
     </tr>
 
         {% for res in result_dict %}
     <tr>
       <td align="center">{{ forloop.counter }}</td>
+      <td align="center">{{res.code}}</td>
       <td align="center">{{res.username}}</td>
-      <td align="center">{{res.name}}</td>
+   
+      <td align="center">{{res.price|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.price_f|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.total|floatformat:2|intcomma }}</td>
       <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
-       <td align="center">{{res.price|floatformat:2|intcomma }}</td>
-       <td align="center">{{res.total }} </td>
-     
+      <td align="center">{{res.totalall|floatformat:2|intcomma }}</td>
+      
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
     {% endfor %}
 
 
+
         <tr>
           <td colspan="3">รวมเป็นค่าตอบแทน</td>
-          <td>{{totalp|floatformat:2|intcomma }}</td>
-        
-          <td>{{sumtax|floatformat:2|intcomma }}</td>
-          <td>{{totalall|floatformat:2|intcomma }}</td>
-  
-        </tr>
       
+       <td align="center">{{t_a_l|floatformat:2|intcomma }}</td>
+           <td align="center">{{t_a_f|floatformat:2|intcomma }}</td>
+       <td align="center">{{t_a_before_tax|floatformat:2|intcomma }}</td>
+       <td align="center">{{t_a_t_tax|floatformat:2|intcomma }}</td>
+        <td align="center">{{t_a_all_tax|floatformat:2|intcomma }}</td>
+        </tr>
       </tbody>
     </table>
   </div>
