@@ -42,6 +42,11 @@ async function calltohub(datas) {
     document.getElementById("status_fullname").innerHTML = full_name;
   }
 
+  function setValuePrintModal(training_id) {
+  console.log(training_id)
+   window.open('www.yourdomain.com','_blank');
+  }
+
   var myVar = null;
 
   function start_read_test() {
@@ -434,6 +439,17 @@ fileInput.value = ''; // Clear the selected file
                 >
                   <i class="icon dripicons-trash" aria-hidden="true"></i>
                   ลบ
+                </button>
+
+
+                
+                <button
+                  type="button"
+                  onclick="setValuePrintModal('{{res.training_id}}')"
+                  class="btn btn-primary"
+                >
+                  <i class="icon print" aria-hidden="true"></i>
+                  พิมพ์เอกสารยินยอม
                 </button>
 
               </div>
