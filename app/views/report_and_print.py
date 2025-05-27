@@ -18,7 +18,7 @@ from django.db.models import Count, Sum, F
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new
 
 
@@ -3401,3 +3401,13 @@ def public_form_print(request):
         s = ""
     context = {'title': defaultTitle,  'data': content, 'search': s}
     return render(request, 'public/public_form_print.html', context)
+
+
+@login_required(login_url='/login')
+def print_consent(request,training_id):
+   
+    getid = training.objects.select_related("ev").get(training_id=training_id)
+    print(getid.ev.course)
+    content = []
+    context = {'title': defaultTitle,  'data': getid}
+    return render(request, 'print/register_print_consent.html', context)

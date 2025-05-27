@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หนังสือรับรองบุคคล</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: "TH Sarabun", sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            background: white;
+        }
+        
+        .document-container {
+            max-width: 21cm;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            min-height: 29.7cm;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .auto-section {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .auto-text {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+        
+        .content-section {
+            margin-bottom: 5px;
+            text-align: justify;
+            line-height: 2;
+        }
+        
+        .blue-text {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+        
+        .red-text {
+            color: #cc0000;
+        }
+        
+        .dotted-line {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+            min-width: 100px;
+        }
+        
+        .signature-section {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 40px;
+        }
+        
+        .signature-line {
+            margin: 20px 0;
+        }
+        
+        .footer-section {
+            margin-top: 40px;
+        }
+        
+        .checkbox-section {
+            margin-top: 30px;
+        }
+        
+        .checkbox {
+            width: 15px;
+            height: 15px;
+            border: 1px solid #000;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        @media print {
+            .print-button {
+                display: none;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .document-container {
+                padding: 20px;
+                margin: 0;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">พิมพ์เอกสาร</button>
+    
+    <div class="document-container">
+        <div class="header">
+            <div class="title" style="font-size: 16px;">หนังสือ ขอรับผิดชอบตนเอง</div>
+        </div>
+        
+        <div class="auto-section">
+            <span>วันที่ </span>
+            <span class="auto-text">Auto</span>
+        </div>
+        
+        <div class="content-section" style="
+    padding-left: 10%;font-size: 14px;"
+>
+            <span>หนังสือฉบับนี้ ข้าพเจ้า</span>
+    
+            <span>{{data.student_prefix_th}} {{data.student_firstname_th}} {{data.student_lastname_th}} เลขที่บัตรประชาชน {{data.student_identification_number}}</span>
+        
+        </div>
+        
+        <div class="content-section">
+            <span> เป็นผู้เข้ารับการอบรม กับบริษัท ไอดีไดร์ฟ จำกัด  หลักสูตร   {{data.ev.course.course_name}}</span>
+          
+            <span> วันที่จัดอบรบ {{data.ev.ev_date_start}} ถืง {{data.ev.ev_date_end}}</span>
+
+        </div>
+        
+        <div class="content-section" style="
+    padding-left: 10%;font-size: 14px;">
+            <span>  ข้าพเจ้าขอรับรองว่า ข้าพเจ้า</span>
+                  <span>{{data.student_prefix_th}} {{data.student_firstname_th}} {{data.student_lastname_th}} เลขที่บัตรประชาชน {{data.student_identification_number}}</span>
+
+  
+    
+        </div>
+
+
+              <div class="content-section">
+    <span>จะขอรับผิดชอบชีวิต และทรัพย์สินของตนเอง และผู้อื่น ซึ่งไม่เกี่ยวข้องกับผู้จัดฝึกอบรมและ บริษัท ไอดีไดรฟ์ จำกัด จึงลงลายมือไว้เป็นลายลักษณ์อักษร</span>
+        </div>
+        
+    
+        
+        <div class="signature-section">
+            <div class="signature-line">
+                <span class="dotted-line"></span>
+      
+            </div>
+            
+            <div class="signature-line">
+                <span>( </span>
+             
+                <span> {{data.student_firstname_th}} {{data.student_lastname_th}} </span>
+                <span>)</span>
+            </div>
+            
+            <div class="signature-line">
+                <span>โทร</span>
+                <span> ...........................</span>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <script>
+        // Auto-fill current date
+        function getCurrentThaiDate() {
+            const now = new Date();
+            const day = now.getDate();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear() + 543; // Convert to Buddhist Era
+            return `${day}/${month}/${year}`;
+        }
+        
+        // Replace Auto with current date on load
+        window.onload = function() {
+            const autoElements = document.querySelectorAll('.auto-text');
+            const currentDate = getCurrentThaiDate();
+            
+            autoElements.forEach(element => {
+                if (element.textContent === 'Auto') {
+                    element.textContent = currentDate;
+                }
+            });
+        };
+        
+        // Make document editable for form filling
+        function makeEditable() {
+            const editableElements = document.querySelectorAll('.dotted-line');
+            editableElements.forEach(element => {
+                element.contentEditable = true;
+                element.style.minWidth = '150px';
+                element.addEventListener('focus', function() {
+                    this.style.backgroundColor = '#f0f8ff';
+                });
+                element.addEventListener('blur', function() {
+                    this.style.backgroundColor = 'transparent';
+                });
+            });
+        }
+        
+        // Initialize editable fields
+        makeEditable();
+    </script>
+</body>
+</html>

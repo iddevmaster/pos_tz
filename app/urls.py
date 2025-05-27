@@ -254,6 +254,10 @@ urlpatterns = [
          name="description_setting_form_update"), 
     path('tax/setting/form/create', desbill.setting_form_tax,
          name="tax_setting_form_create"),
+
+    path('consent/print/<slug:training_id>',report_and_print.print_consent),
+
+        
          
     path('api/sequence/up', desbill.up),
     path('api/sequence/down', desbill.down),     
