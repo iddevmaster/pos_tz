@@ -622,13 +622,14 @@ def calendar_event_all(request):
 
 def calendar_event_api(request):
     user_id = request.user.id
-  
+    
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
     start = request.GET.get('start', None)
+    
     end = request.GET.get('end', None)
     _date = date.today()
     if start is not None and end is not None:
@@ -642,13 +643,16 @@ def calendar_event_api(request):
     status = ['W','Y','I']
     # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
     
- 
+
+    sobj = _date + timedelta(days=-365)
+    eobj = _date + timedelta(days=365)
     content = course_event.objects.select_related(
         "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
    
     obj = []
 
     sff = []
+    print(content.count())
     for r in content:
         
         conditiondata = []
@@ -718,6 +722,8 @@ def calendar_event_api(request):
 
 def calendar_event_apiall(request):
     user_id = request.user.id
+
+    
   
     try:
         m = user_group.objects.get(user=user_id)

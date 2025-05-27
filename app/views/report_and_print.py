@@ -86,7 +86,7 @@ def register_print(request, rp_id):
             items.rpi_price_total) + float(items.rpi_price_vat)
     else:
         rpi_price_default = items.rpi_price_total
-
+    
     context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:
