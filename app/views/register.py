@@ -705,7 +705,7 @@ def payment_create(request):
     totaldata = register_payment.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current).count()
     running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+    rp_doc_number = "IDSS" + year_current_f[2:4] + "/" + \
         str(twoDigit(month_current)) + "/" + str(running_number)
     # Item
     rpi_code = request.POST['rpi_code']
@@ -900,7 +900,7 @@ def payment_createno(request):
     totaldata = register_payment.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current).count()
     running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+    rp_doc_number = "IDSS" + year_current_f[2:4] + "/" + \
         str(twoDigit(month_current)) + "/" + str(running_number)
     # Item
     rpi_code = request.POST['rpi_code']
