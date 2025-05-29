@@ -22,10 +22,15 @@
         body {
           -webkit-print-color-adjust: exact;
         }
+        @page {
+                size: A4;
+                margin-bottom: 1.5cm; /* Adjust margins as needed */
+            }
+        
       }
       body {
         font-family: "Sarabun", sans-serif;
-        font-size: 16px;
+     
         left: 0;
         position: relative;
       }
@@ -68,7 +73,7 @@
                 style="width: 100px; height: 100px"
               />
             </td>
-            <td style="vertical-align: middle" align="center">
+            <td style="vertical-align: middle;font-size: 16px;" align="center">
               <h3>Training Zenter (ศูนย์เทรนนิ่ง TZ เซ็นเตอร์)</h3>
               <h4>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</h4>
             </td>
@@ -178,7 +183,7 @@
       </table>
 
       <table
-        style="width: 100%; border-collapse: collapse"
+        style="width: 100%; border-collapse: collapse;font-size: 15px;"
         border="1"
         class="table-detail"
       >
@@ -317,21 +322,21 @@
        
 
             </td>
-            <td colspan="3" rowspan="1">
+            <td colspan="3" rowspan="1" style="font-size: 12px;">
               <div style="display: flex;padding-top: 5px;">
                 <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
               </div>
-              <br>
+            
               <div style="display: flex;">
                 <div style="flex: 1;"> โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ สาขาสี่แยกมะลิวัลย์(ขอนแก่น) ธ.ไทยพานิชย์
                    บัญชีเลขที่ 729-3-01791-5 </div>
               </div>
-              <br>
+            
               <div style="display: flex;">
                 <div style="flex: 1;"> สั่งจ่ายเช็คธนาคาร นาม บจก.ไอดีไดรฟ์ เมื่อสั่งจ่ายแล้วกรุณาโทร
                   082-7513888 ส่งใบ payin ทาง Line ID : TZ00018 </div>
               </div>
-<br>
+
 
            
               
@@ -350,15 +355,16 @@
               <div style="display: flex;padding-top: 5px;">
                 <div style="flex: 1;">E-mail:&nbsp;&nbsp;id.trainingcenter@iddrives.co.th </div>
               </div>
-              <div style="display: flex;padding-top: 5px;">
+              <div style="display: flex;padding-top: 1px;">
                 <div style="flex: 1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idfinance@iddrives.co.th </div>
               </div>
   
             </td>  
           </tr>
 
+      
 
-          <tr>
+ <tr>
             <td colspan="3" rowspan="1">
 
               <div style="display: flex;text-align: center;">
@@ -371,7 +377,7 @@
                   src="{{signa.image_cover.url}}"
                  
                   alt="IDLOGO"
-                  style="width: 200px; height: 100px"
+                  style="width: 100px; height: 50px"
                 />
                
                 </div>
@@ -396,7 +402,7 @@
                 <img
                 src="{{signama.image_cover.url}}"
                 alt="IDLOGO"
-                style="width: 200px; height: 100px"
+                  style="width: 100px; height: 50px"
               />
              
               </div>
@@ -412,11 +418,12 @@
               </div>
             </td>
             <td colspan="3" rowspan="1">
+              <br>
               <div style="flex: 1;text-align: center;">
                 <img
                 src="{% static 'images/wh.png' %}"
                 alt="IDLOGO"
-                style="width: 200px; height: 100px"
+               style="width: 100px; height: 50px"
               />
              
               </div>
