@@ -529,8 +529,8 @@ function validateForm() {
               <select class="select2"  id="rp_name_seller" name="rp_name_seller" style="width: 100%" required>
                 <option value="">--ผู้เสนอโครงการ--</option>
                 {% for res in list_user %}
-                <option value="{{res.id}}">
-                  {{res.first_name}} {{res.last_name}}
+                <option value="{{res.id}}" >
+             {{res.first_name}} {{res.last_name}}
                 </option>
                 {% endfor %}
               </select>
@@ -707,8 +707,8 @@ function validateForm() {
               <select class="form-select" id="user_manage" name="user_manage" style="width: 100%" required>
                 <option value="">--เลือกผู้จัดการ--</option>
                 {% for res in manage %}
-                <option value="{{res.user.id}}">
-                  {{res.user.first_name}} {{res.user.last_name}} {{res.user.id}}
+                <option value="{{res.user.id}}"  {% if res.user.id == 14 %}selected{% endif %}>
+                  {{res.user.first_name}} {{res.user.last_name}}
                 </option>
                 {% endfor %}
               </select>
