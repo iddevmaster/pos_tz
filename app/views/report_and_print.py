@@ -2259,7 +2259,7 @@ def register_report_summary_teacher_withdraw(request):
         code = getdatauser
         name = teacher_one
         
-        lassssst = teacher_income_setting.objects.filter(tis_group=tis_group_l,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
+        lassssst = teacher_income_setting.objects.filter(tis_group=tis_group_l,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,active=0)
         
         price = 0
         totalp = 0
@@ -2390,7 +2390,7 @@ def register_report_summary_teacher_withdraw(request):
             
             taxall = price * (rs.tax / 100)
             sumtaxl += taxall
-        first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end)
+        first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,active=0)
        
         for rs in first:
             regbyev = register_main.objects.filter(ev_id=rs.ev)
@@ -2547,8 +2547,7 @@ def register_report_summary_withdraw(request):
                 tis_end_date__day__lte=last_day,
                 tis_end_date__month=day_current_m,
                 tis_end_date__year=year_current).order_by('teacher_id')
-    print(start)
-    print(last_day)
+ 
     requirements = 'ไม่มี'
     name_con = '-'
     totalp = 0
