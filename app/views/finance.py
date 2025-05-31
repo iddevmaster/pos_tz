@@ -203,9 +203,9 @@ def billing_cycle_result(request):
            
             if teacher_current != None and teacher_current != '':
                 instance = instance.filter(teacher=teacher_current)
-            # day_current  วันปัจจุบัน มากกว่า รึเท่ากับ 
+          
             if day_current >= day_end and instance.count() >= 1:
-                instance.update(active=1, tis_group=tis_group,status='S',
+                instance.update(tis_group=tis_group,status='S',
                                 upd_date=dateTimeNow())
         obj2 = []
         content = teacher_income_setting.objects.filter(
