@@ -198,7 +198,8 @@ function validateForm() {
     let fix = isNaN(sum) ? 0 : sum;
     document.getElementById("rpi_price_discount").value = 0;
     document.getElementById("rpi_price_total").value = fix.toFixed(2);
-    sumVat();
+    document.getElementById("rpi_price_result").value = fix.toFixed(2);
+    // sumVat();
   }
   function sumDiscount() {
     let rpi_quantity = document.getElementById("rpi_quantity").value;
@@ -210,7 +211,8 @@ function validateForm() {
     let sum = parseFloat(total) - parseFloat(rpi_price_discount);
     let fix = isNaN(sum) ? 0 : sum;
     document.getElementById("rpi_price_total").value = fix.toFixed(2);
-    sumVat();
+     document.getElementById("rpi_price_result").value = fix.toFixed(2);
+    // sumVat();
   }
   function sumVat() {
     
@@ -261,8 +263,6 @@ if (parseInt(ev_vat) == 1) {
 
 }
     }else {
-      console.log('เครดิต');
-
       if (parseInt(ev_vat) == 1) {
         
         let rpi_quantity = document.getElementById("rpi_quantity").value;
@@ -981,7 +981,7 @@ if (parseInt(ev_vat) == 1) {
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6" style="display: none;">
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select class="form-select"  id="vat" name="vat" style="width: 100%" onchange="handleChangeVat()" required>
              
@@ -1067,7 +1067,7 @@ if (parseInt(ev_vat) == 1) {
             </div>
           </div>
 
-       <div class="col-lg-4 col-md-6">
+       <div class="col-lg-4 col-md-6" style="display: none;">
             <div class="form-group">
               <label>จำนวนเงินสินค้าเพิ่มเติม</label>
               <label style="color: red">*</label>
@@ -1098,7 +1098,7 @@ if (parseInt(ev_vat) == 1) {
 
 
           
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6" style="display: none;">
             <div class="form-group">
               <label>ราคาก่อนรวมภาษีมูลค่าเพิ่ม 7&#37;</label>
               <label style="color: red">*</label>
@@ -1113,7 +1113,7 @@ if (parseInt(ev_vat) == 1) {
           </div>
      
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6" style="display: none;">
             <div class="form-group">
               <label>ภาษีมูลค่าเพิ่ม 7&#37;</label>
               <label style="color: red">*</label>
