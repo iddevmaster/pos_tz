@@ -35,8 +35,17 @@
       }
     </script>
 
-    <style>
- 
+<style scoped>
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+        }
+        @page {
+                size: A4;
+                margin-bottom: 1cm;
+            }
+        
+      }
       body {
     font-family: "Sarabun", sans-serif;
         font-size: 12px;
@@ -66,10 +75,7 @@
       }
 	  
 	  
-      .footer {
-        position: relative;
-        bottom: 60px;
-      }
+ 
       .cutword {
         white-space: nowrap;
         width: 250px;
