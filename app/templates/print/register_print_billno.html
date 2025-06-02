@@ -241,12 +241,34 @@
             </td>
             {% endfor %}
 
-          <tr >
-  
+         <tr >
             <td colspan="5" rowspan="4" style="padding: 10px;vertical-align: top;padding-left: 5px">
               <div style="display: flex;text-align: center;">
                 <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
               </div>
+
+                   <div style="display: flex;text-align: center;">
+                      <div style="flex: 1;">
+               
+
+                      โอนเงินธนาคาร SCB ธนาคารไทยพาณิชย์ สาขาสี่แยกมะลิวัย์ 7293020269 บริษัท ไอดีไดรฟ์ จำกัด โทร  043-228899 (ฝ่ายธุรการ)
+                      </div>
+            
+                    </div>
+
+                         <div style="display: flex;text-align: center;">
+                      <div style="flex: 1;">
+                        <img
+                        src="{% static 'images/176579.jpg' %}"
+                        alt="IDLOGO"
+                        style="width: 150px; height: 150px"
+                      />
+                     
+
+                    
+                      </div>
+            
+                    </div>
               {{data.rp_ref1}}
               <br>
               {{data.rp_ref2}}
@@ -256,7 +278,7 @@
 
             <td colspan="2">รวมเงิน</td>
             <td align="right">
-              {{rpi_total |floatformat:2|intcomma }}
+              {{rpi_price_default |floatformat:2|intcomma }}
             </td>
           </tr>
           <tr>
@@ -338,7 +360,7 @@
       <div align="center" class="footer">
         Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
         ระบบ
-        <span style="text-transform: uppercase"> pos.trainingzenter</span>
+        <span style="text-transform: uppercase"> pos.idss</span>
         <span id="showdate3"></span>
         <div>เลขที่ ISO FD-TZ-IDD-001 13-01-2566</div>
         <img
