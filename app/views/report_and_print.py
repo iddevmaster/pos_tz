@@ -234,7 +234,7 @@ def register_printnoev(request, rp_id):
         machine = None
    
     # users = User.objects.get(id=content.user_create)
-    
+    bill = bill_setting.objects.get(bill_id=1)
     items = register_payment_items.objects.filter(rp_id=content.rp_id).first()
     uuid_without_dashes = str(content.register_id).replace('-', '')
  
@@ -269,11 +269,11 @@ def register_printnoev(request, rp_id):
         rpi_total = items.rpi_price_total
     # ราคารวม  ช่องแนวนอน
    
-    print(rpi_total)
+  
     # ราคาก่อนvat
     rpi_price_default = items.rpi_price_total  
 
-    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'rpi_total':rpi_total,
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'rpi_total':rpi_total,'is_show_signature':bill.is_show_signature,
                'items': items, "content_regist": content_regist,'rpi_price_rpi_pri':rpi_price_rpi_pri, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ

@@ -35,48 +35,59 @@
       }
     </script>
 
-    <style>
- 
+  <style scoped>
+    @media print {
       body {
-    font-family: "Sarabun", sans-serif;
-        font-size: 12px;
-        left: 0;
-        position: relative;
+        -webkit-print-color-adjust: exact;
       }
-	  
-      .table-head {
-        position: relative;
-        bottom: 85px;
+
+      @page {
+        size: A4;
+        margin-bottom: 1cm;
       }
-      .table-title {
-        position: relative;
-        bottom: 85px;
-      }
-      .table-detail {
-        position: relative;
-        bottom: 70px;
-      }
-      .table-footer {
-        position: relative;
-        bottom: 50px;
-      }
-	  
-	     tr {
-  height:35px;
-      }
-	  
-	  
-      .footer {
-        position: relative;
-        bottom: 60px;
-      }
-      .cutword {
-        white-space: nowrap;
-        width: 250px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    </style>
+
+    }
+
+    body {
+      font-family: "Sarabun", sans-serif;
+      font-size: 12px;
+      left: 0;
+      position: relative;
+    }
+
+    .table-head {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-title {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-detail {
+      position: relative;
+      bottom: 70px;
+    }
+
+    .table-footer {
+      position: relative;
+      bottom: 50px;
+    }
+
+    tr {
+      height: 35px;
+    }
+
+
+
+    .cutword {
+      white-space: nowrap;
+      width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
   </head>
   {% comment %} window.print() {% endcomment %}
   <body onLoad="myFunction();window.print();RunDate();">
@@ -319,14 +330,13 @@
                       "
                     >
                       <br />
-                      <img
-               
-                  
-                      src="{{signa.image_cover.url}}"
-                     
-                      alt="IDLOGO"
-                      style="width: 200px; height: 100px"
-                    />
+               {% if is_show_signature == 1 %}
+                    <img src="{{signa.image_cover.url}}" alt="IDLOGO" style="width: 200px; height: 90px" />
+                    {% else %}
+                    <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 200px; height: 90px" />
+                    {% endif %}
+
+                    
                       <br />
 					  <div style="
     padding-top: 10px;
@@ -343,20 +353,42 @@
               </table>
             </td>
           </tr>
+  <tr>
+          <td colspan="12" style="
+    border: hidden;
+">
+            Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
+            ระบบ
+            <span style="text-transform: uppercase"> pos.trainingzenter</span>
+            <span id="showdate3"></span>
+          </td>
+        </tr>
+
+        <tr style=" border: none;">
+          <td colspan="12" style="
+    border: hidden;text-align: center;
+">
+            เลขที่ ISO FD-TZ-IDD-001 13-01-2566
+
+          </td>
+        </tr>
+
+        <tr style=" border: none;">
+          <td colspan="12" style="
+    border: hidden;
+">
+            <div align="center">
+
+              <img src="{% static 'images/all-logo-03.png' %}" alt="TZLOGO" style="width: 100%; height: auto" />
+            </div>
+
+          </td>
+        </tr>
+
+          
         </tbody>
       </table>
-      <div align="center" class="footer">
-        Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
-        ระบบ
-        <span style="text-transform: uppercase"> pos.trainingzenter</span>
-        <span id="showdate3"></span>
-        <div>เลขที่ ISO FD-TZ-IDD-001 13-01-2566</div>
-        <img
-          src="{% static 'images/all-logo-03.png' %}"
-          alt="TZLOGO"
-          style="width: 100%; height: auto"
-        />
-      </div>
+
     </div>
   </body>
 </html>
