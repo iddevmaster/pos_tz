@@ -16,9 +16,9 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,learn
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
-from ..constant import prefixEng,prefixThai
+from ..constant import prefixEng,prefixThai,api_id_card
 
 api_id_card = api_id_card
 
@@ -495,17 +495,39 @@ def register_detail(request, register_id):
         objMenu.append(r)
     try:
         content_regist = register_main.objects.get(register_id=register_id)
+        uuid_without_dashes = str(register_id).replace('-', '')
+        content_learn = learn.objects.get(register_id=uuid_without_dashes)
+        
     except:
         content_regist = None
+        content_learn = None
         return redirect("/")
     content_customer = customers.objects.select_related("location").filter(
         register_id=register_id).first()
     content_course = course_event.objects.select_related(
         "course").get(ev_id=content_regist.ev_id)
-    context = {'title': title,  'content_regist': content_regist, 'listMenuPermission': objMenu,
+    context = {'title': title,  'content_regist': content_regist, 'listMenuPermission': objMenu,'content_learn':content_learn,'api_id_card': api_id_card, 
                'content_customer': content_customer, 'content_course': content_course}
     return render(request, 'register/register_detail.html', context)
 
+
+@login_required(login_url='/login')
+def register_detail_update(request, reg_id):
+    
+   
+  
+    reg_prefix_thai = request.POST['reg_prefix_thai']
+    reg_name_thai = request.POST['reg_name_thai']
+    reg_lname_thai = request.POST['reg_lname_thai']
+    mobile_contact = request.POST['mobile_contact']
+    print(mobile_contact)
+
+    content_learn = learn.objects.get(reg_id=reg_id)
+    # content_learn.mobile_contact = mobile_contact
+    # content_learn.save()
+    messages.success(request, "ทำรายการสำเร็จ !")
+    # return redirect("/register/management")
+    return redirect("/register/detail/" + str(content_learn.register_id))
 
 @login_required(login_url='/login')
 def payment(request, register_id):

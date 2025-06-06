@@ -30,6 +30,7 @@ urlpatterns = [
     path('register/update/close_the_sale',
          register.update_close_the_sale, name="UpdateCloseTheSale"),
     path('register/detail/<str:register_id>', register.register_detail),
+    path('register/detail/update/<str:reg_id>', register.register_detail_update),
     path('register/cancle', register.register_cancle, name="CancleRegister"),
     path('register/studentlist/<str:register_id>', register.student_list),
     path('student/ref/create',
