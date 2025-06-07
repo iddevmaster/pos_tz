@@ -1,7 +1,33 @@
-{% extends 'base.html' %} {% block content %}
 
 
+{% extends 'base.html' %} {% block content %} {% load humanize %} {% load static %}
 <script>
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var fileInput = document.getElementById("image_cover");
+    console.log(fileInput)
+    fileInput.addEventListener("change", function () {
+      // Get the selected file
+      var file = fileInput.files[0];
+
+      // Perform your action here, such as displaying a preview of the selected image
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var preview = document.getElementById("image-preview");
+          preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+
+
+
+  function removeFirstCharacter(str) {
+    return str.substring(1);
+  }
   var myVar = null;
 
   function start_read_test() {
@@ -20,21 +46,33 @@
 
     var data = jsondata.substr(13, jsondata.length - 14);
     let jdata = JSON.parse(data);
+    console.log(jdata);
 
     if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
       document.getElementById("error_load").innerHTML =
         "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
       return false;
     }
-    document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
-    document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
-    document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
-    document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
-    document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
-    document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
+    document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
+    document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
+    document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
+    document.getElementById("reg_prefix_eng").value = jdata?.TitleNameEn;
+    document.getElementById("reg_name_eng").value = jdata?.FirstNameEn;
+    document.getElementById("reg_lname_eng").value = jdata?.LastNameEn;
+    document.getElementById("tax_id").value = jdata?.CitizenNo;
+    document.getElementById("birthday").value = jdata?.BirthDate;
+
+    document.getElementById("address_present").value = jdata?.HomeNo;
+    document.getElementById("road_present").value = jdata?.Road;
+    document.getElementById("village_present").value = jdata?.Moo;
+    document.getElementById("subdistrict_present").value = jdata?.Tumbol;
+    document.getElementById("district_present").value = jdata?.Amphur;
+    document.getElementById("province_present").value = jdata?.Province;
+
+
+
   }
 </script>
-
 
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -194,6 +232,7 @@
         action="/register/detail/update/{{content_learn.reg_id}}"
         method="post"
         autocomplete="off"
+        enctype="multipart/form-data"
       >
         {% csrf_token %}
 
@@ -223,15 +262,17 @@
         
         <div class="col-lg-12 col-md-12">
               
-                <img src="https://hrc.iddrives.co.th/images/images_user/JGD2MI.jpg" alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="blah" width="115" height="125">
-                  <a href="#" data-toggle="tooltip" title="" name="uploadbutton" onclick="imageupload.click()" data-original-title="คลิ๊กเพื่ออัพโหลดรูปภาพ"><span class="photo"></span></a>
-               
+                            <div style="padding-bottom: 15px">
+          <img src="{% static "images/no-photo-available.png" %}"
+          alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="image-preview"  width="115" height="125" class="rounded" />
+        </div>
+  <input type="file" name="image_cover" accept="image/*" required id="image_cover">
 
                  
         </div>
-  <input type="file" name="imageupload" id="imageupload" onchange="readURL(this);" accept=".png, .jpg, .jpeg">
 
 
+   
         <div class="col-lg-4 col-md-4">
           <div class="form-group">
             <label>คำนำหน้า</label> <span style="color: red;"> ตัวอย่าง นาย</span>
@@ -550,6 +591,57 @@
 
       </div>
 
+
+
+
+            <div class="row">
+        <h4 class="card-title">สำเนาวุฒิการศึกษา</h4>
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">
+          <input type="file" name="transcript" accept=".jpg, .jpeg, .png, .gif, .pdf" required id="transcript">
+          
+      {% if content_learn.transcript == '' %}
+            ไฟล์ปัจจุบัน: ไม่มี
+      {% else %} 
+              ไฟล์ปัจจุบัน: {{content_learn.transcript}} 
+      {% endif %}
+          </div>
+          
+        </div>
+        
+      </div>
+
+
+      <div class="row">
+        <h4 class="card-title">หลักฐานการเปลี่ยน ชื่อ-สกุล (ถ้ามี)</h4>
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">
+          <input type="file" name="proofofreplacement" accept=".jpg, .jpeg, .png, .gif, .pdf"  id="proofofreplacement">
+                {% if content_learn.proofofreplacement == '' %}
+            ไฟล์ปัจจุบัน: ไม่มี
+      {% else %} 
+              ไฟล์ปัจจุบัน: {{content_learn.proofofreplacement}} 
+      {% endif %}
+          </div>
+        </div>
+      </div>
+
+
+            <div class="row">
+        <h4 class="card-title">ใบรับรองแพทย์</h4>
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">
+          <input type="file" name="medicalcertificate" accept=".jpg, .jpeg, .png, .gif, .pdf" id="medicalcertificate">
+                          {% if content_learn.medicalcertificate == '' %}
+            ไฟล์ปัจจุบัน: ไม่มี
+      {% else %} 
+              ไฟล์ปัจจุบัน: {{content_learn.medicalcertificate}} 
+      {% endif %}
+          </div>
+
+        </div>
+      </div>
+
               <div style="padding-top: 25px" align="center">
             <div class="col-lg-12 col-md-12">
           <div align="right">
@@ -558,9 +650,7 @@
          
               <button
               type="submit"
-              class="btn btn-info"
-          
-            >
+              class="btn btn-info" >
          
               บันทึก
             </button>

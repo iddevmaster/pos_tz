@@ -478,6 +478,8 @@ def customer_createno(request):
 def register_detail(request, register_id):
     title = defaultTitle
     user_id = request.user.id
+
+ 
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -495,8 +497,11 @@ def register_detail(request, register_id):
         objMenu.append(r)
     try:
         content_regist = register_main.objects.get(register_id=register_id)
+       
         uuid_without_dashes = str(register_id).replace('-', '')
+        print('xxxxx',uuid_without_dashes)
         content_learn = learn.objects.get(register_id=uuid_without_dashes)
+        
         
     except:
         content_regist = None
@@ -520,11 +525,25 @@ def register_detail_update(request, reg_id):
     reg_name_thai = request.POST['reg_name_thai']
     reg_lname_thai = request.POST['reg_lname_thai']
     mobile_contact = request.POST['mobile_contact']
-    print(mobile_contact)
+  
 
     content_learn = learn.objects.get(reg_id=reg_id)
-    # content_learn.mobile_contact = mobile_contact
-    # content_learn.save()
+
+    try:
+        transcript = request.FILES['transcript']
+        proofofreplacement = request.FILES['proofofreplacement']
+        medicalcertificate = request.FILES['medicalcertificate']
+    except KeyError:
+        transcript = None
+        proofofreplacement = None
+        medicalcertificate = None
+        
+    print('xxxxxxxxx',transcript)    
+    content_learn.mobile_contact = mobile_contact
+    content_learn.transcript = transcript
+    content_learn.proofofreplacement = proofofreplacement
+    content_learn.medicalcertificate = medicalcertificate
+    content_learn.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
     return redirect("/register/detail/" + str(content_learn.register_id))

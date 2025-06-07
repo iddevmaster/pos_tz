@@ -325,6 +325,12 @@ class learn(models.Model):
     status = models.CharField(blank=True, null=True, max_length=1)
     image_cover = models.ImageField(
         upload_to=generate_unique_name('images/logo'), default=None)
+    transcript = models.ImageField(
+        upload_to=generate_unique_name('images/logo'), default=None)
+    proofofreplacement = models.ImageField(
+        upload_to=generate_unique_name('images/logo'), default=None)
+    medicalcertificate = models.ImageField(
+        upload_to=generate_unique_name('images/logo'), default=None)
 
 class billing_cycle_setting(models.Model):
     bcs_start_day = models.IntegerField(default=0, blank=False)
