@@ -524,6 +524,39 @@ def register_detail_update(request, reg_id):
     reg_prefix_thai = request.POST['reg_prefix_thai']
     reg_name_thai = request.POST['reg_name_thai']
     reg_lname_thai = request.POST['reg_lname_thai']
+
+    reg_prefix_eng = request.POST['reg_prefix_eng']
+    reg_name_eng = request.POST['reg_name_eng']
+    reg_lname_eng = request.POST['reg_lname_eng']
+
+    tax_id = request.POST['tax_id']
+    birthday = request.POST['birthday']
+    age = request.POST['age']
+    religion = request.POST['religion']
+
+    passport_number = request.POST['passport_number']
+    expire_passport = request.POST['expire_passport']
+
+    address_card = request.POST['address_card']
+    road_card = request.POST['road_card']
+    village_card = request.POST['village_card']
+    subdistrict_card = request.POST['subdistrict_card']
+    district_card = request.POST['district_card']
+    province_card = request.POST['province_card']
+    zipcode_card = request.POST['zipcode_card']
+  
+
+    address_present = request.POST['address_present']
+    road_present = request.POST['road_present']
+    village_present = request.POST['village_present']
+    subdistrict_present = request.POST['subdistrict_present']
+    district_present = request.POST['district_present']
+    province_present= request.POST['province_present']
+    zipcode_present = request.POST['zipcode_present']
+
+
+
+
     mobile_contact = request.POST['mobile_contact']
   
 
@@ -537,12 +570,37 @@ def register_detail_update(request, reg_id):
         transcript = None
         proofofreplacement = None
         medicalcertificate = None
-        
-    print('xxxxxxxxx',transcript)    
+    content_learn.reg_prefix_thai = reg_prefix_thai
+    content_learn.reg_name_thai = reg_name_thai
+    content_learn.reg_lname_thai = reg_lname_thai
+    content_learn.reg_prefix_eng = reg_prefix_eng
+    content_learn.reg_name_eng = reg_name_eng
+    content_learn.reg_lname_eng = reg_lname_eng
+
+    content_learn.address_card = address_card
+    content_learn.road_card = road_card
+    content_learn.village_card = village_card
+    content_learn.subdistrict_card = subdistrict_card
+    content_learn.district_card = district_card
+    content_learn.province_card = province_card
+    content_learn.zipcode_card = zipcode_card
+
+    content_learn.address_present = address_present
+    content_learn.road_present = road_present
+    content_learn.village_present = village_present
+    content_learn.subdistrict_present = subdistrict_present
+    content_learn.district_present = district_present
+    content_learn.province_present = province_present
+    content_learn.zipcode_present = zipcode_present
+    
+
+    content_learn.tax_id = tax_id
+    content_learn.age = age
     content_learn.mobile_contact = mobile_contact
-    content_learn.transcript = transcript
-    content_learn.proofofreplacement = proofofreplacement
-    content_learn.medicalcertificate = medicalcertificate
+
+    # content_learn.transcript = transcript
+    # content_learn.proofofreplacement = proofofreplacement
+    # content_learn.medicalcertificate = medicalcertificate
     content_learn.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
