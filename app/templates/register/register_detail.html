@@ -53,6 +53,7 @@
         "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
       return false;
     }
+    console.log(jdata)
     document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
     document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
     document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
@@ -299,15 +300,30 @@ function formatDate(dateString) {
         <h5 class="card-title">1.ข้อมูลผู้สมัคร</h5>
         
         <div class="col-lg-12 col-md-12">
-              
-                            <div style="padding-bottom: 15px">
+       
+        <div style="padding-bottom: 15px">
+         {% if content_learn.image_cover == '' %}
           <img src="{% static "images/no-photo-available.png" %}"
           alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="image-preview"  width="115" height="125" class="rounded" />
+
+        {% else %}
+         <img src=""
+          alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="image-preview"  width="115" height="125" class="rounded" />
+
+
+        {% endif %}
         </div>
   <input type="file" name="image_cover" accept="image/*"  id="image_cover">
 
+
+   
                  
         </div>
+    
+
+
+
+    
 
 
    

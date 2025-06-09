@@ -578,7 +578,7 @@ def register_detail_update(request, reg_id):
 
 
     congenital = request.POST.get('congenital', '')
-    print(congenital)
+   
     congenital_text = request.POST['congenital_text']
 
     content_learn = learn.objects.get(reg_id=reg_id)
