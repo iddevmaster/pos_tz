@@ -618,17 +618,16 @@ function formatDate(dateString) {
         </div>
       </div>
 
-
       <div class="row">
         <h4 class="card-title">8.การเจ็บป่วย</h4>
         <div class="col-lg-4 col-md-4">
           <div class="form-group">
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="no" >
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="no"  {% if content_learn.Illness == 'no' %}checked{% endif %}>
               <label class="form-check-label" for="inlineRadio1">ไม่เคย</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="yes">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="yes"   {% if content_learn.Illness == 'yes' %}checked{% endif %}>
               <label class="form-check-label" for="inlineRadio2">เคย</label>
             </div>
           </div>
@@ -640,7 +639,7 @@ function formatDate(dateString) {
               <label for="inputPassword6" class="col-form-label"> ด้วยโรค</label>
             </div>
             <div class="col-lg-6">
-              <input type="text" id="inputPassword6" class="form-control">
+              <input type="text" id="disease" class="form-control" name="disease" value="{{content_learn.disease}}" >
             </div>
           </div>
         </div>
@@ -654,11 +653,11 @@ function formatDate(dateString) {
         <div class="col-lg-4 col-md-4">
           <div class="form-group">
                 <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="inlineRadio3" value="option3" >
+              <input class="form-check-input" type="radio" name="congenital" id="congenital1" value="no"  {% if content_learn.congenital == 'no' %}checked{% endif %} >
               <label class="form-check-label" for="inlineRadio1">ไม่มี</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="inlineRadio4" value="option4">
+              <input class="form-check-input" type="radio" name="congenital" id="congenital2" value="yes"  {% if content_learn.congenital == 'yes' %}checked{% endif %}>
               <label class="form-check-label" for="inlineRadio2">มี</label>
             </div>
           </div>
@@ -671,7 +670,7 @@ function formatDate(dateString) {
               <label for="inputPassword6" class="col-form-label"> กรณีมีโรค โรคและอาการ</label>
             </div>
             <div class="col-lg-6">
-              <input type="text" id="inputPassword6" class="form-control">
+              <input type="text" class="form-control"  name="congenital_text" id="congenital_text" value="{{content_learn.congenital_text}}">
             </div>
           </div>
         </div>

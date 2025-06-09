@@ -529,7 +529,7 @@ def register_detail_update(request, reg_id):
    
     selected_option = request.POST.get('inlineRadioOptions', '')
    
-    print(selected_option)
+    
     reg_prefix_thai = request.POST['reg_prefix_thai']
     reg_name_thai = request.POST['reg_name_thai']
     reg_lname_thai = request.POST['reg_lname_thai']
@@ -574,8 +574,12 @@ def register_detail_update(request, reg_id):
     talent = request.POST['talent']
     news_from = request.POST['news_from']
     educa_etc = request.POST['educa_etc']
+    disease = request.POST['disease']
 
 
+    congenital = request.POST.get('congenital', '')
+    print(congenital)
+    congenital_text = request.POST['congenital_text']
 
     content_learn = learn.objects.get(reg_id=reg_id)
 
@@ -632,8 +636,11 @@ def register_detail_update(request, reg_id):
     content_learn.passport_number = passport_number
     content_learn.expire_passport = expire_passport
     content_learn.educa_etc = educa_etc
-
+    content_learn.disease = disease
     content_learn.Illness = selected_option
+
+    content_learn.congenital = congenital
+    content_learn.congenital_text = congenital_text
 
     # content_learn.transcript = transcript
     # content_learn.proofofreplacement = proofofreplacement

@@ -333,8 +333,11 @@ class learn(models.Model):
     talent = models.CharField(blank=True, null=True, max_length=255)
     news_from = models.CharField(blank=True, null=True, max_length=255)
     Illness = models.CharField(blank=True, null=True, max_length=255)
+    disease = models.TextField(blank=True, null=True)
     education = models.TextField(blank=True, null=True)
     educa_etc = models.TextField(blank=True, null=True)
+    congenital = models.CharField(blank=True, null=True, max_length=255)
+    congenital_text = models.TextField(blank=True, null=True)
     image_cover = models.ImageField(
         upload_to=generate_unique_name('images/logo'), default=None)
     transcript = models.ImageField(
