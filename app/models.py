@@ -330,6 +330,11 @@ class learn(models.Model):
     relationship_person = models.CharField(blank=True, null=True, max_length=255)
     tel_person = models.CharField(blank=True, null=True, max_length=255)
     status = models.CharField(blank=True, null=True, max_length=1)
+    talent = models.CharField(blank=True, null=True, max_length=255)
+    news_from = models.CharField(blank=True, null=True, max_length=255)
+    Illness = models.CharField(blank=True, null=True, max_length=255)
+    education = models.TextField(blank=True, null=True)
+    educa_etc = models.TextField(blank=True, null=True)
     image_cover = models.ImageField(
         upload_to=generate_unique_name('images/logo'), default=None)
     transcript = models.ImageField(

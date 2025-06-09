@@ -564,24 +564,25 @@ function formatDate(dateString) {
 
       <div class="row">
         <h4 class="card-title">5.การศึกษา</h4>
+        
         <div class="col-lg-5 col-md-4">
           <div class="form-group">
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="education" value="highschool" {% if 'highschool' in my_list %}checked{% endif %} >
               <label class="form-check-label" for="inlineCheckbox1">มัธยมปลาย/ปวช.</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox2" name="education" value="diploma" {% if 'diploma' in my_list %}checked{% endif %}>
               <label class="form-check-label" for="inlineCheckbox2">ปวส./อนุปริญญา </label>
             </div>
 
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox3" name="education" value="degree" {% if 'degree' in my_list %}checked{% endif %}>
               <label class="form-check-label" for="inlineCheckbox2">ปริญญาตรี </label>
             </div>
 
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+              <input class="form-check-input" type="checkbox" id="inlineCheckbox4" name="education" value="etc" {% if 'etc' in my_list %}checked{% endif %}>
               <label class="form-check-label" for="inlineCheckbox2">อื่นๆ </label>
             </div>
           </div>
@@ -591,7 +592,7 @@ function formatDate(dateString) {
           <div class="row g-3 align-items-center">
 
             <div class="col-lg-6">
-              <input type="text" id="inputPassword6" class="form-control">
+              <input type="text" id="educa_etc"  name="educa_etc"  class="form-control"  value="{{content_learn.educa_etc}}">
             </div>
           </div>
         </div>
@@ -602,7 +603,7 @@ function formatDate(dateString) {
         <h4 class="card-title">6.ความสามารถพิเศษ</h4>
         <div class="col-lg-12 col-md-12">
           <div class="form-group">
-            <input type="text" class="form-control" id="talent" name="talent">
+            <input type="text" class="form-control" id="talent" name="talent" value="{{content_learn.talent}}">
           </div>
         </div>
       </div>
@@ -612,11 +613,9 @@ function formatDate(dateString) {
         <h4 class="card-title">7.ข่าวการสมัครเรียน</h4>
         <div class="col-lg-12 col-md-12">
           <div class="form-group">
-            <input type="text" class="form-control" id="news_from" name="news_from">
+            <input type="text" class="form-control" id="news_from" name="news_from" value="{{content_learn.news_from}}">
           </div>
         </div>
-
-
       </div>
 
 
@@ -625,16 +624,15 @@ function formatDate(dateString) {
         <div class="col-lg-4 col-md-4">
           <div class="form-group">
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" >
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="no" >
               <label class="form-check-label" for="inlineRadio1">ไม่เคย</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="yes">
               <label class="form-check-label" for="inlineRadio2">เคย</label>
             </div>
           </div>
         </div>
-
 
         <div class="col-lg-8 col-md-4">
           <div class="row g-3 align-items-center">
@@ -677,8 +675,6 @@ function formatDate(dateString) {
             </div>
           </div>
         </div>
-
-
 
       </div>
 
