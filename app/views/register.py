@@ -522,6 +522,12 @@ def register_detail(request, register_id):
 
 
 @login_required(login_url='/login')
+def register_detail_print_formregister(request, reg_id):
+    print(reg_id)
+
+    return render(request, 'print/register_print_formregister.html')
+
+@login_required(login_url='/login')
 def register_detail_update(request, reg_id):
     
     
@@ -542,6 +548,8 @@ def register_detail_update(request, reg_id):
     birthday = request.POST['birthday']
     age = request.POST['age']
     religion = request.POST['religion']
+
+    image_cover_data = request.POST['image_cover_data']
 
     passport_number = request.POST['passport_number']
     expire_passport = request.POST['expire_passport']
@@ -592,7 +600,7 @@ def register_detail_update(request, reg_id):
         proofofreplacement = None
         medicalcertificate = None
 
-    
+    content_learn.image_cover = image_cover_data
     content_learn.education = education
     content_learn.reg_prefix_thai = reg_prefix_thai
     content_learn.reg_name_thai = reg_name_thai
