@@ -15,7 +15,10 @@
       if (file) {
         var reader = new FileReader();
         reader.onload = function (e) {
+          const base64String = e.target.result; // The Base64 string
           var preview = document.getElementById("image-preview");
+          document.getElementById("image_cover_data").value = base64String
+          
           preview.src = e.target.result;
         };
         reader.readAsDataURL(file);
@@ -279,7 +282,14 @@ function formatDate(dateString) {
                  <div class="col-lg-12 col-md-12">
           <div align="right">
             <div class="btn-group mb-3">
-
+   <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="window.open('/register/print/formregister/{{content_learn.reg_id}}','','width=950,height=650'); return false;"
+                  >
+                    <i class="icon dripicons-print"></i>
+                    พิมพ์
+                  </button>
               <a class="btn btn-warning" href="{{api_id_card}}" target="_blank">
                 เปิดสิทธิ์
               </a>
@@ -307,7 +317,7 @@ function formatDate(dateString) {
           alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="image-preview"  width="115" height="125" class="rounded" />
 
         {% else %}
-         <img src=""
+         <img src="{{content_learn.image_cover}}"
           alt="อัพโหลดได้เฉพาะไฟล์รูปภาพ !" id="image-preview"  width="115" height="125" class="rounded" />
 
 
@@ -316,7 +326,7 @@ function formatDate(dateString) {
   <input type="file" name="image_cover" accept="image/*"  id="image_cover">
 
 
-   
+     <input type="hidden" name="image_cover_data"   id="image_cover_data" value="{{content_learn.image_cover}}">
                  
         </div>
     

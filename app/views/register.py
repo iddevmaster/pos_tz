@@ -523,9 +523,17 @@ def register_detail(request, register_id):
 
 @login_required(login_url='/login')
 def register_detail_print_formregister(request, reg_id):
-    print(reg_id)
 
-    return render(request, 'print/register_print_formregister.html')
+    data = learn.objects.get(reg_id=reg_id)
+    checkboxrtt = data.education
+    my_list = ast.literal_eval(checkboxrtt)
+
+    regis = register_main.objects.get(register_id=data.register_id)
+    getcourse = course.objects.get(course_id=regis.course_id)
+    content_course = course_event.objects.get(ev_id=regis.ev_id)
+    context = {'data': data,'my_list':my_list,'getcourse':getcourse,'content_course':content_course,'content_regist':regis}
+
+    return render(request, 'print/register_print_formregister.html',context)
 
 @login_required(login_url='/login')
 def register_detail_update(request, reg_id):
