@@ -1244,15 +1244,16 @@ def student_list(request, register_id):
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
     try:
+        
         main = register_main.objects.select_related(
             "ev").get(register_id=register_id)
+        print('xxxxxxxx',main)
     except register_main.DoesNotExist:
         main = None
         return redirect("/")
     # ถ้ายังไม่ปิดการขาย
     if main.close_the_sale < 1:
         return redirect("/")
-
     try:
         ref_data = register_ref.objects.filter(
             register_id=register_id).order_by('-crt_date').first()
@@ -1914,6 +1915,7 @@ def student_form_certificate(request, student_id):
 def register_management(request):
     title = defaultTitle
     user_id = request.user.id
+  
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
