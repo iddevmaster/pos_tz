@@ -15,10 +15,10 @@ from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..forms.form_month import MyFormWithThai
 from django.db.models.functions import TruncMonth
 from django.db.models import Count, Sum, F
-
+import ast
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,learn
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new
 
 
@@ -2836,7 +2836,7 @@ def public_form_print(request):
 @login_required(login_url='/login')
 def register_report_after(request):
     date_range = request.POST.get('date_range', None)
-    print(date_range)
+    
     user_id = request.user.id
     try:
         m = user_group.objects.get(user=user_id)
@@ -2869,12 +2869,27 @@ def register_report_after(request):
     daterange = str(default_start) + " - " + str(default_end)
     course_list = course.objects.filter(
         cancelled=1, active=1).order_by("-course_id")
-    try:
-        province_list = location_thai.objects.all().values(
-            'province_code', 'province_name').annotate(total=Count('province_code'))
-    except location_thai.DoesNotExist:
-        province_list = None
-    context = {'title': defaultTitle,  'province_list': province_list, 'listMenuPermission': objMenu,
+
+
+    getregister = learn.objects.select_related('register').filter(register__status='Y')
+    my_list = '-'
+    obj = []
+    total_elements = 0
+    for r in getregister:
+        if r.education != '':
+            my_list = ast.literal_eval(r.education)[-1]
+        
+            print('ว่าง')
+      
+        coursed = course.objects.get(course_id=r.register.course_id)
+      
+        res = {'register_number': r.register.register_number, 'reg_prefix_thai': r.reg_prefix_thai,'reg_name_thai': r.reg_name_thai,'reg_lname_thai': r.reg_lname_thai,
+               'course': coursed,'ev_generation': r.register.ev.ev_generation, 'tax_id': r.tax_id,'crt_date':r.register.crt_date,'education':my_list}
+        obj.append(res)
+    
+        # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    # print(getregister)
+    context = {'title': defaultTitle,  'listMenuPermission': objMenu,'data':obj,
                'list_user': list_user, 'course_list': course_list, 'daterange': daterange}
     return render(request, 'report/register_report_after.html', context)  
 

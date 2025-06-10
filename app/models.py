@@ -346,6 +346,7 @@ class learn(models.Model):
         upload_to=generate_unique_name('images/logo'), default=None)
     medicalcertificate = models.ImageField(
         upload_to=generate_unique_name('images/logo'), default=None)
+    
 
 class billing_cycle_setting(models.Model):
     bcs_start_day = models.IntegerField(default=0, blank=False)

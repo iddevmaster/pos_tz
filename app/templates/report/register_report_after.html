@@ -42,53 +42,11 @@
               value="{{daterange}}"
             />
           </div>
-          <div class="col-lg-3 col-md-6">
-            <select class="form-select select2" id="qprovince" name="qprovince">
-              <option value="0">-ทุกจังหวัด-</option>
-              {% for res in province_list %}
-              <option value="{{res.province_code}}">
-                {{res.province_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-3 mb-4">
-            <div class="form-group">
-              <select
-                class="form-select"
-                name="qcustomer_type"
-                id="qcustomer_type"
-              >
-                <option value="0">-ประเภทลูกค้าทั้งหมด-</option>
-                <option value="1">บุคคล</option>
-                <option value="2">บริษัท</option>
-              </select>
-            </div>
-          </div>
+     
+      
 
-          <div class="col-md-3 mb-4">
-            <div class="form-group">
-              <select class="form-select" name="qpay_type" id="qpay_type">
-                <option value="0">-ประเภทการชำระเงินทั้งหมด-</option>
-                <option value="1">เงินสด</option>
-                <option value="2">เครดิต</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="col-md-3 mb-4">
-            <select
-              class="form-control"
-              name="qclose_the_sale"
-              id="qclose_the_sale"
-            >
-              <option value="-1">-สถานะปิดการขายทั้งหมด-</option>
-              <option value="0">กำลังขาย</option>
-              <option value="1">ปิดการขาย - ขายสำเร็จ</option>
-              <option value="2">ปิดการขาย - ไม่ขายสำเร็จ</option>
-            </select>
-          </div>
-
+    
           <div class="col-lg-3 col-md-6">
             <select class="form-select select2" id="qcourse" name="qcourse">
               <option value="0">-หลักสูตรทั้งหมด-</option>
@@ -111,29 +69,9 @@
             />
           </div>
 
-          <div class="col-lg-3 col-md-6">
-            <select class="form-select select2" id="qseller" name="qseller">
-              <option value="0">-ผู้ขายทั้งหมด-</option>
-              {% for res2 in list_user %}
-              <option value="{{res2.id}}">
-                {{res2.first_name}} {{res2.last_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
+ 
 
-          <div class="col-md-3 mb-4">
-            <select
-              class="form-control"
-              name="event"
-              id="event"
-            >
-              <option value="0">ทั้งหมด</option>
-              <option value="1">มี Event</option>
-              <option value="2">ไม่มี Event</option>
-  
-            </select>
-          </div>
+     
 
           <div class="col-lg-3 col-md-6">
             <input
@@ -183,25 +121,25 @@
           </tr>
         </thead>
         <tbody>
-       
+       {% for res in data %}
           <tr>
             
             <td align="center">{{ forloop.counter }}</td>
-            <td align="center">x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td align="center">
-      x
+            <td align="center">{{res.register_number}}</td>
+            <td>{{res.crt_date}}</td>
+            <td>{{res.reg_prefix_thai}} {{res.reg_name_thai}} {{res.reg_lname_thai}}</td>
+            <td>{{res.tax_id}}</td>
+            <td>
+      {{res.course.course_name}}
             </td>
             <td align="center">
-             x
+              {{res.ev_generation}}
             </td>
             <td>
-           x
+          {{res.education}}
             </td>
           </tr>
-      
+        {% endfor %}
         </tbody>
       </table>
     </div>
