@@ -36,30 +36,7 @@ def teacher_list(request):
     context = {'title': title,  'data': result,'listMenuPermission': objMenu}
     return render(request, 'teacher/teachers.html', context)
 
-    user_id = request.user.id
-    # Menu
-    try:
-        u = user_detail.objects.get(user_id=user_id)
-        cm_id = u.cm
-    except user_detail.DoesNotExist:
-        cm_id = 0
-    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
-    objMenu = []
-    for rs in list(listMenuPermission):
-        children = category_program_permission.objects.filter(
-            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
-        r = {'group_label': rs['group_label'],
-             'group_value': rs['group_value'], 'children': children}
-        objMenu.append(r)
-    try:
-        m = user_group.objects.get(user=user_id)
-    except user_group.DoesNotExist:
-        m = None
-        return render(request, '404.html') 
-    title = defaultTitle
-    result = teacher.objects.filter(cancelled=1,module=m.module).order_by("-crt_date")
-    context = {'title': title,  'data': result,'listMenuPermission': objMenu}
-    return render(request, 'teacher/teachersoutsource.html', context)
+
 
 @login_required(login_url='/login')
 def teacher_form_create(request):

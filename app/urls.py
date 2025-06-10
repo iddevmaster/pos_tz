@@ -32,6 +32,7 @@ urlpatterns = [
     path('register/detail/<str:register_id>', register.register_detail),
     path('register/detail/update/<str:reg_id>', register.register_detail_update),
     path('register/print/formregister/<str:reg_id>', register.register_detail_print_formregister),
+    
 
    
     path('register/cancle', register.register_cancle, name="CancleRegister"),
@@ -192,6 +193,9 @@ urlpatterns = [
     path('teacher/print/witdraw/<str:teacher_id>/<str:start>/<str:end>', report_and_print.register_print_witdraw),
     path('report/teacher/export/onemore', report_and_print.register_report_compensation_withdraw_onemore),
     path('report/teacher/export/withdraw/onemore', report_and_print.register_report_compensation_withdraw_onemorefitter),
+
+    path('report/form/registerafter', report_and_print.register_report_after),
+    path('report/form/registerafter/all', report_and_print.register_report_after_all),
     
 
     path('report/withdraw/all/summary', report_and_print.register_report_summary),
