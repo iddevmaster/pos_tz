@@ -56,7 +56,7 @@
         "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
       return false;
     }
- 
+    console.log(jdata?.Photo)
     let pic = base64ToDataURL(jdata?.Photo)
     var preview = document.getElementById("image-preview");
     document.getElementById("image_cover_data").value = pic
