@@ -2905,6 +2905,77 @@ def register_report_after(request):
 
 
 @login_required(login_url='/login')
+def register_report_complate(request):
+    
+    
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+     # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
+    lastday = lastDateOfmonth(
+        date.today().year, date.today().month, date.today().day)
+    default_start = "01" + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    default_end = str(lastday) + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    daterange = str(default_start) + " - " + str(default_end)
+    course_list = course.objects.filter(
+        cancelled=1, active=1).order_by("-course_id")
+    
+    date_range = request.POST.get('date_range', None)
+    course_id = request.POST.get('course_id', None)
+    ev_generation = request.POST.get('ev_generation', None)
+   
+   
+
+
+    getregister = learn.objects.select_related('register').filter(register__status='Y')
+    if ev_generation is not None and ev_generation != "":
+        getregister = getregister.filter(register__ev__ev_generation =ev_generation)
+    if course_id is not None and course_id != "":
+        getregister = getregister.filter(register__course_id = int(course_id))    
+        
+    my_list = '-'
+    obj = []
+    total_elements = 0
+    for r in getregister:
+        if r.education != '':
+            my_list = ast.literal_eval(r.education)[-1]
+        
+      
+        coursed = course.objects.get(course_id=r.register.course_id)
+      
+        res = {'register_number': r.register.register_number, 'reg_prefix_thai': r.reg_prefix_thai,'reg_name_thai': r.reg_name_thai,'reg_lname_thai': r.reg_lname_thai,
+               'course': coursed,'ev_generation': r.register.ev.ev_generation, 'tax_id': r.tax_id,'crt_date':r.register.crt_date,'education':my_list}
+        obj.append(res)
+    
+        # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    # print(getregister)
+    context = {'title': defaultTitle,  'listMenuPermission': objMenu,'data':obj,
+               'list_user': list_user, 'course_list': course_list, 'daterange': daterange}
+    return render(request, 'report/register_report_after_complate.html', context)  
+
+
+@login_required(login_url='/login')
 def register_report_after_all(request):
     user_id = request.user.id
     try:

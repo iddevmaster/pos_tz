@@ -196,6 +196,8 @@ urlpatterns = [
 
     path('report/form/registerafter', report_and_print.register_report_after),
     path('report/form/registerafter/all', report_and_print.register_report_after_all),
+
+    path('report/form/complate', report_and_print.register_report_complate),
     
 
     path('report/withdraw/all/summary', report_and_print.register_report_summary),

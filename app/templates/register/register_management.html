@@ -112,7 +112,7 @@
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.customer_list.register.register_number}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
+            <td>{{res.course_list.course_name}}</td>
             <td>{{res.customer_list.customer_name}}</td>
             <td align="center">
               {% if res.customer_list.register.customer_type == 1 %}
@@ -178,7 +178,7 @@
                     <a
                       class="dropdown-item"
                       href="/register/detail/{{res.customer_list.register_id}}"
-                      >รายละเอียดการสมัคร</a
+                      >รายละเอียดการสมัคร {{res.customer_list.register_id}}</a
                     >
                     {% if res.customer_list.register.close_the_sale == 1 %}
                     <a

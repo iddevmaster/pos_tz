@@ -1,0 +1,151 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายงานนักเรียนสำเร็จการศึกษา – สถานที่ทำงาน</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          รายงานนักเรียนสำเร็จการศึกษา – สถานที่ทำงาน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="post"
+        action="/report/form/registerafter"
+
+      >
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              class="form-control daterange"
+              id="date_range"
+              name="date_range"
+              required
+              value="{{daterange}}"
+            />
+          </div>
+     
+      
+
+
+    
+          <div class="col-lg-3 col-md-6">
+            <select class="form-select select2" id="course_id" name="course_id">
+              <option value="0">-หลักสูตรทั้งหมด-</option>
+              {% for res1 in course_list %}
+              <option value="{{res1.course_id}}">
+                {{res1.course_code}} {{res1.course_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              id="ev_generation"
+              name="ev_generation"
+              class="form-control"
+              pattern="[0-9]+"
+              placeholder="รุ่น"
+            />
+          </div>
+
+ 
+
+     
+<!-- 
+          <div class="col-lg-3 col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              id="qcustomer_name"
+              name="qcustomer_name"
+              placeholder="ค้นหาชื่อลูกค้า"
+            />
+          </div> -->
+        </div>
+        <div class="form-goup" align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-warning"
+            onclick="window.location.href='/register/export/seller'"
+          >
+            <i class="icon dripicons-clockwise"></i>
+            รีเซ็ต
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="card">
+
+    <div class="card-body">
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>วันที่สมัคร</th>
+            <th>ชื่อ นามสกุล</th>
+            <th>เลขประจำตัวประชาชน</th>
+            <th>หลักสูตร</th>
+            <th>รุ่น</th>
+            <th>การศึกษาสูงสุด</th>
+          </tr>
+        </thead>
+        <tbody>
+       {% for res in data %}
+          <tr>
+            
+            <td align="center">{{ forloop.counter }}</td>
+            <td align="center">{{res.register_number}}</td>
+            <td>{{res.crt_date}}</td>
+            <td>{{res.reg_prefix_thai}} {{res.reg_name_thai}} {{res.reg_lname_thai}}</td>
+            <td>{{res.tax_id}}</td>
+            <td>
+      {{res.course.course_name}}
+            </td>
+            <td align="center">
+              {{res.ev_generation}}
+            </td>
+            <td>
+          {{res.education}}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</section>
+
+{% endblock %}

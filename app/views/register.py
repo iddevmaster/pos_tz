@@ -496,26 +496,35 @@ def register_detail(request, register_id):
         r = {'group_label': rs['group_label'],
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
+    my_list = 'ไม่มี'    
     try:
         content_regist = register_main.objects.get(register_id=register_id)
-       
+        
         uuid_without_dashes = str(register_id).replace('-', '')
         
         content_learn = learn.objects.get(register_id=uuid_without_dashes)
-        checkboxrtt = content_learn.education
         
-        my_list = ast.literal_eval(checkboxrtt)
+        if  content_learn.education is not None:
+            checkboxrtt = content_learn.education
+            my_list = ast.literal_eval(checkboxrtt)
        
         
     except:
         content_regist = None
         content_learn = None
+      
+      
         return redirect("/")
     content_customer = customers.objects.select_related("location").filter(
         register_id=register_id).first()
     
-    content_course = course_event.objects.select_related(
-        "course").get(ev_id=content_regist.ev_id)
+    evs = 0
+    print('content_regist if',content_regist.ev_id)
+    if content_regist.ev_id is not None:
+        content_course = course_event.objects.select_related("course").get(ev_id=content_regist.ev.ev_id)
+    else :    
+        content_course = course.objects.get(course_id=content_regist.course.course_id)
+    
     context = {'title': title,  'content_regist': content_regist, 'listMenuPermission': objMenu,'content_learn':content_learn,'api_id_card': api_id_card,'my_list':my_list, 
                'content_customer': content_customer, 'content_course': content_course}
     return render(request, 'register/register_detail.html', context)
@@ -529,8 +538,15 @@ def register_detail_print_formregister(request, reg_id):
     my_list = ast.literal_eval(checkboxrtt)
 
     regis = register_main.objects.get(register_id=data.register_id)
+    print('content_regist if',regis.ev_id)
+    if regis.ev_id is not None:
+        content_course = course_event.objects.get(ev_id=regis.ev_id)
+    else :    
+        content_course = course.objects.get(course_id=regis.course_id)
+
     getcourse = course.objects.get(course_id=regis.course_id)
-    content_course = course_event.objects.get(ev_id=regis.ev_id)
+
+    
     context = {'data': data,'my_list':my_list,'getcourse':getcourse,'content_course':content_course,'content_regist':regis}
 
     return render(request, 'print/register_print_formregister.html',context)
@@ -955,9 +971,7 @@ def payment_create(request):
         rp_id=rp_id,
         register_id=register_id,
         stmdate=stmda,
-        stmetc=etc,
-
-        
+        stmetc=etc, 
     )
 
     # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
@@ -1006,6 +1020,12 @@ def payment_create(request):
         register_id=uuid_without_dashes,
         des_id=bill
     )    
+        
+
+    learn.objects.create(
+        register_id=register_id,
+        age=18,
+    )
 
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
@@ -1175,7 +1195,11 @@ def payment_createno(request):
 
     # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
 
-   
+    learn.objects.create(
+        register_id=register_id,
+        age=18,
+    )
+
 
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
@@ -2106,9 +2130,8 @@ def register_management(request):
         
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,
+        course_list = course.objects.get(course_id=r.course.course_id)
+        res = {'customer_list': customer_list,'register_id':r.register_id,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}

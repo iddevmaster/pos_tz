@@ -56,7 +56,11 @@
         "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
       return false;
     }
-    console.log(jdata)
+ 
+    let pic = base64ToDataURL(jdata?.Photo)
+    var preview = document.getElementById("image-preview");
+    document.getElementById("image_cover_data").value = pic
+    preview.src = pic;
     document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
     document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
     document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
@@ -80,6 +84,10 @@
 
 
   }
+
+  function base64ToDataURL(base64String, mimeType = 'image/jpeg') {
+  return `data:${mimeType};base64,${base64String}`;
+}
 
 
   function formatDateFromDays(daysSinceEpoch) {
@@ -147,8 +155,8 @@ function formatDate(dateString) {
           <div class="form-group">
             <label>หลักสูตร</label>
             <h4>
-              {{content_course.course.course_code}}
-              {{content_course.course.course_name}}
+              {{content_course.course_name}}
+           
             </h4>
           </div>
         </div>

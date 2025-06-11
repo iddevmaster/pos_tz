@@ -331,9 +331,15 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
-         {
+    {
         "value": "report/form/registerafter",
         "label": "รานงานใบสมัครนักเรียน",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+    {
+        "value": "report/form/complate",
+        "label": "รายงานนักเรียนสำเร็จการศึกษา",
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
