@@ -66,9 +66,9 @@ REST_FRAMEWORK = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = ["https://idss.idvocationalskilltrainingschool.com"]
-CSRF_ALLOWED_ORIGINS = ["https://idss.idvocationalskilltrainingschool.com"]
-CORS_ORIGINS_WHITELIST = ["https://idss.idvocationalskilltrainingschool.com"]
+CSRF_TRUSTED_ORIGINS = ["http://idss.idvocationalskilltrainingschool.com"]
+CSRF_ALLOWED_ORIGINS = ["http://idss.idvocationalskilltrainingschool.com"]
+CORS_ORIGINS_WHITELIST = ["http://idss.idvocationalskilltrainingschool.com"]
 
 
 TEMPLATES = [
