@@ -51,8 +51,8 @@
 
     var data = jsondata.substr(13, jsondata.length - 14);
     let jdata = JSON.parse(data);
+   
     console.log(jdata)
-
     if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
      Swal.fire({
       title: 'เสียบบัตรใหม่',
@@ -62,11 +62,18 @@
     });
       return false;
     }
-    
+
+    if(document.getElementById("image_cover_data").value){
+
+    }else {
     let pic = base64ToDataURL(jdata?.Photo)
     var preview = document.getElementById("image-preview");
     document.getElementById("image_cover_data").value = pic
     preview.src = pic;
+    }
+    
+
+ 
     document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
     document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
     document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
