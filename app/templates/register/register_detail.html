@@ -49,14 +49,18 @@
 
     var data = jsondata.substr(13, jsondata.length - 14);
     let jdata = JSON.parse(data);
-  
+    console.log(jdata)
 
     if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
-      document.getElementById("error_load").innerHTML =
-        "ไม่สามารถเชื่อมต่อกับเครื่องอ่านบัตรได้!";
+     Swal.fire({
+      title: 'เสียบบัตรใหม่',
+      text: "กรุณาเสียบบัตรใหม่",
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
       return false;
     }
-    console.log(jdata?.Photo)
+    
     let pic = base64ToDataURL(jdata?.Photo)
     var preview = document.getElementById("image-preview");
     document.getElementById("image_cover_data").value = pic
