@@ -48,7 +48,7 @@
 
     
           <div class="col-lg-3 col-md-6">
-            <select class="form-select select2" id="qcourse" name="qcourse">
+            <select class="form-select select2" id="course_id" name="course_id">
               <option value="0">-หลักสูตรทั้งหมด-</option>
               {% for res1 in course_list %}
               <option value="{{res1.course_id}}">
@@ -61,8 +61,8 @@
           <div class="col-lg-3 col-md-6">
             <input
               type="text"
-              id="qgeneration"
-              name="qgeneration"
+              id="ev_generation"
+              name="ev_generation"
               class="form-control"
               pattern="[0-9]+"
               placeholder="รุ่น"
@@ -72,7 +72,7 @@
  
 
      
-
+<!-- 
           <div class="col-lg-3 col-md-6">
             <input
               type="text"
@@ -81,7 +81,7 @@
               name="qcustomer_name"
               placeholder="ค้นหาชื่อลูกค้า"
             />
-          </div>
+          </div> -->
         </div>
         <div class="form-goup" align="center" style="padding-top: 25px">
           <button type="submit" class="btn btn-success">

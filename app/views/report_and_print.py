@@ -2835,7 +2835,7 @@ def public_form_print(request):
 
 @login_required(login_url='/login')
 def register_report_after(request):
-    date_range = request.POST.get('date_range', None)
+    
     
     user_id = request.user.id
     try:
@@ -2869,9 +2869,20 @@ def register_report_after(request):
     daterange = str(default_start) + " - " + str(default_end)
     course_list = course.objects.filter(
         cancelled=1, active=1).order_by("-course_id")
+    
+    date_range = request.POST.get('date_range', None)
+    course_id = request.POST.get('course_id', None)
+    ev_generation = request.POST.get('ev_generation', None)
+   
+   
 
 
     getregister = learn.objects.select_related('register').filter(register__status='Y')
+    if ev_generation is not None and ev_generation != "":
+        getregister = getregister.filter(register__ev__ev_generation =ev_generation)
+    if course_id is not None and course_id != "":
+        getregister = getregister.filter(register__course_id = int(course_id))    
+        
     my_list = '-'
     obj = []
     total_elements = 0
@@ -2879,7 +2890,6 @@ def register_report_after(request):
         if r.education != '':
             my_list = ast.literal_eval(r.education)[-1]
         
-            print('ว่าง')
       
         coursed = course.objects.get(course_id=r.register.course_id)
       
