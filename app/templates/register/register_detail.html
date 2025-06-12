@@ -45,56 +45,6 @@
   }
 
   async function load_dataTest() {
-    let myObject = await fetch("{{api_id_card}}");
-    console.log(myObject)
-    let jsondata = await myObject.text();
-
-    var data = jsondata.substr(13, jsondata.length - 14);
-    let jdata = JSON.parse(data);
-   
-    console.log(jdata)
-    if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
-     Swal.fire({
-      title: 'เสียบบัตรใหม่',
-      text: "กรุณาเสียบบัตรใหม่",
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-      return false;
-    }
-
-    if(document.getElementById("image_cover_data").value){
-
-    }else {
-    let pic = base64ToDataURL(jdata?.Photo)
-    var preview = document.getElementById("image-preview");
-    document.getElementById("image_cover_data").value = pic
-    preview.src = pic;
-    }
-    
-
- 
-    document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
-    document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
-    document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
-    document.getElementById("reg_prefix_eng").value = jdata?.TitleNameEn;
-    document.getElementById("reg_name_eng").value = jdata?.FirstNameEn;
-    document.getElementById("reg_lname_eng").value = jdata?.LastNameEn;
-    document.getElementById("tax_id").value = jdata?.CitizenNo;
-
-
-    // const formattedDate = formatDateFromDays(jdata?.BirthDate);
-
-    const birthDateGregorian = convertBuddhistToGregorianDate(jdata?.BirthDate);
-  
-    document.getElementById("birthday").value = birthDateGregorian;
-
-    document.getElementById("address_card").value = jdata?.HomeNo;
-    document.getElementById("road_card").value = jdata?.Road;
-    document.getElementById("village_card").value = jdata?.Moo;
-    document.getElementById("subdistrict_card").value = jdata?.Tumbol;
-    document.getElementById("district_card").value = jdata?.Amphur;
-    document.getElementById("province_card").value = jdata?.Province;
 
 const apiUrl = "{{api_id_card}}"; // แทนที่ด้วย URL จริงของคุณ
 
