@@ -45,50 +45,52 @@
   }
 
   async function load_dataTest() {
+    let myObject = await fetch("{{api_id_card}}");
+   
+    let jsondata = await myObject.text();
 
-const apiUrl = "{{api_id_card}}"; // แทนที่ด้วย URL จริงของคุณ
-
-     try {
-    let response = await fetch(apiUrl);
-
-    // 1. ตรวจสอบ response.ok ก่อน (สถานะ HTTP 200-299)
-    if (response.ok) {
-      console.log("การเรียก API สำเร็จ!");
-      console.log("HTTP Status Code:", response.status);
-
-      // 2. ถ้าสำเร็จ, ดึงข้อมูลจาก response body
-      // ตรวจสอบ Content-Type ของ response ก่อน หากไม่แน่ใจว่าเป็น JSON หรือ Text
-      const contentType = response.headers.get("Content-Type");
-      if (contentType && contentType.includes("application/json")) {
-        const data = await response.json(); // แปลงเป็น JSON object
-        console.log("ข้อมูลที่ดึงได้ (JSON):", data);
-        return data; // ส่งข้อมูลที่ได้กลับไป
-      } else {
-        const textData = await response.text(); // แปลงเป็นข้อความธรรมดา
-        console.log("ข้อมูลที่ดึงได้ (Text):", textData);
-        return textData; // ส่งข้อมูลที่ได้กลับไป
-      }
-
-    } else {
-      // 3. ถ้า response.ok เป็น false (เช่น สถานะ 4xx, 5xx)
-      console.error("การเรียก API ไม่สำเร็จ! HTTP Status Code:", response.status);
-      console.error("Status Text:", response.statusText);
-
-      // พยายามอ่านข้อความ error จาก body (ถ้ามี)
-      try {
-        const errorText = await response.text();
-        console.error("Response Error Body:", errorText);
-      } catch (e) {
-        console.error("ไม่สามารถอ่านข้อผิดพลาดจาก Body ได้:", e);
-      }
-      throw new Error(`API call failed with status ${response.status}`);
+    var data = jsondata.substr(13, jsondata.length - 14);
+    let jdata = JSON.parse(data);
+   
+  
+    if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
+      return false;
     }
-  } catch (error) {
-    // 4. จับข้อผิดพลาดที่เกี่ยวข้องกับเครือข่าย หรือ Promise reject อื่นๆ
-    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
-    // คุณสามารถจัดการข้อผิดพลาดที่นี่ เช่น แสดงข้อความให้ผู้ใช้ทราบ
-    throw error; // โยนข้อผิดพลาดต่อไป
-  }
+
+    if(document.getElementById("image_cover_data").value){
+
+    }else {
+    let pic = base64ToDataURL(jdata?.Photo)
+    var preview = document.getElementById("image-preview");
+    document.getElementById("image_cover_data").value = pic
+    preview.src = pic;
+    }
+    
+
+ 
+    document.getElementById("reg_prefix_thai").value = jdata?.TitleNameTh;
+    document.getElementById("reg_name_thai").value = jdata?.FirstNameTh;
+    document.getElementById("reg_lname_thai").value = jdata?.LastNameTh;
+    document.getElementById("reg_prefix_eng").value = jdata?.TitleNameEn;
+    document.getElementById("reg_name_eng").value = jdata?.FirstNameEn;
+    document.getElementById("reg_lname_eng").value = jdata?.LastNameEn;
+    document.getElementById("tax_id").value = jdata?.CitizenNo;
+
+
+    // const formattedDate = formatDateFromDays(jdata?.BirthDate);
+
+    const birthDateGregorian = convertBuddhistToGregorianDate(jdata?.BirthDate);
+  
+    document.getElementById("birthday").value = birthDateGregorian;
+
+    document.getElementById("address_card").value = jdata?.HomeNo;
+    document.getElementById("road_card").value = jdata?.Road;
+    document.getElementById("village_card").value = jdata?.Moo;
+    document.getElementById("subdistrict_card").value = jdata?.Tumbol;
+    document.getElementById("district_card").value = jdata?.Amphur;
+    document.getElementById("province_card").value = jdata?.Province;
+
+
   }
 
   function base64ToDataURL(base64String, mimeType = 'image/jpeg') {
