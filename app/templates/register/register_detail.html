@@ -48,19 +48,27 @@
     async function load_dataTest() {
 
 
+       Swal.fire({
+                title: 'กำลังโหลดข้อมูล...',
+                text: 'รอสักครู่ ถ้ายังไม่ได้เสียบบัตรกรุณาเสียบได้เลย',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
     const apiUrl = "{{api_id_card2}}"; // แทนที่ด้วย URL จริงของคุณ
 
      try {
     let response = await fetch('http://localhost:21998/readCard');
-    console.log(response)
 
     // 1. ตรวจสอบ response.ok ก่อน (สถานะ HTTP 200-299)
     if (response.ok) {
-      console.log("การเรียก API สำเร็จ!");
-      console.log("HTTP Status Code:", response.status);
+
       const data = await response.json(); // แปลงเป็น JSON object
-      console.log("ข้อมูลที่ดึงได้ (JSON):", data.result);
+ 
       if(data.result == 'ok'){
 
     let pic = base64ToDataURL(data.photo)
@@ -68,7 +76,7 @@
     document.getElementById("image_cover_data").value = pic
     preview.src = pic;
 
-           document.getElementById("reg_prefix_thai").value = data.title_th;
+    document.getElementById("reg_prefix_thai").value = data.title_th;
     document.getElementById("reg_name_thai").value = data.fname_th;
     document.getElementById("reg_lname_thai").value = data.sname_th;
     document.getElementById("reg_prefix_eng").value = data.title_en;
@@ -90,11 +98,17 @@
     document.getElementById("district_card").value = data.address_amphor;
     document.getElementById("province_card").value = data.address_provinice;
 
-
-  console.log("หยุดload");
+    Swal.fire({
+    icon: 'success',
+    title: 'สำเร็จ!',
+    text: 'ดึงข้อมูลสำเร็จ.',
+    showConfirmButton: false,
+    timer: 1500
+  });
+ 
   return true
       }else {
-        console.log("loadต่อ");
+   
          await new Promise(resolve => setTimeout(resolve, 2000)); // หน่วงเวลา 2 วินาทีก่อนลองใหม่
       return load_dataTest(); // เรียกตัวเองซ้ำ
       }
