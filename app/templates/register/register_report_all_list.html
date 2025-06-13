@@ -60,6 +60,86 @@ async function calltohub(datas) {
   }
 
   async function load_dataTest() {
+
+      Swal.fire({
+                title: 'กำลังโหลดข้อมูล...',
+                text: 'รอสักครู่ ถ้ายังไม่ได้เสียบบัตรกรุณาเสียบได้เลย',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+
+                 try {
+    let response = await fetch('http://localhost:21998/readCard');
+
+    // 1. ตรวจสอบ response.ok ก่อน (สถานะ HTTP 200-299)
+    if (response.ok) {
+
+      const data = await response.json(); // แปลงเป็น JSON object
+ 
+      if(data.result == 'ok'){
+
+
+
+
+     let ev = document.getElementById("ev_id").value
+     let student_identification_number = data.nat_id;
+     let student_prefix_th = data.title_th;
+     let student_firstname_th = data.fname_th;
+     let student_lastname_th = data.sname_th;
+     let student_prefix_eng = data.title_en;
+     let student_firstname_eng = data.fname_en;
+     let student_lastname_eng = data.sname_en;
+    
+     const ex = await fetch('/api/card/register', {
+              method: 'POST',
+              body:JSON.stringify({'ev_id':ev,'student_identification_number':student_identification_number,'student_prefix_th':student_prefix_th,'student_firstname_th':student_firstname_th,'student_lastname_th':student_lastname_th,'student_prefix_eng':student_prefix_eng,'student_firstname_eng':student_firstname_eng,'student_lastname_eng':student_lastname_eng})
+            })
+            .then(response => response.json())
+            .then(data => {
+                  Swal.fire({
+    icon: 'success',
+    title: 'สำเร็จ!',
+    text: 'ดึงข้อมูลสำเร็จ.',
+    showConfirmButton: false,
+    timer: 1500
+  });
+
+              window.location.reload();
+            })
+      }else {
+         await new Promise(resolve => setTimeout(resolve, 2000)); // หน่วงเวลา 2 วินาทีก่อนลองใหม่
+      return load_dataTest(); // เรียกตัวเองซ้ำ
+      }
+
+
+    } else {
+      // 3. ถ้า response.ok เป็น false (เช่น สถานะ 4xx, 5xx)
+      console.error("การเรียก API ไม่สำเร็จ! HTTP Status Code:", response.status);
+      console.error("Status Text:", response.statusText);
+
+      // พยายามอ่านข้อความ error จาก body (ถ้ามี)
+      try {
+        const errorText = await response.text();
+        console.error("Response Error Body:", errorText);
+      } catch (e) {
+        console.error("ไม่สามารถอ่านข้อผิดพลาดจาก Body ได้:", e);
+      }
+      throw new Error(`API call failed with status ${response.status}`);
+    }
+  } catch (error) {
+    // 4. จับข้อผิดพลาดที่เกี่ยวข้องกับเครือข่าย หรือ Promise reject อื่นๆ
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+    // คุณสามารถจัดการข้อผิดพลาดที่นี่ เช่น แสดงข้อความให้ผู้ใช้ทราบ
+    throw error; // โยนข้อผิดพลาดต่อไป
+  }
+
+
+
     let myObject = await fetch("{{api_id_card}}");
     let jsondata = await myObject.text();
 
@@ -94,13 +174,6 @@ async function calltohub(datas) {
               window.location.reload();
   
             })
-
-    //   document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
-    // document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
-    // document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
-    // document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
-    // document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
-    // document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
     }
 
 
@@ -342,7 +415,7 @@ fileInput.value = ''; // Clear the selected file
               type="submit"
               class="btn btn-info"
               form="create_form_idcard"
-              onclick="start_read_test()"
+              onclick="load_dataTest()"
             >
               <i class="icon dripicons-card" aria-hidden="true"></i>
               เครื่องอ่านบัตร
