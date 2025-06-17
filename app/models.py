@@ -529,3 +529,42 @@ class training(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     ev = models.ForeignKey(
         course_event, on_delete=models.CASCADE)
+    
+
+
+class course_register_check_in_out(models.Model):
+    eregister_id = models.AutoField(primary_key=True)
+    ev_date_start = models.DateField(blank=True, null=True)
+    ev_date_end = models.DateField(blank=True, null=True)
+    student_identification_number = models.CharField(
+        max_length=24, blank=True, default=None)
+    student_prefix_th = models.CharField(
+        max_length=48, blank=True, default=None)
+    student_firstname_th = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_lastname_th = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_prefix_eng = models.CharField(
+        max_length=100, blank=True, default=None)
+    student_firstname_eng = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_lastname_eng = models.CharField(
+        max_length=128, blank=True, default=None)
+    student_learning_status = models.IntegerField(default=0, blank=False)
+    student_code = models.CharField(max_length=64, blank=True, default=None)
+    status_check = models.CharField(max_length=64, blank=True, default=None)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+    course = models.ForeignKey(
+        course, on_delete=models.CASCADE)    
+    
+
+
+class course_register_check(models.Model):
+    reg_id = models.AutoField(primary_key=True)
+    ev_date_start = models.DateField(blank=True, null=True)
+    ev_date_end = models.DateField(blank=True, null=True)
+    gen = models.CharField(
+        max_length=24, blank=True, default=None)
+    name = models.CharField(
+        max_length=255, blank=True, default=None)

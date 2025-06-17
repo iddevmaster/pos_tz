@@ -361,6 +361,12 @@ listMenu = [
         "group_value": "naSt14",
         "group_label": "ทะเบียนเข้าอบรม",
     },
+    {
+        "value": "register/course/form",
+        "label": "กำหนดช่วงเวลาเข้าเรียน",
+        "group_value": "naSt14",
+        "group_label": "ทะเบียนเข้าอบรม",
+    },
      {
         "value": "register/event/teacher",
         "label": "ลงทะเบียนผู้เข้าอบรม (หน้างาน)",

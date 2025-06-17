@@ -156,12 +156,16 @@ urlpatterns = [
     path('register/student/delete',
          register.register_delete, name="RegisterFormDelete"),
 
+
+
     path('register/all/student/form/create/<str:ev_id>', register.register_form_createall),
     path('register/all/student/form/store/<str:ev_id>', register.register_form_storeall ,name="StoreStudentAll"),
     path('register/all/student/form/show/<str:ev_id>/<str:training_id>', register.register_form_showall ,name="ShowStudentAll"),
     path('register/all/student/form/update/<str:ev_id>/<str:training_id>', register.register_form_updateall),
     path('register/all/student/delete',
-         register.register_deleteall, name="RegisterFormDeleteAll"),     
+         register.register_deleteall, name="RegisterFormDeleteAll"),
+
+    path('register/course/form', register.register_form_course),      
 
 
     path('projectlist/', project.project_list),
