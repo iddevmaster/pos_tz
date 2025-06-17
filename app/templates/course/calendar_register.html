@@ -1,0 +1,602 @@
+{% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+$(document).ready(function () {
+    // Initialize Select2
+    $('#teacher').select2({
+        dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+    });
+
+    // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
+    $('#select2Modal').on('shown.bs.modal', function () {
+        $('#teacher').select2({
+            dropdownParent: $('#select2Modal')
+        });
+    });
+});
+
+function setValueDeleteModal(id) {
+  
+
+    document.getElementById("id_delete").value = id;
+
+    const eventModal = new bootstrap.Modal(document.getElementById('DeleteClick'));
+    eventModal.show();
+  }
+
+  async function delel() {
+
+
+    let data = await fetch('/api/evenetdel', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'id':document.getElementById("id_delete").value})
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+
+
+
+// this.calen();
+// window.location.reload();
+//    return data.status
+
+// setTimeout(() => {
+//       window.location.reload();
+//  }, 100);
+
+})
+  
+
+  }
+
+  
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+      locale: "th",
+      buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+      editable: false,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+        url: "/calendar_event_apiall/",
+        failure: function () {
+          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+        },
+      },
+      eventClick: function (info) {
+        
+  
+    $('#cardContainer').empty(); // Clear previous cards
+        document.getElementById('eventModalLabel').innerText = info.event.title;
+
+        document.getElementById("ev_id").value = info.event.extendedProps.evs_id
+
+
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        eventModal.show();
+
+
+    let jsonData = info.event.extendedProps.data
+    const tableBody = document.getElementById('json-table-body');
+    tableBody.innerHTML = ''; // Clears all rows
+            jsonData.forEach((item,index) => {
+     const row = document.createElement('tr');
+               if((item.status == 'N') ||(item.status == 'W')) {
+                  row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
+                    <td>${item.pi_name}</td>
+                  <td> - </td>
+                    <td> -   </td>  
+                    <td> - </td>
+                      <td><span style="color:#ea7731">รอการยืนยัน</span></td>
+                    <td>       </td>  
+                `;
+               }else {
+  row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
+                    <td>${item.pi_name}</td>
+                  <td> - </td>
+                    <td> - </td>  
+                    <td> - </td>
+                      <td><span style="color:#0ba252">ยืนยัน</span></td>
+                    <td>       </td>  
+                `;
+
+               }
+
+
+                
+              
+                
+           
+                tableBody.appendChild(row);
+            });
+
+            
+            // Add new JSON data dynamically
+            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
+
+    
+ // Populate modal with event data
+
+},
+      
+    });
+    calendar.render();
+  });
+
+  
+
+  async function save() {
+
+
+   const pi = document.getElementById("pi").value
+   const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
+   let te = document.getElementById("teacher_id").value
+   let tis_unit = document.getElementById("tis_unit").value
+   let tis_compensation = document.getElementById("tis_compensation").value
+   let tis_quantity = document.getElementById("tis_quantity").value
+   let tis_sum = document.getElementById("tis_sum").value
+   const ev_id = document.getElementById("ev_id").value
+
+
+
+    if(te == ""){
+    Swal.fire({
+      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
+      text: 'กรุณาเลือกรายชื่อ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+
+    return false
+   }
+
+   
+const status_hour = document.getElementById("status_hour").value 
+const status_people = document.getElementById("status_people").value 
+const status_teacher = document.getElementById("status_teacher").value 
+
+
+if(status_hour == 'false'){
+    Swal.fire({
+      title: 'จำนวนชั่วโมงไม่เพียงพอ',
+      text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+   }
+   if(status_people == 'false'){
+    Swal.fire({
+      title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
+      text: 'กรุณาตรวจสอบให้ถูกต้อง',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+  }
+  if(status_teacher == 'false'){
+    Swal.fire({
+      title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
+      text: 'กรุณาเลือกรายชื่ออื่น',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false
+   }
+
+
+    let data = await fetch('/api/saveevenet', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum})
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+
+if(data.status == 200){
+  Swal.fire({
+      title: 'บันทึกสำเร็จ',
+      text: 'บันทึกสำเร็จ',
+      icon: 'success',
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+ }, 100);
+
+    
+}else {
+  Swal.fire({
+      title: 'บันทึกไม่สำเร็จ',
+      text: 'บันทึกไม่สำเร็จ',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+}
+
+// this.calen();
+// window.location.reload();
+//    return data.status
+
+
+
+})
+.catch(error => {
+   
+  
+});
+    
+  }
+
+  function handleSelectChangePy(selectElement) {
+    const selectedValue = selectElement.value;
+ document.getElementById("pi").value = selectedValue;
+
+ setTimeout(() => {
+  CheckHourbeforeSave()
+  getComposetaion()
+
+ }, 50);
+
+ setTimeout(() => {
+ 
+  Caculate()
+ }, 200);
+  }
+
+
+  function handleSelectChange(selectElement) {
+    const selectedValue = selectElement.value;
+
+
+    let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
+ document.getElementById("teacher_id").value = result;
+
+//  calen()
+ 
+
+
+ setTimeout(() => {
+  CheckHourbeforeSave()
+  getComposetaion()
+  
+ }, 50);
+
+
+  }
+
+  function Caculate() {
+    const aaaa = document.getElementById("tis_compensation").value;
+    const tis_quantity = document.getElementById("tis_quantity").value;
+console.log('cal',aaaa);
+console.log('cal',tis_quantity);
+   document.getElementById("tis_sum").value = aaaa * tis_quantity;
+   }
+
+   async function CheckHourbeforeSave() {
+
+
+const ev_id = document.getElementById("ev_id").value;
+const pi = document.getElementById("pi").value
+const tis_quantity = document.getElementById("tis_quantity").value;
+const teacher_id = document.getElementById("teacher_id").value
+
+
+let data = await fetch('/api/checkhours', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json',
+},
+body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id),'teacher_id':teacher_id})
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+   
+    document.getElementById("status_hour").value = data.status_hour;
+    document.getElementById("status_people").value = data.status_people;
+    document.getElementById("status_teacher").value = data.status_teacher;
+
+
+
+//    return data.status
+
+
+
+})
+.catch(error => {
+   
+  
+});
+
+return data
+}
+
+
+function getComposetaion() {
+    const teacher_id = document.getElementById("teacher_id").value
+    const py = document.getElementById("pi").value
+    const csrftoken = "{{ csrf_token }}";
+  fetch('/api/get/compensation', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
+})
+    .then(response => response.json())
+    .then(data => {
+        // Display response
+     console.log(data);
+        if(data.length == 0){
+          document.getElementById("tis_compensation").value = 0
+          return false;
+        }
+        document.getElementById("tis_compensation").value = data.compensation
+        Caculate()
+
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+      
+    });
+   }
+
+   function allowOnlyNumbers(event) {
+
+   
+// Allow: Backspace, Tab, Arrow keys, Delete
+if (
+    event.key === "Backspace" || 
+    event.key === "Tab" || 
+    event.key === "ArrowLeft" || 
+    event.key === "ArrowRight" || 
+    event.key === "Delete"
+) {
+
+    setTimeout(() => {
+const it = document.getElementById("tis_quantity").value;
+if (it.charAt(0) == "0") {
+  let result = removeFirstCharacter(it);
+  document.getElementById("tis_quantity").value = result 
+ // return it.slice(0); // Removes the first character
+}
+
+}, 20);
+
+
+setTimeout(() => {
+
+getComposetaion()
+}, 100);
+
+setTimeout(() => {
+
+Caculate()
+CheckHourbeforeSave()
+}, 200);
+
+    return true; // Allow default behavior
+}
+
+// Allow only numbers (0-9)
+if (!/^\d$/.test(event.key)) {
+    event.preventDefault(); // Block other characters
+    return false; // Prevent default behavior
+}
+
+
+
+
+
+setTimeout(() => {
+const it = document.getElementById("tis_quantity").value;
+if (it.charAt(0) == "0") {
+  let result = removeFirstCharacter(it);
+  document.getElementById("tis_quantity").value = result 
+ // return it.slice(0); // Removes the first character
+}
+
+}, 20);
+
+
+setTimeout(() => {
+
+getComposetaion()
+}, 100);
+
+setTimeout(() => {
+
+Caculate()
+CheckHourbeforeSave()
+}, 200);
+
+
+
+}
+</script>
+<style>
+
+.modal-xxl {
+            max-width: 90%;
+            width: 90%;
+        }
+
+        /* Ensure modal-content scales properly */
+        .modal-xxl .modal-content {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Optional: Add responsive styling */
+        @media (max-width: 768px) {
+            .modal-xxl {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        .select2-container {
+    z-index: 1055 !important; /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+}
+</style>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตารางหลักสูตรอบรม</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางหลักสูตรอบรม
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <span id="msg" style="color: red"></span>
+      <div id="calendar"></div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="eventModalLabel"></h5>
+
+              <input
+              type="hidden"
+              name="ev_id"
+              id="ev_id"
+              required
+             
+            />
+
+            
+        <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
+        <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
+        <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+ 
+          <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
+          <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+
+
+ 
+      <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ลำดับ</th>
+                <th>ครู-วิทยากร</th>
+                <th>ตำแหน่ง/หน้าที่</th>
+                <th>ค่าตอบแทน</th>
+                <th>จำนวนหน่วย</th>
+                <th>รายได้สุทธิ</th>
+                <th>สถานะ</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody id="json-table-body"></tbody>
+    </table>
+        </div>
+          <div class="modal-footer">
+            
+              <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+   
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="text" name="id" id="id_delete" required />
+          <input
+            type="hidden"
+            name="ev_id"
+            id="ev_id"
+            required
+            value="{{main_data.ev_id}}"
+          />
+          <div align="center">
+            <h4>ยืนยันการลบข้อมูล</h4>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1" >
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+            </button>
+          </div>
+        </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

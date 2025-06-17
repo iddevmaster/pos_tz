@@ -166,7 +166,8 @@ urlpatterns = [
          register.register_deleteall, name="RegisterFormDeleteAll"),
 
     path('register/course/form', register.register_form_course),
-    path('register/course/create', register.register_form_course_create,name="register_form_create"),  
+    path('register/course/create', register.register_form_course_create,name="register_form_create"),
+    path('formregister/course/calendar/<str:re_id>', register.register_form_course_cal),  
 
 
     path('projectlist/', project.project_list),
