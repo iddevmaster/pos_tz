@@ -561,7 +561,7 @@ class course_register_check_in_out(models.Model):
 
 
 class course_register_check(models.Model):
-    reg_id = models.AutoField(primary_key=True)
+    re_id = models.AutoField(primary_key=True)
     ev_date_start = models.DateField(blank=True, null=True)
     ev_date_end = models.DateField(blank=True, null=True)
     gen = models.CharField(

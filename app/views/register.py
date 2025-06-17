@@ -17,7 +17,7 @@ from django.shortcuts import render
 import openpyxl
 import ast
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,learn,course_register_check,course_register_check_in_out
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,learn,course_register_check,course_register_check_in_out,project_code
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 from ..constant import prefixEng,prefixThai,api_id_card
 
@@ -1607,18 +1607,24 @@ def register_form_createall(request, ev_id):
 
 
 
-@login_required(login_url='/login')
 
+
+@login_required(login_url='/login')
 def register_form_course(request):
+
     user_id = request.user.id
-    # Menu
+     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
     except user_detail.DoesNotExist:
+
+       
         cm_id = 0
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
+
+        
     for rs in list(listMenuPermission):
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
@@ -1627,14 +1633,54 @@ def register_form_course(request):
         objMenu.append(r)
     try:
         m = user_group.objects.get(user=user_id)
+    
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+
+    course_list = course.objects.filter(
+            cancelled=1, active=1).order_by("-course_id")
+    
+    result = course_register_check.objects.filter()
+   
+    
+ 
+        
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list}
+    
+    return render(request, 'register/checkregister.html', context)
+
+@login_required(login_url='/login')
+
+def register_form_course_create(request):
+    
+    user_id = request.user.id
+
+    course_id = request.POST['course_id']
+    ev_date_start = dmytoymd(request.POST['ev_date_start'])
+    ev_date_end = dmytoymd(request.POST['ev_date_end'])
+    gen = request.POST['ev_generation']
+
+    try:
+        m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html') 
     title = defaultTitle
-    result = course_register_check.objects.filter()
-    print(result)
-    context = {'title': title,  'data': result,'listMenuPermission': objMenu}
-    return render(request, 'register/checkregister.html', context)
+    
+    conu = course.objects.get(pk=course_id)
+    content = course_register_check(
+        ev_date_start=ev_date_start,
+        ev_date_end=ev_date_end,
+        gen=gen,
+        name=conu.course_name
+     )
+    content.save()
+
+  
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/register/course/form")
 
 
 
@@ -3293,5 +3339,16 @@ def insertcard(request):
             )
     datas = {'status':200,'data':data}
     return JsonResponse(datas, status=200,safe=False)
+
+
+
+@csrf_exempt
+def delecouseregister(request):
+    data = json.loads(request.body)
+    re_id = data.get("re_id")
+    check = course_register_check.objects.get(re_id=re_id)
+    
+    datas = {'status':200}
+    return JsonResponse(datas, status=200,safe=False) 
 
 

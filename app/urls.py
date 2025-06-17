@@ -165,7 +165,8 @@ urlpatterns = [
     path('register/all/student/delete',
          register.register_deleteall, name="RegisterFormDeleteAll"),
 
-    path('register/course/form', register.register_form_course),      
+    path('register/course/form', register.register_form_course),
+    path('register/course/create', register.register_form_course_create,name="register_form_create"),  
 
 
     path('projectlist/', project.project_list),
@@ -276,6 +277,7 @@ urlpatterns = [
     path('api/checkhours', finance.checkhours),
     path('api/updateeve', course.updateeve),
     path('api/updatstatusev', course.updatstatusev),
+    path('api/deleteformregister', register.delecouseregister),
     path('api/getgen', course.getgen),
     path('api/updatestatusproject', project.updatestatus),
     path('api/saveevenet', finance.saveeventadmin),
