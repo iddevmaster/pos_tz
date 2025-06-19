@@ -9,8 +9,8 @@ from datetime import date, timedelta
 from dateutil import rrule
 import json
 from datetime import datetime
-import datetime
-import datetime as dts
+
+
 from ..forms.student_form import studentForm
 from ..form import ExcelUploadForm
 from django.http import JsonResponse
