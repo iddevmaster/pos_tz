@@ -9,6 +9,8 @@ from datetime import date, timedelta
 from dateutil import rrule
 import json
 from datetime import datetime
+import datetime
+import datetime as dts
 from ..forms.student_form import studentForm
 from ..form import ExcelUploadForm
 from django.http import JsonResponse
@@ -17,7 +19,7 @@ from django.shortcuts import render
 import openpyxl
 import ast
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,learn,course_register_check,course_register_check_in_out,project_code
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,learn,course_register_check,course_register_check_in_out,project_code,course_register_event
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 from ..constant import prefixEng,prefixThai,api_id_card
 
@@ -1658,26 +1660,63 @@ def register_form_course_create(request):
     user_id = request.user.id
 
     course_id = request.POST['course_id']
-    ev_date_start = dmytoymd(request.POST['ev_date_start'])
-    ev_date_end = dmytoymd(request.POST['ev_date_end'])
+
+  
+   
+    ev_date_start = datetime.datetime.strptime(request.POST['ev_date_start'], '%d/%m/%Y').date()
+    ev_date_end = datetime.datetime.strptime(request.POST['ev_date_end'], '%d/%m/%Y').date()
+   
+ 
     gen = request.POST['ev_generation']
 
+    _date = date.today()
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html') 
     title = defaultTitle
-    
+    start_date = None
+    end_date = None
     conu = course.objects.get(pk=course_id)
-    content = course_register_check(
-        ev_date_start=ev_date_start,
-        ev_date_end=ev_date_end,
-        gen=gen,
-        name=conu.course_name
-     )
-    content.save()
+    # content = course_register_check(
+    #     ev_date_start=ev_date_start,
+    #     ev_date_end=ev_date_end,
+    #     gen=gen,
+    #     name=conu.course_name
+    #  )
+    # content.save()
+   
 
+
+    format_string = "%Y-%m-%d"
+
+
+
+    # x = ev_date_start.split('/')
+    # day = x[0]
+    # month = x[1]
+    # year = x[2]
+    # start_date = datetime.datetime(year, month, day)
+
+    delta = timedelta(days=1)
+    current_date = ev_date_start
+    
+ 
+    created_count = 0
+    skipped_count = 0
+    errors = []
+
+    while current_date <= ev_date_end:
+            print(current_date)
+            created_count += 1
+        
+            
+           
+
+       
+            current_date += delta
+   
   
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/register/course/form")

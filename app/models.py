@@ -568,3 +568,13 @@ class course_register_check(models.Model):
         max_length=24, blank=True, default=None)
     name = models.CharField(
         max_length=255, blank=True, default=None)
+    
+class course_register_event(models.Model):
+    cre_id = models.AutoField(primary_key=True)
+    ev_date_start = models.DateField(blank=True, null=True)
+    ev_date_end = models.DateField(blank=True, null=True)
+    re = models.ForeignKey(
+        course_register_check, on_delete=models.CASCADE) 
+    status = models.CharField(max_length=64, blank=True, default=None)  
+    perial = models.CharField(max_length=64, blank=True, default=None) 
+   

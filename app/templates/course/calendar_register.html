@@ -18,49 +18,32 @@ $(document).ready(function () {
     });
 });
 
-function setValueDeleteModal(id) {
-  
 
-    document.getElementById("id_delete").value = id;
-
-    const eventModal = new bootstrap.Modal(document.getElementById('DeleteClick'));
-    eventModal.show();
-  }
-
-  async function delel() {
-
-
-    let data = await fetch('/api/evenetdel', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'id':document.getElementById("id_delete").value})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
-
-
-
-// this.calen();
-// window.location.reload();
-//    return data.status
-
-// setTimeout(() => {
-//       window.location.reload();
-//  }, 100);
-
-})
-  
-
-  }
 
   
 
 
   document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
+
+    const path = window.location.pathname; // This will give you "/calendar/2"
+    console.log(path)
+
+    const pathSegments = path.split('/');
+// pathSegments will be: ["", "calendar", "2"]
+
+// The dynamic parameter (the '2') is the last element in this array.
+// We also need to make sure it's not an empty string if the URL ends with a slash.
+const lastSegment = pathSegments[pathSegments.length - 1];
+
+let id = null;
+if (lastSegment !== "") { // Check to ensure the last segment isn't an empty string (e.g., if URL was /calendar/)
+  id = parseInt(lastSegment); // Convert it to a number
+}
+
+console.log('Full Path:', path);
+console.log('Path Segments:', pathSegments);
+console.log('Extracted ID:', id); // Output: 2
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
       headerToolbar: {
@@ -76,7 +59,7 @@ body: JSON.stringify({'id':document.getElementById("id_delete").value})
       editable: false,
       dayMaxEvents: true, // allow "more" link when too many events
       events: {
-        url: "/calendar_event_apiall/",
+        url: "/calendar_event_api_register/"+id,
         failure: function () {
           document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
         },
@@ -84,60 +67,7 @@ body: JSON.stringify({'id':document.getElementById("id_delete").value})
       eventClick: function (info) {
         
   
-    $('#cardContainer').empty(); // Clear previous cards
-        document.getElementById('eventModalLabel').innerText = info.event.title;
 
-        document.getElementById("ev_id").value = info.event.extendedProps.evs_id
-
-
-        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-        eventModal.show();
-
-
-    let jsonData = info.event.extendedProps.data
-    const tableBody = document.getElementById('json-table-body');
-    tableBody.innerHTML = ''; // Clears all rows
-            jsonData.forEach((item,index) => {
-     const row = document.createElement('tr');
-               if((item.status == 'N') ||(item.status == 'W')) {
-                  row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
-                    <td>${item.pi_name}</td>
-                  <td> - </td>
-                    <td> -   </td>  
-                    <td> - </td>
-                      <td><span style="color:#ea7731">รอการยืนยัน</span></td>
-                    <td>       </td>  
-                `;
-               }else {
-  row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
-                    <td>${item.pi_name}</td>
-                  <td> - </td>
-                    <td> - </td>  
-                    <td> - </td>
-                      <td><span style="color:#0ba252">ยืนยัน</span></td>
-                    <td>       </td>  
-                `;
-
-               }
-
-
-                
-              
-                
-           
-                tableBody.appendChild(row);
-            });
-
-            
-            // Add new JSON data dynamically
-            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
-
-    
- // Populate modal with event data
 
 },
       
@@ -147,299 +77,14 @@ body: JSON.stringify({'id':document.getElementById("id_delete").value})
 
   
 
-  async function save() {
 
 
-   const pi = document.getElementById("pi").value
-   const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
-   let te = document.getElementById("teacher_id").value
-   let tis_unit = document.getElementById("tis_unit").value
-   let tis_compensation = document.getElementById("tis_compensation").value
-   let tis_quantity = document.getElementById("tis_quantity").value
-   let tis_sum = document.getElementById("tis_sum").value
-   const ev_id = document.getElementById("ev_id").value
 
 
 
-    if(te == ""){
-    Swal.fire({
-      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-      text: 'กรุณาเลือกรายชื่อ',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
 
-    return false
-   }
 
-   
-const status_hour = document.getElementById("status_hour").value 
-const status_people = document.getElementById("status_people").value 
-const status_teacher = document.getElementById("status_teacher").value 
 
-
-if(status_hour == 'false'){
-    Swal.fire({
-      title: 'จำนวนชั่วโมงไม่เพียงพอ',
-      text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-   }
-   if(status_people == 'false'){
-    Swal.fire({
-      title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
-      text: 'กรุณาตรวจสอบให้ถูกต้อง',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-  }
-  if(status_teacher == 'false'){
-    Swal.fire({
-      title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
-      text: 'กรุณาเลือกรายชื่ออื่น',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-   }
-
-
-    let data = await fetch('/api/saveevenet', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
-
-if(data.status == 200){
-  Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      text: 'บันทึกสำเร็จ',
-      icon: 'success',
-    });
-
-    setTimeout(() => {
-      window.location.reload();
- }, 100);
-
-    
-}else {
-  Swal.fire({
-      title: 'บันทึกไม่สำเร็จ',
-      text: 'บันทึกไม่สำเร็จ',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-}
-
-// this.calen();
-// window.location.reload();
-//    return data.status
-
-
-
-})
-.catch(error => {
-   
-  
-});
-    
-  }
-
-  function handleSelectChangePy(selectElement) {
-    const selectedValue = selectElement.value;
- document.getElementById("pi").value = selectedValue;
-
- setTimeout(() => {
-  CheckHourbeforeSave()
-  getComposetaion()
-
- }, 50);
-
- setTimeout(() => {
- 
-  Caculate()
- }, 200);
-  }
-
-
-  function handleSelectChange(selectElement) {
-    const selectedValue = selectElement.value;
-
-
-    let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
- document.getElementById("teacher_id").value = result;
-
-//  calen()
- 
-
-
- setTimeout(() => {
-  CheckHourbeforeSave()
-  getComposetaion()
-  
- }, 50);
-
-
-  }
-
-  function Caculate() {
-    const aaaa = document.getElementById("tis_compensation").value;
-    const tis_quantity = document.getElementById("tis_quantity").value;
-console.log('cal',aaaa);
-console.log('cal',tis_quantity);
-   document.getElementById("tis_sum").value = aaaa * tis_quantity;
-   }
-
-   async function CheckHourbeforeSave() {
-
-
-const ev_id = document.getElementById("ev_id").value;
-const pi = document.getElementById("pi").value
-const tis_quantity = document.getElementById("tis_quantity").value;
-const teacher_id = document.getElementById("teacher_id").value
-
-
-let data = await fetch('/api/checkhours', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id),'teacher_id':teacher_id})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
-   
-    document.getElementById("status_hour").value = data.status_hour;
-    document.getElementById("status_people").value = data.status_people;
-    document.getElementById("status_teacher").value = data.status_teacher;
-
-
-
-//    return data.status
-
-
-
-})
-.catch(error => {
-   
-  
-});
-
-return data
-}
-
-
-function getComposetaion() {
-    const teacher_id = document.getElementById("teacher_id").value
-    const py = document.getElementById("pi").value
-    const csrftoken = "{{ csrf_token }}";
-  fetch('/api/get/compensation', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
-})
-    .then(response => response.json())
-    .then(data => {
-        // Display response
-     console.log(data);
-        if(data.length == 0){
-          document.getElementById("tis_compensation").value = 0
-          return false;
-        }
-        document.getElementById("tis_compensation").value = data.compensation
-        Caculate()
-
-
-    })
-    .catch(error => {
-        console.error('Error:', error);
-      
-    });
-   }
-
-   function allowOnlyNumbers(event) {
-
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
-
-    setTimeout(() => {
-const it = document.getElementById("tis_quantity").value;
-if (it.charAt(0) == "0") {
-  let result = removeFirstCharacter(it);
-  document.getElementById("tis_quantity").value = result 
- // return it.slice(0); // Removes the first character
-}
-
-}, 20);
-
-
-setTimeout(() => {
-
-getComposetaion()
-}, 100);
-
-setTimeout(() => {
-
-Caculate()
-CheckHourbeforeSave()
-}, 200);
-
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
-
-
-
-
-
-setTimeout(() => {
-const it = document.getElementById("tis_quantity").value;
-if (it.charAt(0) == "0") {
-  let result = removeFirstCharacter(it);
-  document.getElementById("tis_quantity").value = result 
- // return it.slice(0); // Removes the first character
-}
-
-}, 20);
-
-
-setTimeout(() => {
-
-getComposetaion()
-}, 100);
-
-setTimeout(() => {
-
-Caculate()
-CheckHourbeforeSave()
-}, 200);
-
-
-
-}
 </script>
 <style>
 
