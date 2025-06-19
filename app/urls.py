@@ -170,6 +170,7 @@ urlpatterns = [
     path('register/course/form', register.register_form_course),
     path('register/course/create', register.register_form_course_create,name="register_form_create"),
     path('formregister/course/calendar/<str:re_id>', register.register_form_course_cal),  
+    path('formregister/course/list/<slug:re_id>', register.register_form_course_cal_list),
 
 
     path('projectlist/', project.project_list),
@@ -305,7 +306,7 @@ urlpatterns = [
     path('api/card/register', register.insertcard),
     path('api/sendwithdraw', finance.sendwithdraw),
     
-
+    path('api/card/register/checkleanring', register.checkleanring),
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.MEDIA_ROOT)

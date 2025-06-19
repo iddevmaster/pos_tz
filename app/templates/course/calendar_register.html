@@ -65,11 +65,9 @@ console.log('Extracted ID:', id); // Output: 2
         },
       },
       eventClick: function (info) {
-        
-  
-
-
-},
+    
+        window.location.href= '/formregister/course/list/'+info.event.extendedProps.cre_id
+      },
       
     });
     calendar.render();

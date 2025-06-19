@@ -1,0 +1,568 @@
+{% extends 'base.html' %} {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+ 
+
+ async function runFunctions() {
+  const data1 = await start();
+
+ }
+async function start() {
+
+
+            const register_id = document.getElementById('register_id').value;
+            const ex = await fetch('/api/studentlist', {
+              method: 'POST',
+              body:JSON.stringify({'register_id':register_id})
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('1');
+              const data2 =  calltohub(data);
+            })
+
+}
+async function calltohub(datas) {
+    const ex = await fetch('/api/tests', {
+              method: 'POST',
+              body:JSON.stringify({'form':datas})
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+          })
+}
+
+  function setValueDeleteModal(training_id) {
+    document.getElementById("training_id_delete").value = training_id;
+  }
+  function setStatusModal(student_id, full_name) {
+    document.getElementById("student_id_update_status").value = student_id;
+    document.getElementById("status_fullname").innerHTML = full_name;
+  }
+
+  var myVar = null;
+
+  function start_read_test() {
+    myStopFunctionTest();
+    myVar = setInterval(load_dataTest, 1500);
+  }
+
+  function myStopFunctionTest() {
+    clearInterval(myVar);
+  }
+
+  async function load_dataTest() {
+    let myObject = await fetch("{{api_id_card}}");
+    let jsondata = await myObject.text();
+
+    var data = jsondata.substr(13, jsondata.length - 14);
+    let jdata = JSON.parse(data);
+    console.log(jdata);
+    if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
+      Swal.fire({
+      title: 'บันทึกไม่สำเร็จ',
+      text: data.text,
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    return false;
+    }else {
+    
+     let cre = document.getElementById("cre_id").value
+     let student_identification_number = jdata?.CitizenNo;
+     let student_prefix_th = jdata?.TitleNameTh;
+     let student_firstname_th = jdata?.FirstNameTh;
+     let student_lastname_th = jdata?.LastNameTh;
+     let student_prefix_eng = jdata?.TitleNameEn;
+     let student_firstname_eng = jdata?.FirstNameEn;
+     let student_lastname_eng = jdata?.LastNameEn;
+    
+     const ex = await fetch('/api/card/register/checkleanring', {
+              method: 'POST',
+              body:JSON.stringify({'cre_id':cre,'student_identification_number':student_identification_number,'student_prefix_th':student_prefix_th,'student_firstname_th':student_firstname_th,'student_lastname_th':student_lastname_th,'student_prefix_eng':student_prefix_eng,'student_firstname_eng':student_firstname_eng,'student_lastname_eng':student_lastname_eng})
+            })
+            .then(response => response.json())
+            .then(data => {
+              window.location.reload();
+  
+            })
+
+    //   document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
+    // document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
+    // document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
+    // document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
+    // document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
+    // document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
+    }
+
+
+  }
+
+  async function RecallApi(data) {
+
+   console.log(data.QuerySet);
+//    for (let i = 0; i < data.length; i++) {
+//     console.log(`Index ${i}: ${data[i]}`);
+// }
+  }
+  
+
+
+    async function uploadFile(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('excel_file');
+            const ev_id = document.getElementById('ev_id').value;
+          
+            formData.append('ev_id', ev_id);
+            formData.append('excel_file', fileInput.files[0]);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+          
+
+            const ex = await fetch('/api/upload/uploadfileev', {
+method: 'POST',
+body:formData
+})
+.then(response => response.json())
+.then(data => {
+    // Display response
+
+if(data.status == 'success'){
+  window.location.reload();
+}else {
+
+  Swal.fire({
+      title: 'บันทึกไม่สำเร็จ',
+      text: data.text,
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+    const fileInput = document.getElementById('excel_file');
+fileInput.value = ''; // Clear the selected file
+}
+
+
+
+
+})
+.catch(error => {
+   
+  
+});
+        }
+
+    function displayFileName() {
+            const fileInput = document.getElementById('excel_file');
+            const fileNameDisplay = document.getElementById('fileName');
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+            }
+
+          const formData = new FormData();
+       
+       formData.append('file', fileInput.files[0]);
+       formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+   
+        }
+
+  var tableToExcel = (function () {
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })
+
+
+  function exportTableToExcel(tableID, filename = 'excel_data') {
+            // Get the table element
+            let table = document.getElementById(tableID);
+
+            // Convert the table to a workbook
+            let workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+            // Access the worksheet
+            let worksheet = workbook.Sheets["Sheet1"];
+
+            // Define columns to hide (e.g., 1st column, which corresponds to "A" in Excel)
+            worksheet["!cols"] = [
+      
+            
+            ];
+
+            // Export the workbook as an Excel file
+            XLSX.writeFile(workbook, `${filename}.xlsx`);
+        }
+      
+</script>
+<style>
+  /* Hide the file input */
+  #excel_file {
+      display: none;
+  }
+
+  /* Style the label as a button */
+  .file-button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      background-color: #0078D4;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+  }
+
+  .file-button:hover {
+      background-color: #005ea2;
+  }
+
+  .file-button:active {
+      background-color: #004080;
+  }
+</style>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ผู้เข้าอบรมหลักสูตร : {{main.name}}</h3>
+    <span>
+        รุ่นที่ {{main.gen}}
+    </span>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/register/management">ดำเนินการ</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">ผู้เข้าอบรม</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+     
+        <input
+        type="hidden"
+        name="cre_id"
+        id="cre_id"
+        value="{{cre_id}}"
+       
+      />
+        <div class="col-lg-9 col-md-9">
+          <div align="right">
+            <div class="btn-group mb-3">
+               <button
+                type="button"
+                class="btn btn-primary"
+                onclick="window.location.href='/register/all/x/form/create/{{main.cre_id}}'"
+              >
+                <i class="icon dripicons-plus" aria-hidden="true"></i>
+                เพิ่มข้อมูล
+              </button>
+
+  
+              <!-- <button
+                type="button"
+                class="btn btn-primary"
+                onclick="window.location.href='/student/form/create/{{main.register_id}}'"
+              >
+                <i class="icon dripicons-plus" aria-hidden="true"></i>
+                เพิ่มข้อมูล
+              </button>
+
+              <button
+                type="submit"
+                class="btn btn-info"
+                form="create_form_idcard"
+                onclick="start_read_test()"
+              >
+                <i class="icon dripicons-card" aria-hidden="true"></i>
+                เครื่องอ่านบัตร
+              </button>
+
+              <form  id="uploadForm" method="post">
+                {% csrf_token %}
+            
+          
+
+              <input type="file" id="excel_file" name="excel_file"  accept=".xlsx, .xls" onchange="uploadFile(event)">
+             <label for="excel_file" class="file-button">Import to Excel:</label>
+           
+              </form> -->
+              <a class="btn btn-warning" href="{{api_id_card}}" target="_blank">
+                เปิดสิทธิ์
+              </a>
+              <button
+              type="submit"
+              class="btn btn-info"
+              form="create_form_idcard"
+              onclick="start_read_test()"
+            >
+              <i class="icon dripicons-card" aria-hidden="true"></i>
+              เครื่องอ่านบัตร
+            </button>
+
+              <form  id="uploadForm" method="post">
+                {% csrf_token %}
+            
+          
+
+              <input type="file" id="excel_file" name="excel_file"  accept=".xlsx, .xls" onchange="uploadFile(event)">
+             <label for="excel_file" class="file-button">Import to Excel:</label>
+           
+              </form>
+
+    
+<!-- 
+            <button
+            type="submit"
+            class="btn btn-warning"
+            form="create_form_idcard"
+            onclick="runFunctions()"
+          >
+           
+            Recall
+          </button> -->
+
+          
+         
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+    
+      <div> 
+      <table class="table table-striped" id="myTable">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>รหัสบัตร ปชช./ Passport</th>
+            <th>ชื่อ - นามสกุล ภาษาไทย</th>
+            <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+            <th>วันที่ทำรายการ</th>
+           
+           
+            <th hidden>รหัสบัตร ปชช./ Passport</th>
+            <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
+            <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+            <th hidden>รหัสหลักสูตร</th>
+            <th hidden>ชื่อหลักสูตร</th>
+            <th hidden>วันที่เริ่มต้น</th>
+            <th hidden>วันที่สิ้นสุด</th>
+            <th hidden>ลายเซ็น</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{res.student_identification_number}}</td>
+            <td>
+              {{res.student_prefix_th}}{{res.student_firstname_th}}
+              {{res.student_lastname_th}}
+            </td>
+            <td>
+              {{res.student_prefix_eng}} {{res.student_firstname_eng}}
+              {{res.student_lastname_eng}}
+            </td>
+            
+            <td>
+              <div>สร้าง : {{res.crt_date}}</div>
+              <div>แก้ไข : {{res.upd_date}}</div>
+            </td>
+
+            <td class="hidden-id">
+              <div align="center">
+            
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  onclick="window.location.href='/register/all/student/form/show/{{main_data.ev_id}}/{{res.training_id}}'"
+                >
+                  <i class="icon dripicons-document-edit"></i> แก้ไข
+                </button>
+
+                <button
+                  type="button"
+                  onclick="setValueDeleteModal('{{res.training_id}}')"
+                  class="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#DeleteClick"
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button>
+
+              </div>
+            </td>
+        
+        
+            <td hidden>{{res.student_identification_number}}</td>
+            <td hidden> {{res.student_prefix_th}}{{res.student_firstname_th}}
+              {{res.student_lastname_th}}</td>
+              <td hidden>
+                {{res.student_prefix_eng}} {{res.student_firstname_eng}}
+                {{res.student_lastname_eng}}
+              </td>
+            <td hidden>{{main_data.course.course_code}}</td>
+            <td hidden>{{main_data.course.course_name}}</td>
+            <td hidden>{{main_data.ev_date_start |date:"d/m/Y"}}</td>
+            <td hidden>{{main_data.ev_date_end|date:"d/m/Y"}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% comment %} Delete {% endcomment %}
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form action="{% url 'RegisterFormDeleteAll' %}" method="post">
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="hidden" name="training_id" id="training_id_delete" />
+          <input
+            type="hidden"
+            name="ev_id"
+            value="{{main_data.ev_id}}"
+          
+          />
+          <div align="center">
+            <h4>ยืนยันการลบข้อมูล</h4>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1">
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยืนยันการลบ</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<form action="/student/create/idcard" method="post" id="read_id_card">
+  {% csrf_token %}
+  <input type="hidden" name="register_id" value="{{main.register_id}}" />
+  <input type="hidden" name="data" id="result_id_card" />
+</form>
+
+{% comment %} UpdateStatusAll {% endcomment %}
+<div class="modal fade" id="SetStatusAllClick">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">
+          ยืนยันการจบหลักสูตร
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <form action="{% url 'StudentUpdateAllStatus' %}" method="post">
+        <div class="modal-body">
+          {% csrf_token %}
+
+          <input
+            type="hidden"
+            name="register_id"
+            value="{{main.register_id}}"
+          />
+          <div align="center">
+            <h4>
+              ยืนยันการเรียนจบหลักสูตร {{detail.course.course_name}} ทั้งหมด
+            </h4>
+            <span style="color: red; font-size: 16px"
+              >หมายเหตุ : เมื่อจบหลักสูตรแล้ว จะไม่สามารถแก้ไขข้อมูลได้
+            </span>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bx bx-x d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยกเลิก</span>
+            </button>
+            <button type="submit" class="btn btn-primary ml-1">
+              <i class="bx bx-check d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">ยืนยัน</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

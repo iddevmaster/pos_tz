@@ -534,8 +534,6 @@ class training(models.Model):
 
 class course_register_check_in_out(models.Model):
     eregister_id = models.AutoField(primary_key=True)
-    ev_date_start = models.DateField(blank=True, null=True)
-    ev_date_end = models.DateField(blank=True, null=True)
     student_identification_number = models.CharField(
         max_length=24, blank=True, default=None)
     student_prefix_th = models.CharField(
@@ -550,13 +548,12 @@ class course_register_check_in_out(models.Model):
         max_length=128, blank=True, default=None)
     student_lastname_eng = models.CharField(
         max_length=128, blank=True, default=None)
-    student_learning_status = models.IntegerField(default=0, blank=False)
-    student_code = models.CharField(max_length=64, blank=True, default=None)
     status_check = models.CharField(max_length=64, blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     course = models.ForeignKey(
         course, on_delete=models.CASCADE)    
+    cre_id = models.IntegerField(default=0, blank=False)  
     
 
 

@@ -1257,7 +1257,7 @@ def calendar_event_api_totalbill(request):
 
 def calendar_event_apiall_register(request,reg_id):
     user_id = request.user.id
-
+    reg_id = reg_id
 
     try:
         m = user_group.objects.get(user=user_id)
@@ -1280,7 +1280,7 @@ def calendar_event_apiall_register(request,reg_id):
     sobj = _date + timedelta(days=-365)
     eobj = _date + timedelta(days=365)
  
-    content = course_register_event.objects.filter(re_id=2)
+    content = course_register_event.objects.filter(re_id=reg_id)
    
     obj = []
     sff = []

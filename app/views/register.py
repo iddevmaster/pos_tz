@@ -10,7 +10,6 @@ from dateutil import rrule
 import json
 from datetime import datetime
 
-
 from ..forms.student_form import studentForm
 from ..form import ExcelUploadForm
 from django.http import JsonResponse
@@ -1663,9 +1662,10 @@ def register_form_course_create(request):
 
   
    
-    ev_date_start = datetime.datetime.strptime(request.POST['ev_date_start'], '%d/%m/%Y').date()
-    ev_date_end = datetime.datetime.strptime(request.POST['ev_date_end'], '%d/%m/%Y').date()
+    ev_date_start = datetime.strptime(request.POST['ev_date_start'], '%d/%m/%Y').date()
    
+    ev_date_end = datetime.strptime(request.POST['ev_date_end'], '%d/%m/%Y').date()
+
  
     gen = request.POST['ev_generation']
 
@@ -1679,14 +1679,14 @@ def register_form_course_create(request):
     start_date = None
     end_date = None
     conu = course.objects.get(pk=course_id)
-    # content = course_register_check(
-    #     ev_date_start=ev_date_start,
-    #     ev_date_end=ev_date_end,
-    #     gen=gen,
-    #     name=conu.course_name
-    #  )
-    # content.save()
-   
+    content = course_register_check(
+        ev_date_start=ev_date_start,
+        ev_date_end=ev_date_end,
+        gen=gen,
+        name=conu.course_name
+     )
+    content.save()
+    print(content.re_id)
 
 
     format_string = "%Y-%m-%d"
@@ -1711,7 +1711,13 @@ def register_form_course_create(request):
             print(current_date)
             created_count += 1
         
-            
+            content_ev = course_register_event(re_id=content.re_id,
+            ev_date_start=current_date,ev_date_end=current_date,status='S',perial='D')
+            content_ev.save()
+
+            content_ev = course_register_event(re_id=content.re_id,
+            ev_date_start=current_date,ev_date_end=current_date,status='S',perial='N')
+            content_ev.save()
            
 
        
@@ -3017,6 +3023,46 @@ def report_register_list(request,evs_id):
 
 
 @login_required(login_url='/login')
+def register_form_course_cal_list(request,re_id):
+    title = defaultTitle
+    user_id = request.user.id
+
+ 
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+
+    data = []
+    mains_one  = course_register_event.objects.get(cre_id=re_id)
+    data = mains_one.re
+  
+    
+    mains  = course_register_check_in_out.objects.filter(cre_id=re_id)
+    obj = []
+    count = 0
+    for rs in list(mains):
+        count += 1
+        r = {'eregister_id':rs.eregister_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng}
+        obj.append(r)
+    
+    context = {'title': title, 'listMenuPermission': objMenu,'data':obj,'count':count,'api_id_card': api_id_card,'main':data,'cre_id':mains_one.cre_id}
+    return render(request, 'register/register_form_all_list.html', context)
+
+
+@login_required(login_url='/login')
 def report_register_listall(request,evs_id):
     title = defaultTitle
     user_id = request.user.id
@@ -3422,8 +3468,30 @@ def delecouseregister(request):
     data = json.loads(request.body)
     re_id = data.get("re_id")
     check = course_register_check.objects.get(re_id=re_id)
+    check.delete()
+
+    checkev = course_register_event.objects.filter(re_id=re_id)
+    checkev.delete()
     
     datas = {'status':200}
     return JsonResponse(datas, status=200,safe=False) 
 
 
+@csrf_exempt
+def checkleanring(request):
+
+    data = json.loads(request.body)
+    ev_id = data.get("ev_id")
+    student_identification_number = data.get("student_identification_number")
+    student_prefix_th = data.get("student_prefix_th")
+    student_firstname_th = data.get("student_firstname_th")
+    student_lastname_th = data.get("student_lastname_th")
+    student_prefix_eng = data.get("student_prefix_eng")
+    student_firstname_eng = data.get("student_firstname_eng")
+    student_lastname_eng = data.get("student_lastname_eng")
+    # check ev student_identification_number
+
+    
+
+    datas = {'status':200,'data':data}
+    return JsonResponse(datas, status=200,safe=False)
