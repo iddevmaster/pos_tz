@@ -2,37 +2,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
- 
-
- async function runFunctions() {
-  const data1 = await start();
-
- }
-async function start() {
 
 
-            const register_id = document.getElementById('register_id').value;
-            const ex = await fetch('/api/studentlist', {
-              method: 'POST',
-              body:JSON.stringify({'register_id':register_id})
-            })
-            .then(response => response.json())
-            .then(data => {
-              console.log('1');
-              const data2 =  calltohub(data);
-            })
+  async function runFunctions() {
+    const data1 = await start();
 
-}
-async function calltohub(datas) {
+  }
+  async function start() {
+
+
+    const register_id = document.getElementById('register_id').value;
+    const ex = await fetch('/api/studentlist', {
+      method: 'POST',
+      body: JSON.stringify({ 'register_id': register_id })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('1');
+        const data2 = calltohub(data);
+      })
+
+  }
+  async function calltohub(datas) {
     const ex = await fetch('/api/tests', {
-              method: 'POST',
-              body:JSON.stringify({'form':datas})
-            })
-            .then(response => response.json())
-            .then(data => {
-              console.log(data);
-          })
-}
+      method: 'POST',
+      body: JSON.stringify({ 'form': datas })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      })
+  }
 
   function setValueDeleteModal(training_id) {
     document.getElementById("training_id_delete").value = training_id;
@@ -53,7 +53,89 @@ async function calltohub(datas) {
     clearInterval(myVar);
   }
 
+
+
   async function load_dataTest() {
+
+    Swal.fire({
+      title: 'กำลังโหลดข้อมูล...',
+      text: 'รอสักครู่ ถ้ายังไม่ได้เสียบบัตรกรุณาเสียบได้เลย',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+
+    try {
+      let response = await fetch('http://localhost:21998/readCard');
+
+      // 1. ตรวจสอบ response.ok ก่อน (สถานะ HTTP 200-299)
+      if (response.ok) {
+
+        const data = await response.json(); // แปลงเป็น JSON object
+
+        if (data.result == 'ok') {
+
+
+
+
+          let cre = document.getElementById("cre_id").value
+          let student_identification_number = data.nat_id;
+          let student_prefix_th = data.title_th;
+          let student_firstname_th = data.fname_th;
+          let student_lastname_th = data.sname_th;
+          let student_prefix_eng = data.title_en;
+          let student_firstname_eng = data.fname_en;
+          let student_lastname_eng = data.sname_en;
+
+          const ex = await fetch('/api/card/register/checkleanring', {
+            method: 'POST',
+            body: JSON.stringify({ 'cre_id': cre, 'student_identification_number': student_identification_number, 'student_prefix_th': student_prefix_th, 'student_firstname_th': student_firstname_th, 'student_lastname_th': student_lastname_th, 'student_prefix_eng': student_prefix_eng, 'student_firstname_eng': student_firstname_eng, 'student_lastname_eng': student_lastname_eng })
+          })
+            .then(response => response.json())
+            .then(data => {
+              Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ!',
+                text: 'ดึงข้อมูลสำเร็จ.',
+                showConfirmButton: false,
+                timer: 1500
+              });
+
+              window.location.reload();
+            })
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // หน่วงเวลา 2 วินาทีก่อนลองใหม่
+          return load_dataTest(); // เรียกตัวเองซ้ำ
+        }
+
+
+      } else {
+        // 3. ถ้า response.ok เป็น false (เช่น สถานะ 4xx, 5xx)
+        console.error("การเรียก API ไม่สำเร็จ! HTTP Status Code:", response.status);
+        console.error("Status Text:", response.statusText);
+
+        // พยายามอ่านข้อความ error จาก body (ถ้ามี)
+        try {
+          const errorText = await response.text();
+          console.error("Response Error Body:", errorText);
+        } catch (e) {
+          console.error("ไม่สามารถอ่านข้อผิดพลาดจาก Body ได้:", e);
+        }
+        throw new Error(`API call failed with status ${response.status}`);
+      }
+    } catch (error) {
+      // 4. จับข้อผิดพลาดที่เกี่ยวข้องกับเครือข่าย หรือ Promise reject อื่นๆ
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+      // คุณสามารถจัดการข้อผิดพลาดที่นี่ เช่น แสดงข้อความให้ผู้ใช้ทราบ
+      throw error; // โยนข้อผิดพลาดต่อไป
+    }
+
+
+
     let myObject = await fetch("{{api_id_card}}");
     let jsondata = await myObject.text();
 
@@ -62,115 +144,110 @@ async function calltohub(datas) {
     console.log(jdata);
     if (jdata?.TitleNameTh === "" || jdata?.TitleNameTh === undefined) {
       Swal.fire({
-      title: 'บันทึกไม่สำเร็จ',
-      text: data.text,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false;
-    }else {
-    
-     let cre = document.getElementById("cre_id").value
-     let student_identification_number = jdata?.CitizenNo;
-     let student_prefix_th = jdata?.TitleNameTh;
-     let student_firstname_th = jdata?.FirstNameTh;
-     let student_lastname_th = jdata?.LastNameTh;
-     let student_prefix_eng = jdata?.TitleNameEn;
-     let student_firstname_eng = jdata?.FirstNameEn;
-     let student_lastname_eng = jdata?.LastNameEn;
-    
-     const ex = await fetch('/api/card/register/checkleanring', {
-              method: 'POST',
-              body:JSON.stringify({'cre_id':cre,'student_identification_number':student_identification_number,'student_prefix_th':student_prefix_th,'student_firstname_th':student_firstname_th,'student_lastname_th':student_lastname_th,'student_prefix_eng':student_prefix_eng,'student_firstname_eng':student_firstname_eng,'student_lastname_eng':student_lastname_eng})
-            })
-            .then(response => response.json())
-            .then(data => {
-              window.location.reload();
-  
-            })
+        title: 'บันทึกไม่สำเร็จ',
+        text: data.text,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    } else {
 
-    //   document.getElementById("student_prefix_th").value = jdata?.TitleNameTh;
-    // document.getElementById("student_firstname_th").value = jdata?.FirstNameTh;
-    // document.getElementById("student_lastname_th").value = jdata?.LastNameTh;
-    // document.getElementById("student_prefix_eng").value = jdata?.TitleNameEn;
-    // document.getElementById("student_firstname_eng").value = jdata?.FirstNameEn;
-    // document.getElementById("student_lastname_eng").value = jdata?.LastNameEn;
+      let cre = document.getElementById("cre_id").value
+      let student_identification_number = jdata?.CitizenNo;
+      let student_prefix_th = jdata?.TitleNameTh;
+      let student_firstname_th = jdata?.FirstNameTh;
+      let student_lastname_th = jdata?.LastNameTh;
+      let student_prefix_eng = jdata?.TitleNameEn;
+      let student_firstname_eng = jdata?.FirstNameEn;
+      let student_lastname_eng = jdata?.LastNameEn;
+
+      const ex = await fetch('/api/card/register/checkleanring', {
+        method: 'POST',
+        body: JSON.stringify({ 'cre_id': cre, 'student_identification_number': student_identification_number, 'student_prefix_th': student_prefix_th, 'student_firstname_th': student_firstname_th, 'student_lastname_th': student_lastname_th, 'student_prefix_eng': student_prefix_eng, 'student_firstname_eng': student_firstname_eng, 'student_lastname_eng': student_lastname_eng })
+      })
+        .then(response => response.json())
+        .then(data => {
+          window.location.reload();
+
+        })
     }
 
 
   }
 
+
+
   async function RecallApi(data) {
 
-   console.log(data.QuerySet);
-//    for (let i = 0; i < data.length; i++) {
-//     console.log(`Index ${i}: ${data[i]}`);
-// }
+    console.log(data.QuerySet);
+    //    for (let i = 0; i < data.length; i++) {
+    //     console.log(`Index ${i}: ${data[i]}`);
+    // }
   }
-  
 
 
-    async function uploadFile(event) {
-            event.preventDefault(); // Prevent default form submission
 
-            const formData = new FormData();
-            const fileInput = document.getElementById('excel_file');
-            const ev_id = document.getElementById('ev_id').value;
-          
-            formData.append('ev_id', ev_id);
-            formData.append('excel_file', fileInput.files[0]);
-            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  async function uploadFile(event) {
+    event.preventDefault(); // Prevent default form submission
 
-          
-
-            const ex = await fetch('/api/upload/uploadfileev', {
-method: 'POST',
-body:formData
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
-
-if(data.status == 'success'){
-  window.location.reload();
-}else {
-
-  Swal.fire({
-      title: 'บันทึกไม่สำเร็จ',
-      text: data.text,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
+    const formData = new FormData();
     const fileInput = document.getElementById('excel_file');
-fileInput.value = ''; // Clear the selected file
-}
+    const ev_id = document.getElementById('ev_id').value;
+
+    formData.append('ev_id', ev_id);
+    formData.append('excel_file', fileInput.files[0]);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
 
 
+    const ex = await fetch('/api/upload/uploadfileev', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
 
-})
-.catch(error => {
-   
-  
-});
+        if (data.status == 'success') {
+          window.location.reload();
+        } else {
+
+          Swal.fire({
+            title: 'บันทึกไม่สำเร็จ',
+            text: data.text,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          const fileInput = document.getElementById('excel_file');
+          fileInput.value = ''; // Clear the selected file
         }
 
-    function displayFileName() {
-            const fileInput = document.getElementById('excel_file');
-            const fileNameDisplay = document.getElementById('fileName');
-            if (fileInput.files.length > 0) {
-                fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
-            } else {
-                fileNameDisplay.textContent = 'No file selected';
-            }
 
-          const formData = new FormData();
-       
-       formData.append('file', fileInput.files[0]);
-       formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-   
-        }
+
+      })
+      .catch(error => {
+
+
+      });
+  }
+
+  function displayFileName() {
+    const fileInput = document.getElementById('excel_file');
+    const fileNameDisplay = document.getElementById('fileName');
+    if (fileInput.files.length > 0) {
+      fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
+    } else {
+      fileNameDisplay.textContent = 'No file selected';
+    }
+
+    const formData = new FormData();
+
+    formData.append('file', fileInput.files[0]);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+
+  }
 
   var tableToExcel = (function () {
     var style = "<style>.green { background-color: green; }</style>";
@@ -196,67 +273,75 @@ fileInput.value = ''; // Clear the selected file
 
 
   function exportTableToExcel(tableID, filename = 'excel_data') {
-            // Get the table element
-            let table = document.getElementById(tableID);
+    // Get the table element
+    let table = document.getElementById(tableID);
 
-            // Convert the table to a workbook
-            let workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    // Convert the table to a workbook
+    let workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
 
-            // Access the worksheet
-            let worksheet = workbook.Sheets["Sheet1"];
+    // Access the worksheet
+    let worksheet = workbook.Sheets["Sheet1"];
 
-            // Define columns to hide (e.g., 1st column, which corresponds to "A" in Excel)
-            worksheet["!cols"] = [
-      
-            
-            ];
+    // Define columns to hide (e.g., 1st column, which corresponds to "A" in Excel)
+    worksheet["!cols"] = [
 
-            // Export the workbook as an Excel file
-            XLSX.writeFile(workbook, `${filename}.xlsx`);
-        }
-      
+
+    ];
+
+    // Export the workbook as an Excel file
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+  }
+
 </script>
 <style>
   /* Hide the file input */
   #excel_file {
-      display: none;
+    display: none;
   }
 
   /* Style the label as a button */
   .file-button {
-      display: inline-block;
-      padding: 10px 20px;
-      font-size: 16px;
-      font-weight: bold;
-      color: white;
-      background-color: #0078D4;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #0078D4;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
   }
 
   .file-button:hover {
-      background-color: #005ea2;
+    background-color: #005ea2;
   }
 
   .file-button:active {
-      background-color: #004080;
+    background-color: #004080;
   }
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
     <h3>ผู้เข้าอบรมหลักสูตร : {{main.name}}</h3>
     <span>
-        รุ่นที่ {{main.gen}}
+      รุ่นที่ {{main.gen}}
+
+
+    </span>
+    {% if datas.perial == 'D' %}
+    <span class="badge bg-success">ช่วงเช้า</span>
+    {% else %}
+    <span class="badge bg-danger">ช่วงบ่าย</span>
+    {% endif %}
+
+
+
     </span>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">หน้าหลัก</a>
@@ -274,27 +359,18 @@ fileInput.value = ''; // Clear the selected file
   <div class="card">
     <div class="card-header">
       <div class="row">
-     
-        <input
-        type="hidden"
-        name="cre_id"
-        id="cre_id"
-        value="{{cre_id}}"
-       
-      />
+
+        <input type="hidden" name="cre_id" id="cre_id" value="{{cre_id}}" />
         <div class="col-lg-12 col-md-12">
           <div align="right">
             <div class="btn-group mb-3">
-               <button
-                type="button"
-                class="btn btn-primary"
-                onclick="window.location.href='/register/all/x/form/create/{{main.cre_id}}'"
-              >
+              <button type="button" class="btn btn-primary"
+                onclick="window.location.href='/register/all/x/form/create/{{main.cre_id}}'">
                 <i class="icon dripicons-plus" aria-hidden="true"></i>
                 เพิ่มข้อมูล
               </button>
 
-  
+
               <!-- <button
                 type="button"
                 class="btn btn-primary"
@@ -326,28 +402,23 @@ fileInput.value = ''; // Clear the selected file
               <a class="btn btn-warning" href="{{api_id_card}}" target="_blank">
                 เปิดสิทธิ์
               </a>
-              <button
-              type="submit"
-              class="btn btn-info"
-              form="create_form_idcard"
-              onclick="start_read_test()"
-            >
-              <i class="icon dripicons-card" aria-hidden="true"></i>
-              เครื่องอ่านบัตร
-            </button>
+              <button type="submit" class="btn btn-info" form="create_form_idcard" onclick="load_dataTest()">
+                <i class="icon dripicons-card" aria-hidden="true"></i>
+                เครื่องอ่านบัตร
+              </button>
 
-              <form  id="uploadForm" method="post">
+              <form id="uploadForm" method="post">
                 {% csrf_token %}
-            
-          
 
-              <input type="file" id="excel_file" name="excel_file"  accept=".xlsx, .xls" onchange="uploadFile(event)">
-             <label for="excel_file" class="file-button">Import to Excel:</label>
-           
+
+
+                <input type="file" id="excel_file" name="excel_file" accept=".xlsx, .xls" onchange="uploadFile(event)">
+                <label for="excel_file" class="file-button">Import to Excel:</label>
+
               </form>
 
-    
-<!-- 
+
+              <!-- 
             <button
             type="submit"
             class="btn btn-warning"
@@ -358,8 +429,8 @@ fileInput.value = ''; // Clear the selected file
             Recall
           </button> -->
 
-          
-         
+
+
             </div>
           </div>
         </div>
@@ -367,88 +438,80 @@ fileInput.value = ''; // Clear the selected file
     </div>
 
     <div class="card-body">
-    
-      <div> 
-      <table class="table table-striped" id="myTable">
-        <thead>
-          <tr>
-            <th>ลำดับ</th>
-            <th>รหัสบัตร ปชช./ Passport</th>
-            <th>ชื่อ - นามสกุล ภาษาไทย</th>
-            <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
-            <th>วันที่ทำรายการ</th>
-           
-           
-            <th hidden>รหัสบัตร ปชช./ Passport</th>
-            <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
-            <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
-            <th hidden>รหัสหลักสูตร</th>
-            <th hidden>ชื่อหลักสูตร</th>
-            <th hidden>วันที่เริ่มต้น</th>
-            <th hidden>วันที่สิ้นสุด</th>
-            <th hidden>ลายเซ็น</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for res in data %}
-          <tr>
-            <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.student_identification_number}}</td>
-            <td>
-              {{res.student_prefix_th}}{{res.student_firstname_th}}
-              {{res.student_lastname_th}}
-            </td>
-            <td>
-              {{res.student_prefix_eng}} {{res.student_firstname_eng}}
-              {{res.student_lastname_eng}}
-            </td>
-            
-            <td>
-              <div>สร้าง : {{res.crt_date}}</div>
-              <div>แก้ไข : {{res.upd_date}}</div>
-            </td>
 
-            <td class="hidden-id">
-              <div align="center">
-            
-                <button
-                  type="button"
-                  class="btn btn-warning"
-                  onclick="window.location.href='/register/all/student/form/show/{{main_data.ev_id}}/{{res.training_id}}'"
-                >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
-                </button>
+      <div>
+        <table class="table table-striped" id="myTable">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>รหัสบัตร ปชช./ Passport</th>
+              <th>ชื่อ - นามสกุล ภาษาไทย</th>
+              <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+              <th>วันที่ทำรายการ</th>
 
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.training_id}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
-                  <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
-                </button>
 
-              </div>
-            </td>
-        
-        
-            <td hidden>{{res.student_identification_number}}</td>
-            <td hidden> {{res.student_prefix_th}}{{res.student_firstname_th}}
-              {{res.student_lastname_th}}</td>
+              <th hidden>รหัสบัตร ปชช./ Passport</th>
+              <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
+              <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
+              <th hidden>รหัสหลักสูตร</th>
+              <th hidden>ชื่อหลักสูตร</th>
+              <th hidden>วันที่เริ่มต้น</th>
+              <th hidden>วันที่สิ้นสุด</th>
+              <th hidden>ลายเซ็น</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for res in data %}
+            <tr>
+              <td align="center">{{ forloop.counter }}</td>
+              <td>{{res.student_identification_number}}</td>
+              <td>
+                {{res.student_prefix_th}}{{res.student_firstname_th}}
+                {{res.student_lastname_th}}
+              </td>
+              <td>
+                {{res.student_prefix_eng}} {{res.student_firstname_eng}}
+                {{res.student_lastname_eng}}
+              </td>
+
+              <td>
+                <div>สร้าง : {{res.crt_date}}</div>
+                <div>แก้ไข : {{res.upd_date}}</div>
+              </td>
+
+              <td class="hidden-id">
+                <div align="center">
+
+                  <button type="button" class="btn btn-warning"
+                    onclick="window.location.href='/register/all/student/form/show/{{main_data.ev_id}}/{{res.training_id}}'">
+                    <i class="icon dripicons-document-edit"></i> แก้ไข
+                  </button>
+
+                  <button type="button" onclick="setValueDeleteModal('{{res.training_id}}')" class="btn btn-danger"
+                    data-bs-toggle="modal" data-bs-target="#DeleteClick">
+                    <i class="icon dripicons-trash" aria-hidden="true"></i>
+                    ลบ
+                  </button>
+
+                </div>
+              </td>
+
+
+              <td hidden>{{res.student_identification_number}}</td>
+              <td hidden> {{res.student_prefix_th}}{{res.student_firstname_th}}
+                {{res.student_lastname_th}}</td>
               <td hidden>
                 {{res.student_prefix_eng}} {{res.student_firstname_eng}}
                 {{res.student_lastname_eng}}
               </td>
-            <td hidden>{{main_data.course.course_code}}</td>
-            <td hidden>{{main_data.course.course_name}}</td>
-            <td hidden>{{main_data.ev_date_start |date:"d/m/Y"}}</td>
-            <td hidden>{{main_data.ev_date_end|date:"d/m/Y"}}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              <td hidden>{{main_data.course.course_code}}</td>
+              <td hidden>{{main_data.course.course_name}}</td>
+              <td hidden>{{main_data.ev_date_start |date:"d/m/Y"}}</td>
+              <td hidden>{{main_data.ev_date_end|date:"d/m/Y"}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -461,12 +524,7 @@ fileInput.value = ''; // Clear the selected file
     <div class="modal-content">
       <div class="modal-header bg-danger">
         <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
@@ -474,21 +532,12 @@ fileInput.value = ''; // Clear the selected file
         <div class="modal-body">
           {% csrf_token %}
           <input type="hidden" name="training_id" id="training_id_delete" />
-          <input
-            type="hidden"
-            name="ev_id"
-            value="{{main_data.ev_id}}"
-          
-          />
+          <input type="hidden" name="ev_id" value="{{main_data.ev_id}}" />
           <div align="center">
             <h4>ยืนยันการลบข้อมูล</h4>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
               <i class="bx bx-x d-block d-sm-none"></i>
               <span class="d-none d-sm-block">ยกเลิก</span>
             </button>
@@ -519,12 +568,7 @@ fileInput.value = ''; // Clear the selected file
         <h5 class="modal-title white" id="myModalLabel19">
           ยืนยันการจบหลักสูตร
         </h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
@@ -532,25 +576,16 @@ fileInput.value = ''; // Clear the selected file
         <div class="modal-body">
           {% csrf_token %}
 
-          <input
-            type="hidden"
-            name="register_id"
-            value="{{main.register_id}}"
-          />
+          <input type="hidden" name="register_id" value="{{main.register_id}}" />
           <div align="center">
             <h4>
               ยืนยันการเรียนจบหลักสูตร {{detail.course.course_name}} ทั้งหมด
             </h4>
-            <span style="color: red; font-size: 16px"
-              >หมายเหตุ : เมื่อจบหลักสูตรแล้ว จะไม่สามารถแก้ไขข้อมูลได้
+            <span style="color: red; font-size: 16px">หมายเหตุ : เมื่อจบหลักสูตรแล้ว จะไม่สามารถแก้ไขข้อมูลได้
             </span>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
               <i class="bx bx-x d-block d-sm-none"></i>
               <span class="d-none d-sm-block">ยกเลิก</span>
             </button>

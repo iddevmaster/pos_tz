@@ -3046,7 +3046,9 @@ def register_form_course_cal_list(request,re_id):
 
 
     data = []
+    datas = []
     mains_one  = course_register_event.objects.get(cre_id=re_id)
+    datas = mains_one
     data = mains_one.re
   
     
@@ -3058,7 +3060,7 @@ def register_form_course_cal_list(request,re_id):
         r = {'eregister_id':rs.eregister_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng}
         obj.append(r)
     
-    context = {'title': title, 'listMenuPermission': objMenu,'data':obj,'count':count,'api_id_card': api_id_card,'main':data,'cre_id':mains_one.cre_id}
+    context = {'title': title, 'listMenuPermission': objMenu,'data':obj,'count':count,'api_id_card': api_id_card,'main':data,'cre_id':mains_one.cre_id,'datas':datas}
     return render(request, 'register/register_form_all_list.html', context)
 
 
@@ -3481,7 +3483,7 @@ def delecouseregister(request):
 def checkleanring(request):
 
     data = json.loads(request.body)
-    ev_id = data.get("ev_id")
+    cre = data.get("cre_id")
     student_identification_number = data.get("student_identification_number")
     student_prefix_th = data.get("student_prefix_th")
     student_firstname_th = data.get("student_firstname_th")
@@ -3490,7 +3492,16 @@ def checkleanring(request):
     student_firstname_eng = data.get("student_firstname_eng")
     student_lastname_eng = data.get("student_lastname_eng")
     # check ev student_identification_number
-
+    course_register_check_in_out.objects.create(
+                student_identification_number=student_identification_number,
+                student_prefix_th=student_prefix_th,
+                student_firstname_th=student_firstname_th,
+                student_lastname_th=student_lastname_th,
+                student_prefix_eng=student_prefix_eng,
+                student_firstname_eng=student_firstname_eng,
+                student_lastname_eng=student_lastname_eng,
+                cre_id=cre
+            )
     
 
     datas = {'status':200,'data':data}
