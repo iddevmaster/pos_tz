@@ -218,6 +218,9 @@ if((card.evs_status == 'S') || (card.evs_status == 'I') || (card.evs_status == '
       if(item.status == 'I'){
         $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
       }
+       if(item.status == 'S'){
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+      }
   
     });
 
