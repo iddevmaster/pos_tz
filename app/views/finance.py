@@ -1178,7 +1178,7 @@ def withdraw_list_one(request):
             select = 0
             price = 0
             tis_compensation = 0
-
+           
             
 
             if int(event.condition_type) == 1:
@@ -1187,7 +1187,7 @@ def withdraw_list_one(request):
             if int(rs.pi_id) == 1:
            
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                
+                print('event.condition_id',event)
                 checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
                 checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
                 checkcourse_con = course.objects.get(course_id=checkhead.course_id)
@@ -1318,6 +1318,7 @@ def withdraw_list_one(request):
                 dt = "-"
             else:
              dt = "จ"
+            print(price) 
             totalp += price
             
             r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}

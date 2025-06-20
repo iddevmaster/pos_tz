@@ -255,8 +255,10 @@ urlpatterns = [
          name="description_setting_form_update"), 
     path('tax/setting/form/create', desbill.setting_form_tax,
          name="tax_setting_form_create"),
-     path('setting/form/bill/create', desbill.setting_form_bill,
+    path('setting/form/bill/create', desbill.setting_form_bill,
          name="bill_setting_form_create"),     
+    path('commissionstages/setting/form/create', desbill.setting_form_commissionstages,
+         name="com_setting_form_create"),     
 
     path('consent/print/<slug:training_id>',report_and_print.print_consent),
 

@@ -480,3 +480,12 @@ class training(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     ev = models.ForeignKey(
         course_event, on_delete=models.CASCADE)
+    
+class commissionstages(models.Model):
+    stage_id = models.AutoField(primary_key=True)
+    commission_rate = models.FloatField(default=0, blank=False)
+    stage_name = models.CharField(max_length=255, unique=True, blank=True)  
+    stage_description = models.CharField(max_length=255,unique=True, blank=True)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+    seq = models.IntegerField(default=None, blank=False)

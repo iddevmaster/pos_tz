@@ -884,11 +884,11 @@ def calendar_event_api2(request,id):
     pi = ['1','2','3','4','5','6','7']
     # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi).order_by(F('ev__ev_date_start').desc())
-    
+   
     obj = []
     
     for r in content:  
-     
+       
        start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        
