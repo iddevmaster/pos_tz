@@ -204,6 +204,10 @@ urlpatterns = [
     path('report/withdraw/all/summary/teacher/<str:teacher_id>/<str:year>/<str:m>', report_and_print.register_report_summary_teacher_all),
     path('report/withdraw/all/summary/teacher/<str:year>/<str:m>', report_and_print.register_report_summary_teacher_all_month),
 
+
+    path('report/overdue/all/com', report_and_print.register_report_summary),
+    path('report/withdraw/all/com', report_and_print.register_report_summary_teacher),
+
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',
@@ -258,9 +262,16 @@ urlpatterns = [
     path('setting/form/bill/create', desbill.setting_form_bill,
          name="bill_setting_form_create"),     
     path('commissionstages/setting/form/create', desbill.setting_form_commissionstages,
-         name="com_setting_form_create"),     
+         name="com_setting_form_create"),
+    path('commissionstage/setting/form/create', desbill.setting_form_commissionstages_create,
+         name="com_setting_form_create"),  
+     path('commissionstage/setting/form/update', desbill.setting_form_commissionstages_update,
+         name="com_setting_form_update"),    
+     path('commissionstage/setting/form/delete', desbill.setting_form_commissionstages_delete,
+         name="com_setting_form_delete"),
 
     path('consent/print/<slug:training_id>',report_and_print.print_consent),
+
 
         
          

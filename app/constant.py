@@ -240,6 +240,12 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
+        {
+        "value": "finance/sale/com",
+        "label": "เบิกค่าCommission",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
     {
         "value": "finance/teacher",
         "label": "รายการเบิกค่าตอบแทน",
@@ -328,6 +334,18 @@ listMenu = [
      {
         "value": "report/withdraw/all/summary/teacher",
         "label": "สรุปรายชื่อครูฝึกตั้งเบิก",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+        {
+        "value": "report/overdue/all/com",
+        "label": "สรุปรายชื่อค้างจ่ายCommission",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+    {
+        "value": "report/withdraw/all/com",
+        "label": "สรุปรายงานตั้งเบิกค่าCommission",
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },

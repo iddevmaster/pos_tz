@@ -257,4 +257,84 @@ def setting_form_commissionstages(request):
     return render(request, 'settingdes/setting_com_form_create.html', context)
     
 
-    
+@login_required(login_url='/login')
+def setting_form_commissionstages_create(request):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    if request.method == 'POST':
+       
+        name = request.POST['stage_name']
+     
+        commission_ra = request.POST.get('commission_ra')
+
+  
+        last_entry = commissionstages.objects.order_by('-seq').first()
+        
+        content = commissionstages(
+        stage_name=name,
+        commission_rate=commission_ra,
+        seq=last_entry.seq + 1,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow())
+        content.save()
+        messages.success(request, "ทำรายการสำเร็จ !")
+        return redirect("/commissionstages/setting/form/create")
+
+    desciption = commissionstages.objects.all().order_by('seq')
+    context = {'title': defaultTitle,  'data': desciption, 'listMenuPermission': objMenu}
+            
+    return render(request, 'settingdes/setting_com_form_create.html', context)
+
+
+
+@login_required(login_url='/login')
+
+def setting_form_commissionstages_update(request):
+
+
+    stage_id = request.POST['stage_id']
+    stage_name = request.POST['stage_name']
+    commission_rate = request.POST['commission_rate_update']
+   
+    content = commissionstages.objects.get(stage_id=stage_id)
+    content.stage_name = stage_name
+    content.commission_rate = commission_rate
+    content.save()
+
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/commissionstages/setting/form/create")
+
+def setting_form_commissionstages_delete(request):
+
+    id = request.POST['id']     
+   
+    instance = commissionstages.objects.get(seq=id)
+    instance.delete()
+    desciption = commissionstages.objects.all().order_by('seq')  
+    t = 0
+    for desciptions in desciption:
+        t += 1
+        desciptions.seq = t
+        desciptions.save()
+        
+    messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/commissionstages/setting/form/create")
