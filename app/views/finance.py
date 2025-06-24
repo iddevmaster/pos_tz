@@ -748,10 +748,10 @@ def saveeventadmin(request):
 
             if pi == '6':    
               content = teacher_income_setting(
-                tis_compensation=0,
+                tis_compensation=300,
                 tis_unit=tis_unit,
                 tis_quantity=tis_quantity,
-                tis_sum=0,
+                tis_sum=300,
                 tis_start_date=instance.ev_date_start,
                 tis_end_date=instance.ev_date_end,
                 ev_id=ev_id,
@@ -767,10 +767,10 @@ def saveeventadmin(request):
               x.status = 'W'
               x.save()
               tot = 0
-              totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
-              if totalpeol > 0 :
-                  bb = 300 / totalpeol
-                  teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=0,tis_compensation=0)
+            #   totalpeol = teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).count()
+            #   if totalpeol > 0 :
+            #       bb = 300 / totalpeol
+            #       teacher_income_setting.objects.filter(ev_id=ev_id, active=0,pi_id=pi).update(tis_sum=0,tis_compensation=0)
             
 
             if pi == '7':    
