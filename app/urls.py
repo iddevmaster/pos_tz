@@ -115,6 +115,8 @@ urlpatterns = [
     path('api/updateeventcondition', course.condition_form_update_event),
     path('api/savetax', desbill.savetax),
     path('api/savesettingbill', desbill.savesettingbill),
+    path('api/findevid', desbill.findbillevid),
+    
 
     #     teacher
     path('teachers/', teacher.teacher_list),

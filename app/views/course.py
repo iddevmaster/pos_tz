@@ -339,7 +339,9 @@ def course_event_delete(request):
     content.cancelled = 0
     content.save()
 
+    teact_in = teacher_income_setting.objects.filter(ev=ev_id).delete()
 
+ 
 
     conu = course.objects.get(pk=content.course_id)
     api_url = "http://127.0.0.1:8000/api/data"

@@ -338,3 +338,16 @@ def setting_form_commissionstages_delete(request):
         
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/commissionstages/setting/form/create")
+
+
+
+@csrf_exempt
+def findbillevid(request):
+    data = json.loads(request.body)
+    ev_id = data.get("ev_id")
+
+
+  
+
+    datas = {'status':'200'}
+    return JsonResponse(data,safe=False)
