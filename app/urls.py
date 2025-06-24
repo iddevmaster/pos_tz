@@ -98,6 +98,7 @@ urlpatterns = [
     path('calendar_event_api/', course.calendar_event_api),
     path('calendar_event_apieve/', course.calendar_event_apizs),
     path('calendar_event_apiall/', course.calendar_event_apiall),
+    path('calendar_event_apiall_com/', course.calendar_event_apiallcom),
     path('calendar_event_apiteacher/', course.calendar_event_apiteacher),
 
     path('calendar_event_api_totalbill/', course.calendar_event_api_totalbill),
@@ -205,8 +206,8 @@ urlpatterns = [
     path('report/withdraw/all/summary/teacher/<str:year>/<str:m>', report_and_print.register_report_summary_teacher_all_month),
 
 
-    path('report/overdue/all/com', report_and_print.register_report_summary),
-    path('report/withdraw/all/com', report_and_print.register_report_summary_teacher),
+    path('report/overdue/all/com', report_and_print.register_report_summary),  #ค้างจ่ายค่าคอม
+    path('report/withdraw/all/com', report_and_print.register_report_summary_teacher), #ตั้งเบิกค่าคอม
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
@@ -250,6 +251,7 @@ urlpatterns = [
 
 #     path('finance/teacher', finance.withdraw_list), 
     path('finance/teacher', finance.withdraw_list_one),
+    path('finance/sale/commission', finance.withdraw_list_commission),
 
     path('description/setting/form/create', desbill.setting_form_create,
          name="description_setting_form_create"),

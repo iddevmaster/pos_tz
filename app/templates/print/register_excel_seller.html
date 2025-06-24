@@ -112,6 +112,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>Tax ID</td>
       <td>เบอร์โทร</td>
       <td>ที่อยู่</td>
+      <td>หลักสูตร</td>
       <td>ประเภทลูกค้า</td>
       <td>ประเภทชำระเงิน</td>
       <td>สถานะการขาย</td>
@@ -133,6 +134,14 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
         {{res.customer_list.location.province_name}}
         {{res.customer_list.location.zipcode}}
       </td>
+       <td>
+  
+        {% if res.payment_list.register.is_event == 'Y' %}
+     {{res.course_list.course.course_name}}
+        {% else %}
+     {{res.course_list.course_name}}
+        {% endif %}
+       </td>
       <td align="center">
         {% if res.customer_list.register.customer_type == 1 %}
         <span>บุคคล</span>

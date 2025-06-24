@@ -1124,6 +1124,31 @@ def withdraw_list(request):
 
 
 
+def withdraw_list_commission(request):
+
+   
+    user_id = request.user.id
+     # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    title = defaultTitle
+    listposition = pay_item.objects.filter(
+            cancelled=1, active=1)
+    list_teacher = teacher.objects.filter(cancelled=1, active=1)
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition}
+    return render(request, 'course/calendar_event_all_com.html', context)
+
 
 def withdraw_list_one(request):
     user_id = request.user.id

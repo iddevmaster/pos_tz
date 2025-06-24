@@ -240,7 +240,13 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
-        {
+    {
+        "value": "finance/sale/commission",
+        "label": "กำหนดรายการCommission",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
+    {
         "value": "finance/sale/com",
         "label": "เบิกค่าCommission",
         "group_value": "naSt0v",

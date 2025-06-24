@@ -429,17 +429,20 @@ def register_excel_seller(request):
     total_sum = 0
     for r in content:
         
-        
-        payment_list = register_payment_items.objects.select_related('rp').filter(
+        payment_list = register_payment_items.objects.select_related('rp','register').filter(
             register_id=r.register).order_by("-rp__rp_id").first()
         
         if payment_list is not None:
+           
             rpi_price_result = payment_list.rpi_price_result
+            if payment_list.register.is_event == 'Y':
+               course_list = course_event.objects.select_related('course').filter(ev_id=r.register.ev_id).first()
+            else :
+               course_list = course.objects.filter(course_id=payment_list.register.course.course_id).first() 
         else:
             rpi_price_result = 0
         total_sum += rpi_price_result
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.register.ev_id).first()
+     
         res = {'customer_list': r,
                'course_list': course_list, 'payment_list': payment_list}
         obj.append(res)
@@ -1215,7 +1218,7 @@ def register_report_summary(request):
     day_current_m = date.today().month - 1
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
-    return render(request, 'report/billing_cycle_result_summary.html', context) 
+    return render(request, 'report/billing_cycle_result_summary_overdue.html', context) 
 
 
 @login_required(login_url='/login')
@@ -1244,7 +1247,7 @@ def register_report_summary_teacher(request):
     day_current_m = date.today().month
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
-    return render(request, 'report/billing_cycle_result_summary_teacher.html', context) 
+    return render(request, 'report/billing_cycle_result_summary_withdraw.html', context) 
 
 
 
