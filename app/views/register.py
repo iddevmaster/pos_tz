@@ -2001,7 +2001,6 @@ def approve_lis_event(request):
                'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
- 
 
     return render(request, 'register/approve_list_event.html', context)
 def approve_lis_event_end(request):
@@ -2067,7 +2066,7 @@ def update_close_the_sale(request):
     # เปรียบเทียบราคาเพื่อยืนยันการปิดการขาย
     check_payment = register_payment_items.objects.filter(
         rpi_price_result=confirm_price, register_id=register_id).order_by("-rpi_id").first()
-    print(check_payment)
+    
     if check_payment:
         set_active = register_payment.objects.get(rp_id=check_payment.rp_id)
         set_active.active = 1

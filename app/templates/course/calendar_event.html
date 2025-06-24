@@ -611,8 +611,8 @@ if(data.status == 200){
       const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
       document.getElementById('tis_quantity').value = count_day
-      document.getElementById('tis_compensation').value = 800
-      const input = document.getElementById('tis_sum').value = 800 * count_day
+      document.getElementById('tis_compensation').value = 1000
+      const input = document.getElementById('tis_sum').value = 1000 * count_day
       const x = document.getElementById('tis_quantity');
     }
     if(selectElement.value == 4) {
@@ -744,8 +744,8 @@ if(data.status == 200){
     const tis_quantity = document.getElementById("tis_quantity").value;
 
     if(pi == 3){
-  document.getElementById("tis_sum").value = (800) * tis_quantity;
-  document.getElementById("tis_compensation").value = 800;
+  document.getElementById("tis_sum").value = (1000) * tis_quantity;
+  document.getElementById("tis_compensation").value = 1000;
 }else if(pi == 4) {
   document.getElementById("tis_sum").value = (500) * tis_quantity;
   document.getElementById("tis_compensation").value = 500;
