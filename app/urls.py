@@ -240,7 +240,7 @@ urlpatterns = [
     path('user/category/clusterting/<slug:pk>',
          user.category_program_form_permission, name="category_program_form_delete"),
     #     finance
-    path('finance/billing/result', finance.billing_cycle_result),
+#     path('finance/billing/result', finance.billing_cycle_result),
     path('finance/billing/setting', finance.course_event_list),
     path('billing/setting/form/create', finance.billing_cycle_setting_form_create,
          name="billing_cycle_setting_form_create"),
@@ -251,7 +251,7 @@ urlpatterns = [
     path('course/event/teacher/form/delete', finance.course_teacher_event_set_income_form_delete,
          name="course_teacher_event_set_income_form_delete"),
 
-#     path('finance/teacher', finance.withdraw_list), 
+    path('finance/teacher', finance.withdraw_list), 
     path('finance/teacher', finance.withdraw_list_one),
     path('finance/sale/commission', finance.withdraw_list_commission),
 
