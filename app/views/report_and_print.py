@@ -427,13 +427,13 @@ def register_excel_seller(request):
     
     obj = []
     total_sum = 0
+    
     for r in content:
         
         payment_list = register_payment_items.objects.select_related('rp','register').filter(
             register_id=r.register).order_by("-rp__rp_id").first()
-        
+        course_list = []
         if payment_list is not None:
-           
             rpi_price_result = payment_list.rpi_price_result
             if payment_list.register.is_event == 'Y':
                course_list = course_event.objects.select_related('course').filter(ev_id=r.register.ev_id).first()
@@ -443,6 +443,7 @@ def register_excel_seller(request):
             rpi_price_result = 0
         total_sum += rpi_price_result
      
+
         res = {'customer_list': r,
                'course_list': course_list, 'payment_list': payment_list}
         obj.append(res)
