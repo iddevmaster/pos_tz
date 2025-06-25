@@ -103,8 +103,7 @@ def register_print_witdraw(request, teacher_id, start, end):
     start_new = ymdtodmy_new(start)
     end_new = ymdtodmy_new(end)
 
-    print(start_new)
-    print(end_new)
+    
     obj = []
     list_teacher = teacher.objects.get(teacher_id=teacher_id,cancelled=1, active=1)
 
@@ -1009,7 +1008,7 @@ def register_report_compensation_withdraw_onemore(request):
     # day_current = 10
     b = billing_cycle_setting.objects.filter(module=m.module)
     start_content = teacher_income_setting.objects.filter(
-        ev__module=m.module,status='I')
+        ev__module=m.module,status='S')
 
     list_teacher = teacher.objects.filter(
         module=m.module, cancelled=1, active=1)
@@ -2708,22 +2707,13 @@ def register_report_summary_withdraw(request):
 def register_report_compensation_withdraw_onemorefitter(request):
    
     user_id = request.user.id
-    
-    date_range = request.POST.get('date_range', None)
-    teac = fact_teacher_user.objects.get(user_id=user_id)
-    uuid_without_dashes = str(teac.teacher_id).replace('-', '')
-
-
-    start = None
-    end = None
-    start_new = None
-    end_new = None
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+        
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -2738,47 +2728,52 @@ def register_report_compensation_withdraw_onemorefitter(request):
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
-    # month_current = date.today().month
-
-
-    result = teacher.objects.filter(cancelled=1).order_by("-crt_date")
 
 
 
-    list_teacher = teacher.objects.filter(
-        module=m.module, cancelled=1, active=1)
-    obj = []
-    totalp = 0
-    sumtax = 0
-    select = 0
-    price = 0
-    cou = 0        
-    tis_compensation = 0
-    teacher_one = None
-    getdatauser = None
-   
-    if date_range is not None:
-        start, end = format_daterange(date_range)
-        start_new ,end_new = format_daterange_new(date_range)
-        content = teacher_income_setting.objects.select_related('ev').filter(status='S',teacher=uuid_without_dashes)
-        teacher_one = teacher.objects.get(teacher_id=uuid_without_dashes)
-        factuser = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
-        getdatauser = User.objects.get(pk=factuser.user_id)
-        cou = content.count()
-        if start == end:
-            content = content.filter(ev__ev_date_start__gte=start)
-        else:
-            content = content.filter(ev__ev_date_start__gte=start,ev__ev_date_end__lte=end)
-
-        requirements = 'ไม่มี'
-        name_con = '-'
+    date_range = request.POST.get('date_range', None)
     
+    start = None
+    end = None
+    start_new = None
+    end_new = None
+
+    lastday = lastDateOfmonth(
+        date.today().year, date.today().month, date.today().day)
+    default_start = str(date.today().year) + "-" + \
+        str(date.today().month) + "-" + "01"
+    default_end = str(date.today().year) + "-" + \
+        str(date.today().month) + "-" + str(lastday)
+    try:
+        getteachid = fact_teacher_user.objects.get(user_id=user_id)
+        obj = []
+        pi = ['1','2','3','4','5']
+        totalp = 0
+        content = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='S',pi_id__in=pi)
+
+        if date_range is not None:
+         start, end = format_daterange(date_range)
+         start_new = ymdtodmy_new(start)
+         end_new = ymdtodmy_new(end)
+         
+         if start == end:
+            content = content.filter(tis_start_date__gte=start)
+         else:
+            content = content.filter(tis_start_date__gte=start,tis_end_date__lte=end)     
+        else:
+            print('else')
+            content = content.filter(tis_start_date__gte=default_start,tis_end_date__lte=default_end)
+            start_new = ymdtodmy_new(default_start)
+            end_new = ymdtodmy_new(default_end)
+        
+        name_con = '-'
         for rs in content:
+            requirements = 'ไม่มี'
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
-            
             for aaa in regbyev:
+                
                 try:
                     bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
                     if bbbb:
@@ -2787,50 +2782,93 @@ def register_report_compensation_withdraw_onemorefitter(request):
                         bbbb = 0
             
             event = course_event.objects.get(ev_id=rs.ev_id)
-         
-         
+            
+            select = 0
+            price = 0
+            tis_compensation = 0
+           
             if int(event.condition_type) == 1:
+                
                 requirements = 'มี'
             if int(rs.pi_id) == 1:
            
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                icont = condition.objects.filter(conhead=event.condition_id)
-                for iconts in icont:
-        
-                     typet = iconts.type
-                      
-                     if typet == '1':
-                    
+                
+                checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
+                checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
+                checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+          
+                if checkcourse_con.is_type_condition == '1':
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('student')
+                   for iconts in icont:
+                      typet = iconts.type
+                      if iconts.type_add == '1': 
+                       if typet == '1':
                         if total_rq_quta > iconts.student:
                             select = iconts.condition_id
                             break
-                     elif typet == '2':
+                       elif typet == '2':
                     
                         if iconts.student < total_rq_quta:
                             select = iconts.condition_id
                             break
-                     elif typet == '3':
-                        
+                       elif typet == '3':
                         if iconts.student == total_rq_quta: 
                             select = iconts.condition_id
-                            break  
-             print('วิทยากร',select)
+                            break   
+
+                else : 
+                   icont = condition.objects.filter(conhead=event.condition_id).order_by('action')
+                   for iconts in icont:
+                     if iconts.action == '0': 
+                        print('เช็คลบก่อนน',iconts.action)
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='2').order_by('student')
+                     elif iconts.action == '1':  
+                        print('เช็คบวกที่หลัง',iconts.action) 
+                        checkcon = condition.objects.filter(conhead=event.condition_id,action='1').order_by('-student')
+                     for checkcons in checkcon:
+                        if total_rq_quta > checkcons.student:
+                            select = checkcons.condition_id
+                            
+                            break
+                        else:
+                           select = 0
+                          
              if select != 0:
               
               totalselect = condition.objects.get(condition_id=select)
-              price = int(rs.tis_quantity) * (totalselect.price)
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
-              name_con = head.name
-              tis_compensation = totalselect.price
-          
-             else:
-                price = int(rs.tis_quantity) * (rs.tis_compensation)    
-                tis_compensation = rs.tis_compensation
-            
-            else :    
-        
-             if int(rs.pi_id) == 2:
+              checkcourse_con = course.objects.get(course_id=checkhead.course_id)
+              if checkcourse_con.is_type_condition == '1':
+                 
+                 price = int(rs.tis_quantity) * (totalselect.price)
+                 name_con = head.name
+                 tis_compensation = totalselect.price
+              else:   
+                 
+                 if totalselect.action == '1':
+                    tis_quantity = int(rs.tis_quantity) + int(totalselect.hour)
+                    price = int(rs.tis_compensation) * (tis_quantity)
+                    tis_compensation = rs.tis_compensation
+                    name_con = head.name
+                    
+                 else :
+                    price = int(rs.tis_quantity) * (totalselect.price)
+                    name_con = head.name
+                    tis_compensation = totalselect.price
+                    
 
+
+             else:
+                
+                price = int(rs.tis_quantity) * (rs.tis_compensation)  
+                name_con = '-'
+                tis_compensation = rs.tis_compensation
+               
+        
+            else :    
+            
+             if int(rs.pi_id) == 2:
               price = int(rs.tis_quantity) * (rs.tis_compensation)  
               tis_compensation = rs.tis_compensation        
               
@@ -2840,31 +2878,66 @@ def register_report_compensation_withdraw_onemorefitter(request):
               tis_compensation = rs.tis_compensation
 
              elif int(rs.pi_id) == 4:
-              
+            
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation
              elif int(rs.pi_id) == 5:
-              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,status='I',pi=5).count()
+              
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
+          
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
-
-            totalp += price
          
-            taxall = price * (rs.tax / 100)
-            sumtax += taxall
+            
+            start = str(event.ev_date_start)
+          
+            end = str(event.ev_date_end)
+            y, m, d = end.split("-")
+            Y, mM, dD = start.split("-")
+            day_of_week = event.ev_date_start.weekday()
            
-            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall}
+           
+            if day_of_week:
+             
+             try:
+                
+                if day_of_week == 0:
+                    dt = "จ"
+                elif day_of_week == 1: 
+                    dt = "อ"  
+                elif day_of_week == 2:
+                    dt = "พ"  
+                elif day_of_week == 3: 
+                    dt = "พฤ" 
+                elif day_of_week == 4: 
+                    dt = "ศ"
+                elif day_of_week == 5:
+                    dt = "ส"
+                elif day_of_week == 6:   
+                    dt = "อา"           
+             except ValueError:
+                dt = "-"
+            else:
+             dt = "จ"
+            
+            totalp += price
+            
+            r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
         
             obj.append(r)
 
+            print(obj)
         
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp,'user_id':user_id,'start_new':start_new,'end_new':end_new}
+    except fact_teacher_user.DoesNotExist:
+        getteachid = None
+        return redirect("/")
+    
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'totalp':totalp,'date_range':date_range,'teacher_id':uuid_without_dashes,'cou':cou,'teacher_one':teacher_one,
-            'list_teacher': list_teacher,'start':start,'end':end,'sumtax':sumtax,'getdatauser':getdatauser,'start_new':start_new,'end_new':end_new}
     return render(request, 'print/report_withdraw_one.html', context)    
 
 @login_required(login_url='/login')

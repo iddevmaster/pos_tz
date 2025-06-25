@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -347,7 +347,45 @@ def findbillevid(request):
     ev_id = data.get("ev_id")
 
 
+    
+
+
   
 
     datas = {'status':'200'}
     return JsonResponse(data,safe=False)
+
+
+@csrf_exempt
+def data_event(request):
+    data = json.loads(request.body)
+    ev_id = data.get("evid")
+    
+    teacher_data = teacher_income_setting.objects.filter(ev_id=ev_id)
+    print(teacher_data)
+    sff = []
+    obj = []
+    if teacher_data.count() > 0:
+        
+        for x in teacher_data:
+            sff = {
+                "teacher_prefix_th": x.teacher.teacher_prefix_th,
+                "teacher_firstname_th": x.teacher.teacher_firstname_th,
+                "teacher_lastname_th": x.teacher.teacher_lastname_th,
+                "pi_id":x.pi_id,
+                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "tis_quantity": x.tis_quantity,
+                "tis_unit": x.tis_unit,
+                "compensation":x.tis_compensation,
+                "id":x.id,
+                "status":x.status,
+                "teacher_id": x.teacher_id,
+                "tis_sum": x.tis_sum
+            }
+            obj.append(sff)
+            
+         
+        else :
+            sff = []
+
+    return JsonResponse(obj,safe=False)

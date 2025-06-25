@@ -46,7 +46,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     background-color: green;
   }
 </style>
-{% if cou > 1 %}
+
 <div style="padding-bottom: 65px">
   <div style="float: left">
   <input
@@ -91,7 +91,6 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     </tr>
 
 
-
  
     {% for res in data %}
     <tr>
@@ -110,7 +109,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     <tr>
       <td colspan="5">รวมเป็นค่าตอบแทน</td>
       <td colspan="1">{{sumtax|floatformat:2|intcomma }}</td>
-      <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{total_all|floatformat:2|intcomma }}</td>
     </tr>
     
     <!-- <tr>
@@ -198,5 +197,3 @@ padding-top: 10px;
     </tr> -->
   </tbody>
 </table>
-{% else %}
-{% endif %} 

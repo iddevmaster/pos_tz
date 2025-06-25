@@ -620,7 +620,7 @@ def checkhours(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": instance}, status=400,safe=False)
 
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)        
+           
 
 @csrf_exempt
 def saveeventadmin(request):
@@ -1343,7 +1343,7 @@ def withdraw_list_one(request):
                 dt = "-"
             else:
              dt = "จ"
-            print(price) 
+            
             totalp += price
             
             r = {'daynum':dD,'day':dt,'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation}
