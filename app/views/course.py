@@ -621,6 +621,97 @@ def calendar_event_all(request):
     return render(request, 'course/calendar_event_all.html', context)
 
 
+
+def data_event(request):
+
+    start = request.GET.get('start', None)
+    end = request.GET.get('end', None)
+    _date = date.today()
+    if start is not None and end is not None:
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        sobj = str(start).split("T")[0]
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        eobj = str(end).split("T")[0]
+    else:
+        sobj = _date + timedelta(days=0)
+        eobj = _date + timedelta(days=60)
+    status = ['W','Y','I']
+    content = course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj, status__in=status)
+   
+    obj = []
+
+    sff = []
+    for r in content:
+        
+        conditiondata = []
+        if r :
+            getcondition = conhead.objects.filter(course_id=r.course_id,is_active='Y')
+            for cond in list(getcondition):
+                 resx = {'conhead_id':cond.conhead_id,'name':cond.name}
+                 conditiondata.append(resx)
+        end = str(r.ev_date_end)
+      
+        y, m, d = end.split("-")
+        nextdayend = addDay(1, int(y), int(m), int(d))
+        
+
+        col = r.status
+        if col == 'W' :
+         t = '#e0ce1b'
+        elif col == 'Y': 
+         t = '#eb2509'  
+        elif col == 'I': 
+         t = '#4be01b'  
+        elif col == 'S': 
+         t = '#4be01b'    
+        else:
+         t = '#4be01b'
+        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
+        location = location_thai.objects.get(location_id=r.location_id)
+   
+        sff = []
+        
+        if teacher_data.count() > 0:
+            sff = [
+            {
+                "teacher_prefix_th": x.teacher.teacher_prefix_th,
+                "teacher_firstname_th": x.teacher.teacher_firstname_th,
+                "teacher_lastname_th": x.teacher.teacher_lastname_th,
+                "pi_id":x.pi_id,
+                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "tis_quantity": x.tis_quantity,
+                "tis_unit": x.tis_unit,
+                "compensation":x.tis_compensation,
+                "id":x.id,
+                "status":x.status,
+                "teacher_id": x.teacher_id,
+                "tis_sum": x.tis_sum
+            }
+            for x in teacher_data
+         ]
+        else :
+            sff = []
+    #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
+    #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
+        delta = r.ev_date_end - r.ev_date_start
+        days_difference = delta.days + 1
+
+
+        
+
+     
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")" ,'data':sff,
+        'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),
+                'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference,'condition_type': r.condition_type,'condition':conditiondata,'condition_id':r.condition_id}
+        obj.append(res)
+       
+    return JsonResponse(obj, safe=False)
+
+
+
+
+   
 def calendar_event_api(request):
     user_id = request.user.id
   
@@ -678,7 +769,7 @@ def calendar_event_api(request):
         teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
         location = location_thai.objects.get(location_id=r.location_id)
    
-        
+        sff = []
         
         if teacher_data.count() > 0:
             sff = [
