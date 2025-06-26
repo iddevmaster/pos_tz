@@ -18,13 +18,20 @@
   //     });
   // });
 
-
+  $(document).ready(function() {
+  $('#eventModal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+});
   $(document).ready(function () {
+
+
     // Initialize Select2 inside modal
     $('#eventModal').on('shown.bs.modal', function () {
       $('#teacher').select2({
         dropdownParent: $('#eventModal') // Ensure dropdown is within the modal
-      }).select2('close'); // Optional: Auto-open Select2
+      })
     });
 
     // Prevent form submission on Enter key in search field
@@ -1098,6 +1105,23 @@
   }
 </script>
 <style scoped>
+
+/* อาจจะต้องเพิ่ม !important เพื่อบังคับให้ใช้ */
+.modal-body {
+    overflow: visible !important; /* ถ้า modal-body ไปตัดขอบ */
+}
+
+/* หรือถ้าปัญหาอยู่ที่ Select2 dropdown เอง */
+.select2-container--open .select2-dropdown {
+    position: fixed !important; /* บังคับให้ตำแหน่งเป็น Fixed */
+    top: 50% !important;        /* เลื่อนลงมา 50% จากขอบบนของ viewport */
+    left: 30% !important;       /* เลื่อนมา 50% จากขอบซ้ายของ viewport */
+    transform: translate(-50%, -50%) !important; /* เลื่อนตัวเองกลับมาครึ่งหนึ่งของความกว้าง/สูง */
+    width: auto !important;     /* ให้ความกว้างปรับตามเนื้อหา (หรือกำหนดเองได้) */
+    max-width: 90% !important;  /* เพื่อไม่ให้กว้างเกินไปบนจอเล็ก */
+    z-index: 99999 !important;  /* ให้แน่ใจว่าอยู่ด้านบนสุด */
+}
+
   .my-custom-modal-width {
     max-width: 700px;
     /* Example: set a custom max-width */
@@ -1199,7 +1223,7 @@
 
 
 <div class="modal fade" id="eventModal">
-  <div class="modal-dialog modal-fullscreen">
+  <div class="modal-dialog modal-xxl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabel"></h5>
