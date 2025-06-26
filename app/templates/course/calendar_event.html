@@ -4,110 +4,110 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
-// $(document).ready(function () {
-//     // Initialize Select2
-//     $('#teacher').select2({
-//         dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
-//     });
+  // $(document).ready(function () {
+  //     // Initialize Select2
+  //     $('#teacher').select2({
+  //         dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+  //     });
 
-//     // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
-//     $('#select2Modal').on('shown.bs.modal', function () {
-//         $('#teacher').select2({
-//             dropdownParent: $('#select2Modal')
-//         });
-//     });
-// });
+  //     // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
+  //     $('#select2Modal').on('shown.bs.modal', function () {
+  //         $('#teacher').select2({
+  //             dropdownParent: $('#select2Modal')
+  //         });
+  //     });
+  // });
 
 
-$(document).ready(function () {
+  $(document).ready(function () {
     // Initialize Select2 inside modal
     $('#eventModal').on('shown.bs.modal', function () {
-        $('#teacher').select2({
-            dropdownParent: $('#eventModal') // Ensure dropdown is within the modal
-        }).select2('close'); // Optional: Auto-open Select2
+      $('#teacher').select2({
+        dropdownParent: $('#eventModal') // Ensure dropdown is within the modal
+      }).select2('close'); // Optional: Auto-open Select2
     });
 
     // Prevent form submission on Enter key in search field
     $(document).on('keypress', '.select2-search__field', function (e) {
-        if (e.keyCode === 13) {
-            e.preventDefault();
-        }
+      if (e.keyCode === 13) {
+        e.preventDefault();
+      }
     });
-});
+  });
 
 
 
 
-async function handleSelectChangeCondition(t) {
- 
-const ev_id = document.getElementById("ev_id");
-         
+  async function handleSelectChangeCondition(t) {
 
-let data = await fetch('/api/updateeventcondition', {
-  method: 'POST',
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':t.value,'condition_type':1})
-  })
-  .then(response => response.json())
-  .then(data => {
-console.log('update');
-  })
-  
-  
-
-}
-
-async function handleClick(myRadio) {
-  
-const ev_id = document.getElementById("ev_id");
-  const myDiv = document.getElementById("myDiv");
-  console.log(myRadio.value);
-
-  if(myRadio.value == 0){
-         
-    myDiv.classList.remove("visible");
-    myDiv.classList.add("hidden");
-let data = await fetch('/api/updateeventcondition', {
-  method: 'POST',
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':0,'condition_type':0})
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('update');
-  })
-
-    
-  }
-
-  if(myRadio.value == 1){
-    myDiv.classList.remove("hidden");
-    myDiv.classList.add("visible");
+    const ev_id = document.getElementById("ev_id");
 
 
     let data = await fetch('/api/updateeventcondition', {
-  method: 'POST',
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({'ev_id':ev_id.value,'condition_id':0,'condition_type':1})
-  })
-  .then(response => response.json())
-  .then(data => {
-console.log('update');
-  })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'ev_id': ev_id.value, 'condition_id': t.value, 'condition_type': 1 })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('update');
+      })
+
 
 
   }
 
-}
+  async function handleClick(myRadio) {
 
-function setValueDeleteModal(id) {
-  
+    const ev_id = document.getElementById("ev_id");
+    const myDiv = document.getElementById("myDiv");
+    console.log(myRadio.value);
+
+    if (myRadio.value == 0) {
+
+      myDiv.classList.remove("visible");
+      myDiv.classList.add("hidden");
+      let data = await fetch('/api/updateeventcondition', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'ev_id': ev_id.value, 'condition_id': 0, 'condition_type': 0 })
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('update');
+        })
+
+
+    }
+
+    if (myRadio.value == 1) {
+      myDiv.classList.remove("hidden");
+      myDiv.classList.add("visible");
+
+
+      let data = await fetch('/api/updateeventcondition', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'ev_id': ev_id.value, 'condition_id': 0, 'condition_type': 1 })
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('update');
+        })
+
+
+    }
+
+  }
+
+  function setValueDeleteModal(id) {
+
 
     document.getElementById("id_delete").value = id;
 
@@ -118,36 +118,52 @@ function setValueDeleteModal(id) {
   async function delel() {
 
 
+
+
     let data = await fetch('/api/evenetdel', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'id':document.getElementById("id_delete").value})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'id': document.getElementById("id_delete").value })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
 
 
-// this.calen();
-// window.location.reload();
-//    return data.status
+        // this.calen();
+        // window.location.reload();
+        //    return data.status
 
-setTimeout(() => {
-      window.location.reload();
- }, 100);
+        setTimeout(() => {
 
-})
-  
+             $('#json-table-body').empty(); // Clear previous cards
+
+
+            const ev_id = document.getElementById("ev_id").value
+
+            let aaaa = findevid(ev_id)
+
+        
+ 
+
+         
+        }, 100);
+
+      })
+
 
   }
 
-  
 
-function calen() {
 
-      
+
+
+
+  function calen() {
+
+
     var calendarEl = document.getElementById("calendar");
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -157,41 +173,41 @@ function calen() {
         right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
       },
       {% comment %} initialDate: "2020-09-12", {% endcomment %}
-      locale: "th",
-      buttonIcons: false, // show the prev/next text
+  locale: "th",
+    buttonIcons: false, // show the prev/next text
       weekNumbers: true,
-      navLinks: true, // can click day/week names to navigate views
-      editable: false,
-      dayMaxEvents: true, // allow "more" link when too many events
-      events: {
-        url: "/calendar_event_api/",
-        failure: function () {
-          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
-        },
+        navLinks: true, // can click day/week names to navigate views
+          editable: false,
+            dayMaxEvents: true, // allow "more" link when too many events
+              events: {
+    url: "/calendar_event_api/",
+      failure: function () {
+        document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
       },
-      eventClick: function (info) {
-        
+  },
+  eventClick: function (info) {
+
     $('#cardContainer').empty(); // Clear previous cards
-        document.getElementById('eventModalLabel').innerText = info.event.title;
+    document.getElementById('eventModalLabel').innerText = info.event.title;
 
 
-        document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
-        document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
+    document.getElementById('limit_price').value = info.event.extendedProps.limit_price;
+    document.getElementById('dis_limit_price').value = info.event.extendedProps.dis_limit;
 
-        document.getElementById("ev_id").value = info.event.extendedProps.evs_id
-
-
-        document.getElementById("ev_hour").innerText = info.event.extendedProps.ev_hour
-        document.getElementById("ev_hour_two").innerText = info.event.extendedProps.ev_hour_two
-        document.getElementById("ev_hour_three").innerText = info.event.extendedProps.ev_hour_three
+    document.getElementById("ev_id").value = info.event.extendedProps.evs_id
 
 
-        document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
-        document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
-        document.getElementById("ev_people_three").innerText = info.event.extendedProps.ev_people_three
-        
-        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-        eventModal.show();
+    document.getElementById("ev_hour").innerText = info.event.extendedProps.ev_hour
+    document.getElementById("ev_hour_two").innerText = info.event.extendedProps.ev_hour_two
+    document.getElementById("ev_hour_three").innerText = info.event.extendedProps.ev_hour_three
+
+
+    document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
+    document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
+    document.getElementById("ev_people_three").innerText = info.event.extendedProps.ev_people_three
+
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    eventModal.show();
 
 
 
@@ -201,9 +217,9 @@ function calen() {
 
 
     const tableBody = document.getElementById('json-table-body');
-            jsonData.forEach((item,index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+    jsonData.forEach((item, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
@@ -212,32 +228,26 @@ function calen() {
                     <td>${item.tis_sum}</td>
                     <td>#</td>  
                 `;
-                tableBody.appendChild(row);
-            });
+      tableBody.appendChild(row);
+    });
 
-            // Add new JSON data dynamically
-            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
-
-    
- // Populate modal with event data
-
-},
+  },
       
     });
-    calendar.render();
+  calendar.render();
  
 
 }
   document.addEventListener("DOMContentLoaded", function () {
 
-          var events = [
-                { title: 'Meeting 1', start: '2025-05-27T09:00:00' },
-                { title: 'Meeting 2', start: '2025-05-27T10:00:00' },
-                { title: 'Meeting 3', start: '2025-05-27T11:00:00' },
-                { title: 'Meeting 4', start: '2025-05-27T12:00:00' },
-                { title: 'Meeting 5', start: '2025-05-27T13:00:00' }
-            ];
-            
+    var events = [
+      { title: 'Meeting 1', start: '2025-05-27T09:00:00' },
+      { title: 'Meeting 2', start: '2025-05-27T10:00:00' },
+      { title: 'Meeting 3', start: '2025-05-27T11:00:00' },
+      { title: 'Meeting 4', start: '2025-05-27T12:00:00' },
+      { title: 'Meeting 5', start: '2025-05-27T13:00:00' }
+    ];
+
     var calendarEl = document.getElementById("calendar");
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -247,133 +257,133 @@ function calen() {
         right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
       },
       {% comment %} initialDate: "2020-09-12", {% endcomment %}
-      locale: "th",
-      buttonIcons: false, // show the prev/next text
-      weekNumbers: true,
-      navLinks: true, // can click day/week names to navigate views
-      editable: false,
-      events: {
-        url: "/calendar_event_api/",
-        failure: function () {
-          document.getElementById("msg").innerHTML  = "..เชื่อมต่อ API ไม่ได้";
+    locale: "th",
+    buttonIcons: false, // show the prev/next text
+    weekNumbers: true,
+    navLinks: true, // can click day/week names to navigate views
+    editable: false,
+    events: {
+    url: "/calendar_event_api/",
+    failure: function () {
+      document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
+    },
+  },
+    initialView: 'dayGridMonth',
+    dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
+    eventClick: function (info) {
+      let timerInterval;
+      Swal.fire({
+        title: "รอสักครู่",
+        html: "I will close in <b></b> milliseconds.",
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
         },
-      },
-      initialView: 'dayGridMonth',
-      dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
-      eventClick: function (info) {
-        let timerInterval;
-Swal.fire({
-  title: "รอสักครู่",
-  html: "I will close in <b></b> milliseconds.",
-  timer: 2000,
-  timerProgressBar: true,
-  didOpen: () => {
-    Swal.showLoading();
-    const timer = Swal.getPopup().querySelector("b");
-    timerInterval = setInterval(() => {
-      timer.textContent = `${Swal.getTimerLeft()}`;
-    }, 100);
-  },
-  willClose: () => {
-    clearInterval(timerInterval);
-  }
-}).then((result) => {
-  /* Read more about handling dismissals below */
-  if (result.dismiss === Swal.DismissReason.timer) {
-    console.log("I was closed by the timer");
-  }
-});
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("I was closed by the timer");
+        }
+      });
 
 
 
-            let data = fetch('/calendar_event_api_totalbill/', {
-  method: 'POST',
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({'ev_id':info.event.extendedProps.evs_id})
-  })
-  .then(response => response.json())
-  .then(data => {
-   
-    document.getElementById("condition_id").value = data.condition_id
-    document.getElementById("condition_type").value = data.condition_type
-    document.getElementById("bill").innerText = data.total_rq_quta
+      let data = fetch('/calendar_event_api_totalbill/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'ev_id': info.event.extendedProps.evs_id })
+      })
+        .then(response => response.json())
+        .then(data => {
 
-    
- 
-  })
-  
-  setTimeout(() => {
- 
-
-
-      document.getElementById('count_day').value = info.event.extendedProps.count_day;
-
-      const radio1 = document.getElementById("inlineRadio1");
-      const radio2 = document.getElementById("inlineRadio2");
-      const condition_type = document.getElementById("condition_type").value;
-      const condition_id = document.getElementById("condition_id").value;
-     
-  
-      if(condition_type == 0){
-        radio2.checked = false;
-        radio1.checked = true;
-        const myDiv = document.getElementById("myDiv");
-        myDiv.classList.remove("visible");
-        myDiv.classList.add("hidden");
-      }
-    
-      if(condition_type == 1){
-        radio2.checked = true;
-        radio1.checked = false;
-        const myDiv = document.getElementById("myDiv");
-        myDiv.classList.remove("hidden");
-        myDiv.classList.add("visible");
-      }
+          document.getElementById("condition_id").value = data.condition_id
+          document.getElementById("condition_type").value = data.condition_type
+          document.getElementById("bill").innerText = data.total_rq_quta
 
 
 
- 
-    let wtf = info.event.extendedProps.condition
-    
+        })
 
-    let myArray = []; // initialize an empty array
-    let myObject = {conhead_id:0,name:"เลือกเงื่อนไข"}; // create an object
-    myArray.push(myObject); // add the object to the array
-   
-    for (let i = 0; i < info.event.extendedProps.condition.length; i++) {
-    
-      let ffff = {conhead_id:info.event.extendedProps.condition[i].conhead_id,name:info.event.extendedProps.condition[i].name}; 
-      myArray.push(ffff); 
-    }
-  
-    // Get the select element
-    const selectElement = document.getElementById("mySelect");
-    while (selectElement.options.length > 0) {
-      selectElement.remove(0);
-    }
-    
+      setTimeout(() => {
 
-    // Loop through the array and create options
-    myArray.forEach(item => {
-      const option = document.createElement("option");
-      // Create a new option element
-  
 
-      // Set the option's value (required)
-      option.value = item.conhead_id;
-      // Set the option's text (what the user sees)
-      option.textContent = item.name;  //  or option.innerText = item.text;
 
-      selectElement.appendChild(option);
-    });
-   
- selectElement.value = condition_id;
+        document.getElementById('count_day').value = info.event.extendedProps.count_day;
 
-        
-    $('#cardContainer').empty(); // Clear previous cards
-   
+        const radio1 = document.getElementById("inlineRadio1");
+        const radio2 = document.getElementById("inlineRadio2");
+        const condition_type = document.getElementById("condition_type").value;
+        const condition_id = document.getElementById("condition_id").value;
+
+
+        if (condition_type == 0) {
+          radio2.checked = false;
+          radio1.checked = true;
+          const myDiv = document.getElementById("myDiv");
+          myDiv.classList.remove("visible");
+          myDiv.classList.add("hidden");
+        }
+
+        if (condition_type == 1) {
+          radio2.checked = true;
+          radio1.checked = false;
+          const myDiv = document.getElementById("myDiv");
+          myDiv.classList.remove("hidden");
+          myDiv.classList.add("visible");
+        }
+
+
+
+
+        let wtf = info.event.extendedProps.condition
+
+
+        let myArray = []; // initialize an empty array
+        let myObject = { conhead_id: 0, name: "เลือกเงื่อนไข" }; // create an object
+        myArray.push(myObject); // add the object to the array
+
+        for (let i = 0; i < info.event.extendedProps.condition.length; i++) {
+
+          let ffff = { conhead_id: info.event.extendedProps.condition[i].conhead_id, name: info.event.extendedProps.condition[i].name };
+          myArray.push(ffff);
+        }
+
+        // Get the select element
+        const selectElement = document.getElementById("mySelect");
+        while (selectElement.options.length > 0) {
+          selectElement.remove(0);
+        }
+
+
+        // Loop through the array and create options
+        myArray.forEach(item => {
+          const option = document.createElement("option");
+          // Create a new option element
+
+
+          // Set the option's value (required)
+          option.value = item.conhead_id;
+          // Set the option's text (what the user sees)
+          option.textContent = item.name;  //  or option.innerText = item.text;
+
+          selectElement.appendChild(option);
+        });
+
+        selectElement.value = condition_id;
+
+
+        $('#cardContainer').empty(); // Clear previous cards
+
         document.getElementById('count_day').value = info.event.extendedProps.count_day;
         document.getElementById('eventModalLabel').innerText = info.event.title;
         document.getElementById('address').innerText = info.event.extendedProps.address;
@@ -391,32 +401,70 @@ Swal.fire({
 
         document.getElementById("ev_people").innerText = info.event.extendedProps.ev_people
         document.getElementById("ev_people_two").innerText = info.event.extendedProps.ev_people_two
-  
-        
-        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-        eventModal.show();
 
 
-    let jsonData = info.event.extendedProps.data
-    const tableBody = document.getElementById('json-table-body');
-    tableBody.innerHTML = ''; // Clears all rows
-            jsonData.forEach((item,index) => {
-             
-              if(item.tis_unit == 'day'){
-                var dt = 'วัน'
-              }
-              if(item.tis_unit == 'hour'){
-                var dt = 'ชั่วโมง'
-              }
-              if(item.tis_unit == 'work'){
-                var dt = 'งาน'
-              }
-              
-                const row = document.createElement('tr');
+        // const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        // eventModal.show();
 
-                if(item.status == 'W'){
-                 
-                  row.innerHTML = `
+
+        $('#eventModal').modal('show');
+
+
+
+
+        let aaaa = findevid(info.event.extendedProps.evs_id)
+
+
+
+
+
+        // Add new JSON data dynamically
+        // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
+
+
+        // Populate modal with event data
+      }, 1000);
+    },
+      
+    });
+  calendar.render();
+  });
+
+
+  async function findevid(evid) { // <-- ADD async here
+    console.log(evid)
+    try {
+      const response = await fetch('/api/calendar_event_api_data', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          evid: evid,
+        })
+      });
+      const data = await response.json();
+      const tableBody = document.getElementById('json-table-body');
+      tableBody.innerHTML = ''; // Clears all rows
+      data.forEach((item, index) => {
+
+        if (item.tis_unit == 'day') {
+          var dt = 'วัน'
+        }
+        if (item.tis_unit == 'hour') {
+          var dt = 'ชั่วโมง'
+        }
+        if (item.tis_unit == 'work') {
+          var dt = 'งาน'
+        }
+
+        const row = document.createElement('tr');
+
+        if (item.status == 'W') {
+
+          row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
@@ -435,10 +483,10 @@ Swal.fire({
                 </button></td>  
                 `;
 
-                }
-                if(item.status == 'Y'){
+        }
+        if (item.status == 'Y') {
 
-                  row.innerHTML = `
+          row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
@@ -457,148 +505,246 @@ Swal.fire({
                 </button></td>  
                 `;
 
-                }
-           
-                tableBody.appendChild(row);
-            });
+        }
 
-            
-            // Add new JSON data dynamically
-            // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
+        tableBody.appendChild(row);
+      });
 
-    
- // Populate modal with event data
-}, 1000);
-},
-      
-    });
-    calendar.render();
-  });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
 
+
+  function fetchEvdata() {
+
+
+    let jsonData = [
+      {
+        "teacher_prefix_th": "นาย",
+        "teacher_firstname_th": "เฉลิมชัย",
+        "teacher_lastname_th": "หุ่นนาครินทร์ทร",
+        "pi_id": 1,
+        "pi_name": [
+          "วิทยากร"
+        ],
+        "tis_quantity": 8,
+        "tis_unit": "hour",
+        "compensation": 1000,
+        "id": 850,
+        "status": "Y",
+        "teacher_id": "7dfb47e8-25c4-44c3-935c-e3ca97230682",
+        "tis_sum": 8000
+      },
+      {
+        "teacher_prefix_th": "นาย",
+        "teacher_firstname_th": "สมพงษ์",
+        "teacher_lastname_th": "เพ็งปอภาร",
+        "pi_id": 2,
+        "pi_name": [
+          "ครูฝึก"
+        ],
+        "tis_quantity": 7,
+        "tis_unit": "hour",
+        "compensation": 300,
+        "id": 851,
+        "status": "Y",
+        "teacher_id": "05c29f79-10dc-4251-b063-54339030227a",
+        "tis_sum": 2100
+      },
+      {
+        "teacher_prefix_th": "คุณ",
+        "teacher_firstname_th": "อรรถพงษ์",
+        "teacher_lastname_th": "หาญณรงค์",
+        "pi_id": 2,
+        "pi_name": [
+          "ครูฝึก"
+        ],
+        "tis_quantity": 7,
+        "tis_unit": "hour",
+        "compensation": 300,
+        "id": 853,
+        "status": "Y",
+        "teacher_id": "8c897aa0-9ca9-4580-adc6-25f494b8cf31",
+        "tis_sum": 2100
+      },
+      {
+        "teacher_prefix_th": "นาย",
+        "teacher_firstname_th": "ศิริโรจน์",
+        "teacher_lastname_th": "เสนาดี",
+        "pi_id": 2,
+        "pi_name": [
+          "ครูฝึก"
+        ],
+        "tis_quantity": 7,
+        "tis_unit": "hour",
+        "compensation": 300,
+        "id": 854,
+        "status": "Y",
+        "teacher_id": "5ac43f8b-f68a-4da6-a4d5-8c4a753fe6cc",
+        "tis_sum": 2100
+      },
+      {
+        "teacher_prefix_th": "คุณ",
+        "teacher_firstname_th": "อรรถพงษ์",
+        "teacher_lastname_th": "หาญณรงค์",
+        "pi_id": 4,
+        "pi_name": [
+          "ผู้ช่วยวิทยากร B"
+        ],
+        "tis_quantity": 1,
+        "tis_unit": "day",
+        "compensation": 500,
+        "id": 855,
+        "status": "Y",
+        "teacher_id": "8c897aa0-9ca9-4580-adc6-25f494b8cf31",
+        "tis_sum": 500
+      },
+      {
+        "teacher_prefix_th": "นาย",
+        "teacher_firstname_th": "สมพงษ์",
+        "teacher_lastname_th": "เพ็งปอภาร",
+        "pi_id": 4,
+        "pi_name": [
+          "ผู้ช่วยวิทยากร B"
+        ],
+        "tis_quantity": 1,
+        "tis_unit": "day",
+        "compensation": 500,
+        "id": 856,
+        "status": "Y",
+        "teacher_id": "05c29f79-10dc-4251-b063-54339030227a",
+        "tis_sum": 500
+      },
+      {
+        "teacher_prefix_th": "นาย",
+        "teacher_firstname_th": "เฉลิมชัย",
+        "teacher_lastname_th": "หุ่นนาครินทร์ทร",
+        "pi_id": 2,
+        "pi_name": [
+          "ครูฝึก"
+        ],
+        "tis_quantity": 14,
+        "tis_unit": "hour",
+        "compensation": 600,
+        "id": 1065,
+        "status": "W",
+        "teacher_id": "7dfb47e8-25c4-44c3-935c-e3ca97230682",
+        "tis_sum": 8400
+      }
+    ]
+
+    return jsonData;
+
+  }
 
 
 
   async function save() {
 
 
-   const pi = document.getElementById("pi").value
-   const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
-   let te = document.getElementById("teacher_id").value
-   let tis_unit = document.getElementById("tis_unit").value
-   let tis_compensation = document.getElementById("tis_compensation").value
-   let tis_quantity = document.getElementById("tis_quantity").value
-   let tis_sum = document.getElementById("tis_sum").value
-   const ev_id = document.getElementById("ev_id").value
 
- 
-    if(te == ""){
-    Swal.fire({
-      title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-      text: 'กรุณาเลือกรายชื่อ',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
+    const pi = document.getElementById("pi").value
+    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
+    let te = document.getElementById("teacher_id").value
+    let tis_unit = document.getElementById("tis_unit").value
+    let tis_compensation = document.getElementById("tis_compensation").value
+    let tis_quantity = document.getElementById("tis_quantity").value
+    let tis_sum = document.getElementById("tis_sum").value
+    const ev_id = document.getElementById("ev_id").value
 
-    return false
-   }
 
-   
-const status_hour = document.getElementById("status_hour").value 
-const status_people = document.getElementById("status_people").value 
-const status_teacher = document.getElementById("status_teacher").value 
+    if (te == "") {
+      Swal.fire({
+        title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
+        text: 'กรุณาเลือกรายชื่อ',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
 
-// if(pi == 3){
+      return false
+    }
 
-// ////////// check จำนวนเงิน
 
-// const dis_limit_price = document.getElementById("dis_limit_price").value 
-// const tis_sum = document.getElementById("tis_sum").value 
+    const status_hour = document.getElementById("status_hour").value
+    const status_people = document.getElementById("status_people").value
+    const status_teacher = document.getElementById("status_teacher").value
 
-// if(parseInt(tis_sum) > parseInt(dis_limit_price)){
-//   Swal.fire({
-//   title: 'จำนวนงบเกินกว่าที่ตั้งไว้',
-//   text: 'จำนวนงบเกินกว่าที่ตั้งไว้',
-//   icon: 'error',
-//   confirmButtonText: 'OK'
-// });
-// return false
-// }
 
-// }
 
-if(status_hour == 'false'){
-    Swal.fire({
-      title: 'จำนวนชั่วโมงไม่เพียงพอ',
-      text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-   }
-   if(status_people == 'false'){
-    Swal.fire({
-      title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
-      text: 'กรุณาตรวจสอบให้ถูกต้อง',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-  }
-  if(status_teacher == 'false'){
-    Swal.fire({
-      title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
-      text: 'กรุณาเลือกรายชื่ออื่น',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false
-   }
+    if (status_hour == 'false') {
+      Swal.fire({
+        title: 'จำนวนชั่วโมงไม่เพียงพอ',
+        text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return false
+    }
+    if (status_people == 'false') {
+      Swal.fire({
+        title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
+        text: 'กรุณาตรวจสอบให้ถูกต้อง',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return false
+    }
+    if (status_teacher == 'false') {
+      Swal.fire({
+        title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
+        text: 'กรุณาเลือกรายชื่ออื่น',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return false
+    }
 
 
     let data = await fetch('/api/saveevenet', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'ev_id':ev_id,'pi':pi,'teacher_id':te,'tis_unit':tis_unit,'tis_compensation':tis_compensation,'tis_quantity':tis_quantity,'tis_sum':tis_sum})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
 
-if(data.status == 200){
-  Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      text: 'บันทึกสำเร็จ',
-      icon: 'success',
-    });
+        if (data.status == 200) {
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            text: 'บันทึกสำเร็จ',
+            icon: 'success',
+          });
 
-    setTimeout(() => {
-      window.location.reload();
- }, 100);
-
-    
-}else {
-  Swal.fire({
-      title: 'บันทึกไม่สำเร็จ',
-      text: 'บันทึกไม่สำเร็จ',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-}
-
-// this.calen();
-// window.location.reload();
-//    return data.status
+          setTimeout(() => {
+            $('#json-table-body').empty(); // Clear previous cards
 
 
+            const ev_id = document.getElementById("ev_id").value
 
-})
-.catch(error => {
-   
-  
-});
-    
+            let aaaa = findevid(ev_id)
+          }, 100);
+
+
+        } else {
+          Swal.fire({
+            title: 'บันทึกไม่สำเร็จ',
+            text: 'บันทึกไม่สำเร็จ',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+
+
+      })
+      .catch(error => {
+
+
+      });
+
   }
 
 
@@ -606,8 +752,8 @@ if(data.status == 200){
   function handleSelectChangePy(selectElement) {
     const selectedValue = selectElement.value;
     document.getElementById("pi").value = selectedValue;
-    if(selectElement.value == 3) {
-      const count_day = document.getElementById("count_day").value 
+    if (selectElement.value == 3) {
+      const count_day = document.getElementById("count_day").value
       const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
       document.getElementById('tis_quantity').value = count_day
@@ -615,21 +761,21 @@ if(data.status == 200){
       const input = document.getElementById('tis_sum').value = 1000 * count_day
       const x = document.getElementById('tis_quantity');
     }
-    if(selectElement.value == 4) {
-      const count_day = document.getElementById("count_day").value 
+    if (selectElement.value == 4) {
+      const count_day = document.getElementById("count_day").value
       const limit_price = document.getElementById("limit_price").value
       document.getElementById("tis_unit").value = 'day';
       document.getElementById('tis_quantity').value = count_day
       document.getElementById('tis_compensation').value = 500
       const input = document.getElementById('tis_sum').value = 500 * count_day
 
-      
+
       const x = document.getElementById('tis_quantity');
 
-      
+
     }
 
-    if(selectElement.value == 5) {
+    if (selectElement.value == 5) {
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
@@ -639,10 +785,10 @@ if(data.status == 200){
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-      
+
     }
 
-    if(selectElement.value == 6) {
+    if (selectElement.value == 6) {
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
@@ -653,11 +799,11 @@ if(data.status == 200){
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-      
+
     }
 
-    if(selectElement.value == 7) {
-      
+    if (selectElement.value == 7) {
+
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
@@ -668,12 +814,12 @@ if(data.status == 200){
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-      
+
     }
 
-    if(selectElement.value == 8) {
+    if (selectElement.value == 8) {
 
- 
+
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
@@ -684,11 +830,11 @@ if(data.status == 200){
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-      
+
     }
 
 
-    if((selectElement.value == 1) ||(selectElement.value == 2)) {
+    if ((selectElement.value == 1) || (selectElement.value == 2)) {
       document.getElementById("tis_unit").value = 'hour';
       const input = document.getElementById('tis_quantity');
       const x = document.getElementById('tis_quantity');
@@ -702,16 +848,16 @@ if(data.status == 200){
 
 
 
- setTimeout(() => {
-  CheckHourbeforeSave()
-  getComposetaion()
+    setTimeout(() => {
+      CheckHourbeforeSave()
+      getComposetaion()
 
- }, 50);
+    }, 50);
 
- setTimeout(() => {
- 
-  Caculate()
- }, 200);
+    setTimeout(() => {
+
+      Caculate()
+    }, 200);
   }
 
 
@@ -721,17 +867,17 @@ if(data.status == 200){
 
 
     let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
- document.getElementById("teacher_id").value = result;
+    document.getElementById("teacher_id").value = result;
 
-//  calen()
- 
+    //  calen()
 
 
- setTimeout(() => {
-  CheckHourbeforeSave()
-  getComposetaion()
-  
- }, 50);
+
+    setTimeout(() => {
+      CheckHourbeforeSave()
+      getComposetaion()
+
+    }, 50);
 
 
   }
@@ -743,247 +889,291 @@ if(data.status == 200){
     const aaaa = document.getElementById("tis_compensation").value;
     const tis_quantity = document.getElementById("tis_quantity").value;
 
-    if(pi == 3){
-  document.getElementById("tis_sum").value = (1000) * tis_quantity;
-  document.getElementById("tis_compensation").value = 1000;
-}else if(pi == 4) {
-  document.getElementById("tis_sum").value = (500) * tis_quantity;
-  document.getElementById("tis_compensation").value = 500;
-}
-else if(pi == 5) {
-  document.getElementById("tis_sum").value = (1000);
-  document.getElementById("tis_compensation").value = 1000;
-}
-else if(pi == 6) {
-  document.getElementById("tis_sum").value = (300);
-  document.getElementById("tis_compensation").value = 300;
-}
+    if (pi == 3) {
+      document.getElementById("tis_sum").value = (1000) * tis_quantity;
+      document.getElementById("tis_compensation").value = 1000;
+    } else if (pi == 4) {
+      document.getElementById("tis_sum").value = (500) * tis_quantity;
+      document.getElementById("tis_compensation").value = 500;
+    }
+    else if (pi == 5) {
+      document.getElementById("tis_sum").value = (1000);
+      document.getElementById("tis_compensation").value = 1000;
+    }
+    else if (pi == 6) {
+      document.getElementById("tis_sum").value = (300);
+      document.getElementById("tis_compensation").value = 300;
+    }
 
 
-else {
-  document.getElementById("tis_sum").value = aaaa * tis_quantity;
-}
-  
-   }
+    else {
+      document.getElementById("tis_sum").value = aaaa * tis_quantity;
+    }
 
-   async function CheckHourbeforeSave() {
+  }
 
-
-const ev_id = document.getElementById("ev_id").value;
-const pi = document.getElementById("pi").value
-const tis_quantity = document.getElementById("tis_quantity").value;
-const teacher_id = document.getElementById("teacher_id").value
+  async function CheckHourbeforeSave() {
 
 
+    const ev_id = document.getElementById("ev_id").value;
+    const pi = document.getElementById("pi").value
+    const tis_quantity = document.getElementById("tis_quantity").value;
+    const teacher_id = document.getElementById("teacher_id").value
 
-  
-let data = await fetch('/api/checkhours', {
-method: 'POST',
-headers: {
-    'Content-Type': 'application/json',
-},
-body: JSON.stringify({'pi':pi,'tis_quantity':parseInt(tis_quantity),'ev_id':parseInt(ev_id),'teacher_id':teacher_id})
-})
-.then(response => response.json())
-.then(data => {
-    // Display response
-   
-    document.getElementById("status_hour").value = data.status_hour;
-    document.getElementById("status_people").value = data.status_people;
-    document.getElementById("status_teacher").value = data.status_teacher;
-//    return data.status
+    if(!teacher_id) {
+      return false
+    }
 
 
-
-})
-.catch(error => {
-   
-  
-});
-
-return data
+    let data = await fetch('/api/checkhours', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 'pi': pi, 'tis_quantity': parseInt(tis_quantity), 'ev_id': parseInt(ev_id), 'teacher_id': teacher_id })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Display response
+        console.log(data)
+        document.getElementById("status_hour").value = data.status_hour;
+        document.getElementById("status_people").value = data.status_people;
+        document.getElementById("status_teacher").value = data.status_teacher;
+        //    return data.status
 
 
 
+      })
+      .catch(error => {
 
-}
+
+      });
+
+    return data
 
 
-function getComposetaion() {
+
+    // try {
+    //   const response = await fetch('/api/checkhours', {
+    //     method: 'POST', // Specify the HTTP method as POST
+    //     headers: {
+    //       'Content-Type': 'application/json' // Tell the server we're sending JSON
+    //       // You might need other headers like 'Authorization' if your API requires it
+    //     },
+    //   body: JSON.stringify({ 'pi': pi, 'tis_quantity': parseInt(tis_quantity), 'ev_id': parseInt(ev_id), 'teacher_id': teacher_id })
+    //   });
+    //   const data = await response.json();
+
+
+    // } catch (error) {
+
+    // }
+
+
+  }
+
+
+  function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
     const csrftoken = "{{ csrf_token }}";
-    if((py == 1)||(py == 2)){
+    if ((py == 1) || (py == 2)) {
       fetch('/api/get/compensation', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({'teacher_id':teacher_id,'py':py})
-})
-    .then(response => response.json())
-    .then(data => {
-        if(data.length == 0){
-          document.getElementById("tis_compensation").value = 0
-          return false;
-        }
-        else {
-          document.getElementById("tis_compensation").value = data.compensation
-          Caculate()
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'teacher_id': teacher_id, 'py': py })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.length == 0) {
+            document.getElementById("tis_compensation").value = 0
+            return false;
+          }
+          else {
+            document.getElementById("tis_compensation").value = data.compensation
+            Caculate()
 
-// if(data.py_id == 3){
-//   const limit_price = document.getElementById("limit_price").value
-//   document.getElementById("tis_compensation").value = (limit_price);
-//   Caculate()
-// } else if(data.py_id == 4){
-//   console.log('else if');
-//   const limit_price = document.getElementById("limit_price").value
-//   document.getElementById("tis_compensation").value = limit_price
-//   Caculate()
-// } else {
-//   document.getElementById("tis_compensation").value = data.compensation
-//   Caculate()
-// }
-        
-        }
-    
+            // if(data.py_id == 3){
+            //   const limit_price = document.getElementById("limit_price").value
+            //   document.getElementById("tis_compensation").value = (limit_price);
+            //   Caculate()
+            // } else if(data.py_id == 4){
+            //   console.log('else if');
+            //   const limit_price = document.getElementById("limit_price").value
+            //   document.getElementById("tis_compensation").value = limit_price
+            //   Caculate()
+            // } else {
+            //   document.getElementById("tis_compensation").value = data.compensation
+            //   Caculate()
+            // }
+
+          }
 
 
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
 
-    }else{
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+    } else {
 
     }
 
-   }
+  }
 
-   function allowOnlyNumbers(event) {
+  function allowOnlyNumbers(event) {
 
-   
-// Allow: Backspace, Tab, Arrow keys, Delete
-if (
-    event.key === "Backspace" || 
-    event.key === "Tab" || 
-    event.key === "ArrowLeft" || 
-    event.key === "ArrowRight" || 
-    event.key === "Delete"
-) {
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+
+      setTimeout(() => {
+        const it = document.getElementById("tis_quantity").value;
+        if (it.charAt(0) == "0") {
+          let result = removeFirstCharacter(it);
+          document.getElementById("tis_quantity").value = result
+          // return it.slice(0); // Removes the first character
+        }
+
+      }, 20);
+
+
+      setTimeout(() => {
+
+        getComposetaion()
+      }, 100);
+
+      setTimeout(() => {
+
+        Caculate()
+        CheckHourbeforeSave()
+      }, 200);
+
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+
+
 
     setTimeout(() => {
-const it = document.getElementById("tis_quantity").value;
-if (it.charAt(0) == "0") {
-  let result = removeFirstCharacter(it);
-  document.getElementById("tis_quantity").value = result 
- // return it.slice(0); // Removes the first character
-}
+      const it = document.getElementById("tis_quantity").value;
+      if (it.charAt(0) == "0") {
+        let result = removeFirstCharacter(it);
+        document.getElementById("tis_quantity").value = result
+        // return it.slice(0); // Removes the first character
+      }
 
-}, 20);
+    }, 20);
 
 
-setTimeout(() => {
+    setTimeout(() => {
 
-getComposetaion()
-}, 100);
+      getComposetaion()
+    }, 100);
 
-setTimeout(() => {
+    setTimeout(() => {
 
-Caculate()
-CheckHourbeforeSave()
-}, 200);
-
-    return true; // Allow default behavior
-}
-
-// Allow only numbers (0-9)
-if (!/^\d$/.test(event.key)) {
-    event.preventDefault(); // Block other characters
-    return false; // Prevent default behavior
-}
+      Caculate()
+      CheckHourbeforeSave()
+    }, 200);
 
 
 
-
-
-setTimeout(() => {
-const it = document.getElementById("tis_quantity").value;
-if (it.charAt(0) == "0") {
-  let result = removeFirstCharacter(it);
-  document.getElementById("tis_quantity").value = result 
- // return it.slice(0); // Removes the first character
-}
-
-}, 20);
-
-
-setTimeout(() => {
-
-getComposetaion()
-}, 100);
-
-setTimeout(() => {
-
-Caculate()
-CheckHourbeforeSave()
-}, 200);
-
-
-
-}
+  }
 </script>
-<style>
+<style scoped>
+  .my-custom-modal-width {
+    max-width: 700px;
+    /* Example: set a custom max-width */
+    /* You can also adjust margin if needed, though Bootstrap handles it well */
+  }
+
+  /* Example: Making it wider for larger screens, but still custom */
+  @media (min-width: 992px) {
+
+    /* For large devices (lg breakpoint) */
+    .my-custom-modal-width {
+      max-width: 900px;
+      /* Wider on larger screens */
+    }
+  }
+
+  @media (min-width: 1200px) {
+
+    /* For extra large devices (xl breakpoint) */
+    .my-custom-modal-width {
+      max-width: 1050px;
+      /* Even wider on very large screens */
+    }
+  }
+
+  .modal-xxl {
+    max-width: 90%;
+    width: 90%;
+  }
+
+  /* Ensure modal-content scales properly */
+  .modal-xxl .modal-content {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Optional: Add responsive styling */
+  @media (max-width: 768px) {
+    .modal-xxl {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .select2-container {
+    z-index: 1055 !important;
+    /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+  }
 
 
-.modal-xxl {
-            max-width: 90%;
-            width: 90%;
-        }
+  .hidden {
+    display: none;
+    /* Initially hide the div */
+  }
 
-        /* Ensure modal-content scales properly */
-        .modal-xxl .modal-content {
-            width: 100%;
-            height: auto;
-        }
+  .visible {
+    display: block;
+    /* Make the div visible */
+  }
 
-        /* Optional: Add responsive styling */
-        @media (max-width: 768px) {
-            .modal-xxl {
-                max-width: 100%;
-                width: 100%;
-            }
-        }
+  .clickable-header {
+    cursor: pointer;
+    /* Indicate that the header is clickable */
+  }
 
-        .select2-container {
-    z-index: 1055 !important; /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
-}
-
-
-.hidden {
-  display: none;  /* Initially hide the div */
-}
-.visible {
-  display: block; /* Make the div visible */
-}
-.clickable-header {
-  cursor: pointer; /* Indicate that the header is clickable */
-}
-
-    #calendar {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
     <h3>ตารางหลักสูตรอบรม</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">หน้าหลัก</a>
@@ -1008,220 +1198,207 @@ CheckHourbeforeSave()
 
 
 
-<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xxl">
-      <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="eventModalLabel"></h5>
-            <br>
-          
-              <input
-              type="hidden"
-              name="ev_id"
-              id="ev_id"
-              required
-             
-            />
-        <input type="hidden" class="form-control" name="limit_price_workhelp" id="limit_price_workhelp"  value=""/>
-        <input type="hidden" class="form-control" name="count_day" id="count_day"  value=""/>
+<div class="modal fade" id="eventModal">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel"></h5>
+        <br>
+
+        <input type="hidden" name="ev_id" id="ev_id" required />
+        <input type="hidden" class="form-control" name="limit_price_workhelp" id="limit_price_workhelp" value="" />
+        <input type="hidden" class="form-control" name="count_day" id="count_day" value="" />
         <input type="hidden" class="form-control" name="dis_limit_price" id="dis_limit_price" />
-        <input type="hidden" class="form-control" name="limit_price" id="limit_price"/>
-        <input type="hidden" class="form-control" name="status_hour" id="status_hour"  value=""/>
-        <input type="hidden" class="form-control" name="status_people" id="status_people"  value=""/>
-        <input type="hidden" class="form-control" name="status_teacher" id="status_teacher"  value=""/>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" >
-            <div class="modal-title" id="address"></div>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-12 col-lg-6 col-md-6">
-                   
-                <span class="font-default">ตำแหน่ง / หน้าที่ / รายการ:</span>
-                <label style="color: red"> *</label> 
-                <select class="form-select"  id="py" name="py" onchange="handleSelectChangePy(this)">
-                  <option value="" disabled>
-                    เลือก
-                   </option>
-                  {% for listpositions in listposition %}
-                  <option value="{{ listpositions.id }}">
-                     {{ listpositions }}
-                  </option>
-              {% endfor %}
-                </select>
-            </div>
-            <div class="col-12 col-lg-6 col-md-6">
-           
-              <span class="font-default">ค่าตอบแทน:</span>
-              <label style="color: red"> *</label> 
-              <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
-        
-          </div>
-
-          
-      <div class="col-12 col-lg-6 col-md-6">
-        <span class="font-default">จำนวนต่อหน่วย:</span>
-        <label style="color: red"> *</label> 
-        <select class="form-select" id="tis_unit" name="tis_unit" style="pointer-events: none; background-color: #e9ecef;">
-          <option value="hour">
-            ชั่วโมง
-       </option>
-       <option value="day">
-           วัน
-        </option>
-        <option value="work">
-         งาน
-       </option>
-        </select>
-    </div>
-
-      <div class="col-12 col-lg-6 col-md-6">
-        <span class="font-default">หน่วย:</span>
-           <label style="color: red"> *</label> 
-        <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"  onkeydown="allowOnlyNumbers(event)" required />
-    </div>
-
-    <div class="col-12 col-lg-6 col-md-6">
-      <span class="font-default">รวม:</span>
-         <label style="color: red"> *</label> 
-      <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0"  readonly/>
-  </div>
-
-    <div class="col-6 col-lg-6 col-md-6">
-      
-      <span class="font-default">ครู - วิทยากร:</span>
-      <label style="color: red"> *</label> 
-    
-    <select id="teacher" class="form-select" onchange="handleSelectChange(this)" name="teacher" style="width: 100%;">
-      
-      <option value="">
-      เลือก
-     </option>
-     {% for teachers in teacher %}
-  
-
-     {% if teachers.teacher_type == 1 %}
-     <option value="{{ teachers.teacher_id }}">
-      {{ teachers}}  - ภายใน
-      </option>
-     {% else %}
-     <option value="{{ teachers.teacher_id }}">
-      {{ teachers}}  - ภายนอก
-      </option>
-     {% endif %}
-    {% endfor %}
-    </select>
-    </div> 
-          </div>
-          <input type="hidden" class="form-control" name="pi" id="pi"  value="1"/>
-          <input type="hidden" name="teacher_id" id="teacher_id" required />
-
-          <input type="hidden" name="condition_id" id="condition_id"  />
-          <input type="hidden" name="condition_type" id="condition_type"  />
-
-       <div class="col-12 col-lg-12 col-md-12">
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0" onclick="handleClick(this);" checked>
-              <label class="form-check-label" for="inlineRadio1">ไม่มีเงื่อนไข</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1" onclick="handleClick(this);">
-              <label class="form-check-label" for="inlineRadio2">มีเงื่อนไข</label>
-            </div>
-         </div>
-
-         <div class="col-12 col-lg-12 col-md-12"  id="myDiv" class="hidden">
-          <select id="mySelect"  class="form-select" aria-label="Default select example" onchange="handleSelectChangeCondition(this)">
-           
-          </select>
-        
-       </div> 
-
-         <div class="col-12 col-lg-12 col-md-12">
-        <span class="font-default"  > จำนวนนักเรียนปัจจุบันที่มี คือ <span class="font-default"  style="color: red" id="bill"> </span> คน</span>
-         </div>
-
-       
-          <div class="col-12 col-lg-12 col-md-12">
-            <span class="font-default"  style="color: red"> หมายเหตุ *</span>
-         </div>
-         <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red" class="font-default">วิทยากร <span id="ev_hour" class="font-default"></span>  ชั่วโมง </label>    <label style="color: red" class="font-default">จำนวน <span id="ev_people"></span> ท่าน </label> 
-         </div>
-         <div class="col-12 col-lg-12 col-md-12">
-           <label style="color: red" class="font-default">ครูฝึก <span id="ev_hour_two"></span>  ชั่วโมง</label>  <label style="color: red" class="font-default">จำนวน <span id="ev_people_two"></span> ท่าน </label> 
-         </div>
-
-      <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>ลำดับ</th>
-                <th>ครู-วิทยากร</th>
-                <th>ตำแหน่ง/หน้าที่</th>
-                <th>ค่าตอบแทน</th>
-                <th>จำนวนหน่วย</th>
-                <th>รายได้สุทธิ</th>
-                <th>สถานะ</th>
-                <th>#</th>
-            </tr>
-        </thead>
-        <tbody id="json-table-body"></tbody>
-    </table>
-        </div>
-          <div class="modal-footer">
-            
-              <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button>
-          </div>
+        <input type="hidden" class="form-control" name="limit_price" id="limit_price" />
+        <input type="hidden" class="form-control" name="status_hour" id="status_hour" value="" />
+        <input type="hidden" class="form-control" name="status_people" id="status_people" value="" />
+        <input type="hidden" class="form-control" name="status_teacher" id="status_teacher" value="" />
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-header">
+        <div class="modal-title" id="address"></div>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 col-lg-6 col-md-6">
+
+            <span class="font-default">ตำแหน่ง / หน้าที่ / รายการ:</span>
+            <label style="color: red"> *</label>
+            <select class="form-select" id="py" name="py" onchange="handleSelectChangePy(this)">
+              <option value="" disabled>
+                เลือก
+              </option>
+              {% for listpositions in listposition %}
+              <option value="{{ listpositions.id }}">
+                {{ listpositions }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-lg-6 col-md-6">
+
+            <span class="font-default">ค่าตอบแทน:</span>
+            <label style="color: red"> *</label>
+            <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
+
+          </div>
+
+
+          <div class="col-12 col-lg-6 col-md-6">
+            <span class="font-default">จำนวนต่อหน่วย:</span>
+            <label style="color: red"> *</label>
+            <select class="form-select" id="tis_unit" name="tis_unit"
+              style="pointer-events: none; background-color: #e9ecef;">
+              <option value="hour">
+                ชั่วโมง
+              </option>
+              <option value="day">
+                วัน
+              </option>
+              <option value="work">
+                งาน
+              </option>
+            </select>
+          </div>
+
+          <div class="col-12 col-lg-6 col-md-6">
+            <span class="font-default">หน่วย:</span>
+            <label style="color: red"> *</label>
+            <input type="text" class="form-control" name="tis_quantity" id="tis_quantity" value="1"
+              onkeydown="allowOnlyNumbers(event)" required />
+          </div>
+
+          <div class="col-12 col-lg-6 col-md-6">
+            <span class="font-default">รวม:</span>
+            <label style="color: red"> *</label>
+            <input type="text" class="form-control" name="tis_sum" id="tis_sum" value="0" readonly />
+          </div>
+
+          <div class="col-6 col-lg-6 col-md-6">
+
+            <span class="font-default">ครู - วิทยากร:</span>
+            <label style="color: red"> *</label>
+
+            <select id="teacher" class="form-select" onchange="handleSelectChange(this)" name="teacher"
+              style="width: 100%;">
+
+              <option value="">
+                เลือก
+              </option>
+              {% for teachers in teacher %}
+
+
+              {% if teachers.teacher_type == 1 %}
+              <option value="{{ teachers.teacher_id }}">
+                {{ teachers}} - ภายใน
+              </option>
+              {% else %}
+              <option value="{{ teachers.teacher_id }}">
+                {{ teachers}} - ภายนอก
+              </option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
+        <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+        <input type="hidden" name="condition_id" id="condition_id" />
+        <input type="hidden" name="condition_type" id="condition_type" />
+
+        <div class="col-12 col-lg-12 col-md-12">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="0"
+              onclick="handleClick(this);" checked>
+            <label class="form-check-label" for="inlineRadio1">ไม่มีเงื่อนไข</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="1"
+              onclick="handleClick(this);">
+            <label class="form-check-label" for="inlineRadio2">มีเงื่อนไข</label>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-12 col-md-12" id="myDiv" class="hidden">
+          <select id="mySelect" class="form-select" aria-label="Default select example"
+            onchange="handleSelectChangeCondition(this)">
+
+          </select>
+
+        </div>
+        <div class="row">
+          <div class="col-12 col-lg-2 col-md-2">
+            <span class="font-default"> จำนวนนักเรียนปัจจุบันที่มี คือ <span class="font-default" style="color: red"
+                id="bill"> </span> คน</span>
+          </div>
+          <div class="col-12 col-lg-2 col-md-2">
+            <label style="color: red" class="font-default">วิทยากร <span id="ev_hour" class="font-default"></span>
+              ชั่วโมง </label> <label style="color: red" class="font-default">จำนวน <span id="ev_people"></span> ท่าน
+            </label>
+          </div>
+          <div class="col-12 col-lg-2 col-md-2">
+            <label style="color: red" class="font-default">ครูฝึก <span id="ev_hour_two"></span> ชั่วโมง</label> <label
+              style="color: red" class="font-default">จำนวน <span id="ev_people_two"></span> ท่าน </label>
+          </div>
+
+        </div>
+
+
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ครู-วิทยากร</th>
+              <th>ตำแหน่ง/หน้าที่</th>
+              <th>ค่าตอบแทน</th>
+              <th>จำนวนหน่วย</th>
+              <th>รายได้สุทธิ</th>
+              <th>สถานะ</th>
+              <th>#</th>
+            </tr>
+          </thead>
+          <tbody id="json-table-body"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button>
+      </div>
+    </div>
   </div>
 </div>
 
 
-<div class="modal fade" id="DeleteClick">
+<div class="modal fade" id="DeleteClick" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header bg-danger">
         <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
-   
-        <div class="modal-body">
-          {% csrf_token %}
-          <input type="hidden" name="id" id="id_delete" required />
-          <input
-            type="hidden"
-            name="ev_id"
-            id="ev_id"
-            required
-            value="{{main_data.ev_id}}"
-          />
-          <div align="center">
-            <h4>ยืนยันการลบข้อมูล</h4>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
-              <i class="bx bx-x d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยกเลิก</span>
-            </button>
-            <button type="submit" class="btn btn-primary ml-1" >
-              <i class="bx bx-check d-block d-sm-none"></i>
-              <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
-            </button>
-          </div>
+
+      <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" name="id" id="id_delete" required />
+        <input type="hidden" name="ev_id" id="ev_id" required value="{{main_data.ev_id}}" />
+        <div align="center">
+          <h4>ยืนยันการลบข้อมูล</h4>
         </div>
-      
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

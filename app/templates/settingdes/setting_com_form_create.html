@@ -72,7 +72,8 @@
         <div class="row">
           <div class="col-12 col-lg-12 col-md-12">
             commission_rate <label style="color: red"> *</label>
-            <input type="text" class="form-control" name="commission_rate" id="commission_rate" required />
+
+            <input type="number" class="form-control" id="commission_ra" name="commission_ra" step="0.1" min="0" max="100" required>
           </div>
         </div>
         <div style="padding-top: 25px" align="center">
@@ -102,7 +103,7 @@
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.stage_name}}</td>
-            <td>{{res.commission_rate}} {{res.stage_description}}</td>
+            <td>{{res.commission_rate}}</td>
             <td>
 
               {% if forloop.first %}
@@ -176,7 +177,7 @@
             <i data-feather="x"></i>
           </button>
         </div>
-        <form action="{% url 'description_setting_form_delete' %}" method="post">
+        <form action="{% url 'com_setting_form_delete' %}" method="post">
           <div class="modal-body">
             {% csrf_token %}
             <input type="hidden" name="id" id="id_delete" required />
@@ -208,7 +209,7 @@
             <i data-feather="x"></i>
           </button>
         </div>
-        <form action="{% url 'description_setting_form_update' %}" method="post">
+        <form action="{% url 'com_setting_form_update' %}" method="post">
           <div class="modal-body">
             {% csrf_token %}
             <input type="text" name="stage_id" id="stage_id" required />
@@ -219,7 +220,7 @@
 
             <div class="col-12 col-sm-12">
               <label>รายละเอียดการอบรม</label> <label style="color: red">*</label>
-              <input type="text" class="form-control" id="commission_rate_update" name="commission_rate" required />
+              <input type="number" class="form-control" id="commission_rate_update" name="commission_rate_update" step="0.1" min="0" max="100" />
             </div>
             <!-- <div class="col-12 col-sm-12">
               <label>รายละเอียดการอบรม</label> <label style="color: red">*</label>
@@ -236,10 +237,10 @@
                 <i class="bx bx-x d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">ยกเลิก</span>
               </button>
-              <!-- <button type="submit" class="btn btn-primary ml-1">
+              <button type="submit" class="btn btn-primary ml-1">
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">บันทึก</span>
-              </button> -->
+              </button>
             </div>
           </div>
         </form>
