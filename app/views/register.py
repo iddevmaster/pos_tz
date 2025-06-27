@@ -112,7 +112,7 @@ def register_home(request):
     hundredDaysLater = _date + timedelta(days=365)
     obj = []
     
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2024, 12, 1), until=hundredDaysLater):
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2025, 6, 1), until=hundredDaysLater):
         
         _newdate = str(dt).split(" ")[0]
         yearstart = _newdate.split("-")[0]
