@@ -315,6 +315,7 @@ urlpatterns = [
     path('api/sendwithdraw', finance.sendwithdraw),
 
     path('api/calendar_event_api_data', desbill.data_event),
+    path('api/calendar_event_api_bill', desbill.data_bill),
     
 
     #     API
