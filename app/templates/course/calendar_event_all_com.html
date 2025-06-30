@@ -47,14 +47,10 @@
         })
       });
       const data = await response.json();
-
+     var statusOptions = await populateTable();
+     console.log(statusOptions)
        var $tableBody = $('#json-table-body-rate');
-        var statusOptions = [
-                { id: 1, text: "Active" },
-                { id: 2, text: "Pending" },
-                { id: 3, text: "Inactive" },
-                { id: 4, text: "Blocked" }
-            ];
+
       data.forEach((item, index) => {
 
                 var $row = $('<tr>');
@@ -91,7 +87,18 @@
 
 
 
+       function populateTable(data) {
 
+    
+
+                 var statusOptions = [
+                { id: 1, text: "Active" },
+                { id: 2, text: "Pending" },
+                { id: 3, text: "Inactive" },
+                { id: 4, text: "Blocked" }
+            ];
+            return statusOptions
+            }
 
   async function findevid(evid) {
 
@@ -112,6 +119,7 @@
         })
       });
       const data = await response.json();
+ 
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
