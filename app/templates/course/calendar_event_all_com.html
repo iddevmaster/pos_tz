@@ -18,49 +18,62 @@
     });
   });
 
-  function setValueDeleteModal(id) {
+  function setValueDeleteModal(register_id,ev_id) {
 
-
-    document.getElementById("id_delete").value = id;
-
-    const eventModal = new bootstrap.Modal(document.getElementById('DeleteClick'));
+    document.getElementById("register_id").value = register_id;
+    
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
     eventModal.show();
+     let com = findcommit(register_id,ev_id)
   }
 
-  async function delel() {
+    async function findcommit(register_id,ev_id) {
 
 
-    let data = await fetch('/api/evenetdel', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 'id': document.getElementById("id_delete").value })
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Display response
+    const table = document.getElementById('ttt');
+    table.style.display = 'block';
 
+    try {
+      const response = await fetch('/api/calendar_event_api_com', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          register_id: register_id,
+          ev_id:ev_id
+        })
+      });
+      const data = await response.json();
+      console.log(data)
+      const tableBody = document.getElementById('json-table-body-rate');
+      tableBody.innerHTML = ''; // Clears all rows
+      data.forEach((item, index) => {
 
+      
 
-        // this.calen();
-        // window.location.reload();
-        //    return data.status
+        const row = document.createElement('tr');
 
-        // setTimeout(() => {
-        //       window.location.reload();
-        //  }, 100);
+             row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.stages_name}</td>
+                <td>${item.rates}</td>
+                `;
+        tableBody.appendChild(row);
+      });
 
-      })
-
-
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
 
 
 
 
 
-  async function findevid(evid) { // <-- ADD async here
+  async function findevid(evid) {
 
 
     const table = document.getElementById('ttt');
@@ -89,20 +102,20 @@
 
              row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${index + 1}</td>
-                    <td>${index + 1}</td>
-                    <td>${index + 1}</td>
-                    <td>${index + 1}</td>  
-                    <td>${index + 1}</td>
-                      <td><span style="color:#ea7731">รอการยืนยัน</span></td>
+                    <td>${item.register_number}</td>
+                    <td> ${item.rpi_code} - ${item.rpi_name}</td>
+                    <td>${item.rp_name_customer}</td>
+                    <td>${item.customer_type}</td>  
+                    <td>${item.pay_type}</td>
+                      
                     <td>         <button
                   type="button"
-                    onclick="setValueDeleteModal('${item.id}')"
+                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}')"
                   class="btn btn-danger"
               
                 >
                   <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
+                 กำหนด
                 </button></td>  
                 `;
         tableBody.appendChild(row);
@@ -112,6 +125,9 @@
       console.error("Error fetching data:", error);
     }
   }
+
+
+
 
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -177,120 +193,6 @@
     });
   calendar.render();
   });
-
-
-
-  async function save() {
-
-
-    const pi = document.getElementById("pi").value
-    const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
-    let te = document.getElementById("teacher_id").value
-    let tis_unit = document.getElementById("tis_unit").value
-    let tis_compensation = document.getElementById("tis_compensation").value
-    let tis_quantity = document.getElementById("tis_quantity").value
-    let tis_sum = document.getElementById("tis_sum").value
-    const ev_id = document.getElementById("ev_id").value
-
-
-
-    if (te == "") {
-      Swal.fire({
-        title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
-        text: 'กรุณาเลือกรายชื่อ',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-
-      return false
-    }
-
-
-    const status_hour = document.getElementById("status_hour").value
-    const status_people = document.getElementById("status_people").value
-    const status_teacher = document.getElementById("status_teacher").value
-
-
-    if (status_hour == 'false') {
-      Swal.fire({
-        title: 'จำนวนชั่วโมงไม่เพียงพอ',
-        text: 'กรุณาเลือกชั่วโมงให้ถูกต้อง',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false
-    }
-    if (status_people == 'false') {
-      Swal.fire({
-        title: 'จำนวนวิทยากร-ครูฝึก-ผู้ช่วยวิทยากร มากกว่าเกินไป',
-        text: 'กรุณาตรวจสอบให้ถูกต้อง',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false
-    }
-    if (status_teacher == 'false') {
-      Swal.fire({
-        title: 'รายชื่อนี้ถูกเพิ่มลงไปแล้ว',
-        text: 'กรุณาเลือกรายชื่ออื่น',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false
-    }
-
-
-    let data = await fetch('/api/saveevenet', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum })
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Display response
-
-        if (data.status == 200) {
-          Swal.fire({
-            title: 'บันทึกสำเร็จ',
-            text: 'บันทึกสำเร็จ',
-            icon: 'success',
-          });
-
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
-
-
-        } else {
-          Swal.fire({
-            title: 'บันทึกไม่สำเร็จ',
-            text: 'บันทึกไม่สำเร็จ',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-
-        // this.calen();
-        // window.location.reload();
-        //    return data.status
-
-
-
-      })
-      .catch(error => {
-
-
-      });
-
-  }
-
-
-
-
-
-
 
 </script>
 <style>
@@ -382,110 +284,12 @@
             <th>ชื่อลูกค้า</th>
             <th>ประเภทลูกค้า</th>
             <th>ประเภทการชำระเงิน</th>
-            <th>ปิดการขาย</th>
-            <th>วันที่ลงทะเบียน</th>
             <th>#</th>
           </tr>
         </thead>
        <tbody id="json-table-body">
-          <!-- {% for res in data %}
-          
-          <tr>
-            <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.customer_list.register.register_number}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
-            <td>{{res.customer_list.customer_name}}</td>
-            <td align="center">
-              {% if res.customer_list.register.customer_type == 1 %}
-
-              <span class="badge bg-success">บุคคล</span>
-              {% else %}
-              <span class="badge bg-info">บริษัท</span>
-              {% endif %}
-            </td>
-            <td align="center">
-              {% if res.customer_list.register.pay_type == 1 %}
-
-              <span class="badge bg-success">เงินสด</span>
-              {% else %}
-              <span class="badge bg-danger">เครดิต</span>
-              {% endif %}
-            </td>
-
-            <td align="center">
-              {% if res.customer_list.register.close_the_sale == 1 %}
-              <span class="badge bg-success">ปิดการขาย - ขายสำเร็จ</span>
-              {% elif res.customer_list.register.close_the_sale == 2 %}
-              <span class="badge bg-danger">ปิดการขาย - ขายไม่สำเร็จ</span>
-              {% else %}
-              <span class="badge bg-warning">กำลังขาย</span>
-              {% endif %}
-            </td>
-
-            <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
-            <td>
-              {% comment %} {{res.total_payment}} {% endcomment %}
-
-              <div class="btn-group me-1 mb-1">
-                <div class="dropdown">
-                  <button
-                    class="btn btn-primary btn-sm dropdown-toggle"
-                    type="button"
-                    id="dropdownMenuButtonIcon"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i class="icon dripicons-checklist"></i>
-                  </button>
-                  <div class="dropdown-menu">
-                    <a
-                      class="dropdown-item"
-                      href="/register/payment/history/{{res.customer_list.register_id}}"
-                    >
-                      {% if res.customer_list.register.pay_type == 1 %} ใบเสร็จ
-                      {% else %} ใบเสนอราคา {% endif %}
-                    </a>
-                    {% if res.customer_list.register.close_the_sale < 1 %}
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#UpdateClick"
-                      onclick="set_close_the_sale('{{res.customer_list.register_id}}')"
-                      >ปิดการขาย {{res.customer_list.register_id}}</a
-                    >
-                    {% endif %}
-                    <a
-                      class="dropdown-item"
-                      href="/register/detail/{{res.customer_list.register_id}}"
-                      >รายละเอียดการสมัคร</a
-                    >
-                    {% if res.customer_list.register.close_the_sale == 1 %}
-                    <a
-                      class="dropdown-item"
-                      href="/register/studentlist/{{res.customer_list.register_id}}"
-                      >จัดการผู้เข้าอบรมและออกใบรับรอง
-                    </a>
-
-                    {% else %}
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#DeleteClick"
-                      onclick="cancle_register('{{res.customer_list.register_id}}')"
-                      >ยกเลิกใบสมัคร
-                    </a>
-                    
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody> -->
+    
+        </tbody>
       </table>
     </div>
   </div>
@@ -500,11 +304,9 @@
         <h5 class="modal-title" id="eventModalLabel"></h5>
 
         <input type="hidden" name="ev_id" id="ev_id" required />
+ <input type="text" name="register_id" id="register_id" required />
 
-
-        <input type="hidden" class="form-control" name="status_hour" id="status_hour" value="" />
-        <input type="hidden" class="form-control" name="status_people" id="status_people" value="" />
-        <input type="hidden" class="form-control" name="status_teacher" id="status_teacher" value="" />
+    
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -519,16 +321,12 @@
           <thead>
             <tr>
               <th>ลำดับ</th>
-              <th>ครู-วิทยากร</th>
-              <th>ตำแหน่ง/หน้าที่</th>
-              <th>ค่าตอบแทน</th>
-              <th>จำนวนหน่วย</th>
-              <th>รายได้สุทธิ</th>
-              <th>สถานะ</th>
-              <th>#</th>
+              <th>ความรับผิดชอบ</th>
+              <th>เรท</th>
+              <th>ชื่อผู้รับ</th>
             </tr>
           </thead>
-          <tbody id="json-table-body"></tbody>
+          <tbody id="json-table-body-rate"></tbody>
         </table>
       </div>
       <div class="modal-footer">
@@ -541,7 +339,7 @@
 
 
 <div class="modal fade" id="DeleteClick">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-xxl">
     <div class="modal-content">
       <div class="modal-header bg-danger">
         <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
@@ -552,8 +350,8 @@
 
       <div class="modal-body">
         {% csrf_token %}
-        <input type="text" name="id" id="id_delete" required />
-        <input type="hidden" name="ev_id" id="ev_id" required value="{{main_data.ev_id}}" />
+       
+        <input type="text" name="ev_id" id="ev_id" required value="" />
         <div align="center">
           <h4>ยืนยันการลบข้อมูล</h4>
         </div>

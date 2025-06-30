@@ -489,3 +489,13 @@ class commissionstages(models.Model):
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     seq = models.IntegerField(default=None, blank=False)
+
+
+class fact_commission(models.Model):
+    commit_id = models.AutoField(primary_key=True)
+    register_id = models.CharField(max_length=255, unique=True, blank=True)  
+    stage_id = models.IntegerField(default=None, blank=False)   
+    user_id = models.IntegerField(default=None, blank=False)   
+
+
+

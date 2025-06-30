@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -409,7 +409,7 @@ def data_bill(request):
             register_id=r.register_id).first()
         payment = register_payment.objects.filter(register=r.register_id).first()
         payment_i = register_payment_items.objects.filter(register=r.register_id).first()
-        print(payment_i)
+    
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id).first()
         
@@ -417,10 +417,46 @@ def data_bill(request):
         #     register_id=r.register_id).count()
         # course_list = course_event.objects.select_related(
         #     'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': r.register_number,'pay_type':r.pay_type,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name}
+        ct = '-'
+        if r.customer_type == '1':
+            ct = 'เงินสด'
+        else:
+            ct = 'เครดิต'
+
+        cus_type = '-'
+        if r.customer_type == '1':
+            cus_type = 'บุคคล'
+        else:
+            cus_type = 'บริษัท'    
+
+
+        uuid_without_dashes = str(r.register_id).replace('-', '')
+        print(uuid_without_dashes)
+
+        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type}
         obj.append(res)
 
 
+   
+
+    return JsonResponse(obj,safe=False)
+
+
+@csrf_exempt
+def data_com(request):
+    data = json.loads(request.body)
+    register_id = data.get("register_id")
+    ev_id = data.get("ev_id")
+
+
+
+    content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
+
+    obj = []
+    for r in content:
+        stages = commissionstages.objects.filter(stage_id=r.stage_id).first()
+        res = {'commit_id':r.commit_id,'stage_id':r.stage_id,'user_id':r.user_id,'register_id':r.register_id,'stages_name':stages.stage_name,'rates':stages.commission_rate}
+        obj.append(res)
    
 
     return JsonResponse(obj,safe=False)
