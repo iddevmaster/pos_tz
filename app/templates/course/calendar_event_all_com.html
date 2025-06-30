@@ -47,21 +47,41 @@
         })
       });
       const data = await response.json();
-      console.log(data)
-      const tableBody = document.getElementById('json-table-body-rate');
-      tableBody.innerHTML = ''; // Clears all rows
+
+       var $tableBody = $('#json-table-body-rate');
+        var statusOptions = [
+                { id: 1, text: "Active" },
+                { id: 2, text: "Pending" },
+                { id: 3, text: "Inactive" },
+                { id: 4, text: "Blocked" }
+            ];
       data.forEach((item, index) => {
 
-      
+                var $row = $('<tr>');
+                    $row.append($('<td>').text(index + 1));
+                    $row.append($('<td>').text(item.stages_name));
+                    $row.append($('<td>').text(item.rates));
 
-        const row = document.createElement('tr');
+                    // Create the td for the Select2
+                    var $statusTd = $('<td>');
+                    var $selectElement = $('<select>')
+                        .addClass('user-status-select') // Add a class for easy selection
+                        .attr('data-user-id', item.user_id) // Store user ID for later use
+                        .css('width', '100%'); // Apply 100% width via inline style
 
-             row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${item.stages_name}</td>
-                <td>${item.rates}</td>
-                `;
-        tableBody.appendChild(row);
+                    $statusTd.append($selectElement);
+                    $row.append($statusTd);
+
+                    $tableBody.append($row);
+
+                     $selectElement.select2({
+                        data: statusOptions, // Provide the status options
+                        placeholder: "Select Status",
+                        allowClear: true
+                    }).val(item.user_id).trigger('change'); // Set initial value and trigger change to display it
+
+
+
       });
 
     } catch (error) {
