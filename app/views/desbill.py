@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -398,27 +398,29 @@ def data_bill(request):
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
 
-  
+    
     obj = []
-    content = register_main.objects.filter(crt_date__month=month_current, crt_date__year=year_current,status='Y').exclude(register_number="-").order_by("-crt_date")
-    obj = []
+    content = register_main.objects.filter(crt_date__month=month_current, crt_date__year=year_current,status='Y',ev_id=ev_id).exclude(register_number="-").order_by("-crt_date")
+   
     for r in content:
 
         
-        # customer_list = customers.objects.select_related('register').filter(
-        #     register_id=r.register_id, register__crt_date__month=1).first()
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
+        payment = register_payment.objects.filter(register=r.register_id).first()
+        payment_i = register_payment_items.objects.filter(register=r.register_id).first()
+        print(payment_i)
+        # customer_list = customers.objects.select_related('register').filter(
+        #     register_id=r.register_id).first()
         
-        total_payment = register_payment.objects.filter(
-            register_id=r.register_id).count()
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,
-               'course_list': course_list, 'total_payment': total_payment}
+        # total_payment = register_payment.objects.filter(
+        #     register_id=r.register_id).count()
+        # course_list = course_event.objects.select_related(
+        #     'course').filter(ev_id=r.ev_id).first()
+        res = {'customer_list': r.register_number,'pay_type':r.pay_type,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name}
         obj.append(res)
 
-    print(obj)    
+
    
 
     return JsonResponse(obj,safe=False)

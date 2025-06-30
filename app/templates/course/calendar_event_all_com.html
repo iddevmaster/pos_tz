@@ -57,44 +57,57 @@
   }
 
 
-  function findevid(evid) {
 
-    //             let data = await fetch('/api/findevid', {
-    // method: 'POST',
-    // headers: {
-    //     'Content-Type': 'application/json',
-    // },
-    // body: JSON.stringify({'ev_id':evid})
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     // Display response
-    // })
-    // .catch(error => {
-
-
-    // });
-
-
-  }
 
 
   async function findevid(evid) { // <-- ADD async here
+
+
+    const table = document.getElementById('ttt');
+    table.style.display = 'block';
+
     try {
-           const response = await fetch('/api/findevid', {
-            method: 'POST', // Specify the HTTP method as POST
-            headers: {
-                'Content-Type': 'application/json' // Tell the server we're sending JSON
-                // You might need other headers like 'Authorization' if your API requires it
-            },
-            body: JSON.stringify({ // Convert your JavaScript object to a JSON string
-                // Your data goes here
-                evid: evid,
-            })
-        });
+      const response = await fetch('/api/calendar_event_api_bill', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          evid: evid,
+        })
+      });
       const data = await response.json();
-      console.log(data);
+      const tableBody = document.getElementById('json-table-body');
+      tableBody.innerHTML = ''; // Clears all rows
+      data.forEach((item, index) => {
+
       
+
+        const row = document.createElement('tr');
+
+             row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${index + 1}</td>
+                    <td>${index + 1}</td>
+                    <td>${index + 1}</td>
+                    <td>${index + 1}</td>  
+                    <td>${index + 1}</td>
+                      <td><span style="color:#ea7731">รอการยืนยัน</span></td>
+                    <td>         <button
+                  type="button"
+                    onclick="setValueDeleteModal('${item.id}')"
+                  class="btn btn-danger"
+              
+                >
+                  <i class="icon dripicons-trash" aria-hidden="true"></i>
+                  ลบ
+                </button></td>  
+                `;
+        tableBody.appendChild(row);
+      });
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -131,11 +144,11 @@
       document.getElementById('eventModalLabel').innerText = info.event.title;
 
       document.getElementById("ev_id").value = info.event.extendedProps.evs_id
-      findevid(info.event.extendedProps.evs_id)
 
 
 
-                      let timerInterval;
+
+      let timerInterval;
       Swal.fire({
         title: "รอสักครู่",
         html: "I will close in <b></b> milliseconds.",
@@ -157,13 +170,7 @@
           console.log("I was closed by the timer");
         }
       });
-      
-
-      // Add new JSON data dynamically
-      // jsonData.push({"id": jsonData.length + 1, "name": "Charlie", "email": "charlie@example.com"});
-
-
-      // Populate modal with event data
+      let aaaa = findevid(info.event.extendedProps.evs_id)
 
     },
       
@@ -279,193 +286,12 @@
 
   }
 
-  function handleSelectChangePy(selectElement) {
-    const selectedValue = selectElement.value;
-    document.getElementById("pi").value = selectedValue;
-
-    setTimeout(() => {
-      CheckHourbeforeSave()
-      getComposetaion()
-
-    }, 50);
-
-    setTimeout(() => {
-
-      Caculate()
-    }, 200);
-  }
-
-
-  function handleSelectChange(selectElement) {
-    const selectedValue = selectElement.value;
-
-
-    let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
-    document.getElementById("teacher_id").value = result;
-
-    //  calen()
-
-
-
-    setTimeout(() => {
-      CheckHourbeforeSave()
-      getComposetaion()
-
-    }, 50);
-
-
-  }
-
-  function Caculate() {
-    const aaaa = document.getElementById("tis_compensation").value;
-    const tis_quantity = document.getElementById("tis_quantity").value;
-    console.log('cal', aaaa);
-    console.log('cal', tis_quantity);
-    document.getElementById("tis_sum").value = aaaa * tis_quantity;
-  }
-
-  async function CheckHourbeforeSave() {
-
-
-    const ev_id = document.getElementById("ev_id").value;
-    const pi = document.getElementById("pi").value
-    const tis_quantity = document.getElementById("tis_quantity").value;
-    const teacher_id = document.getElementById("teacher_id").value
-
-
-    let data = await fetch('/api/checkhours', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 'pi': pi, 'tis_quantity': parseInt(tis_quantity), 'ev_id': parseInt(ev_id), 'teacher_id': teacher_id })
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Display response
-
-        document.getElementById("status_hour").value = data.status_hour;
-        document.getElementById("status_people").value = data.status_people;
-        document.getElementById("status_teacher").value = data.status_teacher;
-
-
-
-        //    return data.status
-
-
-
-      })
-      .catch(error => {
-
-
-      });
-
-    return data
-  }
-
-
-  function getComposetaion() {
-    const teacher_id = document.getElementById("teacher_id").value
-    const py = document.getElementById("pi").value
-    const csrftoken = "{{ csrf_token }}";
-    fetch('/api/get/compensation', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 'teacher_id': teacher_id, 'py': py })
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Display response
-        console.log(data);
-        if (data.length == 0) {
-          document.getElementById("tis_compensation").value = 0
-          return false;
-        }
-        document.getElementById("tis_compensation").value = data.compensation
-        Caculate()
-
-
-      })
-      .catch(error => {
-        console.error('Error:', error);
-
-      });
-  }
-
-  function allowOnlyNumbers(event) {
-
-
-    // Allow: Backspace, Tab, Arrow keys, Delete
-    if (
-      event.key === "Backspace" ||
-      event.key === "Tab" ||
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowRight" ||
-      event.key === "Delete"
-    ) {
-
-      setTimeout(() => {
-        const it = document.getElementById("tis_quantity").value;
-        if (it.charAt(0) == "0") {
-          let result = removeFirstCharacter(it);
-          document.getElementById("tis_quantity").value = result
-          // return it.slice(0); // Removes the first character
-        }
-
-      }, 20);
-
-
-      setTimeout(() => {
-
-        getComposetaion()
-      }, 100);
-
-      setTimeout(() => {
-
-        Caculate()
-        CheckHourbeforeSave()
-      }, 200);
-
-      return true; // Allow default behavior
-    }
-
-    // Allow only numbers (0-9)
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault(); // Block other characters
-      return false; // Prevent default behavior
-    }
 
 
 
 
 
-    setTimeout(() => {
-      const it = document.getElementById("tis_quantity").value;
-      if (it.charAt(0) == "0") {
-        let result = removeFirstCharacter(it);
-        document.getElementById("tis_quantity").value = result
-        // return it.slice(0); // Removes the first character
-      }
 
-    }, 20);
-
-
-    setTimeout(() => {
-
-      getComposetaion()
-    }, 100);
-
-    setTimeout(() => {
-
-      Caculate()
-      CheckHourbeforeSave()
-    }, 200);
-
-
-
-  }
 </script>
 <style>
   #ttt {
@@ -524,21 +350,148 @@
 </section>
 
 
-<table class="table table-bordered table-striped" id="ttt">
-  <thead>
-    <tr>
-      <th>ลำดับ</th>
-      <th>ครู-วิทยากร</th>
-      <th>ตำแหน่ง/หน้าที่</th>
-      <th>ค่าตอบแทน</th>
-      <th>จำนวนหน่วย</th>
-      <th>รายได้สุทธิ</th>
-      <th>สถานะ</th>
-      <th>#</th>
-    </tr>
-  </thead>
-  <tbody id="json-table-body"></tbody>
-</table>
+
+<section class="section" id="ttt">
+  <div class="card">
+    <div class="card-body">
+      <!-- <table class="table table-bordered table-striped" >
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ครู-วิทยากร</th>
+            <th>ตำแหน่ง/หน้าที่</th>
+            <th>ค่าตอบแทน</th>
+            <th>จำนวนหน่วย</th>
+            <th>รายได้สุทธิ</th>
+            <th>สถานะ</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody id="json-table-body"></tbody>
+      </table> -->
+
+
+
+
+            <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>หลักสูตร</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>ปิดการขาย</th>
+            <th>วันที่ลงทะเบียน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+       <tbody id="json-table-body">
+          <!-- {% for res in data %}
+          
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{res.customer_list.register.register_number}}</td>
+            <td>{{res.course_list.course.course_name}}</td>
+            <td>{{res.customer_list.customer_name}}</td>
+            <td align="center">
+              {% if res.customer_list.register.customer_type == 1 %}
+
+              <span class="badge bg-success">บุคคล</span>
+              {% else %}
+              <span class="badge bg-info">บริษัท</span>
+              {% endif %}
+            </td>
+            <td align="center">
+              {% if res.customer_list.register.pay_type == 1 %}
+
+              <span class="badge bg-success">เงินสด</span>
+              {% else %}
+              <span class="badge bg-danger">เครดิต</span>
+              {% endif %}
+            </td>
+
+            <td align="center">
+              {% if res.customer_list.register.close_the_sale == 1 %}
+              <span class="badge bg-success">ปิดการขาย - ขายสำเร็จ</span>
+              {% elif res.customer_list.register.close_the_sale == 2 %}
+              <span class="badge bg-danger">ปิดการขาย - ขายไม่สำเร็จ</span>
+              {% else %}
+              <span class="badge bg-warning">กำลังขาย</span>
+              {% endif %}
+            </td>
+
+            <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
+            <td>
+              {% comment %} {{res.total_payment}} {% endcomment %}
+
+              <div class="btn-group me-1 mb-1">
+                <div class="dropdown">
+                  <button
+                    class="btn btn-primary btn-sm dropdown-toggle"
+                    type="button"
+                    id="dropdownMenuButtonIcon"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="icon dripicons-checklist"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a
+                      class="dropdown-item"
+                      href="/register/payment/history/{{res.customer_list.register_id}}"
+                    >
+                      {% if res.customer_list.register.pay_type == 1 %} ใบเสร็จ
+                      {% else %} ใบเสนอราคา {% endif %}
+                    </a>
+                    {% if res.customer_list.register.close_the_sale < 1 %}
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      data-bs-toggle="modal"
+                      data-bs-target="#UpdateClick"
+                      onclick="set_close_the_sale('{{res.customer_list.register_id}}')"
+                      >ปิดการขาย {{res.customer_list.register_id}}</a
+                    >
+                    {% endif %}
+                    <a
+                      class="dropdown-item"
+                      href="/register/detail/{{res.customer_list.register_id}}"
+                      >รายละเอียดการสมัคร</a
+                    >
+                    {% if res.customer_list.register.close_the_sale == 1 %}
+                    <a
+                      class="dropdown-item"
+                      href="/register/studentlist/{{res.customer_list.register_id}}"
+                      >จัดการผู้เข้าอบรมและออกใบรับรอง
+                    </a>
+
+                    {% else %}
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      data-bs-toggle="modal"
+                      data-bs-target="#DeleteClick"
+                      onclick="cancle_register('{{res.customer_list.register_id}}')"
+                      >ยกเลิกใบสมัคร
+                    </a>
+                    
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody> -->
+      </table>
+    </div>
+  </div>
+</section>
+
+
 
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xxl">
