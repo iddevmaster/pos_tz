@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1172,7 +1172,17 @@ def withdraw_list_one_com(request):
         objMenu.append(r)
     title = defaultTitle
 
-    context = {'title': title,'listMenuPermission': objMenu}
+    commit = fact_commission.objects.filter(status='Y',user_id=user_id)
+    obj = []
+    for r in commit:
+       
+        content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
+        stage = commissionstages.objects.get(stage_id=r.stage_id)
+        r = {'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end}
+        obj.append(r)
+
+    print(obj)
+    context = {'title': title,'listMenuPermission': objMenu,'data':obj}
     return render(request, 'finance/teachers_withdraw.html',context)
 
 
