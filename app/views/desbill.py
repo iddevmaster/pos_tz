@@ -400,11 +400,8 @@ def data_bill(request):
 
     
     obj = []
-    content = register_main.objects.filter(crt_date__month=month_current, crt_date__year=year_current,status='Y',ev_id=ev_id).exclude(register_number="-").order_by("-crt_date")
-   
+    content = register_main.objects.filter(status='Y',ev_id=ev_id).exclude(register_number="-").order_by("-crt_date")
     for r in content:
-
-        
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
         payment = register_payment.objects.filter(register=r.register_id).first()
@@ -419,19 +416,19 @@ def data_bill(request):
         #     'course').filter(ev_id=r.ev_id).first()
         ct = '-'
         if r.customer_type == '1':
-            ct = 'เงินสด'
-        else:
             ct = 'เครดิต'
+        else:
+            ct = 'เงินสด'
 
         cus_type = '-'
         if r.customer_type == '1':
-            cus_type = 'บุคคล'
+            cus_type = 'บริษัท'
         else:
-            cus_type = 'บริษัท'    
+            cus_type = 'บุคคล'    
 
 
         uuid_without_dashes = str(r.register_id).replace('-', '')
-        print(uuid_without_dashes)
+      
 
         res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type}
         obj.append(res)
@@ -446,16 +443,17 @@ def data_bill(request):
 def data_com(request):
     data = json.loads(request.body)
     register_id = data.get("register_id")
-    ev_id = data.get("ev_id")
-
-
 
     content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
-
+    
     obj = []
     for r in content:
+        s_name = 'ยังไม่ยืนยัน'
         stages = commissionstages.objects.filter(stage_id=r.stage_id).first()
-        res = {'commit_id':r.commit_id,'stage_id':r.stage_id,'user_id':r.user_id,'register_id':r.register_id,'stages_name':stages.stage_name,'rates':stages.commission_rate}
+        if r.status == 'Y':
+            s_name = 'ยืนยันแล้ว'
+        
+        res = {'commit_id':r.commit_id,'stage_id':r.stage_id,'user_id':r.user_id,'register_id':r.register_id,'stages_name':stages.stage_name,'rates':stages.commission_rate,'s_name':s_name}
         obj.append(res)
    
 
@@ -477,6 +475,21 @@ def user_com(request):
   
         res = {'id':r.id,'text':r.first_name +'-'+ r.last_name }
         obj.append(res)
+   
+
+    return JsonResponse(obj,safe=False)
+
+
+@csrf_exempt
+def update_com(request):
+    data = json.loads(request.body)
+    commit_id = data.get("commit_id")
+    user_id = data.get("user_id")
+    content = fact_commission.objects.get(commit_id=commit_id)
+    content.user_id = user_id
+    content.save()
+    obj = {'status':200}
+ 
    
 
     return JsonResponse(obj,safe=False)

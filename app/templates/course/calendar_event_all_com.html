@@ -47,17 +47,16 @@
         })
       });
       const data = await response.json();
+    
      var statusOptions = await populateTable();
+     var $tableBody = $('#json-table-body-rate');
 
-    console.log(statusOptions)
-       var $tableBody = $('#json-table-body-rate');
-
-      data.forEach((item, index) => {
-
+     data.forEach((item, index) => {
                 var $row = $('<tr>');
                     $row.append($('<td>').text(index + 1));
                     $row.append($('<td>').text(item.stages_name));
                     $row.append($('<td>').text(item.rates));
+                    $row.append($('<td>').text(item.s_name));
 
                     // Create the td for the Select2
                     var $statusTd = $('<td>');
@@ -68,16 +67,47 @@
 
                     $statusTd.append($selectElement);
                     $row.append($statusTd);
-
+                    
                     $tableBody.append($row);
-
-                     $selectElement.select2({
+                    $selectElement.prop('disabled', false);
+                    if(item.s_name == 'ยืนยันแล้ว'){
+                    $selectElement.prop('disabled', true);
+                    }
+                    
+                    $selectElement.select2({
                         data: statusOptions, // Provide the status options
                         placeholder: "Select Status",
                         allowClear: true
                     }).val(item.user_id).trigger('change'); // Set initial value and trigger change to display it
 
 
+                     $selectElement.on('change', function() {
+                    
+                       const selectedValue = $(this).val();
+
+  const dataToSend = {
+        commit_id: item.commit_id, // Assuming item.user_id is available in this scope
+        user_id: selectedValue
+    };
+
+            $.ajax({
+        url: '/api/calendar_event_api_update_com',
+        method: 'POST', // Or 'PUT', 'PATCH' depending on your API
+        contentType: 'application/json',
+        data: JSON.stringify(dataToSend),
+        success: function(response) {
+            console.log('API update successful:', response);
+            // Optionally, show a success message to the user
+        },
+        error: function(xhr, status, error) {
+            console.error('API update failed:', error);
+            console.error('Response text:', xhr.responseText);
+            // Optionally, show an error message to the user
+            // You might want to revert the selection or show a warning
+        }
+    });
+                    
+                     });
 
       });
 
@@ -145,12 +175,10 @@
         })
       });
       const data = await response.json();
- 
+      
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
-
-      
 
         const row = document.createElement('tr');
 
@@ -358,7 +386,7 @@
         <h5 class="modal-title" id="eventModalLabel"></h5>
 
         <input type="hidden" name="ev_id" id="ev_id" required />
- <input type="text" name="register_id" id="register_id" required />
+ <input type="hidden" name="register_id" id="register_id" required />
 
     
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -377,6 +405,7 @@
               <th>ลำดับ</th>
               <th>ความรับผิดชอบ</th>
               <th>เรท</th>
+              <th>สถานะ</th>
               <th>ชื่อผู้รับ</th>
             </tr>
           </thead>
@@ -405,7 +434,7 @@
       <div class="modal-body">
         {% csrf_token %}
        
-        <input type="text" name="ev_id" id="ev_id" required value="" />
+        <input type="hidden" name="ev_id" id="ev_id" required value="" />
         <div align="center">
           <h4>ยืนยันการลบข้อมูล</h4>
         </div>

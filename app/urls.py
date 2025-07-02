@@ -255,6 +255,8 @@ urlpatterns = [
 #     path('finance/teacher', finance.withdraw_list), 
     path('finance/teacher', finance.withdraw_list_one),
     path('finance/sale/commission', finance.withdraw_list_commission),
+    path('finance/sale/com', finance.withdraw_list_one_com),
+   
 
     path('description/setting/form/create', desbill.setting_form_create,
          name="description_setting_form_create"),
@@ -318,6 +320,7 @@ urlpatterns = [
     path('api/calendar_event_api_bill', desbill.data_bill),
     path('api/calendar_event_api_com', desbill.data_com),
     path('api/calendar_event_api_user', desbill.user_com),
+    path('api/calendar_event_api_update_com', desbill.update_com),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

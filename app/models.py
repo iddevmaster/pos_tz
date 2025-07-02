@@ -496,6 +496,7 @@ class fact_commission(models.Model):
     register_id = models.CharField(max_length=255, unique=True, blank=True)  
     stage_id = models.IntegerField(default=None, blank=False)   
     user_id = models.IntegerField(default=None, blank=False)   
+    status = models.CharField(max_length=1, blank=False)
 
 
 

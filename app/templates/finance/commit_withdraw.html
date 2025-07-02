@@ -1,0 +1,144 @@
+{% extends 'base.html' %} {% block content %}{% load humanize %} 
+<style>
+  .center-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 130px;
+    background-color: #f0f0f0;
+    /* Light gray background */
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    /* Blue color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+  }
+</style>
+<script>
+
+
+
+</script>
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>เบิกค่าตอบแทน</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          เบิกค่าตอบแทน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<input type="hidden" class="form-control" name="user_id" id="user_id" value="{{user_id}}" />
+<div class="row"  id="cardContainer">
+
+<div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card">
+    <div class="card-body">
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมทั้งหมด : </span><span style="font-size: 24px;color:red">{{total_all}}</span></p>
+      <button type="button" class="btn btn-danger" onclick="withdraw()">เบิกค่าตอบแทน</button>
+      <button type="button" class="btn btn-primary" onclick="gotoReportwith()">หน้ารายการขอเบิก</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="row"  id="cardContainer">
+  {% for res in data %}
+<div class="col-12 col-md-6 col-sm-12 col-xs-6" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card mb-3">
+  
+  <div class="row g-0">
+     <div class="col-1 col-md-1 col-sm-1 col-xs-1" style=" padding: 15px;  border-right: 3px solid #f5ecea;">
+       <p class="card-text" style="text-align: center;">{{res.daynum}}</p>
+       <p class="card-text" style="text-align: center;">{{res.day}}</p>
+      </div>
+      <div class="col-9 col-md-9 col-sm-9 col-xs-9">
+        <div class="card-body">
+          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span style="color:red"> จำนวนผู้อบรม {{res.total_rq_quta}} คน</span>
+          <p>
+
+          {{res.tis_compensation}} / {{res.tis_quantity}} -
+              {% if res.tis_unit == 'hour' %}
+              ชั่วโมง
+              {% elif res.tis_unit == 'day' %}
+              วัน
+              {% else %}
+              งาน
+              {% endif %}  / {{res.pi}}
+
+              เงื่อนไข: {{res.requirements}} - {{res.name_con}}
+          </p>
+             <span> รายได้ค่าตอบแทน: 
+  
+       
+          </span>  
+          <span style="color:red">
+  
+          {{ res.price |floatformat:2|intcomma }}
+          </span>  
+        </div>
+
+
+    </div>
+  </div>
+</div>
+</div>
+   {% endfor %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script scope>
+function gotoReportwith(){
+
+  alert('ok');
+}
+
+async function withdraw() {
+
+
+ const user_id = document.getElementById("user_id").value
+
+ let data = await fetch('/api/sendwithdraw', {
+   method: 'POST',
+  headers: {
+      'Content-Type': 'application/json',
+  },
+   body: JSON.stringify({'user_id':user_id})
+   })
+   .then(response => response.json())
+   .then(data => {
+    Swal.fire({
+       title: 'บันทึก',
+       text: 'บันทึกสำเร็จ',
+       icon: 'success',
+     confirmButtonText: 'OK'
+    });
+   })
+
+  setTimeout(function() { 
+    window.location.reload();
+   }, 1000);
+}
+
+</script>
+
+{% endblock %}

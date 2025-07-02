@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 from ..constant import prefixEng,prefixThai
 
@@ -847,6 +847,16 @@ def payment_create(request):
         register_id=uuid_without_dashes,
         des_id=bill
     )    
+        
+    com = commissionstages.objects.all()
+    for coms in com:
+        dtaf = fact_commission.objects.create( 
+        stage_id=coms.stage_id,
+        register_id=uuid_without_dashes,
+        status='N'
+    )   
+
+# commissionstages,fact_commission
 
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
