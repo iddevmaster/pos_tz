@@ -74,27 +74,20 @@
       </div>
       <div class="col-9 col-md-9 col-sm-9 col-xs-9">
         <div class="card-body">
-          <span> {{res.course_code}} - {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span>   <span style="color:red"> จำนวนผู้อบรม {{res.total_rq_quta}} คน</span>
+          <span> {{res.course_name}} - รุ่น {{res.ev_generation}}</span>   <span> วันที่ {{res.ev_date_start}} ถึง {{res.ev_date_end}}</span> 
+          <span> เลขบิล {{res.register_number}}  จำนวนเงิน {{ res.rpi_price_result |floatformat:2|intcomma }}</span> 
           <p>
 
-          {{res.tis_compensation}} / {{res.tis_quantity}} -
-              {% if res.tis_unit == 'hour' %}
-              ชั่วโมง
-              {% elif res.tis_unit == 'day' %}
-              วัน
-              {% else %}
-              งาน
-              {% endif %}  / {{res.pi}}
-
-              เงื่อนไข: {{res.requirements}} - {{res.name_con}}
+      
+            รายการ : {{res.stage_name}} - {{res.commission_rate}}%
           </p>
              <span> รายได้ค่าตอบแทน: 
-  
+
        
           </span>  
           <span style="color:red">
   
-          {{ res.price |floatformat:2|intcomma }}
+          {{ res.price_com |floatformat:2|intcomma }}
           </span>  
         </div>
 
@@ -117,7 +110,8 @@ async function withdraw() {
 
  const user_id = document.getElementById("user_id").value
 
- let data = await fetch('/api/sendwithdraw', {
+
+ let data = await fetch('/api/sendwithdrawcom', {
    method: 'POST',
   headers: {
       'Content-Type': 'application/json',
@@ -126,6 +120,7 @@ async function withdraw() {
    })
    .then(response => response.json())
    .then(data => {
+    console.log(data)
     Swal.fire({
        title: 'บันทึก',
        text: 'บันทึกสำเร็จ',
@@ -134,9 +129,9 @@ async function withdraw() {
     });
    })
 
-  setTimeout(function() { 
-    window.location.reload();
-   }, 1000);
+  // setTimeout(function() { 
+  //   window.location.reload();
+  //  }, 1000);
 }
 
 </script>
