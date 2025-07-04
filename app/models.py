@@ -293,6 +293,7 @@ class teacher_income_setting(models.Model):
 class tax_setting(models.Model):
     tax_id = models.AutoField(primary_key=True)
     tax  = models.IntegerField(default=0, blank=False)
+    tax_com  = models.IntegerField(default=0, blank=False)
 
 class bill_setting(models.Model):
     bill_id = models.AutoField(primary_key=True)

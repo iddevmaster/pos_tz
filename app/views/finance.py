@@ -1184,16 +1184,21 @@ def withdraw_list_one_com(request):
 
 
         #### คำนวน ####
-        getpricebill = paymet.rpi_price_result
-        getcom = ((stage.commission_rate) / 100 )
-        print(getpricebill)
-        print(getcom)
-        total = Decimal(getpricebill) * Decimal(getcom)
         
-        r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total}
+        getpricebill_before_vat = paymet.rpi_price_result
+        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100
+        after_vat_cal = getpricebill_before_vat - getpricebill_after_vat 
+      
+        print(after_vat_cal)
+        getcom = ((stage.commission_rate) / 100 )
+    
+        total = Decimal(after_vat_cal) * Decimal(getcom)
+        
+       
+        r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat}
         obj.append(r)
 
-        print(obj)
+       
 
    
     context = {'title': title,'listMenuPermission': objMenu,'data':obj,'user_id':user_id}
@@ -1418,6 +1423,16 @@ def sendwithdrawcom(request):
    
     data = json.loads(request.body)
     user_id = data.get("user_id")
-  
+
+
+    content = fact_commission.objects.filter(user_id=user_id).order_by("stage_id")
+    
+    obj = []
+    for r in content:
+       
+       print(r)
+
+
+    upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='S')
     datas = {'status':user_id}
     return JsonResponse(datas, status=200,safe=False)
