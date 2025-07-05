@@ -1173,7 +1173,7 @@ def withdraw_list_one_com(request):
         objMenu.append(r)
     title = defaultTitle
 
-    commit = fact_commission.objects.filter(status='Y',user_id=user_id)
+    commit = fact_commission.objects.filter(status='N',user_id=user_id)
     obj = []
     for r in commit:
        
@@ -1189,7 +1189,7 @@ def withdraw_list_one_com(request):
         getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100
         after_vat_cal = getpricebill_before_vat - getpricebill_after_vat 
       
-        print(after_vat_cal)
+     
         getcom = ((stage.commission_rate) / 100 )
     
         total = Decimal(after_vat_cal) * Decimal(getcom)
@@ -1423,16 +1423,52 @@ def sendwithdrawcom(request):
    
     data = json.loads(request.body)
     user_id = data.get("user_id")
+    day_current = date.today().day
+    year_current = request.GET.get('qyear', date.today().year)
+    
+    bill = billing_cycle_setting.objects.filter()
 
+    
 
     content = fact_commission.objects.filter(user_id=user_id).order_by("stage_id")
     
     obj = []
     for r in content:
-       
-       print(r)
+     
+        taxs = tax_setting.objects.get(tax_id=1)
+        getdaybill = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
+        paymet = register_payment_items.objects.get(register_id=r.register_id)
+        
+        stage = commissionstages.objects.get(stage_id=r.stage_id)
 
 
-    upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='S')
+        #### คำนวน ####
+        
+        getpricebill_before_vat = paymet.rpi_price_result  #### ก่อน vat ####
+        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100   #### ค่า vat 7% ####
+        after_vat_cal = getpricebill_before_vat - getpricebill_after_vat  #### เงินบิล - เงินบิลหลังหักvat = ยอดเงินหักvat ####
+        getcom = ((stage.commission_rate) / 100 ) #### แปลงrate ####
+        total = Decimal(after_vat_cal) * Decimal(getcom) #### คำนวนค่าคอม ตาม rate  จากยอด  ####
+        taxaum = (Decimal(after_vat_cal) * Decimal(getcom) *  1) / 100 
+        total_result = total - taxaum
+        ev_id = getdaybill.ev.ev_id
+        course_id = getdaybill.course.course_id
+
+        taxs.tax_com
+        com_id = r.commit_id
+        active = 0
+        tis_com_before_tax = total
+        tis_com_after_tax = total_result
+        register = r.register_id
+        # content = commissionstages(
+        # stage_name=name,
+        # commission_rate=commission_ra,
+        # seq=last_entry.seq + 1,
+        # crt_date=dateTimeNow(),
+        # upd_date=dateTimeNow())
+        # content.save()
+
+    
+    # upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')
     datas = {'status':user_id}
     return JsonResponse(datas, status=200,safe=False)
