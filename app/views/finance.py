@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,com_income_setting
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1454,19 +1454,26 @@ def sendwithdrawcom(request):
         ev_id = getdaybill.ev.ev_id
         course_id = getdaybill.course.course_id
 
-        taxs.tax_com
         com_id = r.commit_id
         active = 0
         tis_com_before_tax = total
         tis_com_after_tax = total_result
         register = r.register_id
-        # content = commissionstages(
-        # stage_name=name,
-        # commission_rate=commission_ra,
-        # seq=last_entry.seq + 1,
-        # crt_date=dateTimeNow(),
-        # upd_date=dateTimeNow())
-        # content.save()
+        content = com_income_setting(
+        tis_com_before_tax=tis_com_before_tax,
+        tis_com_after_tax=tis_com_after_tax,
+        tis_group="-",
+        active=active,
+        ev_id=ev_id,
+        register_id=register,
+        tax=taxs.tax_com,
+        com_id=com_id,
+        course=getdaybill.course
+        )
+        content.save()
+
+
+
 
     
     # upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')

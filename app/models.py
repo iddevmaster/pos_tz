@@ -500,4 +500,16 @@ class fact_commission(models.Model):
     status = models.CharField(max_length=1, blank=False)
 
 
-
+class com_income_setting(models.Model):
+    tis_com_before_tax = models.FloatField(default=0 , blank=False)
+    tis_com_after_tax = models.FloatField(default=0 , blank=False)
+    tis_group  = models.CharField(max_length=64, blank=True, default="-")
+    active = models.IntegerField(default=0, blank=False)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+    ev = models.ForeignKey(course_event, on_delete=models.CASCADE ) 
+    register_id  = models.CharField(max_length=254, blank=True, default="-")
+    tax = models.IntegerField(blank=True, default=None)
+    com_id = models.IntegerField(blank=True, default=None)
+    course = models.ForeignKey(course, on_delete=models.CASCADE)
+    
