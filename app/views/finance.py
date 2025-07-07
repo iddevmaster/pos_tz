@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,com_income_setting
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1425,16 +1425,28 @@ def sendwithdrawcom(request):
     user_id = data.get("user_id")
     day_current = date.today().day
     year_current = request.GET.get('qyear', date.today().year)
+    month_current = request.GET.get('qmonths', date.today().month)
+    tis_group = '-'
+    # start = billone.bcs_start_day
+    # end = billone.bcs_end_day
+    # tis_group = f"{start} - {end}"
+    start = 21
+    get_last_day = last_day_of_month(
+            datetime.date(int(year_current), month_current, 1))
+    last_day = get_last_day.day
     
-    bill = billing_cycle_setting.objects.filter()
-
+    print(get_last_day)
+    if 1 <= day_current <= 20:
+        tis_group = '1 - 20'
+    else:
+       tis_group = f"{start} - {last_day}"
+            
     
-
     content = fact_commission.objects.filter(user_id=user_id).order_by("stage_id")
     
     obj = []
     for r in content:
-     
+        
         taxs = tax_setting.objects.get(tax_id=1)
         getdaybill = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
         paymet = register_payment_items.objects.get(register_id=r.register_id)
@@ -1454,26 +1466,35 @@ def sendwithdrawcom(request):
         ev_id = getdaybill.ev.ev_id
         course_id = getdaybill.course.course_id
 
+        taxs.tax_com
         com_id = r.commit_id
         active = 0
         tis_com_before_tax = total
         tis_com_after_tax = total_result
         register = r.register_id
+        status = 'S'
+        # content = commissionstages(
+        # stage_name=name,
+        # commission_rate=commission_ra,
+        # seq=last_entry.seq + 1,
+        # crt_date=dateTimeNow(),
+        # upd_date=dateTimeNow())
+        # content.save()
         content = com_income_setting(
         tis_com_before_tax=tis_com_before_tax,
         tis_com_after_tax=tis_com_after_tax,
-        tis_group="-",
+        tis_group=tis_group,
         active=active,
         ev_id=ev_id,
         register_id=register,
         tax=taxs.tax_com,
         com_id=com_id,
-        course=getdaybill.course
+        course=getdaybill.course,
+        user_id=user_id,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
         )
         content.save()
-
-
-
 
     
     # upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')

@@ -209,8 +209,8 @@ urlpatterns = [
     path('report/withdraw/all/summary/teacher/<str:year>/<str:m>', report_and_print.register_report_summary_teacher_all_month),
 
 
-    path('report/overdue/all/com', report_and_print.register_report_summary),  #ค้างจ่ายค่าคอม
-    path('report/withdraw/all/com', report_and_print.register_report_summary_teacher), #ตั้งเบิกค่าคอม
+    path('report/overdue/all/com', report_and_print.register_report_summary_com),  #ค้างจ่ายค่าคอม
+    path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),

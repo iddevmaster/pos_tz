@@ -512,4 +512,5 @@ class com_income_setting(models.Model):
     tax = models.IntegerField(blank=True, default=None)
     com_id = models.IntegerField(blank=True, default=None)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
+    user_id = models.IntegerField(default=None, blank=False)
     
