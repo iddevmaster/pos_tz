@@ -174,6 +174,7 @@ urlpatterns = [
      
     # Master Data
     path('locationthai/', master_data.get_locationThai),
+    path('customer/', master_data.get_customer),
 
     # General
     path('login/', general.login),
@@ -183,6 +184,8 @@ urlpatterns = [
     # print / export / report
     path('report/register/export/seller',
          report_and_print.register_selller_report),
+    path('report/register/export/seller/event',
+         report_and_print.register_selller_report_event),     
     path('report/register/export/quotation',
          report_and_print.register_report_quotation),
     path('report/register/export/bill', report_and_print.register_report_bill),
@@ -319,6 +322,7 @@ urlpatterns = [
 
     path('api/calendar_event_api_data', desbill.data_event),
     path('api/calendar_event_api_bill', desbill.data_bill),
+    path('api/calendar_event_api_billevent', desbill.data_bill_event),
     path('api/calendar_event_api_com', desbill.data_com),
     path('api/calendar_event_api_user', desbill.user_com),
     path('api/calendar_event_api_update_com', desbill.update_com),

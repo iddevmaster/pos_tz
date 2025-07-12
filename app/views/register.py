@@ -125,7 +125,9 @@ def register_home(request):
         content = {"label": label, "data": result}
         obj.append(content)
     # print(idcard_data)
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,
+    getcustomer = customers.objects.filter()
+    print(getcustomer)
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,'customers':getcustomer,
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
     return render(request, 'register/register.html', context)
 

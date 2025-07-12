@@ -290,6 +290,12 @@ listMenu = [
         "group_label": "รายงาน",
     },
     {
+        "value": "report/register/export/seller/event",
+        "label": "รายงานข้อมูลการขาย By Event",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+    {
         "value": "report/register/export/quotation",
         "label": "รายงานข้อมูลใบเสนอราคา",
         "group_value": "WRltr2",

@@ -1,6 +1,6 @@
 from django.http.response import JsonResponse
 from django.db.models import Q
-from ..models import location_thai
+from ..models import location_thai,customers
 
 
 def get_locationThai(request):
@@ -23,5 +23,29 @@ def get_locationThai(request):
             str(re.amphur_name) + ' - ' + \
             str(re.province_name) + ' ' + str(re.zipcode)
         list = {'id': re.location_id, 'text': text}
+        context.append(list)
+    return JsonResponse(context, safe=False)
+
+
+def get_customer(request):
+    try:
+        searchTerm = request.POST['searchTerm']
+    except KeyError:
+        searchTerm = None
+        return JsonResponse({'status': "Fail", 'message': 'ไม่พบข้อมูล'}, safe=False)
+    try:
+        content = customers.objects.filter(Q(customer_code__icontains=searchTerm) |
+                                               Q(customer_name__icontains=searchTerm) |
+                                               Q(customer_phone__icontains=searchTerm) |
+                                               Q(customer_code__icontains=searchTerm))[:25]
+    except customers.DoesNotExist:
+        content = None
+        return JsonResponse({'status': "Fail", 'message': 'ไม่พบข้อมูล'}, safe=False)
+    context = []
+    for re in content:
+        text = str(re.customer_code) + ' - ' + \
+            str(re.customer_name) + ' - ' + \
+            str(re.customer_phone) + ' ' + str(re.customer_code)
+        list = {'id': re.customer_id, 'text': text}
         context.append(list)
     return JsonResponse(context, safe=False)

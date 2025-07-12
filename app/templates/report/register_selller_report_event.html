@@ -1,0 +1,446 @@
+{% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+  $(document).ready(function () {
+    // Initialize Select2
+    $('#teacher').select2({
+      dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
+    });
+
+    // Reinitialize Select2 when modal is opened (optional, but ensures reliability)
+    $('#select2Modal').on('shown.bs.modal', function () {
+      $('#teacher').select2({
+        dropdownParent: $('#select2Modal')
+      });
+    });
+  });
+
+  function setValueDeleteModal(register_id,ev_id) {
+  $('#json-table-body-rate').empty(); // Clear previous cards
+    document.getElementById("register_id").value = register_id;
+    
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    eventModal.show();
+     let com = findcommit(register_id,ev_id)
+  }
+
+    async function findcommit(register_id,ev_id) {
+
+
+    const table = document.getElementById('ttt');
+    table.style.display = 'block';
+
+    try {
+      const response = await fetch('/api/calendar_event_api_com', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          register_id: register_id,
+          ev_id:ev_id
+        })
+      });
+      const data = await response.json();
+    
+     var statusOptions = await populateTable();
+     var $tableBody = $('#json-table-body-rate');
+
+     data.forEach((item, index) => {
+                var $row = $('<tr>');
+                    $row.append($('<td>').text(index + 1));
+                    $row.append($('<td>').text(item.stages_name));
+                    $row.append($('<td>').text(item.rates));
+                    $row.append($('<td>').text(item.s_name));
+
+                    // Create the td for the Select2
+                    var $statusTd = $('<td>');
+                    var $selectElement = $('<select>')
+                        .addClass('user-status-select') // Add a class for easy selection
+                        .attr('data-user-id', item.user_id) // Store user ID for later use
+                        .css('width', '100%'); // Apply 100% width via inline style
+
+                    $statusTd.append($selectElement);
+                    $row.append($statusTd);
+                    
+                    $tableBody.append($row);
+                    $selectElement.prop('disabled', false);
+                    if(item.s_name == 'ยืนยันแล้ว'){
+                    $selectElement.prop('disabled', true);
+                    }
+                    
+                    $selectElement.select2({
+                        data: statusOptions, // Provide the status options
+                        placeholder: "Select Status",
+                        allowClear: true
+                    }).val(item.user_id).trigger('change'); // Set initial value and trigger change to display it
+
+
+                     $selectElement.on('change', function() {
+                    
+                       const selectedValue = $(this).val();
+
+  const dataToSend = {
+        commit_id: item.commit_id, // Assuming item.user_id is available in this scope
+        user_id: selectedValue
+    };
+
+            $.ajax({
+        url: '/api/calendar_event_api_update_com',
+        method: 'POST', // Or 'PUT', 'PATCH' depending on your API
+        contentType: 'application/json',
+        data: JSON.stringify(dataToSend),
+        success: function(response) {
+            console.log('API update successful:', response);
+            // Optionally, show a success message to the user
+        },
+        error: function(xhr, status, error) {
+            console.error('API update failed:', error);
+            console.error('Response text:', xhr.responseText);
+            // Optionally, show an error message to the user
+            // You might want to revert the selection or show a warning
+        }
+    });
+                    
+                     });
+
+      });
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+
+
+  async function populateTable() {
+    try {
+        const response = await fetch('/api/calendar_event_api_user', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          register_id: register_id,
+          ev_id:1
+        })
+      });
+
+        
+        // Check if the request was successful (status code 200-299)
+        if (!response.ok) {
+            // If not successful, throw an error with the status
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const data = await response.json();
+
+        // --- Now you have the data! ---
+        console.log("Fetched Calendar Events:", data);
+
+
+        return data; // Return the fetched data
+    } catch (error) {
+        console.error("Error fetching calendar events:", error);
+        // Handle the error appropriately, e.g., display an error message to the user
+        return null; // Or re-throw the error
+    }
+}
+
+
+  async function findevid(evid) {
+
+
+    const table = document.getElementById('ttt');
+    table.style.display = 'block';
+
+    try {
+      const response = await fetch('/api/calendar_event_api_billevent', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          evid: evid,
+        })
+      });
+      const data = await response.json();
+      
+      const tableBody = document.getElementById('json-table-body');
+      tableBody.innerHTML = ''; // Clears all rows
+      data.forEach((item, index) => {
+
+        const row = document.createElement('tr');
+
+             row.innerHTML = `
+                    <td>${index + 1}</td>
+                      <td> ${item.crt_date}</td>
+                    <td>${item.register_number}</td>
+                    <td>${item.rp_name_customer}</td>
+                    <td>${item.tel}</td>  
+                    <td>${item.seller}</td>
+                      
+                 
+                `;
+        tableBody.appendChild(row);
+      });
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+    locale: "th",
+    buttonIcons: false, // show the prev/next text
+    weekNumbers: true,
+    navLinks: true, // can click day/week names to navigate views
+    editable: false,
+    initialView: 'dayGridMonth',
+    dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
+    events: {
+    url: "/calendar_event_apiall_com/",
+    failure: function () {
+      document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
+    },
+  },
+    eventClick: function (info) {
+
+
+      $('#cardContainer').empty(); // Clear previous cards
+      document.getElementById('eventModalLabel').innerText = info.event.title;
+
+      document.getElementById("ev_id").value = info.event.extendedProps.evs_id
+
+
+
+
+      let timerInterval;
+      Swal.fire({
+        title: "รอสักครู่",
+        html: "I will close in <b></b> milliseconds.",
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("I was closed by the timer");
+        }
+      });
+      let aaaa = findevid(info.event.extendedProps.evs_id)
+
+    },
+      
+    });
+  calendar.render();
+  });
+
+</script>
+<style>
+  #ttt {
+    display: none;
+  }
+
+  .modal-xxl {
+    max-width: 90%;
+    width: 90%;
+  }
+
+  /* Ensure modal-content scales properly */
+  .modal-xxl .modal-content {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Optional: Add responsive styling */
+  @media (max-width: 768px) {
+    .modal-xxl {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .select2-container {
+    z-index: 1055 !important;
+    /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+  }
+</style>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตารางหลักสูตรอบรม</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางหลักสูตรอบรม
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <span id="msg" style="color: red"></span>
+      <div id="calendar"></div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section" id="ttt">
+  <div class="card">
+    <div class="card-body">
+      <!-- <table class="table table-bordered table-striped" >
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ครู-วิทยากร</th>
+            <th>ตำแหน่ง/หน้าที่</th>
+            <th>ค่าตอบแทน</th>
+            <th>จำนวนหน่วย</th>
+            <th>รายได้สุทธิ</th>
+            <th>สถานะ</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody id="json-table-body"></tbody>
+      </table> -->
+
+
+
+
+            <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>วันที่โอน</th>
+            <th>เลขที่ใบเสร็จ</th>
+            <th>ชื่อผู้เข้าอบรม</th>
+            <th>เบอร์โทร</th>
+            <th>ชื่อผู้ประสานงาน</th>
+     
+       
+          </tr>
+        </thead>
+       <tbody id="json-table-body">
+    
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel"></h5>
+
+        <input type="hidden" name="ev_id" id="ev_id" required />
+ <input type="hidden" name="register_id" id="register_id" required />
+
+    
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
+        <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+
+
+
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ความรับผิดชอบ</th>
+              <th>เรท</th>
+              <th>สถานะ</th>
+              <th>ชื่อผู้รับ</th>
+            </tr>
+          </thead>
+          <tbody id="json-table-body-rate"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+
+        <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        {% csrf_token %}
+       
+        <input type="hidden" name="ev_id" id="ev_id" required value="" />
+        <div align="center">
+          <h4>ยืนยันการลบข้อมูล</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
