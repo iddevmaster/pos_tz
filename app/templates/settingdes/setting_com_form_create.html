@@ -212,14 +212,14 @@
         <form action="{% url 'com_setting_form_update' %}" method="post">
           <div class="modal-body">
             {% csrf_token %}
-            <input type="text" name="stage_id" id="stage_id" required />
+            <input type="hidden" name="stage_id" id="stage_id" required />
             <div class="col-12 col-sm-12">
-              <label>รายละเอียดการอบรม</label> <label style="color: red">*</label>
+              <label>ชื่อ</label> <label style="color: red">*</label>
               <input type="text" class="form-control" id="stage_name_update" name="stage_name" required />
             </div>
 
             <div class="col-12 col-sm-12">
-              <label>รายละเอียดการอบรม</label> <label style="color: red">*</label>
+              <label>เรท</label> <label style="color: red">*</label>
               <input type="number" class="form-control" id="commission_rate_update" name="commission_rate_update" step="0.1" min="0" max="100" />
             </div>
             <!-- <div class="col-12 col-sm-12">
