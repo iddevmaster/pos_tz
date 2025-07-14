@@ -3091,3 +3091,16 @@ def insertcard(request):
     return JsonResponse(datas, status=200,safe=False)
 
 
+@csrf_exempt
+def get_customer_data(request):
+
+
+    data = json.loads(request.body)
+    obj = []
+    customer_id = data.get("customer_id")
+    print(customer_id)
+    dat = customers.objects.get(customer_id=customer_id)
+
+    r = {'customer_address':dat.customer_address,'customer_phone':dat.customer_phone,'customer_code':dat.customer_code,'customer_name':dat.customer_name}
+    obj.append(r)
+    return JsonResponse(r, status=200,safe=False)

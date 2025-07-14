@@ -174,7 +174,7 @@ urlpatterns = [
      
     # Master Data
     path('locationthai/', master_data.get_locationThai),
-    path('customer/', master_data.get_customer),
+    path('api/customer', register.get_customer_data),
 
     # General
     path('login/', general.login),

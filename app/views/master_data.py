@@ -1,6 +1,7 @@
 from django.http.response import JsonResponse
 from django.db.models import Q
 from ..models import location_thai,customers
+import json
 
 
 def get_locationThai(request):
@@ -49,3 +50,4 @@ def get_customer(request):
         list = {'id': re.customer_id, 'text': text}
         context.append(list)
     return JsonResponse(context, safe=False)
+

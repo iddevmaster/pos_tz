@@ -8,9 +8,6 @@
           placeholder: "เลือกข้อมูล",
           allowClear: true,
         });
-
-
-
   });
 
   function setBillName() {
@@ -49,7 +46,23 @@
   async function myFunction(selectElement) {
   
 const selectedValue = selectElement.value;
-console.log(selectedValue);
+
+
+
+    let data = await fetch('/api/customer', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({'customer_id':selectedValue})
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+
+        document.getElementById("customer_address").value= data.customer_address;
+
+      })
       
   }
 
@@ -309,7 +322,7 @@ console.log(selectedValue);
 
        <div class="col-lg-4 col-md-6">
          <div class="form-group">
-            <label>หลักสูตร  
+            <label>ลูกค้า  
       </label> <label style="color: red">*</label>
             <select
               class="select2"
@@ -319,7 +332,7 @@ console.log(selectedValue);
               onchange="myFunction(this)" 
               
             >
-              <option value="">-เลือกหลักสูตรและวันที่อบรม-</option>
+              <option value="">-เลือกลูกค้า-</option>
               {% for res in customers %}
               <option value="{{res.customer_id}}">
                 {{res.customer_name}}
