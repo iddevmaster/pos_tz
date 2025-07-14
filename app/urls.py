@@ -212,6 +212,10 @@ urlpatterns = [
     path('report/withdraw/all/summary/teacher/<str:year>/<str:m>', report_and_print.register_report_summary_teacher_all_month),
 
 
+    path('report/withdraw/all/withdraw/comm', report_and_print.register_report_summary_user_withdraw_com),
+    path('report/withdraw/all/summary/overdue', report_and_print.register_report_summary_user_withdraw_com_overdue),
+
+
     path('report/overdue/all/com', report_and_print.register_report_summary_com),  #ค้างจ่ายค่าคอม
     path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
 

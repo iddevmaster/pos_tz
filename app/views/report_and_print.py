@@ -18,7 +18,7 @@ from django.db.models import Count, Sum, F
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new
 
 
@@ -3604,3 +3604,180 @@ def register_report_summary_sale_com(request):
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
     return render(request, 'report/billing_cycle_result_summary_withdraw_com.html', context) 
+
+
+
+
+
+
+@login_required(login_url='/login')
+def register_report_summary_user_withdraw_com(request):
+
+    month_select_now = request.POST.get('monthss', date.today().month)
+    
+ 
+    m_n = month_select_now
+    m_l = int(month_select_now) - 1
+ 
+    day_same_m = request.POST.get('monthss', date.today().month)
+ 
+    day_current_m = request.POST.get('monthss', date.today().month - 1)
+
+    year_current = request.GET.get('qyear', date.today().year)
+    
+    start = None
+    end = None
+    start_new = None
+    end_new = None
+    obj = []
+
+    get_last_day = last_day_of_month(
+            datetime.date(int(year_current), int(day_current_m), 1))
+    last_day = get_last_day.day
+    default_start = str(date.today().year) + "-" + \
+        str(m_l) + "-" + "21"
+    default_end = str(date.today().year) + "-" + \
+        str(m_n) + "-" + "20"
+    
+
+    get_last_day_m = last_day_of_month(
+            datetime.date(int(year_current), m_l, 1))
+    last_day_m = get_last_day_m.day
+   
+    tis_group_l = f"21 - {last_day_m}"
+    tis_group_f = "1 - 20"
+    
+
+
+    day_current_day = date.today().day
+
+  
+    result_dict = {}
+    customer_order_counts = com_income_setting.objects.filter(status='S').values('user_id').distinct()
+    
+    price = 0
+    totalp = 0
+    totalp_f = 0
+    sumtaxall = 0
+    sumtaxl = 0
+    sumtaxf = 0
+    totalall = 0
+
+   
+    for customer_order in customer_order_counts:
+        item_id = customer_order['user_id']
+    
+        getdatauser = User.objects.get(pk=item_id)
+        code = getdatauser
+        name = getdatauser.first_name + '' + getdatauser.last_name
+   
+        
+        lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+  
+        price = 0
+        totalp = 0
+        totalp_f = 0
+        sumtaxall = 0
+        sumtaxl = 0
+        sumtaxf = 0
+        totalall = 0
+        for rs in lassssst:
+            totalp += rs.tis_com_before_tax
+            sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
+          
+        first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+
+        for rsf in first:
+           
+           totalp_f += rsf.tis_com_before_tax
+           sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
+           
+        if item_id not in result_dict:
+                aa = totalp_f + totalp
+                sumtaxall = sumtaxl + sumtaxf
+                
+                totalall = aa - sumtaxall
+                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
+            
+    result_list = list(result_dict.values())
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f}
+  
+    return render(request, 'print/report_withdraw_summary_commission.html', context)   
+
+
+
+
+
+@login_required(login_url='/login')
+def register_report_summary_user_withdraw_com_overdue(request):
+
+   
+   
+    day_current_m = request.POST.get('monthss', date.today().month - 1)
+    year_current = request.GET.get('qyear', date.today().year)
+
+    start = None
+    end = None
+    start_new = None
+    end_new = None
+    obj = []
+
+    day_current_day = date.today().day
+    
+ 
+    bill = billing_cycle_setting.objects.get(id=2)
+    start = bill.bcs_start_day
+    get_last_day = last_day_of_month(
+            datetime.date(int(year_current), int(day_current_m), 1))
+    last_day = get_last_day.day
+
+
+    
+
+    content = com_income_setting.objects.filter(status='S',active=0,tis_start_date__day__gte=start,
+                tis_start_date__day__lte=last_day,
+                tis_start_date__month=day_current_m,
+                tis_start_date__year=year_current)
+    print(content)
+    requirements = 'ไม่มี'
+    name_con = '-'
+    totalp = 0
+    sumtax = 0
+    totalall = 0
+    for rs in content:
+            
+    
+        
+            
+            sumtax += rs.tis_com_before_tax - rs.tis_com_after_tax
+           
+           
+            r = {'user_id':rs.user_id,'totalp':rs.tis_com_before_tax,'sumtax':sumtax}
+            print(r)
+            obj.append(r)   
+
+    result_dict = {}
+    for item in obj:
+          
+   
+            getdatauser = User.objects.get(pk=item["user_id"])
+            item_id = item["user_id"]
+            name = getdatauser.first_name + ' ' + getdatauser.last_name
+            qty = item["totalp"]
+            ta = item["sumtax"]
+            total = item["totalp"] -item["sumtax"]
+            aaaa = total
+            if item_id not in result_dict:
+                result_dict[item_id] = {"Id": item_id, "totalp": 0, "sumtax": 0,"total":0,'name':name,'username':getdatauser.username}
+            result_dict[item_id]["totalp"] += qty
+            result_dict[item_id]["sumtax"] += ta
+            result_dict[item_id]["total"] += aaaa
+            
+
+    result_list = list(result_dict.values())
+    totalall = totalp - sumtax
+      
+
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(day_current_m),'year_current':year_current,'m':day_current_m}
+  
+    return render(request, 'print/report_withdraw_summary_overdue_com.html', context)    

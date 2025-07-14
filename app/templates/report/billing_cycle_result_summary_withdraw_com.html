@@ -5,7 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-console.log('load')
+
  function validateForm() {
   
 
@@ -13,7 +13,7 @@ console.log('load')
 Swal.fire({
   title: "รอสักครู่",
   html: "I will close in <b></b> milliseconds.",
-  timer: 12000,
+  timer: 1000,
   timerProgressBar: true,
   didOpen: () => {
     Swal.showLoading();
@@ -84,7 +84,7 @@ Swal.fire({
     <div class="card-body">
       <form
         method="post"
-        action="/report/withdraw/all/withdraw"
+        action="/report/withdraw/all/withdraw/comm"
         autocomplete="off"
         target="iframe_target" 
         onsubmit="return validateForm()"
@@ -150,7 +150,7 @@ Swal.fire({
   <iframe
 id="iframe_target"
 name="iframe_target"
-src="/report/withdraw/all/withdraw"
+src="/report/withdraw/all/withdraw/comm"
 style="height: 1000px; width: 100%; border: thin; background-color: #fff"
 ></iframe>
 </section>

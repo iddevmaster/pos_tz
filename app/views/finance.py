@@ -1424,6 +1424,7 @@ def sendwithdrawcom(request):
     data = json.loads(request.body)
     user_id = data.get("user_id")
     day_current = date.today().day
+    day_curr= date.today()
     year_current = request.GET.get('qyear', date.today().year)
     month_current = request.GET.get('qmonths', date.today().month)
     tis_group = '-'
@@ -1435,7 +1436,7 @@ def sendwithdrawcom(request):
             datetime.date(int(year_current), month_current, 1))
     last_day = get_last_day.day
     
-    print(get_last_day)
+  
     if 1 <= day_current <= 20:
         tis_group = '1 - 20'
     else:
@@ -1458,15 +1459,17 @@ def sendwithdrawcom(request):
         
         getpricebill_before_vat = paymet.rpi_price_result  #### ก่อน vat ####
         getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100   #### ค่า vat 7% ####
+    
         after_vat_cal = getpricebill_before_vat - getpricebill_after_vat  #### เงินบิล - เงินบิลหลังหักvat = ยอดเงินหักvat ####
         getcom = ((stage.commission_rate) / 100 ) #### แปลงrate ####
+       
         total = Decimal(after_vat_cal) * Decimal(getcom) #### คำนวนค่าคอม ตาม rate  จากยอด  ####
-        taxaum = (Decimal(after_vat_cal) * Decimal(getcom) *  1) / 100 
+        taxaum = (Decimal(after_vat_cal) * Decimal(getcom) *  taxs.tax_com) / 100 
+       
         total_result = total - taxaum
         ev_id = getdaybill.ev.ev_id
-        course_id = getdaybill.course.course_id
+      
 
-        taxs.tax_com
         com_id = r.commit_id
         active = 0
         tis_com_before_tax = total
@@ -1481,6 +1484,8 @@ def sendwithdrawcom(request):
         # upd_date=dateTimeNow())
         # content.save()
         content = com_income_setting(
+        tis_com_before_vat=getpricebill_before_vat,
+        tis_com_after_vat=after_vat_cal,
         tis_com_before_tax=tis_com_before_tax,
         tis_com_after_tax=tis_com_after_tax,
         tis_group=tis_group,
@@ -1491,12 +1496,14 @@ def sendwithdrawcom(request):
         com_id=com_id,
         course=getdaybill.course,
         user_id=user_id,
+        status=status,
+        tis_start_date=day_curr,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         )
         content.save()
 
     
-    # upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')
+    upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')
     datas = {'status':user_id}
     return JsonResponse(datas, status=200,safe=False)

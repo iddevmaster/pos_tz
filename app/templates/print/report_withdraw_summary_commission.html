@@ -1,0 +1,210 @@
+{% load humanize %} {% comment %}
+https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel-using-JavaScript/
+{% endcomment %}
+
+<script
+  src="https://code.jquery.com/jquery-latest.min.js"
+  type="text/javascript"
+></script>
+
+<script type="text/javascript">
+    function details(id,year,m) {
+   let origin = location.origin;
+   let u = '/report/withdraw/all/summary/teacher/'
+   window.open(origin+u+id+'/'+year+'/'+m,'_blank');
+
+    }
+  var tableToExcel = (function () {
+    // Define your style class template.
+    var style = "<style>.green { background-color: green; }</style>";
+    var uri = "data:application/vnd.ms-excel;base64,",
+      template =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        style +
+        "</head><body><table>{table}</table></body></html>",
+      base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+      },
+      format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+          return c[p];
+        });
+      };
+    return function (table, name) {
+      if (!table.nodeType) table = document.getElementById(table);
+      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+      window.location.href = uri + base64(format(template, ctx));
+    };
+  })();
+</script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+  rel="stylesheet"
+/>
+
+<style type="text/css">
+  body {
+    font-family: "Sarabun", sans-serif;
+    font-size: 16px;
+  }
+  table {
+    font-size: 16px;
+  }
+  .green {
+    background-color: green;
+  }
+</style>
+
+<div style="padding-bottom: 65px">
+  <div style="float: left">
+  <input
+      type="button"
+       onclick="window.open('/report/withdraw/all/summary/teacher/{{year_current}}/{{m}}','','width=950,height=650'); return false;"
+      value="Print"
+      style="height: 35px"
+    />
+  </div>
+  <div style="float: right">
+    <input
+      type="button"
+      onclick="tableToExcel('testTable', 'รายงานการขาย')"
+      value="Export to Excel"
+      style="height: 35px"
+    />
+  </div>
+</div>
+
+<table style="width: 100%; border-collapse: collapse" border="1" class="table-detail" id="testTable">
+  <tbody>
+    <tr style="font-weight: bold">
+      <td colspan="10" align="center">บริษัท ไอดีไดร์ฟ จำกัด</td>
+    </tr>
+    <tr style="font-weight: bold">
+      <td colspan="10" align="center">สรุปรายงานการตั้งเบิกค่าตอบแทน</td>
+    </tr>
+    <tr style="font-weight: bold">
+     
+      <td colspan="10" align="center">ระหว่างวันที่  {{tis_group_l}} {{old_m}} {{year_current}} ถึง {{tis_group_f}} {{current_m}} {{year_current}} </td>
+    </tr>
+    <tr>
+      <td>ลำดับ</td>
+      <td>รหัสพนักงาน</td>
+      <td>ชื่อ-สกุล</td>
+      <td>รวมค่าตอบแทน        ค้าง {{tis_group_l}} {{old_m}} {{year_current}} </td>
+      <td>รวมค่าตอบแทน    {{tis_group_f}} {{current_m}} {{year_current}}</td>
+      <td>รวมเป็นเงิน</td>
+      <td>หัก ณ ที่จ่าย</td>
+      <td>รายได้สุทธิ</td>
+    </tr>
+
+    {% for res in result_dict %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td align="center">{{res.code}}</td>
+      <td align="center">{{res.username}}</td>
+   
+      <td align="center">{{res.price|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.price_f|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.total|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.totalall|floatformat:2|intcomma }}</td>
+       {% comment %} <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
+            คลิกดูรายละเอียด
+          </button></td> {% endcomment %}
+      <!-- <td align="center">{{res.requirements}}</td> -->
+    </tr>
+    {% endfor %}
+    {% comment %} <tr>
+      <td colspan="3">รวมเป็นค่าตอบแทน</td>
+       <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{totalp|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{sumtax|floatformat:2|intcomma }}</td>
+      <td colspan="1">{{totalall|floatformat:2|intcomma }}</td>
+    </tr> {% endcomment %}
+    
+
+    <!-- <tr>
+      <td colspan="8">
+        <table style="width: 100%; border-collapse: collapse" border="1">
+          <tbody>
+            <tr align="center">
+
+              <td style="
+              border-left-color: white;
+              border-top-color: white;
+              border-bottom-color: white;
+            ">
+          <div style="display: flex;text-align: center;">
+            <div style="flex: 1;">
+              <br>
+              <img src="/media/images/logo/1740458201733.jpg" alt="IDLOGO" style="width: 200px; height: 100px">
+              <br>
+             <span>ชื่อ.....................</span><br>
+             <span>(ผู้ขอตั้งเบิก)<span><br>
+              <span>วดป<span><br>
+           
+            </div>
+  
+          </div>
+      
+          </td>
+
+
+       
+              <td style="
+                  border-left-color: white;
+                  border-top-color: white;
+                  border-bottom-color: white;
+                ">
+              <div style="display: flex;text-align: center;">
+                <div style="flex: 1;">
+                  <br>
+                  <img src="/media/images/logo/1740458201733.jpg" alt="IDLOGO" style="width: 200px; height: 100px">
+                  <br>
+                 <span>ชื่อ.....................</span><br>
+                 <span>(ผู้ตรวจสอบ)<span><br>
+                  <span>วดป<span><br>
+                </div>
+              </div>
+              </td>
+              <td style="
+              border-left-color: white;
+              border-top-color: white;
+              border-bottom-color: white;
+            ">
+          <div style="display: flex;text-align: center;">
+            <div style="flex: 1;">
+              <br>
+              <img src="/media/images/logo/1740458201733.jpg" alt="IDLOGO" style="width: 200px; height: 100px">
+              <br>
+             <span>ชื่อ.....................</span><br>
+             <span>(ผู้อนุมัติ)<span><br>
+              <span>วดป<span><br>
+            </div>
+          </div>
+          </td>
+              <td style="
+                  border-right-color: white;
+                  border-top-color: white;
+                  border-bottom-color: white;
+                ">
+                <br>
+                <img src="/media/images/logo/1740458201733.jpg" alt="IDLOGO" style="width: 200px; height: 100px">
+                <br>
+      <div style="
+padding-top: 10px;
+">
+                ผู้ดูแล ระบบ TZ
+      </div>
+                <div>ผู้รับเงิน</div>
+                <div>
+                  03/05/2025
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr> -->
+  </tbody>
+</table>
