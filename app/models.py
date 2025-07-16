@@ -197,7 +197,8 @@ class register_payment_items(models.Model):
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
     stmdate = models.DateTimeField(blank=True, null=True)
     stmetc = models.CharField(max_length=64, blank=True, default=None)
-
+    type_payment = models.CharField(max_length=64, blank=True, default=None)
+    
 
 class customers(models.Model):
     customer_id = models.AutoField(primary_key=True)

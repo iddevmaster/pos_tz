@@ -673,6 +673,7 @@ def payment_create(request):
     rp_address = request.POST['rp_address']
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
+    type_payment = request.POST['type_payment']
     stmda = request.POST.get('stmdate')
     etc= request.POST.get('stmetc')
     bills = request.POST.getlist("selected_bills", [])
@@ -799,6 +800,7 @@ def payment_create(request):
         register_id=register_id,
         stmdate=stmda,
         stmetc=etc,
+        type_payment=type_payment
 
         
     )
