@@ -175,9 +175,13 @@ const selectedValue = selectElement.value;
       <div class="row">
         <div class="col-lg-6 col-md-6">
           <div class="form-grop">
-            <label> ข้อมูลลูกค้า </label>
+           ข้อมูลลูกค้า
           </div>
         </div>
+
+   
+
+    
 
         <div class="col-lg-6 col-md-6">
 
@@ -199,6 +203,20 @@ const selectedValue = selectElement.value;
 
       <form method="post" action="{% url 'CreateCustomer' %}">
         {% csrf_token %}
+
+           <div class="row">
+    
+
+           <div class="col-lg-12 col-md-12">
+           <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="method1" id="new" value="new" checked>
+                <label class="form-check-label" for="new">ลูกค้าใหม่</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="method1" id="same" value="same">
+                <label class="form-check-label" for="same">ลูกค้าเก่า</label>
+            </div>
+        </div>
       <div class="row">
 
         {% if content_regist.customer_type == 1 %}
@@ -320,7 +338,8 @@ const selectedValue = selectElement.value;
           </div>
         </div>
 
-       {% comment %} <div class="col-lg-4 col-md-6">
+
+                <div class="col-lg-4 col-md-6">
          <div class="form-group">
             <label>ลูกค้า  
       </label> <label style="color: red">*</label>
@@ -343,7 +362,11 @@ const selectedValue = selectElement.value;
 
         </div>
         
-      </div> {% endcomment %}
+      </div> 
+
+
+        
+      </div> 
 
       <div class="form-group" align="center">
         <button type="submit" class="btn btn-success rounded-pill">
@@ -353,6 +376,10 @@ const selectedValue = selectElement.value;
     </form>
 
     </div>
+  </div>
+
+
+
   </div>
   {% endif %}
 </section>

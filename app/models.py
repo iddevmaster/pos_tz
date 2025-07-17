@@ -213,6 +213,11 @@ class customers(models.Model):
         location_thai, on_delete=models.CASCADE)
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
 
+class fact_customer(models.Model):
+    fact_cus_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(customers, on_delete=models.CASCADE)  
+    register = models.ForeignKey(register_main, on_delete=models.CASCADE)    
+
 # status 1 = อนุมัติ , 2 = ไม่อนุมัติ
 # doc_type 1 =  อนุมัติเพื่อแก้ไขใบเสร็จ / ใบเสนอราคา
 # complete 0 = ยังไม่ทำรายการ , 1 = ทำรายการเสร็จสมบูรณ์แล้ว

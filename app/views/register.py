@@ -16,7 +16,7 @@ from ..constant import defaultTitle, api_id_card
 from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
-from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission
+from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission,fact_customer
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 from ..constant import prefixEng,prefixThai
 
@@ -320,6 +320,9 @@ def register_createnoevent(request):
 @login_required(login_url='/login')
 def customer_create(request):
 
+
+    dddd = request.POST['method1']
+    print(dddd)
     try:
         register_id = request.session['register_id']
         content_regist = register_main.objects.get(register_id=register_id)
@@ -329,9 +332,11 @@ def customer_create(request):
         register_id = None
         content_regist = None
         return redirect("/")
-    chkcustomer = customers.objects.filter(register_id=register_id).count()
+    chkcustomer = fact_customer.objects.filter(register_id=register_id).count()
     if chkcustomer > 0:
         return redirect("/register/reset")
+    
+    # ลูกค้าใหม่  รึลูกค้าเก่า
     customer_code = "C" + str(dateTimeIntNow())
     customer_name = request.POST['customer_name']
     customer_tax = request.POST['customer_tax']
@@ -349,6 +354,12 @@ def customer_create(request):
         location_id=location_id,
         register_id=register_id
     )
+    # 
+    fact_customer.objects.create(
+        customer_id='x',
+        register_id=register_id
+    )
+
 
     # Update Register
     month_current = date.today().month

@@ -3,6 +3,99 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
+  let selectedPaymentMethod = null;
+
+        function selectPayment(method) {
+            // Remove previous selection
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            const selectedCard = document.getElementById(method === 'cash_full' ? 'fullPayment' : 'depositPayment');
+            selectedCard.classList.add('selected');
+
+            // Update selected payment method
+            selectedPaymentMethod = method;
+
+            // Show/hide installment details
+            const installmentDetails = document.getElementById('installmentDetails');
+            if (method === 'deposit') {
+                installmentDetails.classList.add('show');
+            } else {
+                installmentDetails.classList.remove('show');
+            }
+
+            // Update selected payment display
+            const selectedPayment = document.getElementById('selectedPayment');
+            const selectedMethod = document.getElementById('selectedMethod');
+            const selectedDetails = document.getElementById('selectedDetails');
+
+            if (method === 'cash_full') {
+                selectedMethod.textContent = 'จ่ายเต็มจำนวน';
+                selectedDetails.textContent = 'ชำระ ฿25,000 ครั้งเดียว รับสินค้าทันที';
+            } else {
+                selectedMethod.textContent = 'ชำระมัดจำ';
+                selectedDetails.textContent = 'มัดจำ ฿5,000 + ผ่อน 12 งวด (เริ่มต้น ฿1,667/เดือน)';
+            }
+
+            selectedPayment.classList.add('show');
+
+            // Enable proceed button
+            document.getElementById('proceedBtn').disabled = false;
+        }
+
+        function proceedToPayment() {
+            if (!selectedPaymentMethod) {
+                alert('กรุณาเลือกวิธีการชำระเงิน');
+                return;
+            }
+
+            if (selectedPaymentMethod === 'full') {
+                alert('🎉 ดำเนินการชำระเงินเต็มจำนวน ฿25,000\n\nกรุณารอสักครู่...');
+                setTimeout(() => {
+                    alert('✅ ชำระเงินสำเร็จ! สินค้าจะจัดส่งภายใน 1-2 วันทำการ');
+                }, 1500);
+            } else {
+                alert('🎉 ดำเนินการชำระมัดจำ ฿5,000\n\nสินค้าจะถูกจองไว้ให้คุณ');
+                setTimeout(() => {
+                    alert('✅ ชำระมัดจำสำเร็จ! \n\nงวดแรกครบกำหนดวันที่ 17 สิงหาคม 2025\nยอดที่ต้องชำระ: ฿1,667');
+                }, 1500);
+            }
+        }
+
+        function resetSelection() {
+            // Remove all selections
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Hide details
+            document.getElementById('installmentDetails').classList.remove('show');
+            document.getElementById('selectedPayment').classList.remove('show');
+
+            // Reset variables
+            selectedPaymentMethod = null;
+            document.getElementById('proceedBtn').disabled = true;
+        }
+
+        // Add hover effects and animations
+        document.querySelectorAll('.payment-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.1)';
+                }
+            });
+
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
 function sumV() {
    
     let addon_qty = document.getElementById("addon_qty").value;
@@ -317,6 +410,261 @@ function validateForm() {
 
   window.onload = sumVat;
 </script>
+
+<style scoped>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+ 
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .product-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid #e9ecef;
+        }
+
+        .product-name {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .payment-card {
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .payment-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea10, #764ba220);
+        }
+
+        .payment-card .icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .payment-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .payment-card .amount {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .payment-card .description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .payment-card .features {
+            list-style: none;
+            text-align: left;
+        }
+
+        .payment-card .features li {
+            padding: 5px 0;
+            color: #555;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .payment-card .features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .installment-details {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .installment-details.show {
+            display: block;
+        }
+
+        .installment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .installment-table th,
+        .installment-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .installment-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .selected-payment {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .selected-payment.show {
+            display: block;
+        }
+
+        .selected-payment h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .payment-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
     <h3>
@@ -773,6 +1121,78 @@ function validateForm() {
     </div>
 
 
+       <div class="card">
+    <div class="card-body">
+   <div class="container">
+        <div class="header">
+            <h1>🛍️ ระบบการขาย</h1>
+            <p>เลือกวิธีการชำระเงินที่เหมาะกับคุณ</p>
+        </div>
+        <div class="payment-options">
+            <div class="payment-card" id="fullPayment" onclick="selectPayment('cash_full')">
+                <div class="icon">💳</div>
+                <h3>จ่ายเต็มจำนวน</h3>
+                <div class="amount">฿25,000</div>
+                <div class="description">ชำระครั้งเดียว รับสินค้าทันที</div>
+                <ul class="features">
+                    <li>ไม่มีดอกเบี้ย</li>
+                    <li>รับสินค้าทันที</li>
+                    <li>ประหยัดค่าใช้จ่าย</li>
+                    <li>ไม่มีภาระผูกพัน</li>
+                </ul>
+            </div>
+
+            <div class="payment-card" id="depositPayment" onclick="selectPayment('deposit')">
+                <div class="icon">📊</div>
+                <h3>ชำระมัดจำ</h3>
+                <div class="amount">฿5,000</div>
+                <div class="description">จ่ายมัดจำ 20% ผ่อนส่วนที่เหลือ</div>
+                <ul class="features">
+                    <li>เริ่มต้นเพียง 5,000 บาท</li>
+                    <li>ผ่อนได้ 12 เดือน</li>
+                    <li>ดอกเบี้ย 0% (6 เดือนแรก)</li>
+                    <li>จองสินค้าไว้ให้</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="installment-details" id="installmentDetails">
+            <h4>📋 รายละเอียดการผ่อนชำระ</h4>
+            <p>ยอดคงเหลือหลังมัดจำ: <strong>฿20,000</strong></p>
+            <table class="installment-table">
+                <thead>
+                    <tr>
+                        <th>งวดที่</th>
+                        <th>จำนวนเงิน</th>
+                        <th>ดอกเบี้ย</th>
+                        <th>รวม</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1-6</td><td>฿1,667</td><td>฿0</td><td>฿1,667</td></tr>
+                    <tr><td>7-12</td><td>฿1,667</td><td>฿50</td><td>฿1,717</td></tr>
+                </tbody>
+            </table>
+            <p><small>*ดอกเบี้ย 3% ต่อปี เริ่มคิดจากงวดที่ 7</small></p>
+        </div>
+
+        <div class="selected-payment" id="selectedPayment">
+            <h4>✅ คุณเลือก: <span id="selectedMethod"></span></h4>
+            <p id="selectedDetails"></p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="proceedBtn" onclick="proceedToPayment()" disabled>
+                ดำเนินการชำระเงิน
+            </button>
+            <button class="btn btn-secondary" onclick="resetSelection()">
+                เลือกใหม่
+            </button>
+        </div>
+    </div>
+ </div>
+ </div>
+
     <div class="card">
       <div class="card-body">
         <div class="form-group">
@@ -787,7 +1207,11 @@ function validateForm() {
           </button>
           <input type="hidden" id="selectedValuesInput" name="selected_values">
         </div>
-   </div></div>
+   </div>
+   
+   </div>
+
+   
    {% if content_regist.pay_type == 2 %}
 
    <div class="card">
@@ -964,6 +1388,7 @@ function validateForm() {
                 onchange="sumUnit();validate(event)"
                 onkeypress="sumUnit();validate(event)"
                 onkeyup="sumUnit();validate(event)"
+
               />
             </div>
           </div>
