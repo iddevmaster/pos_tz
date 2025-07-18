@@ -1,15 +1,128 @@
 {% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+
+
+   const existingRadio = document.getElementById('existing');
+        const newRadio = document.getElementById('new');
+        const existingOption = document.getElementById('existing-option');
+        const newOption = document.getElementById('new-option');
+        const existingForm = document.getElementById('existingCustomerForm');
+        const newForm = document.getElementById('newCustomerForm');
+        const customerSearch = document.getElementById('customerSearch');
+        const searchResults = document.getElementById('searchResults');
+        const form = document.getElementById('customerForm');
+
+    function selectCus(x) {
+ showExistingForm(x);
+    }
+
+
+function validateForm() {
+
+ 
+
+
+
+  const languageRadios = document.getElementsByName('customerType');
+
+            // 2. อ้างอิงถึง Element ที่จะใช้แสดงผลลัพธ์
+            const displayElement = document.getElementById('selectedLanguageDisplay');
+ let selectedValue = null;
+            // 3. วนลูปผ่าน NodeList เพื่อเพิ่ม Event Listener ให้กับแต่ละ Radio button
+            for (let i = 0; i < languageRadios.length; i++) {
+                // เพิ่ม 'change' event listener
+                // 'change' event จะถูก fire เมื่อสถานะ checked ของ input เปลี่ยนไป
+  if (languageRadios[i].checked) {
+                    selectedValue = languageRadios[i].value;
+                    break; // เมื่อเจอตัวที่ถูกเลือกแล้ว ก็ออกจากลูปทันที
+                }
+            }
+
+
+
+if(selectedValue != null){
+  if(selectedValue == 'existing'){  
+   const customer_id = document.getElementById('customer_id').value;
+    if(customer_id){
+      console.log('ไปต่อ');
+    }else {
+            Swal.fire({
+       title: 'เลือกลูกค้า',
+       text: 'Select Customer',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+    }
+
+  }
+
+   if(selectedValue == 'new'){ 
+
+  }
+   return false; 
+}
+else {
+      Swal.fire({
+       title: 'เลือกข้อมูลลูกค้า',
+       text: 'Select Data Customer',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+}
+
+ 
+ return false; 
+
+ 
+}
+
+
 
     $(document).ready(function () {
     // Initialize Select2
 
+
             $(".select2").select2({
+              
           placeholder: "เลือกข้อมูล",
           allowClear: true,
         });
   });
 
+
+         function showExistingForm(x) {
+            const existingForm = document.getElementById('existingCustomerForm');
+            const newForm = document.getElementById('newCustomerForm');
+        
+
+          if(x == 'new'){
+            existingForm.classList.remove('hidden');
+            existingForm.classList.add('show');
+    
+            newForm.classList.remove('hidden');
+            newForm.classList.add('show');
+   
+
+          }else {
+
+
+           existingForm.classList.add('hidden');
+            existingForm.classList.remove('show');
+
+
+             newForm.classList.remove('hidden');
+            newForm.classList.add('show');
+
+
+    
+
+          }
+
+
+        }
+        
   function setBillName() {
     let student_firstname_th = document.getElementById(
       "student_firstname_th"
@@ -20,6 +133,9 @@
     document.getElementById("customer_name").value =
       student_firstname_th + " " + student_lastname_th;
   }
+
+
+
 
   var myVar = null;
 
@@ -58,7 +174,6 @@ const selectedValue = selectElement.value;
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
 
         document.getElementById("customer_address").value= data.customer_address;
 
@@ -67,6 +182,32 @@ const selectedValue = selectElement.value;
   }
 
 </script>
+<style scoped>
+
+        .form-section {
+            margin-bottom: 25px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+           
+            transition: all 0.4s ease;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+       .form-section.hidden {
+            display: none;
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        .form-section.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        .select2-container {
+    width: 100% !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+}
+</style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
     <h3>เปิดการขาย</h3>
@@ -179,10 +320,7 @@ const selectedValue = selectElement.value;
           </div>
         </div>
 
-   
-
-    
-
+  
         <div class="col-lg-6 col-md-6">
 
           {% if content_regist.customer_type == 1 %}
@@ -201,23 +339,25 @@ const selectedValue = selectElement.value;
       </form>
 
 
-      <form method="post" action="{% url 'CreateCustomer' %}">
+      <form method="post"  onsubmit="return validateForm();"  action="{% url 'CreateCustomer' %}">
         {% csrf_token %}
 
            <div class="row">
-    
-
+  
            <div class="col-lg-12 col-md-12">
-           <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="method1" id="new" value="new" checked>
+           <div class="form-check form-check-inline"  id="new-option">
+                <input class="form-check-input" type="radio" id="new" name="customerType" value="new" onclick="selectCus('new')">
                 <label class="form-check-label" for="new">ลูกค้าใหม่</label>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="method1" id="same" value="same">
+            <div class="form-check form-check-inline"  id="existing-option" >
+                <input class="form-check-input" type="radio"  id="existing" name="customerType" value="existing" onclick="selectCus('existing')">
                 <label class="form-check-label" for="same">ลูกค้าเก่า</label>
             </div>
         </div>
-      <div class="row">
+       
+      <div id="existingCustomerForm" class="form-section hidden">
+ <div class="row">
+
 
         {% if content_regist.customer_type == 1 %}
         <div class="col-lg-4 col-md-6">
@@ -250,7 +390,7 @@ const selectedValue = selectElement.value;
             type="hidden"
             name="customer_name"
             id="customer_name"
-            required
+            
             value="{{idcard_data.FirstNameTh}} {{idcard_data.LastNameTh}}"
           />
           </div>
@@ -264,7 +404,7 @@ const selectedValue = selectElement.value;
               class="form-control"
               name="customer_name"
               id="customer_name"
-              required
+              
             />
           </div>
         </div>
@@ -289,7 +429,7 @@ const selectedValue = selectElement.value;
               class="form-control"
               name="customer_phone"
               id="customer_phone"
-              required
+              
             />
           </div>
         </div>
@@ -313,18 +453,18 @@ const selectedValue = selectElement.value;
               class="form-control"
               name="customer_address"
               id="customer_address"
-              required
+              
               value="{{address}}"
             />
           </div>
         </div>
 
-        <div class="col-lg-4 col-md-6">
+        <div class="col-lg-12 col-md-12">
           <div class="form-group">
             <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์</label> <label style="color: red">*</label>
             <select
               class="form-select"
-              required
+              
               name="location_id"
               id="selLocations"
             >
@@ -339,7 +479,17 @@ const selectedValue = selectElement.value;
         </div>
 
 
-                <div class="col-lg-4 col-md-6">
+ 
+        
+      </div> 
+      
+
+ </div>
+
+
+        <div  id="newCustomerForm"  class="form-section hidden">
+     <div class="row">
+                <div class="col-lg-12 col-md-12">
          <div class="form-group">
             <label>ลูกค้า  
       </label> <label style="color: red">*</label>
@@ -347,14 +497,14 @@ const selectedValue = selectElement.value;
               class="select2"
               id="customer_id"
               name="customer_id"
-              required
+              
               onchange="myFunction(this)" 
               
             >
               <option value="">-เลือกลูกค้า-</option>
               {% for res in customers %}
               <option value="{{res.customer_id}}">
-                {{res.customer_name}}
+                {{res.customer_name}}   {{res.customer_id}}  
               </option>
               {% endfor %}
             </select>
@@ -377,7 +527,7 @@ const selectedValue = selectElement.value;
 
     </div>
   </div>
-
+</div>
 
 
   </div>
