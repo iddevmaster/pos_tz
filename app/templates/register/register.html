@@ -40,13 +40,20 @@ function validateForm() {
                 }
             }
 
-
+console.log(selectedValue);
 
 if(selectedValue != null){
   if(selectedValue == 'existing'){  
    const customer_id = document.getElementById('customer_id').value;
+
+   
+
     if(customer_id){
-      console.log('ไปต่อ');
+
+      console.log('ไปกันต่อ');
+
+    return true
+   
     }else {
             Swal.fire({
        title: 'เลือกลูกค้า',
@@ -59,6 +66,69 @@ if(selectedValue != null){
   }
 
    if(selectedValue == 'new'){ 
+
+    const student_firstname_th = document.getElementById('student_firstname_th').value;
+    const student_lastname_th = document.getElementById('student_lastname_th').value;
+    const customer_tax = document.getElementById('customer_tax').value;
+    const customer_phone = document.getElementById('customer_phone').value;
+    const customer_email = document.getElementById('customer_email').value;
+    const customer_address = document.getElementById('customer_address').value;
+    const location_id = document.getElementById('selLocations').value;
+
+    if((student_firstname_th) && (student_lastname_th) && (customer_phone) && (customer_address) && (location_id)){
+return true
+    }else {
+      if(!student_firstname_th){
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'ชื่อ',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+
+      if(!student_lastname_th){
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'นามสกุล',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+
+      if(!customer_phone){
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'เบอร์โทร',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+
+            if(!customer_address){
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'ที่อยู่เลขที่',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+
+      if(!location_id){
+        Swal.fire({
+       title: 'กรุณาเลือกที่อยู่',
+       text: 'ตำบล-อำเภอ-จังหวัด-ไปรษณีย์',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+      
+    }
 
   }
    return false; 
@@ -96,10 +166,10 @@ else {
             const existingForm = document.getElementById('existingCustomerForm');
             const newForm = document.getElementById('newCustomerForm');
         
-
+       
           if(x == 'new'){
-            existingForm.classList.remove('hidden');
-            existingForm.classList.add('show');
+            existingForm.classList.remove('show');
+            existingForm.classList.add('hidden');
     
             newForm.classList.remove('hidden');
             newForm.classList.add('show');
@@ -108,12 +178,12 @@ else {
           }else {
 
 
-           existingForm.classList.add('hidden');
-            existingForm.classList.remove('show');
+            existingForm.classList.add('show');
+            existingForm.classList.remove('hidden');
 
 
-             newForm.classList.remove('hidden');
-            newForm.classList.add('show');
+             newForm.classList.remove('show');
+            newForm.classList.add('hidden');
 
 
     
@@ -204,8 +274,8 @@ const selectedValue = selectElement.value;
             display: block;
             animation: slideIn 0.5s ease-out;
         }
-        .select2-container {
-    width: 100% !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+        .select2-selection.select2-selection--single {
+    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
 }
 </style>
 <div class="row">
@@ -355,7 +425,7 @@ const selectedValue = selectElement.value;
             </div>
         </div>
        
-      <div id="existingCustomerForm" class="form-section hidden">
+      <div id="newCustomerForm" class="form-section hidden">
  <div class="row">
 
 
@@ -487,7 +557,7 @@ const selectedValue = selectElement.value;
  </div>
 
 
-        <div  id="newCustomerForm"  class="form-section hidden">
+        <div  id="existingCustomerForm"  class="form-section hidden">
      <div class="row">
                 <div class="col-lg-12 col-md-12">
          <div class="form-group">
@@ -504,7 +574,7 @@ const selectedValue = selectElement.value;
               <option value="">-เลือกลูกค้า-</option>
               {% for res in customers %}
               <option value="{{res.customer_id}}">
-                {{res.customer_name}}   {{res.customer_id}}  
+                {{res.customer_name}}  - {{res.customer_code}}  
               </option>
               {% endfor %}
             </select>

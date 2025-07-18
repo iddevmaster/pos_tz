@@ -321,8 +321,8 @@ def register_createnoevent(request):
 def customer_create(request):
 
 
-    dddd = request.POST['method1']
-    print(dddd)
+    dddd = request.POST['customerType']
+  
     try:
         register_id = request.session['register_id']
         content_regist = register_main.objects.get(register_id=register_id)
@@ -337,14 +337,16 @@ def customer_create(request):
         return redirect("/register/reset")
     
     # ลูกค้าใหม่  รึลูกค้าเก่า
-    customer_code = "C" + str(dateTimeIntNow())
-    customer_name = request.POST['customer_name']
-    customer_tax = request.POST['customer_tax']
-    customer_phone = request.POST['customer_phone']
-    customer_email = request.POST['customer_email']
-    customer_address = request.POST['customer_address']
-    location_id = request.POST['location_id']
-    customers.objects.create(
+    if dddd == 'new':
+        print('ใหม่')
+        customer_code = "C" + str(dateTimeIntNow())
+        customer_name = request.POST['customer_name']
+        customer_tax = request.POST['customer_tax']
+        customer_phone = request.POST['customer_phone']
+        customer_email = request.POST['customer_email']
+        customer_address = request.POST['customer_address']
+        location_id = request.POST['location_id']
+        cus = customers.objects.create(
         customer_code=customer_code,
         customer_name=customer_name,
         customer_tax=customer_tax,
@@ -355,10 +357,18 @@ def customer_create(request):
         register_id=register_id
     )
     # 
-    fact_customer.objects.create(
-        customer_id='x',
+        fact_customer.objects.create(
+        customer_id=cus.customer_id,
         register_id=register_id
     )
+    else :
+        customer_id = request.POST['customer_id']
+        fact_customer.objects.create(
+        customer_id=customer_id,
+        register_id=register_id
+    )
+       
+
 
 
     # Update Register
