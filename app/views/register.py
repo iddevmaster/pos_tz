@@ -320,6 +320,9 @@ def register_createnoevent(request):
 @login_required(login_url='/login')
 def customer_create(request):
 
+
+    dddd = request.POST['customerType']
+  
     try:
         register_id = request.session['register_id']
         content_regist = register_main.objects.get(register_id=register_id)
@@ -329,27 +332,71 @@ def customer_create(request):
         register_id = None
         content_regist = None
         return redirect("/")
-    chkcustomer = customers.objects.filter(register_id=register_id).count()
+    chkcustomer = fact_customer.objects.filter(register_id=register_id).count()
     if chkcustomer > 0:
         return redirect("/register/reset")
-    customer_code = "C" + str(dateTimeIntNow())
-    customer_name = request.POST['customer_name']
-    customer_tax = request.POST['customer_tax']
-    customer_phone = request.POST['customer_phone']
-    customer_email = request.POST['customer_email']
-    customer_address = request.POST['customer_address']
-    location_id = request.POST['location_id']
-    customers.objects.create(
-        customer_code=customer_code,
-        customer_name=customer_name,
-        customer_tax=customer_tax,
-        customer_phone=customer_phone,
-        customer_email=customer_email,
-        customer_address=customer_address,
-        location_id=location_id,
+    
+    # ลูกค้าใหม่  รึลูกค้าเก่า
+    customer_type = content_regist.customer_type
+    if dddd == 'new':
+        if customer_type == 1:
+            customer_code = "C" + str(dateTimeIntNow())
+            customer_name = request.POST['customer_name']
+            customer_tax = request.POST['customer_tax']
+            customer_phone = request.POST['customer_phone']
+            customer_email = request.POST['customer_email']
+            customer_address = request.POST['customer_address']
+            location_id = request.POST['location_id']
+            cus = customers.objects.create(
+            customer_code=customer_code,
+            customer_name=customer_name,
+            customer_tax=customer_tax,
+            customer_phone=customer_phone,
+            customer_email=customer_email,
+            customer_address=customer_address,
+            location_id=location_id,
+            register_id=register_id,
+            customer_fisrt=request.POST['student_firstname_th'],
+            customer_last=request.POST['student_lastname_th'])
+        else:
+            customer_code = "C" + str(dateTimeIntNow())
+            customer_name = request.POST['customer_name']
+            customer_tax = request.POST['customer_tax']
+            customer_phone = request.POST['customer_phone']
+            customer_email = request.POST['customer_email']
+            customer_address = request.POST['customer_address']
+            location_id = request.POST['location_id']
+            cus = customers.objects.create(
+            customer_code=customer_code,
+            customer_name=customer_name,
+            customer_tax=customer_tax,
+            customer_phone=customer_phone,
+            customer_email=customer_email,
+            customer_address=customer_address,
+            location_id=location_id,
+            register_id=register_id,
+            customer_fisrt='-',
+            customer_last='-')
+    # 
+        save = fact_customer.objects.create(
+        customer_id=cus.customer_id,
         register_id=register_id
     )
+        
+    else :
+        customer_id = request.POST['customer_id']
+        save = fact_customer.objects.create(
+        customer_id=customer_id,
+        register_id=register_id
+    )
+      
+       
+    factcustr = fact_customer.objects.get(register=register_id)  
+    custr = customers.objects.get(customer_id=factcustr.customer_id)    
+    print(custr)
+  
 
+    # Update Register
     month_current = date.today().month
     year_current = date.today().year
     year_current_f = str(int(date.today().year) + 543)
@@ -393,10 +440,6 @@ def customer_create(request):
         del request.session['idcard_data']
     except KeyError:
         pass
-
-
-
-   
     return redirect("/register/payment/" + str(register_id))
 
 @login_required(login_url='/login')
@@ -676,7 +719,7 @@ def payment_create(request):
     rp_address = request.POST['rp_address']
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
-    # type_payment = request.POST['type_payment']
+    type_payment = request.POST['type_payment']
     stmda = request.POST.get('stmdate')
     etc= request.POST.get('stmetc')
     bills = request.POST.getlist("selected_bills", [])
@@ -803,7 +846,7 @@ def payment_create(request):
         register_id=register_id,
         stmdate=stmda,
         stmetc=etc,
-        # type_payment=type_payment
+        type_payment=type_payment
 
         
     )

@@ -204,6 +204,8 @@ class customers(models.Model):
     customer_id = models.AutoField(primary_key=True)
     customer_code = models.CharField(max_length=128, blank=True, default=None)
     customer_name = models.CharField(max_length=256, blank=True, default=None)
+    customer_fisrt = models.CharField(max_length=256, blank=True, default=None)
+    customer_last = models.CharField(max_length=256, blank=True, default=None)
     customer_tax = models.CharField(max_length=64, blank=True, default=None)
     customer_phone = models.CharField(max_length=64, blank=True, default=None)
     customer_email = models.CharField(max_length=64, blank=True, default=None)
