@@ -393,7 +393,7 @@ def customer_create(request):
        
     factcustr = fact_customer.objects.get(register=register_id)  
     custr = customers.objects.get(customer_id=factcustr.customer_id)    
-    print(custr)
+    
   
 
     # Update Register
@@ -410,19 +410,19 @@ def customer_create(request):
     content.save()
 
     customer_type = content_regist.customer_type
+    print(custr.customer_fisrt)
     if customer_type == 1:
-        student_firstname_th = request.POST['student_firstname_th']
-        student_lastname_th = request.POST['student_lastname_th']
+        
         totaldata = student.objects.filter(
             crt_date__month=month_current, crt_date__year=year_current).count()
         running_number = treeDigit(totaldata + 1)
         student_code = "TZ" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
         student.objects.create(
-            student_identification_number=customer_tax,
+            student_identification_number=custr.customer_tax,
             student_prefix_th="",
-            student_firstname_th=student_firstname_th,
-            student_lastname_th=student_lastname_th,
+            student_firstname_th=custr.customer_fisrt,
+            student_lastname_th=custr.customer_last,
             student_prefix_eng="",
             student_firstname_eng="",
             student_lastname_eng="",
@@ -431,7 +431,7 @@ def customer_create(request):
             upd_date=dateTimeNow(),
             register_id=register_id
         )
-
+    
     try:
         del request.session['register_id']
     except KeyError:
@@ -576,8 +576,8 @@ def payment(request, register_id):
 
     title = defaultTitle
     try:
-        content = customers.objects.select_related(
-            "register", "location").get(register_id=register_id)
+        content = fact_customer.objects.select_related(
+            "register","customer").get(register_id=register_id)
     except:
         content = None
         return redirect("/")
@@ -592,8 +592,7 @@ def payment(request, register_id):
     signature = fact_signature.objects.select_related('user').all()
     
     
- 
-    
+
     for aaa in regbyev:
         
         try:
@@ -626,8 +625,8 @@ def payment(request, register_id):
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
-
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
+    print(student_data)
+    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
 
