@@ -18,7 +18,7 @@ from django.db.models import Count, Sum, F
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new
 
 
@@ -81,7 +81,8 @@ def register_print(request, rp_id):
         mange = None
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
     
-    customer = customers.objects.get(register_id=content.register_id)
+    factcustomer = fact_customer.objects.get(register_id=content.register_id)
+    customer = customers.objects.get(pk=factcustomer.customer_id)
     if content_regist.ev.ev_vat == 1:
         rpi_price_default = float(
             items.rpi_price_total) + float(items.rpi_price_vat)

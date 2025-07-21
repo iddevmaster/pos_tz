@@ -772,7 +772,7 @@ function validateForm() {
           type="hidden"
           id="register_id"
           name="register_id"
-          value="{{data.register_id}}"
+          value="{{datas}}"
         />
         <input
           type="hidden"
@@ -799,7 +799,7 @@ function validateForm() {
           </div>
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
-              <label>นามสกุล</label> <label style="color: red">*</label>
+              <label>นามสกุล</label> 
               <input
                 type="text"
                 class="form-control"
@@ -808,7 +808,7 @@ function validateForm() {
                 onkeypress="setBillName();"
                 onkeyup="setBillName();"
                 value="{{student_data.student_lastname_th}}"
-                required
+                
               />
               <input
                 type="hidden"
@@ -1062,6 +1062,8 @@ function validateForm() {
           
             </div>
           </div>
+
+   
           {% else %}
           {% endif %}
 
@@ -1121,7 +1123,7 @@ function validateForm() {
     </div>
 
 
-       <div class="card">
+       <!-- <div class="card">
     <div class="card-body">
    <div class="container">
         <div class="header">
@@ -1191,7 +1193,7 @@ function validateForm() {
         </div>
     </div>
  </div>
- </div>
+ </div> -->
 
     <div class="card">
       <div class="card-body">

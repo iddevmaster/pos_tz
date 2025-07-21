@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -450,11 +450,15 @@ def data_bill_event(request):
     obj = []
     content = register_main.objects.filter(status='Y',ev_id=ev_id).exclude(register_number="-").order_by("crt_date")
     for r in content:
-        customer_list = customers.objects.select_related('register').filter(
+        factcustomer_list = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
+        
+        print(r.register_id)
+        customer_list = customers.objects.filter(
+            pk=factcustomer_list.customer_id).first()
         payment = register_payment.objects.filter(register=r.register_id).first()
         payment_i = register_payment_items.objects.filter(register=r.register_id).first()
-    
+      
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id).first()
         

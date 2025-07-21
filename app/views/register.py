@@ -625,8 +625,8 @@ def payment(request, register_id):
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
-    print(student_data)
-    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,
+    
+    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment.html', context)
 
@@ -718,7 +718,7 @@ def payment_create(request):
     rp_address = request.POST['rp_address']
     rp_phone = request.POST['rp_phone']
     rp_email = request.POST['rp_email']
-    type_payment = request.POST['type_payment']
+    type_payment = 'nocan'  
     stmda = request.POST.get('stmdate')
     etc= request.POST.get('stmetc')
     bills = request.POST.getlist("selected_bills", [])
@@ -732,7 +732,9 @@ def payment_create(request):
     user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
     if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
         user_man = 0
-    
+
+    if 'type_payment' in request.POST:
+        type_payment = request.POST['type_payment']
     try:
         rp_quota = request.POST['rp_quota']
     except KeyError:
@@ -821,15 +823,19 @@ def payment_create(request):
     )
         
     # Create Item
+ 
     content_regist = register_main.objects.select_related(
         "ev").get(register_id=register_id)
     ev_vat = content_regist.ev.ev_vat
+
+    print(ev_vat)
     # print(ev_vat)
     
     if ev_vat == 0:
         new_total = rpi_price_total
     else:
         new_total = float(rpi_price_total) - float(rpi_price_vat)
+       
     register_payment_items.objects.create(
         rpi_code=rpi_code,
         rpi_name=rpi_name,
@@ -847,7 +853,6 @@ def payment_create(request):
         stmetc=etc,
         type_payment=type_payment
 
-        
     )
 
     # ถ้ามีการแก้ไขใบเสร็จ / ใบเสนอราคา ให้ทำการเปลี่ยนสถานะเป็นค่าเริ่มต้นทั้งหมด
@@ -2003,14 +2008,17 @@ def register_management(request):
         
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id, register__crt_date__month=1).first()
-        customer_list = customers.objects.select_related('register').filter(
+        factcustomer_list = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
         
+        customer_list = customers.objects.filter(
+            pk=factcustomer_list.customer_id).first()
+        print(factcustomer_list.register)
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,
+        res = {'customer_list': customer_list,'regis':factcustomer_list.register,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
