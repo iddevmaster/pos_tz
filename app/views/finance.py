@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1507,3 +1507,30 @@ def sendwithdrawcom(request):
     upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')
     datas = {'status':user_id}
     return JsonResponse(datas, status=200,safe=False)
+
+
+
+def withdraw_list_overduepayment(request):
+
+    user_id = request.user.id
+     # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    title = defaultTitle
+    listposition = pay_item.objects.filter(
+            cancelled=1, active=1)
+    list_teacher = teacher.objects.filter(cancelled=1, active=1)
+    getcustomer = customers.objects.filter()
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition,'customers':getcustomer}
+    return render(request, 'course/calendar_overduepayment.html', context)

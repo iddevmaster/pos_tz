@@ -133,6 +133,7 @@ class register_main(models.Model):
     close_the_sale = models.IntegerField(default=0, blank=False)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
+    orderstatus = models.CharField(max_length=64, blank=True, default=None)
     ev = models.ForeignKey(course_event, on_delete=models.CASCADE)
     seller = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_create")

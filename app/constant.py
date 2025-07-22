@@ -246,6 +246,12 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+      {
+        "value": "finance/overduepayment",
+        "label": "ค้างชำระ",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
     {
         "value": "finance/sale/com",
         "label": "เบิกค่าCommission",

@@ -960,6 +960,59 @@ def calendar_event_apiallcom(request):
        
     return JsonResponse(obj, safe=False)
 
+def calendar_event_apialloverdue(request):
+    user_id = request.user.id
+  
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    start = request.GET.get('start', None)
+    end = request.GET.get('end', None)
+    _date = date.today()
+    if start is not None and end is not None:
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        sobj = str(start).split("T")[0]
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31
+        eobj = str(end).split("T")[0]
+    else:
+        sobj = _date + timedelta(days=0)
+        eobj = _date + timedelta(days=60)
+    status = ['W','Y','I','S']
+    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
+    
+ 
+    content = course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
+   
+    obj = []
+    sff = []
+    for r in content:
+        bill = 0
+        end = str(r.ev_date_end)
+      
+        y, m, d = end.split("-")
+        nextdayend = addDay(1, int(y), int(m), int(d))
+        col = r.status
+        sff = []
+    #  uuid_with_dashes = t1.teacher_id  # This is a UUID object
+    #     uuid_without_dashes = str(uuid_with_dashes).replace('-', '')
+        delta = r.ev_date_end - r.ev_date_start
+        days_difference = delta.days + 1
+        
+        order_dep = register_main.objects.filter(orderstatus='Deposit',ev_id=r.ev_id).count()
+
+        if order_dep > 0 :
+            t = "#f13312"
+        else :    
+            t = '#4be01b'
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_code) + " (รุ่นที่ " + str(r.ev_generation)+")" + "รายการค้างชำระ " + str(order_dep),'data':sff,
+                'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference}
+        obj.append(res)
+       
+    return JsonResponse(obj, safe=False)
+
 def calendar_event_apiteacher(request):
     user_id = request.user.id
     

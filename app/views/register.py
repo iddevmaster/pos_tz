@@ -126,7 +126,7 @@ def register_home(request):
         obj.append(content)
     # print(idcard_data)
     getcustomer = customers.objects.filter()
-    print(getcustomer)
+   
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,'customers':getcustomer,
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
     return render(request, 'register/register.html', context)
@@ -771,9 +771,9 @@ def payment_create(request):
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
         instecent.status = 'Y'
+        instecent.orderstatus = type_payment
         instecent.save()
        
-
     if pay_type == 2:
         instecent = register_main.objects.get(register_id=register_id)
         instecent.status = 'N'
