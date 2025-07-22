@@ -545,3 +545,43 @@ def update_com(request):
 
     return JsonResponse(obj,safe=False)
 
+@csrf_exempt
+def data_bill_overdue(request):
+    data = json.loads(request.body)
+    customers_id = data.get("customer_id")
+
+    obj = []
+  
+    content = fact_customer.objects.select_related('register','customer').filter(
+            customer=customers_id,register__orderstatus='Completed')
+    
+    
+    
+    for r in content:
+        
+    
+        payment = register_payment.objects.filter(register=r.register.register_id).first()
+        payment_i = register_payment_items.objects.filter(register=r.register.register_id).first()
+    
+ 
+        ct = '-'
+        if r.register.customer_type == '1':
+            ct = 'เครดิต'
+        else:
+            ct = 'เงินสด'
+
+        cus_type = '-'
+        if r.register.customer_type == '1':
+            cus_type = 'บริษัท'
+        else:
+            cus_type = 'บุคคล'    
+
+
+        uuid_without_dashes = str(r.register.register_id).replace('-', '')
+      
+
+        res = {'register_id':uuid_without_dashes,'ev_id':r.register.ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type}
+        obj.append(res)
+
+
+    return JsonResponse(obj,safe=False)

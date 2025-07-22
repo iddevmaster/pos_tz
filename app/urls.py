@@ -334,6 +334,7 @@ urlpatterns = [
     path('api/calendar_event_api_update_com', desbill.update_com),
 
      path('calendar_event_apiall_overdue/', course.calendar_event_apialloverdue),
+     path('api/bill_overdue', desbill.data_bill_overdue),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

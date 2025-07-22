@@ -17,9 +17,35 @@
 
   });
 
+ 
     async function myFunction(selectElement) {
   
 const selectedValue = selectElement.value;
+
+  let aaaa = findoverdue(selectedValue)
+
+     let timerInterval;
+      Swal.fire({
+        title: "รอสักครู่",
+        html: "I will close in <b></b> milliseconds.",
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("I was closed by the timer");
+        }
+      });
 
 
 
@@ -34,7 +60,6 @@ const selectedValue = selectElement.value;
       .then(data => {
 
       
-
       })
       
   }
@@ -180,7 +205,7 @@ const selectedValue = selectElement.value;
   async function findevid(evid) {
 
 
-    const table = document.getElementById('ttt');
+    const table = document.getElementById('findoverdue');
     table.style.display = 'block';
 
     try {
@@ -193,6 +218,61 @@ const selectedValue = selectElement.value;
         body: JSON.stringify({ // Convert your JavaScript object to a JSON string
           // Your data goes here
           evid: evid,
+        })
+      });
+      const data = await response.json();
+      
+      const tableBody = document.getElementById('json-table-body');
+      tableBody.innerHTML = ''; // Clears all rows
+      data.forEach((item, index) => {
+
+        const row = document.createElement('tr');
+
+             row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.register_number}</td>
+                    <td> ${item.rpi_code} - ${item.rpi_name}</td>
+                    <td>${item.rp_name_customer}</td>
+                    <td>${item.customer_type}</td>  
+                    <td>${item.pay_type}</td>
+                      
+                    <td>         <button
+                  type="button"
+                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}')"
+                  class="btn btn-danger"
+              
+                >
+                
+                 กำหนด
+                </button></td>  
+                `;
+        tableBody.appendChild(row);
+      });
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+
+
+    async function findoverdue(customer) {
+ 
+
+    const table = document.getElementById('findoverdue');
+    table.style.display = 'block';
+
+    try {
+      const response = await fetch('/api/bill_overdue', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          customer_id: customer,
+          
         })
       });
       const data = await response.json();
@@ -419,6 +499,33 @@ const selectedValue = selectElement.value;
 
    
       </form>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section" id="findoverdue">
+  <div class="card">
+  
+    <div class="card-body">
+     <h5 class="card-title">เลขที่ใบสมัครที่ยังค้างชำระ</h5>
+            <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>หลักสูตร</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+       <tbody id="json-table-body">
+    
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
