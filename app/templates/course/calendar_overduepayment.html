@@ -316,6 +316,16 @@ const selectedValue = selectElement.value;
     }
   }
 
+  async function reset() {
+    let customer = document.getElementById('customer_id').value;
+    console.log(customer);
+    if(!customer == '' ){
+      console.log('if')
+$("#customer_id").val(0).trigger('change');
+    }
+ 
+  }
+
 
   document.addEventListener("DOMContentLoaded", function () {
     var calendarEl = document.getElementById("calendar");
@@ -374,7 +384,10 @@ const selectedValue = selectElement.value;
         }
       });
       let aaaa = findevid(info.event.extendedProps.evs_id)
-       $("#customer_id").val(null).trigger('change');
+      let re =  reset()
+      
+
+
     },
       
     });
@@ -539,7 +552,7 @@ const selectedValue = selectElement.value;
 
 
 
-<section class="section" id="ttt">
+{% comment %} <section class="section" id="ttt">
   <div class="card">
   
     <div class="card-body">
@@ -562,7 +575,7 @@ const selectedValue = selectElement.value;
       </table>
     </div>
   </div>
-</section>
+</section> {% endcomment %}
 
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xxl">
