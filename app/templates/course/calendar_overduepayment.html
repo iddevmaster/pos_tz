@@ -15,10 +15,15 @@
         });
 
 
+   
+
+
   });
 
  
     async function myFunction(selectElement) {
+
+
   
 const selectedValue = selectElement.value;
 
@@ -65,6 +70,8 @@ const selectedValue = selectElement.value;
   }
 
   function setValueDeleteModal(register_id,ev_id) {
+
+    alert('ok');
   $('#json-table-body-rate').empty(); // Clear previous cards
     document.getElementById("register_id").value = register_id;
     
@@ -243,7 +250,7 @@ const selectedValue = selectElement.value;
               
                 >
                 
-                 กำหนด
+                 ดูรายการ
                 </button></td>  
                 `;
         tableBody.appendChild(row);
@@ -298,7 +305,7 @@ const selectedValue = selectElement.value;
               
                 >
                 
-                 กำหนด
+                 ดูรายการ
                 </button></td>  
                 `;
         tableBody.appendChild(row);
@@ -367,7 +374,7 @@ const selectedValue = selectElement.value;
         }
       });
       let aaaa = findevid(info.event.extendedProps.evs_id)
-
+       $("#customer_id").val(null).trigger('change');
     },
       
     });
