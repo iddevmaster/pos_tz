@@ -1554,9 +1554,10 @@ def withdraw_list_overduepayment_details(request,register_id):
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
     title = defaultTitle
-    listposition = pay_item.objects.filter(
-            cancelled=1, active=1)
+    
+    getorder = register_main.objects.select_related("course","ev").get(register_id=register_id)
+    getpayment = register_payment.objects.filter(register_id=register_id)
     list_teacher = teacher.objects.filter(cancelled=1, active=1)
     getcustomer = customers.objects.filter()
-    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition,'customers':getcustomer}
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment}
     return render(request, 'course/calendar_overduepayment_details.html', context)
