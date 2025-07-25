@@ -71,13 +71,10 @@ const selectedValue = selectElement.value;
 
   function setValueDeleteModal(register_id,ev_id) {
 
-    alert('ok');
-  $('#json-table-body-rate').empty(); // Clear previous cards
-    document.getElementById("register_id").value = register_id;
-    
-    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-    eventModal.show();
-     let com = findcommit(register_id,ev_id)
+  
+
+    window.location.href = window.location+'/'+register_id;
+
   }
 
     async function findcommit(register_id,ev_id) {

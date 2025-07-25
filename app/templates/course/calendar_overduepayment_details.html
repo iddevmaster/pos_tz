@@ -1,0 +1,340 @@
+{% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+  $(document).ready(function () {
+    // Initialize Select2
+
+
+              $(".select2").select2({
+              
+          placeholder: "เลือกข้อมูล",
+          allowClear: true,
+        });
+
+
+  
+
+  });
+
+ 
+
+
+
+
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+      },
+      {% comment %} initialDate: "2020-09-12", {% endcomment %}
+    locale: "th",
+    buttonIcons: false, // show the prev/next text
+    weekNumbers: true,
+    navLinks: true, // can click day/week names to navigate views
+    editable: false,
+    initialView: 'dayGridMonth',
+    dayMaxEventRows: 5, // แสดงสูงสุด 5 แถวของ event
+    events: {
+    url: "/calendar_event_apiall_overdue/",
+    failure: function () {
+      document.getElementById("msg").innerHTML = "..เชื่อมต่อ API ไม่ได้";
+    },
+  },
+    eventClick: function (info) {
+
+
+      $('#cardContainer').empty(); // Clear previous cards
+      document.getElementById('eventModalLabel').innerText = info.event.title;
+
+      document.getElementById("ev_id").value = info.event.extendedProps.evs_id
+
+
+
+
+      let timerInterval;
+      Swal.fire({
+        title: "รอสักครู่",
+        html: "I will close in <b></b> milliseconds.",
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("I was closed by the timer");
+        }
+      });
+      let aaaa = findevid(info.event.extendedProps.evs_id)
+      let re =  reset()
+      
+
+
+    },
+      
+    });
+  calendar.render();
+  });
+
+</script>
+<style>
+  #ttt {
+    display: none;
+  }
+
+  .modal-xxl {
+    max-width: 90%;
+    width: 90%;
+  }
+
+  /* Ensure modal-content scales properly */
+  .modal-xxl .modal-content {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Optional: Add responsive styling */
+  @media (max-width: 768px) {
+    .modal-xxl {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .select2-container {
+    z-index: 1055 !important;
+    /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+  }
+
+  
+</style>
+
+<style scoped>
+
+        .form-section {
+            margin-bottom: 25px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+           
+            transition: all 0.4s ease;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+       .form-section.hidden {
+            display: none;
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        .form-section.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        .select2-selection.select2-selection--single {
+    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+}
+</style>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตารางหลักสูตรอบรม และ รายการค้างชำระ</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ตารางหลักสูตรอบรม และ รายการค้างชำระ
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+     <h5 class="card-title">ค้นหาชื่อลูกค้า</h5>
+      <form
+        method="post"
+        action="/register/excel/seller"
+        autocomplete="off"
+        target="iframe_target"
+      >
+        {% csrf_token %}
+         <div class="row">
+                <div class="col-lg-12 col-md-12">
+         <div class="form-group">
+            <label>ลูกค้า  
+      </label> <label style="color: red">*</label>
+            <select
+              class="select2"
+              id="customer_id"
+              name="customer_id"
+              
+              onchange="myFunction(this)" 
+            
+            >
+              <option value="">-เลือกลูกค้า-</option>
+              {% for res in customers %}
+              <option value="{{res.customer_id}}">
+                {{res.customer_name}}  -  {{'รหัสลูกค้า'}} {{res.customer_code}} - {{res.customer_tax}}  
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
+        
+      </div> 
+
+   
+      </form>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section" id="findoverdue">
+  <div class="card">
+  
+    <div class="card-body">
+     <h5 class="card-title">เลขที่ใบสมัครที่ยังค้างชำระ</h5>
+            <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>หลักสูตร</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+       <tbody id="json-table-body">
+    ห
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+
+{% comment %} <section class="section" id="ttt">
+  <div class="card">
+  
+    <div class="card-body">
+     <h5 class="card-title">เลขที่ใบสมัครที่ยังค้างชำระ</h5>
+            <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>หลักสูตร</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+       <tbody id="json-table-body">
+    
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section> {% endcomment %}
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel"></h5>
+        <input type="hidden" name="ev_id" id="ev_id" required />
+ <input type="hidden" name="register_id" id="register_id" required />
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
+        <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ความรับผิดชอบ</th>
+              <th>เรท</th>
+              <th>สถานะ</th>
+              <th>ชื่อผู้รับ</th>
+            </tr>
+          </thead>
+          <tbody id="json-table-body-rate"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+
+        <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        {% csrf_token %}
+       
+        <input type="hidden" name="ev_id" id="ev_id" required value="" />
+        <div align="center">
+          <h4>ยืนยันการลบข้อมูล</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
