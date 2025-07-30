@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month
 from ..forms.finance_form import billing_cycle_setting_form
@@ -18,6 +18,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Coalesce
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 
 @login_required(login_url='/login')
@@ -1556,9 +1557,226 @@ def withdraw_list_overduepayment_details(request,register_id):
     title = defaultTitle
     
     getorder = register_main.objects.select_related("course","ev").get(register_id=register_id)
-    getpayment = register_payment.objects.filter(register_id=register_id)
+    getpayment = register_payment_items.objects.select_related("rp").filter(register_id=register_id)
+  
     factcus = fact_customer.objects.get(register=register_id)
     list_teacher = teacher.objects.filter(cancelled=1, active=1)
     getcustomer = customers.objects.get(customer_id=factcus.customer.customer_id)
     context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment}
     return render(request, 'course/calendar_overduepayment_details.html', context)
+
+
+
+
+
+def withdraw_list_pay(request, register_id):
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    title = defaultTitle
+    try:
+        content = fact_customer.objects.select_related(
+            "register","customer").get(register_id=register_id)
+    except:
+        content = None
+        return redirect("/")
+   
+    content_regist = register_main.objects.select_related(
+        "seller", "ev").prefetch_related("student_register").get(register_id=register_id)
+    
+    des_bill = desciption_bill.objects.all().order_by('seq')
+    regbyev = register_main.objects.filter(ev_id=content_regist.ev_id)
+    total_rq_quta = 0
+
+    signature = fact_signature.objects.select_related('user').all()
+    
+    
+
+    for aaa in regbyev:
+        
+        try:
+            bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+            if bbbb:
+             total_rq_quta += bbbb.rp_quota
+             
+        except register_payment.DoesNotExist:  
+      
+            bbbb = 0
+    content_course = course_event.objects.select_related(
+        "course").get(ev_id=content_regist.ev_id)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
+    # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
+    total_ca_quta = content_regist.ev.ev_training - total_rq_quta
+    
+    if content_regist.customer_type == 1:
+        try:
+            student_data = student.objects.filter(
+                register_id=register_id).first()
+        except:
+            student_data = None
+    else:
+        student_data = None
+    # print(content)
+    course_list = course.objects.filter(is_show_order='Y',cancelled=1)
+    uuid_without_dashes = str(register_id).replace('-', '')
+    
+    addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
+
+    total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+    
+    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,
+               'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
+    return render(request, 'register/register_payment_pay.html', context)
+
+
+
+def payment_pay_deposit(request):
+    print('payment_pay_deposit')
+    now = date.today()
+    # Main
+    user_id = request.user.id
+    register_id = request.POST['register_id']
+    rp_code_customer = request.POST['rp_code_customer']
+    rp_name_customer = request.POST['rp_name_customer']
+    rp_tax = request.POST['rp_tax']
+    rp_name_seller = request.POST['rp_name_seller']
+    rp_name_contact = request.POST['rp_name_contact']
+    rp_branch = request.POST['rp_branch']
+    rp_address = request.POST['rp_address']
+    rp_phone = request.POST['rp_phone']
+    rp_email = request.POST['rp_email']
+    type_payment = 'nocan'  
+    stmda = request.POST.get('stmdate')
+    etc= request.POST.get('stmetc')
+    bills = request.POST.getlist("selected_bills", [])
+    rp_confirm_date_price = dmytoymd(
+        request.POST.get("rp_confirm_date_price", now.strftime("%d/%m/%Y")))
+    rp_date_delivery = dmytoymd(
+        request.POST.get("rp_date_delivery", now.strftime("%d/%m/%Y")))
+  
+  
+    user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
+    if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
+        user_man = 0
+
+    if 'type_payment' in request.POST:
+        type_payment = request.POST['type_payment']
+    try:
+        rp_quota = request.POST['rp_quota']
+    except KeyError:
+        rp_quota = 1
+
+    rp_ref1 = request.POST['rp_ref1']
+    rp_ref2 = request.POST['rp_ref2']
+    content_main = register_main.objects.get(register_id=register_id)
+    pay_type = content_main.pay_type
+   
+    if pay_type == 1:
+        active = 1
+    else:
+        active = 0
+    month_current = date.today().month
+    year_current = date.today().year
+    year_current_f = str(int(date.today().year) + 543)
+    totaldata = register_payment.objects.filter(
+        crt_date__month=month_current, crt_date__year=year_current).count()
+    running_number = treeDigit(totaldata + 1)
+    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+        str(twoDigit(month_current)) + "/" + str(running_number)
+    # Item
+    rpi_code = request.POST['rpi_code']
+    rpi_name = request.POST['rpi_name']
+    rpi_quantity = request.POST['rpi_quantity']
+    rpi_unit = request.POST['rpi_unit']
+    rpi_price = request.POST['rpi_price']
+    rpi_price_discount = request.POST['rpi_price_discount']
+    rpi_price_total = request.POST['rpi_price_total']
+    rpi_price_vat = request.POST['rpi_price_vat']
+    rpi_price_result = request.POST['rpi_price_result']
+
+ 
+    u = User.objects.get(id=rp_name_seller)
+
+    content_regist = register_main.objects.get(register_id=register_id)
+    content_regist.seller_id = rp_name_seller
+    content_regist.orderstatus = 'Completed'
+    content_regist.save()
+    # Crate Main
+    # object = register_payment.objects.create(
+    #     rp_doc_number=rp_doc_number,
+    #     rp_code_customer=rp_code_customer,
+    #     rp_name_customer=rp_name_customer,
+    #     rp_tax=rp_tax,
+    #     rp_name_seller=u.first_name+' '+u.last_name,
+    #     rp_name_contact=rp_name_contact,
+    #     rp_branch=rp_branch,
+    #     rp_address=rp_address,
+    #     rp_phone=rp_phone,
+    #     rp_email=rp_email,
+    #     rp_confirm_date_price=rp_confirm_date_price,
+    #     rp_date_delivery=rp_date_delivery,
+    #     rp_quota=0,
+    #     rp_ref1=rp_ref1,
+    #     rp_ref2=rp_ref2,
+    #     active=active,
+    #     crt_date=dateTimeNow(),
+    #     upd_date=dateTimeNow(),
+    #     register_id=register_id,
+    #     user_create=user_id,
+    #     user_manage=user_man
+    # )
+    # object.refresh_from_db()
+  
+    # register_payment_items.objects.create(
+    #     rpi_code=rpi_code,
+    #     rpi_name=rpi_name,
+    #     rpi_quantity=0,
+    #     rpi_unit=rpi_unit,
+    #     rpi_price=rpi_price,
+    #     rpi_price_discount=rpi_price_discount,
+    #     rpi_price_total=rpi_price_total,
+    #     rpi_price_vat=rpi_price_vat,
+    #     rpi_price_result=rpi_price_result,
+    #     rpi_pay=rpi_price_result,
+    #     rp_id=object.rp_id,
+    #     register_id=register_id,
+    #     vat=rpi_price_vat,
+    #     stmdate=stmda,
+    #     stmetc=etc,
+    #     type_payment=type_payment
+    # )
+
+    
+        
+    # com = commissionstages.objects.all()
+    # for coms in com:
+    #     dtaf = fact_commission.objects.create( 
+    #     stage_id=coms.stage_id,
+    #     register_id=register_id,
+    #     rpi_id=object.rp_id,
+    #     status='N'
+    # )   
+
+
+    messages.success(request, "ทำรายการสำเร็จ !")
+    # return redirect("/register/management")
+    return redirect("/finance/overduepayment/" + str(register_id))
+
+
+
+

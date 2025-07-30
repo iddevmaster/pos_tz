@@ -1,25 +1,25 @@
-{% extends 'base.html' %} {% block content %}
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
+{% extends 'base.html' %} {% load humanize %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
 
   $(document).ready(function () {
     // Initialize Select2
 
 
-              $(".select2").select2({
-              
-          placeholder: "เลือกข้อมูล",
-          allowClear: true,
-        });
+    $(".select2").select2({
+
+      placeholder: "เลือกข้อมูล",
+      allowClear: true,
+    });
 
 
-  
+
 
   });
 
- 
+
 
 
 
@@ -84,8 +84,8 @@
         }
       });
       let aaaa = findevid(info.event.extendedProps.evs_id)
-      let re =  reset()
-      
+      let re = reset()
+
 
 
     },
@@ -95,7 +95,7 @@
   });
 
 </script>
-  <style>
+<style>
   #ttt {
     display: none;
   }
@@ -123,384 +123,412 @@
     z-index: 1055 !important;
     /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
   }
-
-  
 </style>
 
-  <style scoped>
+<style scoped>
+  .card {
+    border: none;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+  }
 
-          .card {
-            border: none;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            transition: all 0.3s ease;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-        
-     
-        
-        .card-header {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            border: none;
-            padding: 1.5rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .course-id {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        
-        .course-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin: 0.5rem 0 1rem 0;
-            line-height: 1.4;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .info-value {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .status-badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .status-pending {
-            background: #FF9800;
-            color: white;
-        }
-        
-        .status-completed {
-            background: #2196F3;
-            color: white;
-        }
-        
-        .type-badges {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .type-badge {
-            padding: 0.3rem 0.6rem;
-            background: #E3F2FD;
-            color: #1565C0;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .amount-display {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #2E7D32;
-        }
-        
 
-        
-        .container-fluid {
-            padding: 2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .info-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.3rem;
-            }
-            
-            .type-badges {
-                margin-top: 0.5rem;
-            }
-        }
 
-        .form-section {
-            margin-bottom: 25px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.8);
-           
-            transition: all 0.4s ease;
-            transform: translateY(0);
-            opacity: 1;
-        }
+  .card-header {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    border: none;
+    padding: 1.5rem;
+  }
 
-       .form-section.hidden {
-            display: none;
-            transform: translateY(-20px);
-            opacity: 0;
-        }
+  .card-body {
+    padding: 1.5rem;
+  }
 
-        .form-section.show {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-        .select2-selection.select2-selection--single {
-    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
-}
+  .course-id {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .course-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0.5rem 0 1rem 0;
+    line-height: 1.4;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-value {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status-active {
+    background: #4CAF50;
+    color: white;
+  }
+
+  .status-pending {
+    background: #FF9800;
+    color: white;
+  }
+
+  .status-completed {
+    background: #2196F3;
+    color: white;
+  }
+
+  .type-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .type-badge {
+    padding: 0.3rem 0.6rem;
+    background: #E3F2FD;
+    color: #1565C0;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .amount-display {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2E7D32;
+  }
+
+
+
+  .container-fluid {
+    padding: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .info-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.3rem;
+    }
+
+    .type-badges {
+      margin-top: 0.5rem;
+    }
+  }
+
+  .form-section {
+    margin-bottom: 25px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.8);
+
+    transition: all 0.4s ease;
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .form-section.hidden {
+    display: none;
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  .form-section.show {
+    display: block;
+    animation: slideIn 0.5s ease-out;
+  }
+
+  .select2-selection.select2-selection--single {
+    width: 700px !important;
+    /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+  }
 </style>
-  <div class="row">
-    <div class="col-12 col-md-6 order-md-1 order-last">
-      <h3>รายการค้างชำระ</h3>
-    </div>
-    <div class="col-12 col-md-6 order-md-2 order-first">
-      <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="/">หน้าหลัก</a>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">รายการค้างชำระ</li>
-        </ol>
-      </nav>
-    </div>
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>รายการค้างชำระ</h3>
   </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">รายการค้างชำระ</li>
+      </ol>
+    </nav>
+  </div>
+</div>
 
-  <div class="col-lg-12 col-md-12">
-    <div class="card h-100">
-      <div class="card-header">
-        <div class="course-id">
-          <i class="fas fa-hashtag me-2"></i>
-          รายการที่ #{{ getorder.register_number }}
-        </div>
-      </div>
-      <div class="card-body">
-        <h5 class="course-title">#{{ getorder.course.course_name }}</h5>
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-calendar-start text-primary"></i>
-            ชื่อ
-          </span>
-          <span class="info-value">{{ customers.customer_name }}</span>
-        </div>
-          <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-calendar-start text-primary"></i>
-            รหัสลูกค้า
-          </span>
-          <span class="info-value">{{ customers.customer_code }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-calendar-start text-primary"></i>
-            วันเวลาเริ่มต้น
-          </span>
-          <span class="info-value">{{ getorder.ev.ev_date_start }} - {{ getorder.ev.ev_date_end }}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-circle-info text-success"></i>
-            สถานะ
-          </span>
-          <span class="status-badge status-pending">{{ getorder.orderstatus }}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-circle-info text-success"></i>
-            ประเภทลูกค้า
-          </span>
-          <span class="status-badge status-pending">
-            {% if getorder.customer_type == 1 %}
-              <span>บุคคล</span>
-            {% else %}
-              <span>บริษัท</span>
-            {% endif %}
-          </span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-tags text-info"></i>
-            ประเภทการชำระเงิน
-          </span>
-          <div class="type-badges">
-            {% if getorder.pay_type == 1 %}
-              <span class="type-badge">เงินสด</span>
-            {% else %}
-              <span class="type-badge">เครดิต</span>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-receipt text-warning"></i>
-            จำนวนบิลทั้งหมด
-          </span>
-          <span class="amount-display">15 บิล</span>
-        </div>
+<div class="col-lg-12 col-md-12">
+  <div class="card h-100">
+    <div class="card-header">
+      <div class="course-id">
+        <i class="fas fa-hashtag me-2"></i>
+        รายการที่ #{{ getorder.register_number }}
       </div>
     </div>
-  </div>
+    <div class="card-body">
+      <h5 class="course-title">#{{ getorder.course.course_name }}</h5>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-calendar-start text-primary"></i>
+          ชื่อ
+        </span>
+        <span class="info-value">{{ customers.customer_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-calendar-start text-primary"></i>
+          รหัสลูกค้า
+        </span>
+        <span class="info-value">{{ customers.customer_code }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-calendar-start text-primary"></i>
+          วันเวลาเริ่มต้น
+        </span>
+        <span class="info-value">{{ getorder.ev.ev_date_start }} - {{ getorder.ev.ev_date_end }}</span>
+      </div>
 
-  <div class="col-lg-6 col-md-6">
-    <div class="card h-100">
-      <div class="card-header">
-        <div class="course-id">
-          <i class="fas fa-hashtag me-2"></i>
-          เลขที่ใบเสร็จ #{{ getorder.register_number }}
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-circle-info text-success"></i>
+          สถานะ
+        </span>
+        <span class="status-badge status-pending">{{ getorder.orderstatus }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-circle-info text-success"></i>
+          ประเภทลูกค้า
+        </span>
+        <span class="status-badge status-pending">
+          {% if getorder.customer_type == 1 %}
+          <span>บุคคล</span>
+          {% else %}
+          <span>บริษัท</span>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-tags text-info"></i>
+          ประเภทการชำระเงิน
+        </span>
+        <div class="type-badges">
+          {% if getorder.pay_type == 1 %}
+          <span class="type-badge">เงินสด</span>
+          {% else %}
+          <span class="type-badge">เครดิต</span>
+          {% endif %}
         </div>
       </div>
-      <div class="card-body">
-        <h5 class="course-title">#{{ getorder.course.course_name }}</h5>
 
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-calendar-start text-primary"></i>
-            วันเวลาเริ่มต้น
-          </span>
-          <span class="info-value">{{ getorder.ev.ev_date_start }} - {{ getorder.ev.ev_date_end }}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-circle-info text-success"></i>
-            สถานะ
-          </span>
-          <span class="status-badge status-pending">{{ getorder.orderstatus }}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-circle-info text-success"></i>
-            ประเภทลูกค้า
-          </span>
-          <span class="status-badge status-pending">
-            {% if getorder.customer_type == 1 %}
-              <span>บุคคล</span>
-            {% else %}
-              <span>บริษัท</span>
-            {% endif %}
-          </span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-tags text-info"></i>
-            ประเภทการชำระเงิน
-          </span>
-          <div class="type-badges">
-            {% if getorder.pay_type == 1 %}
-              <span class="type-badge">เงินสด</span>
-            {% else %}
-              <span class="type-badge">เครดิต</span>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">
-            <i class="fas fa-receipt text-warning"></i>
-            จำนวนบิลทั้งหมด
-          </span>
-          <span class="amount-display">15 บิล</span>
-        </div>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          จำนวนบิลทั้งหมด
+        </span>
+        <span class="amount-display">15 บิล</span>
       </div>
     </div>
   </div>
+</div>
 
 
-  <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xxl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="eventModalLabel"></h5>
-          <input type="hidden" name="ev_id" id="ev_id" required />
-          <input type="hidden" name="register_id" id="register_id" required />
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+{% for getpayments in getpayment %}
+<div class="col-lg-6 col-md-6">
+  <div class="card h-100">
+    <div class="card-header">
+      <div class="course-id">
+        <i class="fas fa-hashtag me-2"></i>
+        เลขที่ใบเสร็จ {{ getpayments.rp.rp_doc_number }}
+      </div>
+    </div>
+    <div class="card-body">
+
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-calendar-start text-primary"></i>
+          รหัส
+        </span>
+        <span class="info-value">{{ getpayments.rpi_code }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-circle-info text-success"></i>
+          หลักสูตร
+        </span>
+        <span class="info-value">{{ getpayments.rpi_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-circle-info text-success"></i>
+          จำนวน
+        </span>
+        <span class="info-value">{{ getpayments.rpi_quantity }} {{ getpayments.rpi_unit }}</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-tags text-info"></i>
+          การชำระเงินแบบ
+        </span>
+        <div class="type-badges">
+          {% if getpayments.type_payment == 'Deposit' %}
+          <span class="type-badge">มัดจำ</span>
+          {% else %}
+          <span class="type-badge">เต็มจำนวน</span>
+          {% endif %}
         </div>
-        <div class="modal-body">
-          <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
-          <input type="hidden" name="teacher_id" id="teacher_id" required />
+      </div>
 
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>ลำดับ</th>
-                <th>ความรับผิดชอบ</th>
-                <th>เรท</th>
-                <th>สถานะ</th>
-                <th>ชื่อผู้รับ</th>
-              </tr>
-            </thead>
-            <tbody id="json-table-body-rate"></tbody>
-          </table>
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          รวมเงิน
+        </span>
+      
+         <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          ส่วนลด
+        </span>
+        <span class="info-value">{{getpayments.rpi_price_discount |floatformat:2|intcomma }}</span>
+      </div>
+
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          ราคาก่อน VAT
+        </span>
+      <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
+      </div>
+
+
+      <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          ภาษีมูลค่าเพิ่ม 7%
+        </span>
+        <span class="info-value">{{getpayments.rpi_price_vat |floatformat:2|intcomma }}</span>
+      </div>
+
+            <div class="info-row">
+        <span class="info-label">
+          <i class="fas fa-receipt text-warning"></i>
+          ยอดรวมสุทธิ
+        </span>
+        <span class="info-value">{{getpayments.rpi_price_result |floatformat:2|intcomma }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel"></h5>
+        <input type="hidden" name="ev_id" id="ev_id" required />
+        <input type="hidden" name="register_id" id="register_id" required />
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
+        <input type="hidden" name="teacher_id" id="teacher_id" required />
+
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ความรับผิดชอบ</th>
+              <th>เรท</th>
+              <th>สถานะ</th>
+              <th>ชื่อผู้รับ</th>
+            </tr>
+          </thead>
+          <tbody id="json-table-body-rate"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="DeleteClick">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><i data-feather="x"></i></button>
+      </div>
+
+      <div class="modal-body">
+        {% csrf_token %}
+
+        <input type="hidden" name="ev_id" id="ev_id" required value="" />
+        <div align="center">
+          <h4>ยืนยันการลบข้อมูล</h4>
         </div>
         <div class="modal-footer">
-          <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">ยกเลิก</span>
+          </button>
+          <button type="submit" class="btn btn-primary ml-1">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
+          </button>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="modal fade" id="DeleteClick">
-    <div class="modal-dialog modal-xxl">
-      <div class="modal-content">
-        <div class="modal-header bg-danger">
-          <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><i data-feather="x"></i></button>
-        </div>
-
-        <div class="modal-body">
-          {% csrf_token %}
-
-          <input type="hidden" name="ev_id" id="ev_id" required value="" />
-          <div align="center">
-            <h4>ยืนยันการลบข้อมูล</h4>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-              <i class="bx bx-x d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยกเลิก</span>
-            </button>
-            <button type="submit" class="btn btn-primary ml-1">
-              <i class="bx bx-check d-block d-sm-none"></i>
-              <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 {% endblock %}

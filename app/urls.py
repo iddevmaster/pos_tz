@@ -266,6 +266,8 @@ urlpatterns = [
 
     path('finance/overduepayment', finance.withdraw_list_overduepayment),
     path('finance/overduepayment/<slug:register_id>', finance.withdraw_list_overduepayment_details),
+    path('finance/pay/<slug:register_id>', finance.withdraw_list_pay),
+    path('pay/payment/create/', finance.payment_pay_deposit, name="PaymentDeposit"),
    
 
     path('description/setting/form/create', desbill.setting_form_create,

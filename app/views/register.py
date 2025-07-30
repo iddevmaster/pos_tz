@@ -1091,6 +1091,7 @@ def payment_createno(request):
 def payment_form_update(request, register_id):
     title = defaultTitle
     user_id = request.user.id
+    
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -1107,8 +1108,9 @@ def payment_form_update(request, register_id):
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
     try:
+        factcontent = fact_customer.objects.get(register_id=register_id)
         content = customers.objects.select_related(
-            "register", "location").get(register_id=register_id)
+            "register", "location").get(customer_id=factcontent.customer_id)
     except:
         content = None
         return redirect("/register/management")
@@ -1127,7 +1129,7 @@ def payment_form_update(request, register_id):
         student_data = student.objects.get(register_id=register_id)
     else:
         student_data = None
-    # print(total_pay)
+    print(total_pay)
     des_bill = desciption_bill.objects.all()
     signature = fact_signature.objects.select_related('user').all()
     uuid_without_dashes = str(register_id).replace('-', '')
