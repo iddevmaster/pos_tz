@@ -769,7 +769,11 @@ def payment_create(request):
     rpi_price_result = request.POST['rpi_price_result']
     rpi_price_pay = request.POST['pay']
 
-    print(rpi_price_result)
+   
+    if not rpi_price_pay:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
+        rpi_price_pay = 0
+
+   
 
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
