@@ -192,6 +192,7 @@ class register_payment_items(models.Model):
     rpi_price_vat = models.FloatField(default=0, blank=False)
     rpi_price_result = models.FloatField(default=0, blank=False)
     rpi_pay = models.FloatField(default=0, blank=False)
+    rpi_price_pay = models.FloatField(default=0, blank=False)
     vat = models.CharField(max_length=64, blank=True, default=None)
     rp = models.ForeignKey(
         register_payment, on_delete=models.CASCADE , related_name='items')

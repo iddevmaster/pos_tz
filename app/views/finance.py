@@ -1562,7 +1562,7 @@ def withdraw_list_overduepayment_details(request,register_id):
     factcus = fact_customer.objects.get(register=register_id)
     list_teacher = teacher.objects.filter(cancelled=1, active=1)
     getcustomer = customers.objects.get(customer_id=factcus.customer.customer_id)
-    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment}
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment,'register_id':register_id}
     return render(request, 'course/calendar_overduepayment_details.html', context)
 
 

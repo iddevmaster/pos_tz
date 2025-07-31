@@ -19,7 +19,9 @@
 
   });
 
-
+async function selectre(id) {
+console.log(id)
+}
 
 
 
@@ -292,7 +294,7 @@
     </nav>
   </div>
 </div>
-
+<input type="text" name="register_id" id="register_id" value="{{ register_id }}" />
 <div class="col-lg-12 col-md-12">
   <div class="card h-100">
     <div class="card-header">
@@ -368,6 +370,21 @@
         </span>
         <span class="amount-display">15 บิล</span>
       </div>
+
+
+      <div class="info-row">
+        <span class="info-label">
+         <button
+                  type="button"
+                  class="btn btn-warning"
+                >
+                  <span class="d-none d-sm-block"  onclick="window.location.href='/finance/pay/{{ register_id }}'">ชำระบิล</span>
+                </button>
+        </span>
+       
+      </div>
+
+
     </div>
   </div>
 </div>
@@ -407,7 +424,7 @@
         </span>
         <span class="info-value">{{ getpayments.rpi_quantity }} {{ getpayments.rpi_unit }}</span>
       </div>
-      
+
       <div class="info-row">
         <span class="info-label">
           <i class="fas fa-tags text-info"></i>
@@ -427,8 +444,8 @@
           <i class="fas fa-receipt text-warning"></i>
           รวมเงิน
         </span>
-      
-         <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
+
+        <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
       </div>
 
       <div class="info-row">
@@ -445,7 +462,7 @@
           <i class="fas fa-receipt text-warning"></i>
           ราคาก่อน VAT
         </span>
-      <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
+        <span class="info-value">{{getpayments.rpi_price_total |floatformat:2|intcomma }}</span>
       </div>
 
 
@@ -457,7 +474,7 @@
         <span class="info-value">{{getpayments.rpi_price_vat |floatformat:2|intcomma }}</span>
       </div>
 
-            <div class="info-row">
+      <div class="info-row">
         <span class="info-label">
           <i class="fas fa-receipt text-warning"></i>
           ยอดรวมสุทธิ
@@ -469,66 +486,6 @@
 </div>
 {% endfor %}
 
-<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xxl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="eventModalLabel"></h5>
-        <input type="hidden" name="ev_id" id="ev_id" required />
-        <input type="hidden" name="register_id" id="register_id" required />
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
-        <input type="hidden" name="teacher_id" id="teacher_id" required />
 
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th>ลำดับ</th>
-              <th>ความรับผิดชอบ</th>
-              <th>เรท</th>
-              <th>สถานะ</th>
-              <th>ชื่อผู้รับ</th>
-            </tr>
-          </thead>
-          <tbody id="json-table-body-rate"></tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button> -->
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="modal fade" id="DeleteClick">
-  <div class="modal-dialog modal-xxl">
-    <div class="modal-content">
-      <div class="modal-header bg-danger">
-        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><i data-feather="x"></i></button>
-      </div>
-
-      <div class="modal-body">
-        {% csrf_token %}
-
-        <input type="hidden" name="ev_id" id="ev_id" required value="" />
-        <div align="center">
-          <h4>ยืนยันการลบข้อมูล</h4>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block" onclick="delel()">ยืนยันการลบ</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}

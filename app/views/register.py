@@ -767,6 +767,9 @@ def payment_create(request):
     rpi_price_total = request.POST['rpi_price_total']
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
+    rpi_price_pay = request.POST['pay']
+
+    print(rpi_price_result)
 
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
@@ -847,6 +850,7 @@ def payment_create(request):
         rpi_price_vat=rpi_price_vat,
         rpi_price_result=rpi_price_result,
         rpi_pay=rpi_price_result,
+        rpi_price_pay=rpi_price_pay,
         rp_id=rp_id,
         register_id=register_id,
         stmdate=stmda,
