@@ -400,13 +400,14 @@ def data_bill(request):
 
     
     obj = []
-    content = register_main.objects.filter(status='Y',ev_id=ev_id).exclude(register_number="-").order_by("-crt_date")
+    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus='Deposit').exclude(register_number="-").order_by("-crt_date")
     for r in content:
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
+        
         payment = register_payment.objects.filter(register=r.register_id).first()
         payment_i = register_payment_items.objects.filter(register=r.register_id).first()
-    
+        
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id).first()
         

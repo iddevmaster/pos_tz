@@ -393,8 +393,12 @@ def register_excel_seller(request):
     generation = request.POST.get('qgeneration', 0)
     seller = int(request.POST.get('qseller', 0))
     customer_name = request.POST.get('qcustomer_name', None)
-    content = customers.objects.select_related(
-        'register', 'location').filter(register__module=m.module)
+    type_payment = request.POST.get('type_payment', 'FullPayment')
+
+   
+    content = fact_customer.objects.select_related(
+            "register","customer").filter(register__module=m.module)
+
     lastday = lastDateOfmonth(
         date.today().year,  date.today().month, date.today().day)
     default_start = str(date.today().year) + "-" + \
@@ -463,12 +467,17 @@ def register_excel_seller(request):
         u = User.objects.get(id=seller)
         seller_param = str(u.first_name) + " " + str(u.last_name)
     if customer_name != None:
-        content = content.filter(Q(customer_name__icontains=customer_name))
+        content = content.filter(Q(customer__customer_name__icontains=customer_name))
     if event == 1:
         content = content.filter(register__ev__ev_id__isnull=False)
     if event == 2:
         content = content.filter(register__ev__ev_id__isnull=True)
+    if type_payment == 'FullPayment':
+        content = content.filter(Q(register__orderstatus='FullPayment') | Q(register__orderstatus='Completed'))
+    if type_payment == 'Deposit':
+        content = content.filter(Q(register__orderstatus='Deposit'))     
 
+    
     
     obj = []
     total_sum = 0

@@ -1560,7 +1560,7 @@ def withdraw_list_overduepayment_details(request,register_id):
     getpayment = register_payment_items.objects.select_related("rp").filter(register_id=register_id)
     getpaorver = register_payment_items.objects.filter(register_id=register_id).order_by('rpi_id').first()
     getpabill = register_payment_items.objects.filter(register_id=register_id).count()
-    print(getpaorver.rpi_price)
+    
     product_price = 0
     product_price = getpaorver.rpi_price
     # if getpaorver.type_payment == 'cash_full':
@@ -1650,7 +1650,7 @@ def withdraw_list_pay(request, register_id):
     price_orver = register_payment_items.objects.get(register_id=register_id)
     
     orver = price_orver.rpi_price - price_orver.rpi_price_pay
-    print(orver)
+    
     context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,'orver':orver,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment_pay.html', context)
@@ -1658,7 +1658,7 @@ def withdraw_list_pay(request, register_id):
 
 
 def payment_pay_deposit(request):
-    print('payment_pay_deposit')
+    
     now = date.today()
     # Main
     user_id = request.user.id
@@ -1721,57 +1721,65 @@ def payment_pay_deposit(request):
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
 
- 
+    
     u = User.objects.get(id=rp_name_seller)
 
     content_regist = register_main.objects.get(register_id=register_id)
     content_regist.seller_id = rp_name_seller
     content_regist.orderstatus = 'Completed'
     content_regist.save()
+
+    ev_vat = content_regist.ev.ev_vat
+    # print(ev_vat)
+    
+    if ev_vat == 0:
+        new_total = rpi_price_total
+    else:
+        new_total = float(rpi_price_total) - float(rpi_price_vat)
     # Crate Main
-    # object = register_payment.objects.create(
-    #     rp_doc_number=rp_doc_number,
-    #     rp_code_customer=rp_code_customer,
-    #     rp_name_customer=rp_name_customer,
-    #     rp_tax=rp_tax,
-    #     rp_name_seller=u.first_name+' '+u.last_name,
-    #     rp_name_contact=rp_name_contact,
-    #     rp_branch=rp_branch,
-    #     rp_address=rp_address,
-    #     rp_phone=rp_phone,
-    #     rp_email=rp_email,
-    #     rp_confirm_date_price=rp_confirm_date_price,
-    #     rp_date_delivery=rp_date_delivery,
-    #     rp_quota=0,
-    #     rp_ref1=rp_ref1,
-    #     rp_ref2=rp_ref2,
-    #     active=active,
-    #     crt_date=dateTimeNow(),
-    #     upd_date=dateTimeNow(),
-    #     register_id=register_id,
-    #     user_create=user_id,
-    #     user_manage=user_man
-    # )
-    # object.refresh_from_db()
+    object = register_payment.objects.create(
+        rp_doc_number=rp_doc_number,
+        rp_code_customer=rp_code_customer,
+        rp_name_customer=rp_name_customer,
+        rp_tax=rp_tax,
+        rp_name_seller=u.first_name+' '+u.last_name,
+        rp_name_contact=rp_name_contact,
+        rp_branch=rp_branch,
+        rp_address=rp_address,
+        rp_phone=rp_phone,
+        rp_email=rp_email,
+        rp_confirm_date_price=rp_confirm_date_price,
+        rp_date_delivery=rp_date_delivery,
+        rp_quota=0,
+        rp_ref1=rp_ref1,
+        rp_ref2=rp_ref2,
+        active=active,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        register_id=register_id,
+        user_create=user_id,
+        user_manage=user_man
+    )
+    object.refresh_from_db()
   
-    # register_payment_items.objects.create(
-    #     rpi_code=rpi_code,
-    #     rpi_name=rpi_name,
-    #     rpi_quantity=0,
-    #     rpi_unit=rpi_unit,
-    #     rpi_price=rpi_price,
-    #     rpi_price_discount=rpi_price_discount,
-    #     rpi_price_total=rpi_price_total,
-    #     rpi_price_vat=rpi_price_vat,
-    #     rpi_price_result=rpi_price_result,
-    #     rpi_pay=rpi_price_result,
-    #     rp_id=object.rp_id,
-    #     register_id=register_id,
-    #     vat=rpi_price_vat,
-    #     stmdate=stmda,
-    #     stmetc=etc,
-    #     type_payment=type_payment
-    # )
+    register_payment_items.objects.create(
+        rpi_code=rpi_code,
+        rpi_name=rpi_name,
+        rpi_quantity=0,
+        rpi_unit=rpi_unit,
+        rpi_price=rpi_price,
+        rpi_price_discount=rpi_price_discount,
+        rpi_price_total=new_total,
+        rpi_price_vat=rpi_price_vat,
+        rpi_price_result=rpi_price_result,
+        rpi_pay=rpi_price_result,
+        rp_id=object.rp_id,
+        register_id=register_id,
+        vat=rpi_price_vat,
+        stmdate=stmda,
+        stmetc=etc,
+        type_payment=type_payment
+    )
 
     
         
