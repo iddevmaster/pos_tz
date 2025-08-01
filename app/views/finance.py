@@ -1558,11 +1558,20 @@ def withdraw_list_overduepayment_details(request,register_id):
     
     getorder = register_main.objects.select_related("course","ev").get(register_id=register_id)
     getpayment = register_payment_items.objects.select_related("rp").filter(register_id=register_id)
-  
+    getpaorver = register_payment_items.objects.filter(register_id=register_id).order_by('rpi_id').first()
+    getpabill = register_payment_items.objects.filter(register_id=register_id).count()
+    print(getpaorver.rpi_price)
+    product_price = 0
+    product_price = getpaorver.rpi_price
+    # if getpaorver.type_payment == 'cash_full':
+    #     product_price = getpaorver.rpi_price
+    # else :    
+    #     product_price = getpaorver.rpi_price
+
     factcus = fact_customer.objects.get(register=register_id)
     list_teacher = teacher.objects.filter(cancelled=1, active=1)
     getcustomer = customers.objects.get(customer_id=factcus.customer.customer_id)
-    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment,'register_id':register_id}
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'customers':getcustomer,'getorder':getorder,'getpayment':getpayment,'register_id':register_id,'product_price':product_price,'getpabill':getpabill}
     return render(request, 'course/calendar_overduepayment_details.html', context)
 
 
@@ -1638,8 +1647,11 @@ def withdraw_list_pay(request, register_id):
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
 
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
+    price_orver = register_payment_items.objects.get(register_id=register_id)
     
-    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,
+    orver = price_orver.rpi_price - price_orver.rpi_price_pay
+    print(orver)
+    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,'orver':orver,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment_pay.html', context)
 

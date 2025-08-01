@@ -769,7 +769,7 @@ def payment_create(request):
     rpi_price_result = request.POST['rpi_price_result']
     rpi_price_pay = request.POST['pay']
 
-   
+    
     if not rpi_price_pay:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
         rpi_price_pay = 0
 
@@ -835,7 +835,7 @@ def payment_create(request):
         "ev").get(register_id=register_id)
     ev_vat = content_regist.ev.ev_vat
 
-    print(ev_vat)
+
     # print(ev_vat)
     
     if ev_vat == 0:

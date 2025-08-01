@@ -279,12 +279,13 @@
 
     const pay = document.getElementById("pay").value;
     const rpi_price_result = document.getElementById("rpi_price_result").value;
+    const rpi_price = document.getElementById("rpi_price").value;
     let type_payment = document.getElementById("type_payment").value;
   
 
     if (type_payment == 'Deposit') {
 
-        if (pay > rpi_price_result) {
+        if (parseInt(pay) > (rpi_price)) {
         Swal.fire({
           title: 'ไม่สามารถออกบิลได้!',
           text: 'ยอดมัดจำเยอะกว่ายอดสินค้า',
@@ -294,10 +295,10 @@
         return false;
       }
 
-      if (pay > rpi_price_result) {
+      if (parseInt(pay) == 0) {
         Swal.fire({
           title: 'ไม่สามารถออกบิลได้!',
-          text: 'ยอดมัดจำเยอะกว่ายอดสินค้า',
+          text: 'ยอดมัดจำเท่ากับ 0',
           icon: 'error',
           confirmButtonText: 'OK'
         });

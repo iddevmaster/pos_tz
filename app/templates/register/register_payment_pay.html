@@ -256,42 +256,20 @@ function validateForm() {
 
   let customer_type = document.getElementById("customer_type").value;
 
+  const orver = document.getElementById("orver").value;
+  const rpi_price = document.getElementById("rpi_price").value;
 
-  
-  if(customer_type == '1'){
-  let rp_quota = document.getElementById("rp_quota").value;
-  let quata = document.getElementById("quata").value;
-
-    if(parseInt(rp_quota) > parseInt(quata)) {
-    Swal.fire({
-      title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
-      text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรม',
+  if(parseInt(orver) != parseInt(rpi_price) ){
+      Swal.fire({
+      title: 'ยอดชำระไม่เท่ากัน',
+      text: 'กรอกข้อมูลให้ถูกต้อง',
       icon: 'error',
       confirmButtonText: 'OK'
     });
-    return false;  
-  }else {
-    return true; 
-  } 
-
+return false;
   }
 
-  if(customer_type == '2'){
-  let rp_quota = document.getElementById("rp_quota").value;
-  let quata = document.getElementById("quata").value;
-    if(parseInt(rp_quota) > parseInt(quata)) {
-    Swal.fire({
-      title: 'จำนวนผู้เข้าอบรมเกินกว่ากำหนด!',
-      text: 'กรุณาเพิ่ม จำนวนผู้เข้าอบรม',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return false;  
-  }else {
-    return true; 
-  } 
-  }
- 
+
 }
 
   function validate(evt) {
@@ -1308,7 +1286,7 @@ function validateForm() {
     <div class="card">
       <div class="card-body">
         <div class="form-group">
-          <label>ชำระค้างจ่าย</label>
+          <label>ยอดค้างชำระ</label><span style="color:red"> {{orver}} บาท</span>
         </div>
         <input
         type="hidden"
@@ -1318,6 +1296,7 @@ function validateForm() {
         name="quata"
         required
       />
+         <input type="text" name="orver" id="orver" value="{{orver}}"  />
 
       <input
       type="hidden"
@@ -1392,13 +1371,13 @@ function validateForm() {
 
           <div class="col-lg-4 col-md-6">
             <div class="form-group">
-              <label>ค่าชำระ</label> <label style="color: red">*</label>
+              <label>ยอดเงิน</label> <label style="color: red">*</label>
               <input
                 type="text"
                 class="form-control"
                 id="rpi_price"
                 name="rpi_price"
-                value="{{content_course.ev_price }}"
+                value="0"
                 onchange="sumUnit();validate(event)"
                 onkeypress="sumUnit();validate(event)"
                 onkeyup="sumUnit();validate(event)"
@@ -1433,7 +1412,7 @@ function validateForm() {
                 class="form-control"
                 id="addon_total"
                 name="addon_total"
-                value="{{total_price_add_on}}"
+                value="0"
                 readonly
               />
             </div>
@@ -1447,7 +1426,7 @@ function validateForm() {
                 class="form-control"
                 id="rpi_price_total"
                 name="rpi_price_total"
-                value="{{content_course.ev_price }}"
+                value="0"
                 readonly
               />
             </div>
