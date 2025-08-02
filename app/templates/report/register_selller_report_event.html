@@ -226,12 +226,20 @@
   },
     eventClick: function (info) {
 
-
+   
       $('#cardContainer').empty(); // Clear previous cards
       document.getElementById('eventModalLabel').innerText = info.event.title;
 
       document.getElementById("ev_id").value = info.event.extendedProps.evs_id
+             const iframe = document.getElementById('iframe_target');
 
+            // 4. Construct the new URL for the iframe's src
+            //    We'll send 'ev_id' as a query parameter.
+            //    Using encodeURIComponent is crucial for handling special characters safely.
+            const newSrc = `/register/excel/sellerev/${encodeURIComponent(info.event.extendedProps.evs_id)}`;
+
+            // 5. Set the iframe's src, which will load/reload its content
+            iframe.src = newSrc;
 
 
 
@@ -264,6 +272,19 @@
     });
   calendar.render();
   });
+
+   function reloadMyIframe() {
+              const iframe = document.getElementById('iframe_target');
+
+            // Check if the iframe element exists and has contentWindow
+            if (iframe && iframe.contentWindow) {
+                // Reload the content of the iframe
+                iframe.contentWindow.location.reload();
+                console.log('Iframe reloaded!');
+            } else {
+                console.error('Iframe not found or not fully loaded.');
+            }
+   }
 
 </script>
 <style>
@@ -365,10 +386,17 @@
       </table>
     </div>
   </div>
+
+
 </section>
 
 
-
+  <iframe
+    id="iframe_target"
+    name="iframe_target"
+    src="/register/excel/sellerev/0"
+    style="height: 500px; width: 100%; border: thin; background-color: #fff"
+  ></iframe>
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xxl">
     <div class="modal-content">
