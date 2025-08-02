@@ -206,9 +206,9 @@ def register_homenotevent(request):
     courses = course.objects.filter(cancelled=1, active=1,is_show_order='Y')
     obj = []
     
-
+    getcustomer = customers.objects.filter()
     # print(idcard_data)
-    context = {'title': title,  'data': courses, 'listMenuPermission': objMenu,
+    context = {'title': title,  'data': courses, 'listMenuPermission': objMenu,'customers':getcustomer,
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
     return render(request, 'register/register_noevent.html', context)
 
@@ -284,7 +284,7 @@ def register_createnoevent(request):
     current_user = request.user
     seller_id = current_user.id
     course = request.POST['course_id']
-    print(course)
+    
     customer_type = request.POST['customer_type']
     pay_type = request.POST['pay_type']
     try:
@@ -313,7 +313,7 @@ def register_createnoevent(request):
     )
     object.refresh_from_db()
     register_id = object.register_id
-    # print(register_id)
+    print(register_id)
     request.session['register_id'] = str(register_id)
     return redirect("/salesnotevent")
 
@@ -410,7 +410,7 @@ def customer_create(request):
     content.save()
 
     customer_type = content_regist.customer_type
-    print(custr.customer_fisrt)
+    
     if customer_type == 1:
         
         totaldata = student.objects.filter(
@@ -444,36 +444,75 @@ def customer_create(request):
 
 @login_required(login_url='/login')
 def customer_createno(request):
-
+    dddd = request.POST['customerType']
+    register_id = request.session['register_id']
     try:
         register_id = request.session['register_id']
         content_regist = register_main.objects.get(register_id=register_id)
         if not content_regist:
-            return redirect("/")
+            return redirect("/salesnotevent")
     except KeyError:
         register_id = None
         content_regist = None
-        return redirect("/")
-    chkcustomer = customers.objects.filter(register_id=register_id).count()
+        return redirect("/salesnotevent")
+    chkcustomer = fact_customer.objects.filter(register_id=register_id).count()
     if chkcustomer > 0:
         return redirect("/register/reset")
-    customer_code = "C" + str(dateTimeIntNow())
-    customer_name = request.POST['customer_name']
-    customer_tax = request.POST['customer_tax']
-    customer_phone = request.POST['customer_phone']
-    customer_email = request.POST['customer_email']
-    customer_address = request.POST['customer_address']
-    location_id = request.POST['location_id']
-    customers.objects.create(
-        customer_code=customer_code,
-        customer_name=customer_name,
-        customer_tax=customer_tax,
-        customer_phone=customer_phone,
-        customer_email=customer_email,
-        customer_address=customer_address,
-        location_id=location_id,
+    customer_type = content_regist.customer_type
+    if dddd == 'new':
+        if customer_type == 1:
+            customer_code = "C" + str(dateTimeIntNow())
+            customer_name = request.POST['customer_name']
+            customer_tax = request.POST['customer_tax']
+            customer_phone = request.POST['customer_phone']
+            customer_email = request.POST['customer_email']
+            customer_address = request.POST['customer_address']
+            location_id = request.POST['location_id']
+            cus = customers.objects.create(
+            customer_code=customer_code,
+            customer_name=customer_name,
+            customer_tax=customer_tax,
+            customer_phone=customer_phone,
+            customer_email=customer_email,
+            customer_address=customer_address,
+            location_id=location_id,
+            register_id=register_id,
+            customer_fisrt=request.POST['student_firstname_th'],
+            customer_last=request.POST['student_lastname_th'])
+        else:
+            customer_code = "C" + str(dateTimeIntNow())
+            customer_name = request.POST['customer_name']
+            customer_tax = request.POST['customer_tax']
+            customer_phone = request.POST['customer_phone']
+            customer_email = request.POST['customer_email']
+            customer_address = request.POST['customer_address']
+            location_id = request.POST['location_id']
+            cus = customers.objects.create(
+            customer_code=customer_code,
+            customer_name=customer_name,
+            customer_tax=customer_tax,
+            customer_phone=customer_phone,
+            customer_email=customer_email,
+            customer_address=customer_address,
+            location_id=location_id,
+            register_id=register_id,
+            customer_fisrt='-',
+            customer_last='-')
+    # 
+        save = fact_customer.objects.create(
+        customer_id=cus.customer_id,
         register_id=register_id
     )
+        
+    else :
+        customer_id = request.POST['customer_id']
+        save = fact_customer.objects.create(
+        customer_id=customer_id,
+        register_id=register_id
+    )
+
+    factcustr = fact_customer.objects.get(register=register_id)  
+    custr = customers.objects.get(customer_id=factcustr.customer_id)    
 
     # Update Register
     month_current = date.today().month
@@ -490,18 +529,17 @@ def customer_createno(request):
 
     customer_type = content_regist.customer_type
     if customer_type == 1:
-        student_firstname_th = request.POST['student_firstname_th']
-        student_lastname_th = request.POST['student_lastname_th']
+        
         totaldata = student.objects.filter(
             crt_date__month=month_current, crt_date__year=year_current).count()
         running_number = treeDigit(totaldata + 1)
         student_code = "TZ" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
         student.objects.create(
-            student_identification_number=customer_tax,
+            student_identification_number=custr.customer_tax,
             student_prefix_th="",
-            student_firstname_th=student_firstname_th,
-            student_lastname_th=student_lastname_th,
+            student_firstname_th=custr.customer_fisrt,
+            student_lastname_th=custr.customer_last,
             student_prefix_eng="",
             student_firstname_eng="",
             student_lastname_eng="",
@@ -634,6 +672,7 @@ def payment(request, register_id):
 @login_required(login_url='/login')
 def paymentnoevent(request, register_id):
     user_id = request.user.id
+    
     # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -652,11 +691,11 @@ def paymentnoevent(request, register_id):
 
     title = defaultTitle
     try:
-        content = customers.objects.select_related(
-            "register", "location").get(register_id=register_id)
+        content = fact_customer.objects.select_related(
+            "register","customer").get(register_id=register_id)
     except:
         content = None
-        return redirect("/")
+        return redirect("/salesnotevent")
    
     content_regist = register_main.objects.select_related(
         "seller").prefetch_related("student_register").get(register_id=register_id)
@@ -681,7 +720,7 @@ def paymentnoevent(request, register_id):
     
     list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
-    print(content_regist.course_id)
+    print(content)
     
     if content_regist.customer_type == 1:
         try:
@@ -697,8 +736,8 @@ def paymentnoevent(request, register_id):
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
     course_c = course.objects.get(is_show_order='Y',cancelled=1,course_id=content_regist.course_id)
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
-    
-    context = {'title': title,  'data': content, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'course':course_c,
+    print(uuid_without_dashes)
+    context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'course':course_c,'register_id':register_id,
                'content_regist': content_regist, 'student_data': student_data,'ev_training':content_regist,'list_user':list_user}
     return render(request, 'register/register_noeventpayment.html', context)    
 
@@ -932,6 +971,8 @@ def payment_createno(request):
     # Main
     user_id = request.user.id
     register_id = request.POST['register_id']
+
+
     rp_code_customer = request.POST['rp_code_customer']
     rp_name_customer = request.POST['rp_name_customer']
     rp_tax = request.POST['rp_tax']
@@ -994,12 +1035,14 @@ def payment_createno(request):
     if pay_type == 1:
         instecent = register_main.objects.get(register_id=register_id)
         instecent.status = 'Y'
+        instecent.orderstatus = 'FullPayment'
         instecent.save()
        
 
     if pay_type == 2:
         instecent = register_main.objects.get(register_id=register_id)
         instecent.status = 'Y'
+        instecent.orderstatus = 'FullPayment'
         instecent.save()
 
     u = User.objects.get(id=rp_name_seller)
@@ -1064,6 +1107,7 @@ def payment_createno(request):
         vat=vat,
         stmdate=stmda,
         stmetc=etc,
+        type_payment='FullPayment'
     )
 
 

@@ -259,8 +259,9 @@ def register_printnoev(request, rp_id):
     except User.DoesNotExist:
         mange = None
     dataadd = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').values()
-    
-    customer = customers.objects.get(register_id=content.register_id)
+    cus = fact_customer.objects.get(register_id=content.register_id)
+ 
+    customer = customers.objects.get(customer_id=cus.customer_id)
     rpi_price_rpi_pri = items.rpi_price * items.rpi_quantity 
     # ราคารวม  rpi_price  สินค้า
     if items.vat == '1':
