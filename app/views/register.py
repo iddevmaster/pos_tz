@@ -809,7 +809,7 @@ def payment_create(request):
     rpi_price_pay = request.POST['pay']
     before_price_vat = request.POST['before_price_vat']
     
-    print(before_price_vat)
+    
     
     if not rpi_price_pay:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
         rpi_price_pay = 0
@@ -1029,7 +1029,7 @@ def payment_createno(request):
     rpi_price_result = request.POST['rpi_price_result']
     addon_total = request.POST['addon_total']
 
-    print(addon_total)
+   
     
 
     if pay_type == 1:

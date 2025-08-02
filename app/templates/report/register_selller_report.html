@@ -33,7 +33,9 @@
       >
         {% csrf_token %}
         <div class="row">
+          
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">ช่วงวันที่</label>
             <input
               type="text"
               class="form-control daterange"
@@ -44,6 +46,7 @@
             />
           </div>
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">จังหวัด</label>
             <select class="form-select select2" id="qprovince" name="qprovince">
               <option value="0">-ทุกจังหวัด-</option>
               {% for res in province_list %}
@@ -54,6 +57,7 @@
             </select>
           </div>
           <div class="col-md-3 mb-4">
+              <label for="x" class="form-label">กลุ่มลูกค้า</label>
             <div class="form-group">
               <select
                 class="form-select"
@@ -68,6 +72,7 @@
           </div>
 
           <div class="col-md-3 mb-4">
+            <label for="x" class="form-label">ประเภทการจ่าย</label>
             <div class="form-group">
               <select class="form-select" name="qpay_type" id="qpay_type">
                 <option value="0">-ประเภทการชำระเงินทั้งหมด-</option>
@@ -78,6 +83,7 @@
           </div>
 
           <div class="col-md-3 mb-4">
+            <label for="x" class="form-label">สถานะ</label>
             <select
               class="form-control"
               name="qclose_the_sale"
@@ -91,6 +97,7 @@
           </div>
 
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">หลักสูตร</label>
             <select class="form-select select2" id="qcourse" name="qcourse">
               <option value="0">-หลักสูตรทั้งหมด-</option>
               {% for res1 in course_list %}
@@ -102,6 +109,7 @@
           </div>
 
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">รุ่น</label>
             <input
               type="text"
               id="qgeneration"
@@ -113,6 +121,7 @@
           </div>
 
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">ผู้เสนอโครงการ</label>
             <select class="form-select select2" id="qseller" name="qseller">
               <option value="0">-ผู้ขายทั้งหมด-</option>
               {% for res2 in list_user %}
@@ -124,6 +133,7 @@
           </div>
 
           <div class="col-md-3 mb-4">
+            <label for="x" class="form-label">Event</label>
             <select
               class="form-control"
               name="event"
@@ -136,7 +146,22 @@
             </select>
           </div>
 
+                    <div class="col-md-3 mb-4">
+            <label for="x" class="form-label">ประเภทบิล</label>
+            <select
+              class="form-control"
+              name="type_payment"
+              id="type_payment"
+            >
+              <option value="FullPayment">จ่ายครบ</option>
+              <option value="Deposit">มัดจำ</option>
+         
+  
+            </select>
+          </div>
+
           <div class="col-lg-3 col-md-6">
+            <label for="x" class="form-label">ชื่อลูกค้า</label>
             <input
               type="text"
               class="form-control"
@@ -155,7 +180,7 @@
           <button
             type="button"
             class="btn btn-warning"
-            onclick="window.location.href='/register/export/seller'"
+            onclick="window.location.href='/report/register/export/seller'"
           >
             <i class="icon dripicons-clockwise"></i>
             รีเซ็ต

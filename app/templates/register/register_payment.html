@@ -52,6 +52,7 @@
 
     var selectElement = document.getElementById("type_payment");
     var inputElement = document.getElementById("pay");
+    console.log(selectElement.value);
 
     let target = document.getElementById('pay_m');
     sumUnit()
@@ -60,7 +61,7 @@
       target.style.display = this.value === 'Deposit' ? 'none' : 'block';
       inputElement.disabled = false; // Enable the input
     } else {
-      
+
       target.style.display = this.value === 'FullPayment' ? 'block' : 'none';
       inputElement.disabled = true; // Disable the input
     }
@@ -281,11 +282,11 @@
     const rpi_price_result = document.getElementById("rpi_price_result").value;
     const rpi_price = document.getElementById("rpi_price").value;
     let type_payment = document.getElementById("type_payment").value;
-  
+
 
     if (type_payment == 'Deposit') {
 
-        if (parseInt(pay) > (rpi_price)) {
+      if (parseInt(pay) > (rpi_price)) {
         Swal.fire({
           title: 'ไม่สามารถออกบิลได้!',
           text: 'ยอดมัดจำเยอะกว่ายอดสินค้า',
@@ -369,15 +370,15 @@
     let fix = isNaN(sum) ? 0 : sum;
     document.getElementById("rpi_price_discount").value = 0;
     document.getElementById("rpi_price_total").value = fix.toFixed(2);
-    
-    if(type_payment == 'FullPayment'){
-sumVat();
+
+    if (type_payment == 'FullPayment') {
+      sumVat();
     }
 
-    if(type_payment == 'Deposit'){
-sumVatDeposit();
+    if (type_payment == 'Deposit') {
+      sumVatDeposit();
     }
- 
+
 
   }
 
@@ -404,7 +405,7 @@ sumVatDeposit();
     let type_payment = document.getElementById("type_payment").value;
     let rpi_price_total = document.getElementById("rpi_price_total").value;
     let addontotal = document.getElementById("addon_total").value;
-    console.log('คำนวน',type_payment)
+    console.log('คำนวน', type_payment)
     document.getElementById("rpi_price_total").value = parseFloat(rpi_price_total) + parseFloat(addontotal);
     let rpi_price_total_all = document.getElementById("rpi_price_total").value;
     let sum;
@@ -421,7 +422,7 @@ sumVatDeposit();
       document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
       document.getElementById("before_price_vat").value = fix.toFixed(2);
       document.getElementById("rpi_price_result").value = rpi_price_total_all;
-     
+
     } else {
       sum = (parseFloat(rpi_price_total) * 7) / 100;
       rpi_price_result = parseFloat(rpi_price_total) + parseFloat(sum);
@@ -430,11 +431,11 @@ sumVatDeposit();
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix.toFixed(2);
       document.getElementById("rpi_price_result").value = fix2.toFixed(2);
-     
+
     }
   }
 
-    function sumVatDeposit() {
+  function sumVatDeposit() {
 
     let ev_vat = document.getElementById("ev_vat").value;
     console.log(ev_vat);
@@ -442,8 +443,8 @@ sumVatDeposit();
     let rpi_price_total = document.getElementById("rpi_price_total").value;
     let addontotal = document.getElementById("addon_total").value;
     let pay = document.getElementById("pay").value;
-    
-   
+
+
     document.getElementById("rpi_price_total").value = parseFloat(pay) + parseFloat(addontotal);
     let rpi_price_total_all = document.getElementById("rpi_price_total").value;
     let sum;
@@ -454,22 +455,22 @@ sumVatDeposit();
 
       sum = (parseFloat(rpi_price_total_all) * 100) / 107;
       rpi_price_result = parseFloat(rpi_price_total_all) - parseFloat(sum);
-    
+
       let fix = isNaN(sum) ? 0 : sum;
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
       document.getElementById("before_price_vat").value = fix.toFixed(2);
       document.getElementById("rpi_price_result").value = rpi_price_total_all;
-     
+
     } else {
-      
+
       sum = (parseFloat(rpi_price_total_all) * 7) / 100;
       rpi_price_result = parseFloat(rpi_price_total_all) + parseFloat(sum);
       let fix = isNaN(sum) ? 0 : sum;
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix.toFixed(2);
       document.getElementById("rpi_price_result").value = fix2.toFixed(2);
-     
+
     }
   }
 
@@ -1055,6 +1056,19 @@ sumVatDeposit();
             </div>
           </div>
 
+          <div class="col-lg-3 col-md-6" hidden>
+            <div class="form-group">
+              <label>ประเภทการจ่าย </label>
+
+              <select class="form-select" id="type_payment" name="type_payment" style="width: 100%"
+                onchange="toggleInput()" required>
+                <option value="FullPayment" select>จ่ายครบ</option>
+                <option value="Deposit">ค้างชำระ</option>
+
+              </select>
+            </div>
+          </div>
+
 
           {% else %}
           {% endif %}
@@ -1092,6 +1106,7 @@ sumVatDeposit();
           </div>
 
           {% endif %}
+
 
 
         </div>
@@ -1383,14 +1398,15 @@ sumVatDeposit();
 
 
         </div>
-        
-          <div class="col-lg-12 col-md-12" style="display: none;" id="pay_m">
-            <div class="form-group">
-              <label>จำนวนเงินมัดจำ</label>
-              <label style="color: red">*</label>
-              <input type="text" class="form-control" id="pay" name="pay" value="0" onkeypress="sumUnit();validate(event)" onkeyup="sumUnit();validate(event)" />
-            </div>
+
+        <div class="col-lg-12 col-md-12" style="display: none;" id="pay_m">
+          <div class="form-group">
+            <label>จำนวนเงินมัดจำ</label>
+            <label style="color: red">*</label>
+            <input type="text" class="form-control" id="pay" name="pay" value="0" onkeypress="sumUnit();validate(event)"
+              onkeyup="sumUnit();validate(event)" />
           </div>
+        </div>
         <div class="form-group" align="center">
           <button type="submit" class="btn btn-success rounded-pill">
             {% if content_regist.pay_type == 2 %} ออกใบเสนอราคา {% else %}
