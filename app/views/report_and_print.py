@@ -3798,138 +3798,66 @@ def register_report_summary_user_withdraw_com_overdue(request):
 @login_required(login_url='/login')
 def register_excel_seller_ev(request,ev_id):
     user_id = request.user.id
-    print(ev_id)
+    
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
         return render(request, '404.html')
     
-    date_range = request.POST.get('date_range', None)
-    # year_current = int(request.POST.get('qyear', date.today().year))
-    # month_current = int(request.POST.get('qmonths', date.today().month))
-    province_code = int(request.POST.get('qprovince', 0))
-    customer_type = int(request.POST.get('qcustomer_type', 0))
-    pay_type = int(request.POST.get('qpay_type', 0))
-    close_the_sale = int(request.POST.get('qclose_the_sale', -1))
-    course_id = int(request.POST.get('qcourse', 0))
-    generation = request.POST.get('qgeneration', 0)
-    seller = int(request.POST.get('qseller', 0))
-    customer_name = request.POST.get('qcustomer_name', None)
-    type_payment = request.POST.get('type_payment', 'FullPayment')
+
 
 
     
 
-   
-    content = fact_customer.objects.select_related(
-            "register","customer").filter(register__module=m.module,register__ev=ev_id)
 
-    lastday = lastDateOfmonth(
-        date.today().year,  date.today().month, date.today().day)
-    default_start = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + "01"
-    default_end = str(date.today().year) + "-" + \
-        str(date.today().month) + "-" + str(lastday)
-    event = int(request.POST.get('event', 0))
- 
-    if date_range is not None:
-        start, end = format_daterange(date_range)
-        if start == end:
-            content = content.filter(
-                register__crt_date__date=start)
-        else:
-            content = content.filter(
-                register__crt_date__date__gte=start, register__crt_date__date__lte=end)
-        range_param = date_range
-    else:
-        # content = content.filter(
-        #     register__crt_date__month=month_current, register__crt_date__year=year_current)
-        content = content.filter(
-            register__crt_date__date__gte=default_start, register__crt_date__date__lte=default_end)
-        range_param = str(ymdtodmy(default_start)) + \
-            " - " + str(ymdtodmy(default_end))
-    province_name = "ทุกจังหวัด"
-    if province_code != 0:
-        content = content.filter(location__province_code=province_code)
-        p = location_thai.objects.filter(
-            province_code=province_code).values_list("province_name").first()
-        province_name = p[0]
-    customer_type_param = "ทุกประเภท"
-    if customer_type != 0:
-        content = content.filter(register__customer_type=customer_type)
-        if customer_type == 1:
-            customer_type_param = "บุคคล"
-        else:
-            customer_type_param = "บริษัท"
-    pay_type_param = "ทุกประเภท"
-    if pay_type != 0:
-        content = content.filter(register__pay_type=pay_type)
-        if pay_type == 1:
-            pay_type_param = "เงินสด"
-        else:
-            pay_type_param = "เครดิต"
-    close_the_sale_param = "ทุกประเภท"
-    if close_the_sale != -1:
-        content = content.filter(register__close_the_sale=close_the_sale)
-        if close_the_sale == 0:
-            close_the_sale_param = "กำลังขาย"
-        elif close_the_sale == 1:
-            close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
-        elif close_the_sale == 2:
-            close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
-    if course_id != 0:
-        content = content.filter(register__ev__course_id=course_id)
-        c = course.objects.get(course_id=course_id)
-        course_param = str(c.course_code) + " " + str(c.course_name)
-    generation_param = "ทุกรุ่น"
-    if generation:
-        content = content.filter(register__ev__ev_generation=generation)
-        generation_param = generation
-    seller_param = "ทุกคน"
-    if seller != 0:
-        content = content.filter(register__seller_id=seller)
-        u = User.objects.get(id=seller)
-        seller_param = str(u.first_name) + " " + str(u.last_name)
-    if customer_name != None:
-        content = content.filter(Q(customer__customer_name__icontains=customer_name))
-    if event == 1:
-        content = content.filter(register__ev__ev_id__isnull=False)
-    if event == 2:
-        content = content.filter(register__ev__ev_id__isnull=True)
-    if type_payment == 'FullPayment':
-        content = content.filter(Q(register__orderstatus='FullPayment') | Q(register__orderstatus='Completed'))
-    if type_payment == 'Deposit':
-        content = content.filter(Q(register__orderstatus='Deposit'))     
 
-    
+    status = ['FullPayment','Completed']
+    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus__in=status).order_by("crt_date")
     
     obj = []
     total_sum = 0
     
     for r in content:
         
-        payment_list = register_payment_items.objects.select_related('rp','register').filter(
-            register_id=r.register).order_by("-rp__rp_id").first()
-        course_list = []
-        if payment_list is not None:
-            rpi_price_result = payment_list.rpi_price_result
-            if payment_list.register.is_event == 'Y':
-               course_list = course_event.objects.select_related('course').filter(ev_id=r.register.ev_id).first()
-            else :
-               course_list = course.objects.filter(course_id=payment_list.register.course.course_id).first() 
-        else:
-            rpi_price_result = 0
-        total_sum += rpi_price_result
-     
-
-        res = {'customer_list': r,
-               'course_list': course_list, 'payment_list': payment_list}
+        payment_list = register_payment_items.objects.select_related('rp','register').filter(register__register_id=r.register_id,type_payment='FullPayment').order_by("-rp__rp_id").first()
+        cus = fact_customer.objects.get(register_id=r.register_id)
+        customer = customers.objects.get(customer_id=cus.customer_id)
+        course_list = course.objects.get(course_id=r.course.course_id)
+        
+        res = {'payment_list':payment_list,'customer_list':customer,'course_list':course_list}
         obj.append(res)
 
-    param = {'total_data': len(content), 'range_param': range_param, 'province_name': province_name, 'customer_type_param': customer_type_param,
-             'pay_type_param': pay_type_param, 'close_the_sale_param': close_the_sale_param, 'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
-    context = {'title': defaultTitle, 'data': obj,
-               'param': param, 'total_sum': total_sum}
+    context = {'title': defaultTitle, 'data': obj}
     return render(request, 'print/register_excel_seller_complate.html', context)
+
+
+@login_required(login_url='/login')
+def register_excel_seller_evover(request,ev_id):
+    user_id = request.user.id
+    
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    
+
+    status = ['Deposit']
+    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus__in=status).order_by("crt_date")
+    
+    obj = []
+    total_sum = 0
+    
+    for r in content:
+        
+        payment_list = register_payment_items.objects.select_related('rp','register').filter(register__register_id=r.register_id,type_payment='Deposit').order_by("-rp__rp_id").first()
+        cus = fact_customer.objects.get(register_id=r.register_id)
+        customer = customers.objects.get(customer_id=cus.customer_id)
+        course_list = course.objects.get(course_id=r.course.course_id)
+        
+        res = {'payment_list':payment_list,'customer_list':customer,'course_list':course_list}
+        obj.append(res)
+
+    context = {'title': defaultTitle, 'data': obj}
+    return render(request, 'print/register_excel_seller_over.html', context)

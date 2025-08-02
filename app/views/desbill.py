@@ -454,19 +454,12 @@ def data_bill_event(request):
         factcustomer_list = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
         
-        print(r.register_id)
+        
         customer_list = customers.objects.filter(
             pk=factcustomer_list.customer_id).first()
         payment = register_payment.objects.filter(register=r.register_id).first()
         payment_i = register_payment_items.objects.filter(register=r.register_id).first()
-      
-        # customer_list = customers.objects.select_related('register').filter(
-        #     register_id=r.register_id).first()
-        
-        # total_payment = register_payment.objects.filter(
-        #     register_id=r.register_id).count()
-        # course_list = course_event.objects.select_related(
-        #     'course').filter(ev_id=r.ev_id).first()
+    
         ct = '-'
         if r.customer_type == '1':
             ct = 'เครดิต'
