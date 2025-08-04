@@ -406,6 +406,8 @@ console.log(id)
         <i class="fas fa-hashtag me-2"></i>
         เลขที่ใบเสร็จ {{ getpayments.rp.rp_doc_number }}
       </div>
+
+      
     </div>
     <div class="card-body">
 
@@ -488,6 +490,18 @@ console.log(id)
           ยอดรวมสุทธิ
         </span>
         <span class="info-value">{{getpayments.rpi_price_result |floatformat:2|intcomma }}</span>
+      </div>
+
+            <div class="info-row">
+        <span class="info-label">
+         <button
+                  type="button"
+                  class="btn btn-warning"
+                >
+                  <span class="d-none d-sm-block"  onclick="window.location.href='/register/print/{{ getpayments.rp.rp_id }}'">PDF</span>
+                </button>
+        </span>
+       
       </div>
     </div>
   </div>

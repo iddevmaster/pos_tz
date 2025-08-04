@@ -89,7 +89,19 @@ def register_print(request, rp_id):
     else:
         rpi_price_default = items.rpi_price_total
 
-    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,
+    
+    t = 0
+    if items.type_payment == 'FullPayment':
+       t = 0
+    elif items.type_payment == 'Deposit':
+       t = items.rpi_price - items.rpi_price_pay
+    else:   
+       t = 0
+
+    print(t)   
+    
+ 
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,'total':t,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
