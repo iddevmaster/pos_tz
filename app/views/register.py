@@ -956,6 +956,7 @@ def payment_create(request):
         dtaf = fact_commission.objects.create( 
         stage_id=coms.stage_id,
         register_id=uuid_without_dashes,
+        rpi_id=object.rp_id,
         status='N'
     )   
 

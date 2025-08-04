@@ -113,6 +113,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>เบอร์โทร</td>
       <td>ที่อยู่</td>
       <td>หลักสูตร</td>
+       <td>เลขรายการ</td>
       <td>ประเภทลูกค้า</td>
       <td>ประเภทชำระเงิน</td>
       <td>สถานะการขาย</td>
@@ -142,6 +143,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
      {{res.course_list.course_name}}
         {% endif %}
        </td>
+         <td> {{res.customer_list.register.register_number}}</td>
       <td align="center">
         {% if res.customer_list.register.customer_type == 1 %}
         <span>บุคคล</span>

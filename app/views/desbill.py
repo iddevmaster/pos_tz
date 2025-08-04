@@ -400,7 +400,9 @@ def data_bill(request):
 
     
     obj = []
-    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus='Deposit').exclude(register_number="-").order_by("-crt_date")
+
+      
+    content = register_payment_items.objects.select_related("rp","register").filter(register__ev_id=ev_id).order_by("-rp_id")
     for r in content:
         customer_list = customers.objects.select_related('register').filter(
             register_id=r.register_id).first()
@@ -416,26 +418,24 @@ def data_bill(request):
         # course_list = course_event.objects.select_related(
         #     'course').filter(ev_id=r.ev_id).first()
         ct = '-'
-        if r.customer_type == '1':
+        if r.register.customer_type == '1':
             ct = 'เครดิต'
         else:
             ct = 'เงินสด'
 
         cus_type = '-'
-        if r.customer_type == '1':
+        if r.register.customer_type == '1':
             cus_type = 'บริษัท'
         else:
             cus_type = 'บุคคล'    
 
 
-        uuid_without_dashes = str(r.register_id).replace('-', '')
+        uuid_without_dashes = str(r.register.register_id).replace('-', '')
       
 
-        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type}
+        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number}
         obj.append(res)
 
-
-   
 
     return JsonResponse(obj,safe=False)
 
