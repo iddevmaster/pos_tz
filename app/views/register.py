@@ -720,7 +720,7 @@ def paymentnoevent(request, register_id):
     
     list_user = User.objects.filter(is_staff=0, is_active=1).prefetch_related('user_group_ref')
     # ถ้าเป็นบุคคลให้ส่งข้อมูลนักเรียนไปด้วย
-    print(content)
+    
     
     if content_regist.customer_type == 1:
         try:
@@ -1184,7 +1184,7 @@ def payment_form_update(request, register_id):
         student_data = student.objects.get(register_id=register_id)
     else:
         student_data = None
-    print(total_pay)
+    
     des_bill = desciption_bill.objects.all()
     signature = fact_signature.objects.select_related('user').all()
     uuid_without_dashes = str(register_id).replace('-', '')
@@ -1368,7 +1368,7 @@ def student_list(request, register_id):
         
         main = register_main.objects.select_related(
             "ev").get(register_id=register_id)
-        print('xxxxxxxx',main)
+        
     except register_main.DoesNotExist:
         main = None
         return redirect("/")
@@ -2070,7 +2070,7 @@ def register_management(request):
         
         customer_list = customers.objects.filter(
             pk=factcustomer_list.customer_id).first()
-        print(factcustomer_list.register)
+        
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         course_list = course_event.objects.select_related(
@@ -2790,7 +2790,7 @@ def report_register_list(request,evs_id):
    
     c_evet = course_event.objects.select_related(
         "course").get(active=1, cancelled=1,pk=evs_id)
-    print(c_evet.ev_training)
+    
     mains  = training.objects.filter(ev=evs_id)
     obj = []
     count = 0
@@ -2830,7 +2830,7 @@ def report_register_listall(request,evs_id):
    
     c_evet = course_event.objects.select_related(
         "course").get(active=1, cancelled=1,pk=evs_id)
-    print(c_evet.ev_training)
+    
     mains  = training.objects.filter(ev=evs_id)
     obj = []
     count = 0
@@ -2869,7 +2869,7 @@ def report_register_listteacher(request,evs_id):
    
     c_evet = course_event.objects.select_related(
         "course").get(active=1, cancelled=1,pk=evs_id)
-    print(c_evet.ev_training)
+    
     mains  = training.objects.filter(ev=evs_id)
     obj = []
     count = 0

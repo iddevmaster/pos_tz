@@ -1317,7 +1317,7 @@ def withdraw_list_one(request):
               head =  conhead.objects.get(conhead_id=totalselect.conhead.conhead_id)
               checkcourse_con = course.objects.get(course_id=checkhead.course_id)
               if checkcourse_con.is_type_condition == '1':
-                 print('คิดนักเรียน')
+                 
                  price = int(rs.tis_quantity) * (totalselect.price)
                  name_con = head.name
                  tis_compensation = totalselect.price

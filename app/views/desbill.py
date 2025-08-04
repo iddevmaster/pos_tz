@@ -120,7 +120,7 @@ def setting_form_tax(request):
  
     tax = tax_setting.objects.get(tax_id=1)
 
-    print(objMenu)
+    
 
     context = {'title': defaultTitle, 'listMenuPermission': objMenu,'tax_id':tax.tax_id,'tax':tax.tax}
             
@@ -362,7 +362,7 @@ def data_event(request):
     ev_id = data.get("evid")
     
     teacher_data = teacher_income_setting.objects.filter(ev_id=ev_id)
-    print(teacher_data)
+    
     sff = []
     obj = []
     if teacher_data.count() > 0:

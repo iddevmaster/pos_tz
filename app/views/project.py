@@ -38,7 +38,7 @@ def project_list(request):
     title = defaultTitle
     result = project_code.objects.filter(
         cancelled=1)
-    print(result)    
+       
     context = {'title': title, 'listMenuPermission': objMenu, 'data': result}
     return render(request, 'projectcode/project_list.html', context)
 
