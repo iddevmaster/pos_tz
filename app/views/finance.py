@@ -1783,14 +1783,14 @@ def payment_pay_deposit(request):
 
     
         
-    # com = commissionstages.objects.all()
-    # for coms in com:
-    #     dtaf = fact_commission.objects.create( 
-    #     stage_id=coms.stage_id,
-    #     register_id=register_id,
-    #     rpi_id=object.rp_id,
-    #     status='N'
-    # )   
+    com = commissionstages.objects.all()
+    for coms in com:
+        dtaf = fact_commission.objects.create( 
+        stage_id=coms.stage_id,
+        register_id=register_id,
+        rpi_id=object.rp_id,
+        status='N'
+    )   
 
 
     messages.success(request, "ทำรายการสำเร็จ !")

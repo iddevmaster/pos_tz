@@ -486,22 +486,25 @@ def register_excel_seller(request):
     for r in content:
         
         payment_list = register_payment_items.objects.select_related('rp','register').filter(
-            register_id=r.register).order_by("-rp__rp_id").first()
+            register_id=r.register).order_by("-rp__rp_id")
         course_list = []
-        if payment_list is not None:
-            rpi_price_result = payment_list.rpi_price_result
-            if payment_list.register.is_event == 'Y':
-               course_list = course_event.objects.select_related('course').filter(ev_id=r.register.ev_id).first()
-            else :
-               course_list = course.objects.filter(course_id=payment_list.register.course.course_id).first() 
-        else:
-            rpi_price_result = 0
-        total_sum += rpi_price_result
-     
+        for rs in payment_list:
+            
+            if payment_list is not None:
+                rpi_price_result = rs.rpi_price_result
+                if rs.register.is_event == 'Y':
+                    course_list = course_event.objects.select_related('course').filter(ev_id=rs.register.ev_id).first()
+                else:
+                    course_list = course.objects.filter(course_id=payment_list.register.course.course_id).first() 
+            else:
+                rpi_price_result = 0
+                total_sum += rpi_price_result
 
-        res = {'customer_list': r,
-               'course_list': course_list, 'payment_list': payment_list}
-        obj.append(res)
+            cs = fact_customer.objects.select_related("register","customer").filter(register_id=rs.register.register_id).first()
+            
+            res = {'customer_list': cs,
+               'course_list': course_list, 'payment_list': rs}
+            obj.append(res)
 
     param = {'total_data': len(content), 'range_param': range_param, 'province_name': province_name, 'customer_type_param': customer_type_param,
              'pay_type_param': pay_type_param, 'close_the_sale_param': close_the_sale_param, 'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}

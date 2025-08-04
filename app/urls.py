@@ -294,8 +294,7 @@ urlpatterns = [
     path('consent/print/<slug:training_id>',report_and_print.print_consent),
 
 
-        
-         
+      
     path('api/sequence/up', desbill.up),
     path('api/sequence/down', desbill.down),     
     #     public
