@@ -806,7 +806,8 @@ def payment_create(request):
     rpi_price_total = request.POST['rpi_price_total']
     rpi_price_vat = request.POST['rpi_price_vat']
     rpi_price_result = request.POST['rpi_price_result']
-    rpi_price_pay = request.POST['pay']
+   
+    rpi_price_pay = request.POST.get('pay', '0') # หากไม่มีคีย์ 'pay' จะใช้ค่า '0' แทน
     before_price_vat = request.POST['before_price_vat']
     
     
