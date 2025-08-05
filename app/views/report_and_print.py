@@ -510,8 +510,8 @@ def register_excel_seller(request):
                     course_list = course.objects.filter(course_id=rs.register.course.course_id).first() 
             else:
                 rpi_price_result = 0
-                total_sum += rpi_price_result
-
+            total_sum += rpi_price_result
+            
             cs = fact_customer.objects.select_related("register","customer").filter(register_id=rs.register.register_id).first()
             
             res = {'customer_list': cs,
