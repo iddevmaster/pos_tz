@@ -1002,7 +1002,7 @@ def calendar_event_apialloverdue(request):
         days_difference = delta.days + 1
         
         order_dep = register_main.objects.filter(orderstatus='Deposit',ev_id=r.ev_id).count()
-
+        print(r.ev_id)
         if order_dep > 0 :
             t = "#f13312"
         else :    
