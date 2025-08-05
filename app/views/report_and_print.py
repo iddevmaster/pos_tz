@@ -501,7 +501,7 @@ def register_excel_seller(request):
             register_id=r.register,register__status='Y').order_by("-rp__rp_id")
         course_list = []
         for rs in payment_list:
-            print(rs.rpi_id)
+            
             if rs.register is not None:
                 rpi_price_result = rs.rpi_price_result
                 if rs.register.is_event == 'Y':
