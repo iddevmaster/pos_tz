@@ -387,7 +387,7 @@ listMenu = [
     },
      {
         "value": "register/event/teacher",
-        "label": "ลงทะเบียนผู้เข้าอบรม (หน้างาน)",
+        "label": "ลงทะเบียนผู้เข้าอบรม",
         "group_value": "naSt14",
         "group_label": "ทะเบียนเข้าอบรม",
     },
