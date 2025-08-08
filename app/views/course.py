@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 
 from django.db.models import Count, Sum, Value, F
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd
 from django.views.decorators.csrf import csrf_exempt
@@ -838,9 +838,10 @@ def calendar_event_apiall(request):
     sff = []
     for r in content:
         
-    
-     
-    
+
+
+        trcount = training.objects.filter(ev_id=r.ev_id).count()
+        ev_traing = r.ev_training
         end = str(r.ev_date_end)
       
         y, m, d = end.split("-")
@@ -888,7 +889,7 @@ def calendar_event_apiall(request):
         delta = r.ev_date_end - r.ev_date_start
 
      
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_code) + " (Reg " + str(r.ev_generation)+")" ,'data':sff,
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_code) + " (Reg คนเข้าอบรม " + str(trcount)+ '/' +str(ev_traing)+")" ,'data':sff,
         'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two}
         obj.append(res)
        
