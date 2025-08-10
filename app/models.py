@@ -102,6 +102,7 @@ class course_event(models.Model):
     active = models.IntegerField(default=1, blank=False)
     location_id = models.IntegerField(default=0, blank=False)
     address = models.CharField(max_length=512, blank=True, default=None)
+    details = models.CharField(max_length=512, blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     cancelled = models.IntegerField(default=1, blank=False)

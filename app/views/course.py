@@ -194,6 +194,7 @@ def course_event_create(request):
     checkevent = request.POST['checkevent']
     local = request.POST['location_id']
     address = request.POST['address']
+    details = request.POST['details']
     status = ''
     now = datetime.datetime.now()
     time_string = now.strftime("%H%M%S")
@@ -238,6 +239,7 @@ def course_event_create(request):
         address=address,
         ev_training=ev_training,
         checkevent=checkevent,
+        details=details,
         module=m.module,
      )
     content.save()
@@ -801,7 +803,7 @@ def calendar_event_api(request):
 
      
         res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")" ,'data':sff,
-        'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),
+        'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),'details':str(r.details),
                 'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference,'condition_type': r.condition_type,'condition':conditiondata,'condition_id':r.condition_id}
         obj.append(res)
        

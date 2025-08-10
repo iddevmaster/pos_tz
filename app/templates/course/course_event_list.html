@@ -5,7 +5,7 @@
   $(document).ready(function () {
     // Initialize Select2 inside modal
     $('#CreateClick').on('shown.bs.modal', function () {
-      
+
       $("#selLocations").select2({
         dropdownParent: $('#CreateClick'), // Ensure dropdown is within the modal
         ajax: {
@@ -31,7 +31,7 @@
 
 
     $('#UpdateClick').on('shown.bs.modal', function () {
-      
+
       $("#selLocations_update").select2({
         dropdownParent: $('#UpdateClick'), // Ensure dropdown is within the modal
         ajax: {
@@ -657,6 +657,7 @@
     ev_training,
     location_id,
     address,
+    details,
     ev_logo,
 
   ) {
@@ -685,8 +686,8 @@
     document.getElementById("limit_price_update").value = limit_price;
     document.getElementById("limit_price_workhelp_update").value = limit_price_workhelp;
     document.getElementById("address_update").value = address;
+    document.getElementById("details_update").value = details;
 
-    
     document.getElementById("active_update").value = active;
     $(".selectUpdate").val(course_id).select2({
       placeholder: "เลือกข้อมูล",
@@ -840,6 +841,8 @@
             <td>
               {{res.ev_date_start|date:"d/m/Y"}} ถึง
               {{res.ev_date_end|date:"d/m/Y"}}
+
+               
             </td>
 
             <td>{{res.ev_generation}}</td>
@@ -878,12 +881,12 @@
               <div align="center">
                 {% if res.ev_logo %}
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','{{res.ev_logo.url}}')">
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','{{res.details}}','{{res.ev_logo.url}}')">
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
                 {% else %}
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateClick"
-                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','')">
+                  onclick="setValueUpdateModal('{{res.ev_id}}','{{res.ev_date_start|date:'d/m/Y'}}','{{res.ev_date_end|date:'d/m/Y'}}','{{res.ev_hour}}','{{res.ev_hour_two}}','{{res.ev_people}}','{{res.ev_people_two}}','{{res.ev_generation}}','{{res.ev_remark}}','{{res.ev_price}}','{{res.ev_vat}}','{{res.active}}','{{res.project_id}}','{{res.course_id}}','{{res.crt_date}}','{{res.upd_date}}','{{res.ev_expired_cer_quantity}}','{{res.limit_price}}','{{res.limit_price_workhelp}}','{{res.ev_training}}','{{res.location_id}}','{{res.address}}','{{res.details}}','')">
                   <i class="icon dripicons-document-edit"></i> แก้ไข
                 </button>
                 {% endif %}
@@ -956,8 +959,12 @@
 
           <div class="form-group">
             <label>ที่อยู่</label> <label style="color: red">*</label>
-            <input type="text" class="form-control" id="address" name="address" required 
-               />
+            <input type="text" class="form-control" id="address" name="address" required />
+          </div>
+
+           <div class="form-group">
+            <label>สถานที่อบรบ</label> <label style="color: red">*</label>
+            <input type="text" class="form-control" id="details" name="details" required />
           </div>
 
           <div class="form-group">
@@ -1057,8 +1064,8 @@
           </div>
 
 
- 
-    
+
+
 
 
           <div class="form-group">
@@ -1161,26 +1168,30 @@
               {% endfor %}
             </select>
           </div>
-          
+
           <div class="form-group">
             <label>เลือกสถานที่อบรม</label> <label style="color: red">*</label>
             <select class="form-select" required name="location_id" id="selLocations_update" style="width: 100%">
 
-      
+
 
               {% for location in addall %}
               <option value="{{location.location_id}}" selected>{{location.district_name}} -
                 {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
               {% endfor %}
 
-              
+
             </select>
           </div>
 
           <div class="form-group">
             <label>ที่อยู่</label> <label style="color: red">*</label>
-            <input type="text" class="form-control" id="address_update" name="address" required 
-               />
+            <input type="text" class="form-control" id="address_update" name="address" required />
+          </div>
+
+          <div class="form-group">
+            <label>สถานที่อบรบ</label> <label style="color: red">*</label>
+            <input type="text" class="form-control" id="details_update" name="details" placeholder="ข้อมูลสถานที่" required />
           </div>
 
           <div class="form-group">
