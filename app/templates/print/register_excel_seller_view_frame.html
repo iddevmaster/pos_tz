@@ -278,7 +278,7 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
   <div class="grid-item" style="text-align: center;"> ชื่อ  {{fname}} {{lname}} เลขที่ผู้เสียภาษี    {{tax_number}}  </div>
 </div>
 <div class="grid-container-1" style="padding-top: 5px;font-size: 14px;">
-  <div class="grid-item" style="text-align: center;"> ประจำวันที่ 21 เดือน กุมภาพันธ์ ปี 2568 </div>
+  <div class="grid-item" style="text-align: center;"> ประจำวันที่ {{ddx}} เดือน {{mmx}} ปี {{yyy}} </div>
 </div>
 <div class="grid-container-1" style="padding-top: 5px;font-size: 14px;">
   <div class="grid-item" style="text-align: center;"> รายละเอียดใบเสร็จรับเงิน  Item {{course_code}}  {{course_name}} </div>
@@ -298,18 +298,19 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
   <tbody>
     <tr style="font-size: 14px;">
       <td>ลำดับ</td>
-      <td>ใบเสร็จรับเงินเลขที่ / ใบเสนอราคา</td>
+     
       <td>ชื่อ - นามสกุล / ชื่อบริษัท</td>
       <td>เลขที่บัตรปชช / เลขที่ผู้เสียภาษี</td>
       <td>โทร</td>
       <td>จำนวนเงินสด(โอน)</td>
       <td>จำนวนเงิน (เครดิต)</td>
       <td>รวมเป็นเงิน  </td>
+       <td>ใบเสร็จรับเงินเลขที่ / ใบเสนอราคา</td>
     </tr>
     {% for res in data %}
     <tr style="font-size: 14px;">
       <td align="center">{{ forloop.counter }}</td>
-      <td>{{res.rp_doc_number}}</td>
+      
       <td>{{res.customer}}</td>
       <td>{{res.tax}}</td>
    
@@ -330,7 +331,9 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
         -
         {% endif %}
       </td>
+      
       <td></td>
+      <td>{{res.rp_doc_number}}</td>
       {% endfor %}
     </tr>
 
@@ -338,7 +341,7 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
 
     <tr style="font-size: 14px;">
     
-             <td  colspan="5" style="text-align: center;">
+             <td  colspan="4" style="text-align: center;">
      
 
               รวม
@@ -353,34 +356,63 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
                    {{total|floatformat:2|intcomma }}
                   </td>
     </tr>
-    <tr style="font-size: 14px;">
-      
-      <td colspan="5">
-        <div style="display: flex;">
-          <div style="flex: 2;">จำนวนใบเสร็จ</div>
-          <div style="flex: 1;">{{total_bill_payment}}</div>
-          <div style="flex: 1;">บิล</div>
+
+
+
+    
+    <tr>
+      <td></td>
+      <td></td>
+      <td colspan="4">
+     <div style="display: flex;">
+          <div style="flex: 1;">จ่ายค่าจ้างเหมา เรื่อง {{course_name}}</div>
         </div>
+        </td>
+      <td colspan="3">บันทึกภายในเลขที่  {{doc_in_hrc.doc_in_hrc}}</td>
+ 
+    </tr>
+
+
+
+    <tr>
+      <td></td>
+      <td></td>
+      <!-- <td colspan="5">
+     
 
         <div style="display: flex;">
-          <div style="flex: 2;">จำนวนใบเสนอราคา</div>
-          <div style="flex: 1;">{{total_bill_credit}}</div>
-          <div style="flex: 1;">บิล</div>
+          <div style="flex: 1;">นโยบายจ่ายค่าจ้างเหมา เลขที่ <input type="text" id="doc" name="doc"> </div>
         </div>
+
+      
+
+        <div style="display: flex;">
+          <div style="flex: 1;">ค่าจ้างเหมาเป็นเงิน  {{totalhours}} ชั่วโมง  ชั่วโมงละ <input type="text" id="total" name="total"    onkeydown="allowOnlyNumbersPeople(event)"> 
+         
+          </div>
+
+        </div>
+        </td> -->
+            <td colspan="4">
+     
+
+        <div style="display: flex;">
+            <div style="flex: 1;">จ่ายค่าจ้างเหมาเป็นเงิน </div>
+          <div style="flex: 1;">{{teacher_income_setting.tis_compensation}}</div>
+             <div style="flex: 1;">บาท</div>
+        </div>
+
+      
 
    
         </td>
-        <td></td>
-        <td></td>
-        <td></td>
-  
+      <!-- <td > <span id="result"></span></td> -->
+      <td colspan="3" style="text-align: center;"> </td>
     </tr>
-
-    
-
+   
 
 
-    <tr style="font-size: 14px;">
+    <!-- <tr style="font-size: 14px;">
      
       <td colspan="6">
     
@@ -399,7 +431,7 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
         <td>ตัวอักษร (<span id="result"></span>) </td> 
       <td>{{price|floatformat:2|intcomma }} </td> 
     </td>
-    </tr>
+    </tr> -->
 
     <tr style="font-size: 14px;">
       <td colspan="8" >
@@ -430,7 +462,6 @@ body: JSON.stringify({'ev_id':teach_in_come,'total':total,'doc':doc,'doc_documen
             /></span><br class="spacer"><span >(อ.เฉลิมชัย  หุ่นนนาครินทร์ )</span></div>
         </div>
       </td>
-  
     </tr>
     <tr style="font-size: 14px;">
       <td colspan="8" style="text-align: center;">ฝ่ายบัญชี  Accept</td>

@@ -550,15 +550,19 @@ def register_excel_seller_accept(request,ev_id):
          
          payment = register_payment.objects.get(register_id=r.register_id)
          item = register_payment_items.objects.get(register_id=r.register_id)
-         custo = customers.objects.get(register_id=r.register_id)
+         cus = fact_customer.objects.get(register_id=r.register_id)
+         custo = customers.objects.get(customer_id=cus.customer_id)
+         nmscr = ''
       
          if r.pay_type == 1:
              total_payment += item.rpi_price_total
          else:
              total_credit += item.rpi_price_total
-                 
+
+         if payment.number_receipt != None:    
+            nmscr = payment.number_receipt
           
-         fs = {'rp_doc_number':payment.rp_doc_number,'pay_type':r.pay_type,'customer':custo.customer_name,'tax':custo.customer_tax,'tel':custo.customer_phone,'rpi_price':item.rpi_price_total}
+         fs = {'number_receipt':nmscr,'rp_doc_number':payment.rp_doc_number,'pay_type':r.pay_type,'customer':custo.customer_name,'tax':custo.customer_tax,'tel':custo.customer_phone,'rpi_price':item.rpi_price_total}
          obj.append(fs) 
            
     total = total_payment + total_credit
@@ -571,23 +575,24 @@ def register_excel_seller_accept(request,ev_id):
     month_current = date.today().month
     year_current = date.today().year
     day_current = date.today().today
-   
+    
+    
 
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
  
-    
-    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'pi':tincome.pi_id,'day':day_current,'month_current':month_fomat(month_current),'year_current':year_current,
-               'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':student_code,'teach_in_come':ev_id}
+   
+    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'pi':tincome.pi_id,'day':day_current,'month_current':month_fomat(month_current),'year_current':year_current,'today':date.today(),
+               'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':student_code,'teach_in_come':ev_id,'tis_compensation':tincome.tis_compensation}
     return render(request, 'print/register_excel_seller_accept.html', context)
 
 
 @login_required(login_url='/login')
 def register_excel_seller_view(request,doc_id):
     user_id = request.user.id
-    print(doc_id)
+   
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
@@ -610,7 +615,8 @@ def register_excel_seller_view(request,doc_id):
          
          payment = register_payment.objects.get(register_id=r.register_id)
          item = register_payment_items.objects.get(register_id=r.register_id)
-         custo = customers.objects.get(register_id=r.register_id)
+         cus = fact_customer.objects.get(register_id=r.register_id)
+         custo = customers.objects.get(customer_id=cus.customer_id)
       
          if r.pay_type == 1:
              total_payment += item.rpi_price_total
@@ -630,7 +636,7 @@ def register_excel_seller_view(request,doc_id):
     month_current = date.today().month
     year_current = date.today().year
     year_current_f = str(int(date.today().year) + 543)
-    current_time = datetime.now().time()
+
     totalhours = cou_ev.ev_hour + cou_ev.ev_hour_two
     totalprice = int(getdoc.price) / totalhours 
 
@@ -640,11 +646,16 @@ def register_excel_seller_view(request,doc_id):
 
     mange = User.objects.get(id=payment.user_manage)
     
+    ddx = getdoc.created_at.day
+    mmx = getdoc.created_at.month
+    yyx = getdoc.created_at.year
+    yyy = str(int(yyx) + 543)
+
     running_number = treeDigit(totaldata + 1)
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
-         
-    context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'users':users,'signa':signa,'mange':mange,
+    _date = date.today()
+    context = {'ddx': ddx,'mmx': mmx,'yyy': yyy,'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'users':users,'signa':signa,'mange':mange,'date':_date,'doc_in_hrc':getdoc,
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':getdoc.doc_number,'payment_policy':getdoc.doc_number,'totalprice':totalprice,'price':getdoc.price}
     return render(request, 'print/register_excel_seller_view_frame.html', context)
 

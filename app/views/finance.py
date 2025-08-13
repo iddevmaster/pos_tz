@@ -713,12 +713,7 @@ def saveeventadmin(request):
         
               x.status = 'W'
               x.save()
-             
-
-
             datas = {'status':200}
-
-
             if pi == '5':    
               content = teacher_income_setting(
                 tis_compensation=tis_compensation,
@@ -777,10 +772,10 @@ def saveeventadmin(request):
 
             if pi == '7':    
               content = teacher_income_setting(
-                tis_compensation=0,
+                tis_compensation=tis_compensation,
                 tis_unit=tis_unit,
                 tis_quantity=tis_quantity,
-                tis_sum=0,
+                tis_sum=tis_compensation,
                 tis_start_date=instance.ev_date_start,
                 tis_end_date=instance.ev_date_end,
                 ev_id=ev_id,
@@ -798,10 +793,10 @@ def saveeventadmin(request):
 
             if pi == '8':    
               content = teacher_income_setting(
-                tis_compensation=0,
+                tis_compensation=tis_compensation,
                 tis_unit=tis_unit,
                 tis_quantity=tis_quantity,
-                tis_sum=0,
+                tis_sum=tis_compensation,
                 tis_start_date=instance.ev_date_start,
                 tis_end_date=instance.ev_date_end,
                 ev_id=ev_id,
@@ -813,8 +808,16 @@ def saveeventadmin(request):
                 register_id='-',
             )
               content.save()
+              pi_x = ['1','2','3','4','5','7']
+              chec = teacher_income_setting.objects.filter(ev_id=ev_id,pi_id__in=pi_x)
+              status = 'I'
+              for check in chec:
+                  if check.status == 'W':
+                     status = 'W'
+                     break
+              
               x = course_event.objects.get(ev_id=ev_id)
-              x.status = 'W'
+              x.status = status
               x.save()  
          
             
@@ -904,12 +907,41 @@ def evenetdel(request):
                   datas = {'status':200}    
                 # ลบก่อน
 
-         
-                aaaa = teacher_income_setting.objects.filter(ev_id=instance.ev_id).count()
-                if aaaa == 0 :
-                    xx = course_event.objects.get(pk=instance.ev_id)
-                    xx.status = 'Y'
-                    xx.save()   
+                pi_x = ['1','2','3','4','5','7','8']
+                chec = teacher_income_setting.objects.filter(ev_id=instance.ev_id,pi_id__in=pi_x)
+                status = 'I'
+                for check in chec:
+                  if check.status == 'W':
+                     status = 'W'
+                     break
+                  if check.status == 'N':
+                     status = 'N'
+                     break
+                
+                xx = course_event.objects.get(pk=instance.ev_id)
+                xx.status = status
+                xx.save()  
+
+                aaa = teacher_income_setting.objects.filter(ev_id=evs_id).count() 
+                
+                if aaa == 0:
+                    x = course_event.objects.get(pk=instance.ev_id)
+                    x.status = 'Y'
+                    x.save()  
+
+            #                 pi_x = ['1','2','3','4','5','7']
+            #   chec = teacher_income_setting.objects.filter(ev_id=ev_id,pi_id__in=pi_x)
+            #   status = 'I'
+            #   for check in chec:
+            #       if check.status == 'W':
+            #          status = 'W'
+            #          break
+              
+            #   x = course_event.objects.get(ev_id=ev_id)
+            #   x.status = status
+            #   x.save()  
+            
+
                 datas = {'status':200}
                 return JsonResponse(datas, status=200,safe=False)
 
@@ -939,41 +971,40 @@ def updateteachincom(request):
 
     data = json.loads(request.body)
     teach_id = data.get("ev_id")
-    it = data.get("it")
-    total = data.get("total")
+
     doc = data.get("doc")
     doc_document = data.get("doc_document")
+    doc_in_hrc = data.get("doc_in_hrc")
    
-
-
-    sumt = int(total) * int(it)
-
+    taxs = tax_setting.objects.get(tax_id=1)
 
     teacher_income = teacher_income_setting.objects.get(id=teach_id)
+
+   
 
     if teacher_income.pi_id == 7:
          teacher_income = teacher_income_setting.objects.get(id=teach_id)
          teacher_income.status = 'S'
-         teacher_income.tis_sum = sumt
-         teacher_income.tis_compensation = sumt
+         teacher_income.tax = taxs.tax
          teacher_income.save()
         
 
     else:
+     teacher_income = teacher_income_setting.objects.get(id=teach_id)
+     teacher_income.status = 'S'
+     teacher_income.tax = taxs.tax
+     teacher_income.save()
     
-     content = document(
+    content = document(
             doc_number=doc_document,
             title='ขอตั้งเบิกค่าจ้างเหมา ',
             teacher_income_id=teach_id,
-            price=sumt,
+            price=teacher_income.tis_sum,
+            doc_in_hrc=doc_in_hrc,
             created_at=dateTimeNow(),
          )
-     content.save()
-     teacher_income = teacher_income_setting.objects.get(id=teach_id)
-     teacher_income.status = 'S'
-     teacher_income.tis_sum = sumt
-     teacher_income.tis_compensation = sumt
-     teacher_income.save()
+    content.save()
+
     datas = {'status':200}
 
     return JsonResponse(datas, status=200,safe=False)
@@ -1236,7 +1267,7 @@ def withdraw_list_one(request):
     try:
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
-        pi = ['1','2','3','4','5']
+        pi = ['1','2','3','4','5','7']
         totalp = 0
         teacher_income = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='I',pi_id__in=pi,active=0)
         
@@ -1269,7 +1300,7 @@ def withdraw_list_one(request):
             if int(rs.pi_id) == 1:
            
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
-                print('event.condition_id',event)
+                
                 checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
                 checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
                 checkcourse_con = course.objects.get(course_id=checkhead.course_id)
@@ -1334,8 +1365,6 @@ def withdraw_list_one(request):
                     name_con = head.name
                     tis_compensation = totalselect.price
                     
-
-
              else:
                 
                 price = int(rs.tis_quantity) * (rs.tis_compensation)  
@@ -1364,8 +1393,13 @@ def withdraw_list_one(request):
               all = 1000 
               price = all / tot
               tis_compensation = all / tot
+
+             elif int(rs.pi_id) == 7: 
+              price = int(rs.tis_quantity) * (rs.tis_compensation) 
+              tis_compensation = rs.tis_compensation
+
+
           
-              
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
          
@@ -1796,6 +1830,29 @@ def payment_pay_deposit(request):
     messages.success(request, "ทำรายการสำเร็จ !")
     # return redirect("/register/management")
     return redirect("/finance/overduepayment/" + str(register_id))
+
+
+
+
+@csrf_exempt
+def updatnumberscript(request):
+ 
+    data = json.loads(request.body)
+    user_id = data.get("user_id")
+  
+    number_receipt = data.get("number_receipt")
+    rp_doc_number = data.get("rp_doc_number")
+ 
+
+
+
+    check_income = register_payment.objects.get(rp_doc_number=rp_doc_number)
+    check_income.number_receipt = number_receipt
+    check_income.save()
+
+
+    datas = {'status':200}
+    return JsonResponse(datas, status=200,safe=False)
 
 
 

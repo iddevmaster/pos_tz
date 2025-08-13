@@ -179,6 +179,9 @@ class register_payment(models.Model):
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
     user_create = models.IntegerField(default=0, blank=False)
     user_manage = models.IntegerField(default=0, blank=False)
+    number_receipt = models.CharField(max_length=256, blank=True, default=None)
+
+    
 
 
 class register_payment_items(models.Model):
@@ -420,8 +423,8 @@ class document(models.Model):
     teacher_income_id = models.IntegerField(default=None, blank=False) 
     status_mange = models.CharField(max_length=1, unique=True, blank=True)
     status_gm = models.CharField(max_length=1, unique=True, blank=True)
-
-
+    doc_in_hrc = models.CharField(max_length=256, unique=True, blank=True)
+    
 class signature(models.Model):
     image_id = models.AutoField(primary_key=True)
     image_cover = models.ImageField(

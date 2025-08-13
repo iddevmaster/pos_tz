@@ -772,11 +772,7 @@
       document.getElementById('tis_quantity').value = count_day
       document.getElementById('tis_compensation').value = 500
       const input = document.getElementById('tis_sum').value = 500 * count_day
-
-
       const x = document.getElementById('tis_quantity');
-
-
     }
 
     if (selectElement.value == 5) {
@@ -789,7 +785,6 @@
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-
     }
 
     if (selectElement.value == 6) {
@@ -799,19 +794,19 @@
       const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
       document.getElementById('tis_sum').value = limit_price_workhelp
       document.getElementById('tis_compensation').value = limit_price_workhelp
-
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
-
     }
 
     if (selectElement.value == 7) {
-
+      
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
       const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      const compensation = document.getElementById('tis_compensation');
+      
       document.getElementById('tis_sum').value = 1
       document.getElementById('tis_compensation').value = 0
 
@@ -819,21 +814,26 @@
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
 
+      compensation.readOnly = false; // Remove readonly
+      compensation.style.backgroundColor = ""; // Reset appearance
+
     }
 
     if (selectElement.value == 8) {
-
-
       document.getElementById("tis_unit").value = 'work';
       const input = document.getElementById('tis_quantity');
       const limit_price = document.getElementById("limit_price").value
       const limit_price_workhelp = document.getElementById("limit_price_workhelp").value
+      const compensation = document.getElementById('tis_compensation');
       document.getElementById('tis_sum').value = 0
       document.getElementById('tis_compensation').value = 0
 
       input.readOnly = true; // Set the input field to readonly
       input.style.backgroundColor = "#e9ecef"; // Optional: Change appear
       input.value = 1;
+
+      compensation.readOnly = false; // Remove readonly
+      compensation.style.backgroundColor = ""; // Reset appearance
 
     }
 
@@ -849,6 +849,7 @@
       x.readOnly = false; // Remove readonly
       x.style.backgroundColor = ""; // Reset appearance
     }
+
 
 
 
@@ -868,7 +869,6 @@
 
   function handleSelectChange(selectElement) {
     const selectedValue = selectElement.value;
-
 
     let result = selectElement.value.replace(/[^a-zA-Z0-9 ]/g, ""); // ลบตัวพิเศษ ยกเว้นช่องว่าง
     document.getElementById("teacher_id").value = result;
@@ -907,6 +907,9 @@
     else if (pi == 6) {
       document.getElementById("tis_sum").value = (300);
       document.getElementById("tis_compensation").value = 300;
+    }
+    else if (pi == 7) {
+      document.getElementById("tis_sum").value = aaaa;
     }
 
 
@@ -1100,6 +1103,39 @@
 
 
   }
+
+
+    function allowOnlyNumbersxx(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+
+
+
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+   
+        setTimeout(() => {
+
+      Caculate()
+    }, 200);
+
+  }
 </script>
 <style scoped>
 
@@ -1263,7 +1299,7 @@
 
             <span class="font-default">ค่าตอบแทน:</span>
             <label style="color: red"> *</label>
-            <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly />
+            <input type="text" class="form-control" name="tis_compensation" id="tis_compensation" value="0" readonly  onkeydown="allowOnlyNumbersxx(event)"/>
 
           </div>
 

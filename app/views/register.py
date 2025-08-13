@@ -2151,7 +2151,6 @@ def approve_lis_event_end(request):
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
 
-    
     content = course_event.objects.select_related('course').filter(status='I')
 
     # obj = []
@@ -2383,7 +2382,7 @@ def approve_list_payment(request):
         obj = []
         pi_id = ['7','8']   
         
-        content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='Y')
+        content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='I')
         
         for r in content:  
             
@@ -2436,8 +2435,8 @@ def approve_list_payment_accept(request,pk):
     
     
     
-    teacher_income = teacher_income_setting.objects.filter(id=pk,status='Y').count()
-    income = teacher_income_setting.objects.filter(id=pk,status='Y').first()
+    teacher_income = teacher_income_setting.objects.filter(id=pk,status='I').count()
+    income = teacher_income_setting.objects.filter(id=pk,status='I').first()
     if teacher_income > 0:
         context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk,'pi':income.pi_id }
         return render(request, 'register/register_selller_report.html',context)
@@ -2968,7 +2967,7 @@ def approve_internal_doc_print(request,doc_id):
 
     users = User.objects.get(id=payment.user_create)
     signa = signature.objects.filter(user_id=payment.user_create).first()
-    print(payment)
+    print(totaldata.created_at)
     mange = User.objects.get(id=payment.user_manage)
     
     running_number = treeDigit(totaldata + 1)
