@@ -2380,7 +2380,7 @@ def approve_list_payment(request):
         objMenu.append(r)
     try:
         obj = []
-        pi_id = ['7','8']   
+        pi_id = ['8']   
         
         content = teacher_income_setting.objects.select_related('ev','teacher').filter(pi_id__in=pi_id,status='I')
         
@@ -3043,13 +3043,11 @@ def approve_gm(request):
     obj = []
     status = ['N','']
     
-    content = document.objects.filter()
+    content = document.objects.filter(status_gm='')
     
     for rs in content:
 
-
         try:
-            
             teacher_income = teacher_income_setting.objects.get(id=rs.teacher_income_id)
             x = course_event.objects.get(ev_id=teacher_income.ev_id)
             courses = course.objects.get(course_id=x.course_id)
@@ -3080,7 +3078,7 @@ def approve_gm_save(request):
         eve = course_event.objects.get(ev_id=fi.ev.ev_id)
         eve.status = 'S'
         fi.status = 'S'
-        fi.active = 1
+        fi.active = 0
         fi.save()
         eve.save()
 
@@ -3091,9 +3089,9 @@ def approve_gm_save(request):
         x = document.objects.get(doc_id=doc_id)
         fi = teacher_income_setting.objects.get(id=x.teacher_income_id)
         eve = course_event.objects.get(ev_id=fi.ev.ev_id)
-        eve.status = 'W'
-        fi.status = 'Y'
-        fi.active = 1
+        eve.status = 'S'
+        fi.status = 'C'
+        fi.active = 0
         fi.save()
         eve.save()
         

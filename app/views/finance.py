@@ -984,14 +984,14 @@ def updateteachincom(request):
 
     if teacher_income.pi_id == 7:
          teacher_income = teacher_income_setting.objects.get(id=teach_id)
-         teacher_income.status = 'S'
+         teacher_income.status = 'T'
          teacher_income.tax = taxs.tax
          teacher_income.save()
         
 
     else:
      teacher_income = teacher_income_setting.objects.get(id=teach_id)
-     teacher_income.status = 'S'
+     teacher_income.status = 'T'
      teacher_income.tax = taxs.tax
      teacher_income.save()
     
