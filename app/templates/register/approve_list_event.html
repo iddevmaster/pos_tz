@@ -115,6 +115,8 @@ function readURL(input) {
           <tr>
             <th>ลำดับ</th>
             <th>เลขที่ใบสมัคร</th>
+              <th>เลขใบเสร็จ / ใบเสนอราคา</th>
+            
             <th>ไอเทม</th>
             <th>หลักสูตร</th>
             <th>รุ่น</th>
@@ -128,8 +130,10 @@ function readURL(input) {
         <tbody>
           {% for res in data %}
           <tr>
+          
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.customer_list.register.register_number}}</td>
+        
             <td>{{res.course_list.course.course_code}}</td>
             <td>{{res.course_list.course.course_name}}</td>
             <td>{{res.course_list.ev_generation}}</td>

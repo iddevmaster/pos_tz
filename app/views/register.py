@@ -2120,6 +2120,7 @@ def approve_lis_event(request):
     obj = []
     if content:
      for r in content:
+       
         
         cus = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
@@ -2131,6 +2132,9 @@ def approve_lis_event(request):
         
         payment_item = register_payment.objects.filter(
             register_id=r.register_id).first()
+     
+        
+        print(payment_item.rp_id)
    
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
