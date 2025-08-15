@@ -33,6 +33,19 @@
   </script>
 
   <style>
+
+    .page22 {
+    width: 21cm;
+    min-height: 29.7cm;
+      padding-left: 0.3cm;
+      padding-right: 0.3cm;
+    padding-top:2cm;
+    margin: 1cm auto;
+    border: 1px #D3D3D3 solid;
+    border-radius: 5px;
+    background: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
     body {
       font-family: "Sarabun", sans-serif;
       font-size: 12px;
@@ -81,7 +94,7 @@
 {% comment %} window.print() {% endcomment %}
 
 <body onLoad="myFunction();window.print();RunDate();">
-  <div class="page">
+  <div class="page22">
     <br>
     <br>
     <table style="width: 100%" border="0" class="table-head">
@@ -124,11 +137,12 @@
     <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
       <tbody>
         <tr>
-          <td colspan="8" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
+          <td colspan="12" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
         </tr>
         <tr>
-          <td>ลำดับ</td>
-          <td>Event งาน(ชื่อหลักสูตร)</td>
+          <td colspan="1">ลำดับ</td>
+          <td colspan="4">Event งาน(ชื่อหลักสูตร)</td>
+          <td>ตำแหน่ง</td>
           <td>วันที่จัดอบรม</td>
           <td>ชั่วโมง / วัน</td>
           <td>ยอดเงินรวม</td>
@@ -139,7 +153,8 @@
         {% for res in data %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td>{{ res.course_name }}</td>
+          <td colspan="4">{{ res.course_name }}</td>
+          <td>{{ res.pi }}</td>
           <td>{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
           {% comment %} <td>{{ res.pi }}</td> {% endcomment %}
           <td>{{ res.tis_quantity }} / {{res.tis_unit}}</td>
@@ -153,7 +168,7 @@
 
 
         <tr>
-          <td colspan="3">รวมเป็นค่าตอบแทน</td>
+          <td colspan="7">รวมเป็นค่าตอบแทน</td>
         
           <td></td>
            <td>{{totalp|floatformat:2|intcomma }}</td>
@@ -161,7 +176,8 @@
           <td>{{totalall|floatformat:2|intcomma }}</td>
         </tr>
 <tr>
-          <td colspan="3" rowspan="1" style="
+
+            <td colspan="2" rowspan="1" style="
                 width: 25%;
             ">
 
@@ -186,7 +202,84 @@
               </div>
             </div>
           </td>
-      <td colspan="3" rowspan="1" style="
+
+                    <td colspan="2" rowspan="1" style="
+                width: 25%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">ผู้พิมพ์บันทึก  </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป {{today}}
+              </div>
+            </div>
+          </td>
+
+                    <td colspan="2" rowspan="1" style="
+                width: 25%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">ผู้พิมพ์บันทึก  </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป {{today}}
+              </div>
+            </div>
+          </td>
+          <td colspan="2" rowspan="1" style="
+                width: 25%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">ผู้พิมพ์บันทึก  </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                วดป {{today}}
+              </div>
+            </div>
+          </td>
+      <td colspan="2" rowspan="1" style="
                 width: 25%;
             ">
 
@@ -211,7 +304,7 @@
               </div>
             </div>
           </td>
-     <td colspan="3" rowspan="1" style="
+     <td colspan="2" rowspan="1" style="
                 width: 25%;
             ">
 
