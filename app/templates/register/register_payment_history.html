@@ -9,6 +9,7 @@
       <span>ใบเสร็จ</span>
 
       {% endif %} {% if main.close_the_sale < 1 %}
+      <!--
       <span>
         <a
           href="/register/payment/update/{{main.register_id}}"
@@ -22,6 +23,7 @@
         </a>
       </span>
       {% elif content_approve.status == 1 %}
+      <!--
       <span>
         <a
           href="/register/payment/update/{{main.register_id}}"
@@ -34,13 +36,14 @@
           {% endif %}
         </a>
       </span>
-
+ -->
       {% elif content_approve_p.status == 0 %}
       <button class="btn btn-secondary rounded-pill">
         <span>กำลังรออนุมัติ..</span>
       </button>
 
       {% else %}
+      <!--
       <button
         class="btn btn-danger rounded-pill"
         data-bs-toggle="modal"
@@ -53,7 +56,7 @@
 
         {% endif %}
       </button>
-
+ -->
       {% endif %}
     </h3>
   </div>

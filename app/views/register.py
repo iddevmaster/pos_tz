@@ -2063,8 +2063,10 @@ def register_management(request):
         crt_date__month=month_current, crt_date__year=year_current,status='Y').exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
+        event = 'none'
+        if r.ev_id :
+            event = 'yes'
 
-        
         # customer_list = customers.objects.select_related('register').filter(
         #     register_id=r.register_id, register__crt_date__month=1).first()
         factcustomer_list = fact_customer.objects.select_related('register').filter(
@@ -2081,7 +2083,8 @@ def register_management(request):
             'course').filter(ev_id=r.ev_id).first()
         
         pay_item = register_payment_items.objects.filter(rp_id=payment_i.rp_id).first()
-        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,
+        print(event)
+        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}

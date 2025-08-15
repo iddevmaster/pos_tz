@@ -64,7 +64,6 @@ def register_print(request, rp_id):
     obj2 = []
     if billdess:
         for rsx in billdess:    
-            
             x = desciption_bill.objects.get(des_id=rsx.des_id)
             v = {'des_id': x.des_id,  'name': x.name}
             obj2.append(v)
