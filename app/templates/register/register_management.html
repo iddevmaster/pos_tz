@@ -97,7 +97,7 @@
           <tr>
             <th>ลำดับ</th>
             <th>เลขที่ใบสมัคร</th>
-            <th>หลักสูตร</th>
+            <th>หลักสูตร  </th>
             <th>ชื่อลูกค้า</th>
             <th>ประเภทลูกค้า</th>
             <th>ประเภทการชำระเงิน</th>
@@ -112,7 +112,13 @@
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.regis.register_number}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
+            <td>{{res.course_list.course.course_name}}
+             {% if res.regis.pay_type == 1 %}
+              {{res.course_list.course.course_name}}
+              {% else %}
+              {{res.pay_item}}
+              {% endif %}
+            </td>
             <td>{{res.customer_list.customer_name}}</td>
             <td align="center">
               {% if res.regis.customer_type == 1 %}

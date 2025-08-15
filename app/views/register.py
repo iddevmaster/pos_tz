@@ -951,14 +951,15 @@ def payment_create(request):
         register_id=uuid_without_dashes,
         des_id=bill
     )    
+    if pay_type == 1:  
         
-    com = commissionstages.objects.all()
-    for coms in com:
-        dtaf = fact_commission.objects.create( 
-        stage_id=coms.stage_id,
-        register_id=uuid_without_dashes,
-        rpi_id=object.rp_id,
-        status='N'
+        com = commissionstages.objects.all()
+        for coms in com:
+            dtaf = fact_commission.objects.create( 
+            stage_id=coms.stage_id,
+            register_id=uuid_without_dashes,
+            rpi_id=object.rp_id,
+            status='N'
     )   
 
 # commissionstages,fact_commission
@@ -2059,7 +2060,7 @@ def register_management(request):
     year_current = request.GET.get('qyear', date.today().year)
 
     content = register_main.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current).exclude(register_number="-").order_by("-crt_date")
+        crt_date__month=month_current, crt_date__year=year_current,status='Y').exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
 
@@ -2074,9 +2075,13 @@ def register_management(request):
         
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
+        payment_i = register_payment.objects.filter(
+            register_id=r.register_id).filter(register_id=r.register_id).first()
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,'regis':factcustomer_list.register,
+        
+        pay_item = register_payment_items.objects.filter(rp_id=payment_i.rp_id).first()
+        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
@@ -2112,8 +2117,12 @@ def approve_lis_event(request):
     obj = []
     if content:
      for r in content:
-        customer_list = customers.objects.select_related('register').filter(
+        
+        cus = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
+        
+        customer_list = customers.objects.filter(
+            customer_id=cus.customer_id).first()
         total_payment = register_payment.objects.filter(
             register_id=r.register_id).count()
         
