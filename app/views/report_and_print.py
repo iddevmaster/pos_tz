@@ -410,7 +410,7 @@ def register_excel_seller(request):
    
     content = fact_customer.objects.select_related(
             "register","customer").filter(register__module=m.module)
-
+    
     lastday = lastDateOfmonth(
         date.today().year,  date.today().month, date.today().day)
     default_start = str(date.today().year) + "-" + \
