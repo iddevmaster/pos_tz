@@ -12,9 +12,20 @@
 
       {% endif %}
        {% if main.close_the_sale < 1 %}
-  
-
-   
+  <!--
+      <span>
+        <a
+          href="/register/payment/update/{{main.register_id}}"
+          class="btn btn-success rounded-pill"
+        >
+          {% if main.pay_type == 2 %}
+          <span>แก้ไขใบเสนอราคา</span>
+          {% else %}
+          <span>แก้ไขใบเสร็จ</span>
+          {% endif %}
+        </a>
+      </span>
+   -->
       {% elif content_approve.status == 1 %}
  
       <span>
