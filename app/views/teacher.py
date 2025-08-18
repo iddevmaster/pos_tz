@@ -313,6 +313,7 @@ def teacher_list_cale(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    print(cm_id)    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
     for rs in list(listMenuPermission):
@@ -325,8 +326,9 @@ def teacher_list_cale(request):
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
         m = None
+        
         return render(request, '404.html') 
-
+    print(m)
     try:
         a = fact_teacher_user.objects.get(user_id=user_id)
         

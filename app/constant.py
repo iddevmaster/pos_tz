@@ -373,6 +373,13 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+        {
+        "value": "report/withdraw/one/com",
+        "label": "รายงานค่าCommission",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+
     {
         "value": "register/report/event/all",
         "label": "รายงานผู้เข้าอบรม",

@@ -219,6 +219,9 @@ urlpatterns = [
     path('report/overdue/all/com', report_and_print.register_report_summary_com),  #ค้างจ่ายค่าคอม
     path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
 
+
+    path('report/withdraw/one/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
+
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
     path('report/register/export/approve_list',
