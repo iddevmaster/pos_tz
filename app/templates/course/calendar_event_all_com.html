@@ -161,9 +161,9 @@
 
     const table = document.getElementById('ttt');
     table.style.display = 'block';
-
+    
     try {
-      const response = await fetch('/api/calendar_event_api_bill', {
+      const response = await fetch('/api/calendar_event_api_bill_com', {
         method: 'POST', // Specify the HTTP method as POST
         headers: {
           'Content-Type': 'application/json' // Tell the server we're sending JSON

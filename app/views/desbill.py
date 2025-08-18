@@ -442,6 +442,57 @@ def data_bill(request):
     return JsonResponse(obj,safe=False)
 
 
+
+@csrf_exempt
+def data_bill_com(request):
+    data = json.loads(request.body)
+    ev_id = data.get("evid")
+    month_current = request.GET.get('qmonths', date.today().month)
+    year_current = request.GET.get('qyear', date.today().year)
+    obj = []
+
+      
+    content = register_main.objects.filter(ev_id=ev_id)
+    
+    for r in content:
+        
+       
+        customer_list = customers.objects.select_related('register').filter(
+            register_id=r.register_id).first()
+        
+        payment = register_payment.objects.filter(register=r.register_id).first()
+        payment_i = register_payment_items.objects.filter(register=r.register_id).first()
+        
+        # customer_list = customers.objects.select_related('register').filter(
+        #     register_id=r.register_id).first()
+        
+        # total_payment = register_payment.objects.filter(
+        #     register_id=r.register_id).count()
+        # course_list = course_event.objects.select_related(
+        #     'course').filter(ev_id=r.ev_id).first()
+        ct = '-'
+        if r.customer_type == '1':
+            ct = 'เครดิต'
+        else:
+            ct = 'เงินสด'
+
+        cus_type = '-'
+        if r.customer_type == '1':
+            cus_type = 'บริษัท'
+        else:
+            cus_type = 'บุคคล'    
+
+
+        uuid_without_dashes = str(r.register_id).replace('-', '')
+      
+
+        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number}
+        obj.append(res)
+
+
+    return JsonResponse(obj,safe=False)
+
+
 @csrf_exempt
 def data_bill_event(request):
     data = json.loads(request.body)
@@ -492,7 +543,7 @@ def data_com(request):
     register_id = data.get("register_id")
 
     content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
-    
+    print(content)
     obj = []
     for r in content:
         s_name = 'ยังไม่ยืนยัน'

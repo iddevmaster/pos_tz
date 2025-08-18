@@ -220,7 +220,8 @@ urlpatterns = [
     path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
 
 
-    path('report/withdraw/one/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
+    path('report/withdraw/one/com', report_and_print.register_report_summary_sale_com_one), #ตั้งเบิกค่าคอม
+    path('report/withdraw/all/withdraw/comm/one', report_and_print.register_report_summary_user_withdraw_com_one),
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
@@ -337,6 +338,9 @@ urlpatterns = [
 
     path('api/calendar_event_api_data', desbill.data_event),
     path('api/calendar_event_api_bill', desbill.data_bill),
+    path('api/calendar_event_api_bill_com', desbill.data_bill_com),
+
+
     path('api/calendar_event_api_billevent', desbill.data_bill_event),
     path('api/calendar_event_api_com', desbill.data_com),
     path('api/calendar_event_api_user', desbill.user_com),
