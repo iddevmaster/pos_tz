@@ -1964,7 +1964,8 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     sure = signature.objects.filter(image_id=factsignature.fact_id).first()
 
     mage = signature.objects.filter(image_id=3).first()
-    gm = signature.objects.filter(image_id=3).first()
+    gm = signature.objects.filter(image_id=5).first()
+    print(gm)
     signa = ''
     if sure:
        signa = sure
