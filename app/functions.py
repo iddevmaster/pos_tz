@@ -8,6 +8,8 @@ import string
 from datetime import datetime as dts, timedelta
 from dateutil.relativedelta import relativedelta
 
+
+
 def generate_unique_name(path):
     def wrapper(instance, filename):
         extension = "." + filename.split('.')[-1]
@@ -257,3 +259,14 @@ def last_day_of_month(any_day):
     next_month = any_day.replace(day=28) + datetime.timedelta(days=4)
     # subtracting the number of the current day brings us back one month
     return next_month - datetime.timedelta(days=next_month.day)
+
+def checkpermi(cleaned_path,cm_id):
+    from app.models import category_program_permission
+    checkper = category_program_permission.objects.filter(cm_id=cm_id,page_route=cleaned_path).count()
+    
+    checkpa = 0
+    if checkper == 1:
+        checkpa = 1
+
+  
+    return checkpa
