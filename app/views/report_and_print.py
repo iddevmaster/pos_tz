@@ -310,6 +310,13 @@ def register_selller_report(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')     
+    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -355,6 +362,13 @@ def register_selller_report_event(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')     
+    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -674,6 +688,12 @@ def register_report_quotation(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -816,6 +836,12 @@ def register_report_bill(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -1283,6 +1309,11 @@ def register_report_summary(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -1312,6 +1343,11 @@ def register_report_summary_teacher(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -3647,6 +3683,11 @@ def register_report_summary_com(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')     
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -3676,6 +3717,12 @@ def register_report_summary_sale_com(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []

@@ -552,6 +552,7 @@ def condition_form_update(request):
 @login_required(login_url='/login')
 def calendar_event(request):
     user_id = request.user.id
+
      # Menu
      
     try:
@@ -559,6 +560,7 @@ def calendar_event(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+        
     path = request.path
     cleaned_path = path.strip('/')    
     checkpa = checkpermi(cleaned_path,cm_id)

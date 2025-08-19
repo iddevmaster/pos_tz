@@ -1167,6 +1167,11 @@ def withdraw_list_commission(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
     for rs in list(listMenuPermission):
