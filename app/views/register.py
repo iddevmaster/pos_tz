@@ -17,7 +17,7 @@ from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
 from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission,fact_customer
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit,checkpermi
 from ..constant import prefixEng,prefixThai
 
 api_id_card = api_id_card
@@ -43,6 +43,7 @@ def customer_read_idcard(request):
 def register_home(request):
     title = defaultTitle
     user_id = request.user.id
+    
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
@@ -54,10 +55,13 @@ def register_home(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    
     objMenu = []
     for rs in list(listMenuPermission):
+        
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
         r = {'group_label': rs['group_label'],
@@ -2134,8 +2138,7 @@ def approve_lis_event(request):
             register_id=r.register_id).first()
      
         
-        print(payment_item.rp_id)
-   
+    
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
         res = {'customer_list': customer_list,'register_id':r.register_id,

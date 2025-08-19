@@ -7,7 +7,7 @@ from datetime import date, timedelta
 from django.db.models import Count, Sum, Value, F
 from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training,register_payment_items
 from ..constant import defaultTitle
-from ..functions import addDay, addYear, dateTimeNow, dmytoymd
+from ..functions import addDay, addYear, dateTimeNow, dmytoymd,checkpermi
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import requests
@@ -553,11 +553,17 @@ def condition_form_update(request):
 def calendar_event(request):
     user_id = request.user.id
      # Menu
+     
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')     
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
     for rs in list(listMenuPermission):
