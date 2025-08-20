@@ -473,17 +473,17 @@ def data_bill_com(request):
         # course_list = course_event.objects.select_related(
         #     'course').filter(ev_id=r.ev_id).first()
         ct = '-'
-        if r.register.customer_type == '1':
-            ct = 'เครดิต'
-        else:
+        if r.register.pay_type == 1:
             ct = 'เงินสด'
+        else:
+            ct = 'เครดิต'
 
         cus_type = '-'
-        if r.register.customer_type == '1':
-            cus_type = 'บริษัท'
+        if r.register.customer_type == 1:
+            cus_type = 'บุคคล'
         else:
-            cus_type = 'บุคคล'    
-
+            cus_type = 'บริษัท'    
+    
 
         uuid_without_dashes = str(r.register.register_id).replace('-', '')
       
