@@ -2329,10 +2329,15 @@ def update_close_the_eventend(request):
 def delete_close_the_event(request):
     register_id = request.POST['register_id']
     ev_id = request.POST['ev_id']
+    uuid_without_dashes = str(register_id).replace('-', '')
+    contentev = event_register.objects.filter(ev_id=ev_id,register_id=uuid_without_dashes)
+    for sr in contentev:
+        contentev = event_register.objects.get(er_id=sr.er_id)
+        contentev.status = 'C'
+        contentev.save()
 
-    contentev = event_register.objects.get(ev_id=ev_id,register_id=register_id)
-    contentev.status = 'C'
-    contentev.save()
+ 
+  
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")
