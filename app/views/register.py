@@ -2119,11 +2119,12 @@ def approve_lis_event(request):
     year_current = request.GET.get('qyear', date.today().year)
 
    
-    content = event_register.objects.select_related('ev').filter(status='D').order_by('ev_id')
+    content = event_register.objects.select_related('ev').filter(status='D').order_by('-ev_id')
 
     obj = []
     if content:
      for r in content:
+        print(r.er_id)
        
         
         cus = fact_customer.objects.select_related('register').filter(
@@ -2137,12 +2138,13 @@ def approve_lis_event(request):
         payment_item = register_payment.objects.filter(
             register_id=r.register_id).first()
      
-        
+        reg = register_main.objects.filter(
+            register_id=r.register_id).first()
     
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.ev_id).first()
         res = {'customer_list': customer_list,'register_id':r.register_id,
-               'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item}
+               'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item,'register':reg}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
 
@@ -2249,16 +2251,28 @@ def update_close_the_event(request):
         ev_logo = None
 
     
-
+   
+    payment = register_payment.objects.get(register_id=register_id)
     content = register_main.objects.get(pk=register_id)
     content.status = 'Y'
+    content.close_the_sale = 1
+    content.orderstatus = 'FullPayment'
     content.save()
 
     contentev = event_register.objects.get(register_id=register_id)
     contentev.status = 'Y'
     contentev.save()
-       
+    uuid_without_dashes = str(register_id).replace('-', '')
 
+    com = commissionstages.objects.all()
+    for coms in com:
+        dtaf = fact_commission.objects.create( 
+        stage_id=coms.stage_id,
+        register_id=uuid_without_dashes,
+        rpi_id=payment.rp_id,
+        status='N'
+    )   
+       
 
     savesal = salesorder.objects.create(
         er_id=contentev.er_id,
