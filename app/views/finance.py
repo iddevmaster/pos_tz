@@ -1223,16 +1223,21 @@ def withdraw_list_one_com(request):
         #### คำนวน ####
         
         getpricebill_before_vat = paymet.rpi_price_result
-        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100
+        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 107
+
+       
         after_vat_cal = getpricebill_before_vat - getpricebill_after_vat 
+        
       
      
         getcom = ((stage.commission_rate) / 100 )
     
         total = Decimal(after_vat_cal) * Decimal(getcom)
-        
+
+
+        print(total)
        
-        r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat}
+        r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat,'after_vat_cal':after_vat_cal}
         obj.append(r)
 
        
@@ -1499,7 +1504,7 @@ def sendwithdrawcom(request):
         #### คำนวน ####
         
         getpricebill_before_vat = paymet.rpi_price_result  #### ก่อน vat ####
-        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 100   #### ค่า vat 7% ####
+        getpricebill_after_vat = (paymet.rpi_price_result * 7) / 107   #### ค่า vat 7% ####
     
         after_vat_cal = getpricebill_before_vat - getpricebill_after_vat  #### เงินบิล - เงินบิลหลังหักvat = ยอดเงินหักvat ####
         getcom = ((stage.commission_rate) / 100 ) #### แปลงrate ####
@@ -1509,7 +1514,7 @@ def sendwithdrawcom(request):
        
         total_result = total - taxaum
         ev_id = getdaybill.ev.ev_id
-      
+        print(total_result)
 
         com_id = r.commit_id
         active = 0
@@ -1517,13 +1522,7 @@ def sendwithdrawcom(request):
         tis_com_after_tax = total_result
         register = r.register_id
         status = 'S'
-        # content = commissionstages(
-        # stage_name=name,
-        # commission_rate=commission_ra,
-        # seq=last_entry.seq + 1,
-        # crt_date=dateTimeNow(),
-        # upd_date=dateTimeNow())
-        # content.save()
+
         content = com_income_setting(
         tis_com_before_vat=getpricebill_before_vat,
         tis_com_after_vat=after_vat_cal,
