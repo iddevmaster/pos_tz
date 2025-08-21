@@ -200,7 +200,7 @@ listMenu = [
     },
     {
         "value": "approve/update/event",
-        "label": "อนุมัติรายการ",
+        "label": "ใบเสนอราคารออนุมัติ",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
