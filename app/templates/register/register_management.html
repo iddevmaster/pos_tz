@@ -103,6 +103,7 @@
             <th>ประเภทการชำระเงิน</th>
             <th>ปิดการขาย</th>
             <th>วันที่ลงทะเบียน</th>
+            <th>ผู้ประสานงาน</th>
             <th>#</th>
           </tr>
         </thead>
@@ -146,9 +147,17 @@
               {% else %}
               <span class="badge bg-warning">กำลังขาย</span>
               {% endif %}
+
+
+              {% if res.saleorder %}
+              <span class="badge bg-warning">{{'SQ:'}}{{res.saleorder.sq}}</span>
+              {% else %}
+              {% endif %}
+             
             </td>
 
             <td>{{res.regis.crt_date|date:"d/m/Y H:i"}}</td>
+                <td>{{res.seller.first_name}} {{res.seller.last_name}}</td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
 

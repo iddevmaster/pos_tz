@@ -2087,8 +2087,19 @@ def register_management(request):
             'course').filter(ev_id=r.ev_id).first()
         
         pay_item = register_payment_items.objects.filter(rp_id=payment_i.rp_id).first()
-        print(event)
-        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,
+        seller = User.objects.filter(pk=r.seller_id).first()
+
+        getso = ''
+        if r.pay_type == 2:
+            print(r.register_id)
+            uuid_without_dashes = str(r.register_id).replace('-', '')
+            event_re = event_register.objects.filter(register_id=uuid_without_dashes,status='Y',ev_id=r.ev_id).first()
+            # sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
+            if event_re != None:
+               sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
+               getso = sale_re
+        
+        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,'seller':seller,'saleorder':getso,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
