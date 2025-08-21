@@ -1194,6 +1194,7 @@ def withdraw_list_one_com(request):
 
    
     user_id = request.user.id
+   
      # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
@@ -1211,8 +1212,10 @@ def withdraw_list_one_com(request):
     title = defaultTitle
 
     commit = fact_commission.objects.filter(status='N',user_id=user_id)
+    
     obj = []
     for r in commit:
+        
        
         content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
         paymet = register_payment_items.objects.get(register_id=r.register_id)
@@ -1489,7 +1492,7 @@ def sendwithdrawcom(request):
        tis_group = f"{start} - {last_day}"
             
     
-    content = fact_commission.objects.filter(user_id=user_id).order_by("stage_id")
+    content = fact_commission.objects.filter(user_id=user_id,status='N').order_by("stage_id")
     
     obj = []
     for r in content:
@@ -1514,7 +1517,7 @@ def sendwithdrawcom(request):
        
         total_result = total - taxaum
         ev_id = getdaybill.ev.ev_id
-        print(total_result)
+        print(r)
 
         com_id = r.commit_id
         active = 0

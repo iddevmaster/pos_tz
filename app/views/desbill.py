@@ -549,7 +549,7 @@ def data_com(request):
     register_id = data.get("register_id")
 
     content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
-    print(content)
+    
     obj = []
     for r in content:
         s_name = 'ยังไม่ยืนยัน'
@@ -589,6 +589,7 @@ def update_com(request):
     data = json.loads(request.body)
     commit_id = data.get("commit_id")
     user_id = data.get("user_id")
+    print(user_id)
     content = fact_commission.objects.get(commit_id=commit_id)
     content.user_id = user_id
     content.save()
