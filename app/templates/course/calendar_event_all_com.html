@@ -18,12 +18,14 @@
     });
   });
 
-  function setValueDeleteModal(register_id,ev_id) {
+  function setValueDeleteModal(register_id,ev_id,seller) {
   $('#json-table-body-rate').empty(); // Clear previous cards
     document.getElementById("register_id").value = register_id;
+    document.getElementById('eventModalLabelSeller').innerText = 'ผู้ประสานงาน : ' + seller;
     
     const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
     eventModal.show();
+  
      let com = findcommit(register_id,ev_id)
   }
 
@@ -190,10 +192,11 @@
                     <td>${item.rp_name_customer}</td>
                     <td>${item.customer_type}</td>  
                     <td>${item.pay_type}</td>
+                     <td>${item.seller}</td>
                       
                     <td>         <button
                   type="button"
-                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}')"
+                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}','${item.seller}')"
                   class="btn btn-danger"
               
                 >
@@ -368,6 +371,7 @@
             <th>ชื่อลูกค้า</th>
             <th>ประเภทลูกค้า</th>
             <th>ประเภทการชำระเงิน</th>
+            <th>ผู้ประสานงาน</th>
             <th>#</th>
           </tr>
         </thead>
@@ -386,12 +390,16 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabel"></h5>
-
+     
         <input type="hidden" name="ev_id" id="ev_id" required />
  <input type="hidden" name="register_id" id="register_id" required />
 
     
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+        <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabelSeller"></h5>
       </div>
       <div class="modal-body">
 

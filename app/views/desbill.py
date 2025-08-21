@@ -486,9 +486,13 @@ def data_bill_com(request):
     
 
         uuid_without_dashes = str(r.register.register_id).replace('-', '')
-      
-
-        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number}
+        
+         
+        seller = User.objects.filter(pk=r.register.seller_id).first()
+        
+        namessell = seller.first_name + '-' + seller.last_name
+        
+        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell}
         obj.append(res)
 
 
