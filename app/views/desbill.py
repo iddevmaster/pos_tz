@@ -453,7 +453,7 @@ def data_bill_com(request):
 
       
  
-    content = register_payment.objects.select_related('register',active=0).filter(register__ev_id=ev_id)
+    content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1)
 
     for r in content:
         
