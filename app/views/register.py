@@ -1392,7 +1392,7 @@ def student_list(request, register_id):
     content = student.objects.filter(
         register_id=register_id).order_by('-crt_date')
     payment_data = register_payment.objects.filter(
-        register_id=register_id, active=1).order_by('-crt_date').first()
+        register_id=register_id).order_by('-crt_date').first()
     if payment_data:
         rp_quota = payment_data.rp_quota
     else:
