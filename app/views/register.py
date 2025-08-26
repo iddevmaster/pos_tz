@@ -1460,9 +1460,11 @@ def student_form_create(request, register_id):
             student_lastname_eng = form.cleaned_data['student_lastname_eng']
             # ตรวจสอบโควต้า
             payment_data = register_payment.objects.filter(
-                register_id=register_id, active=1).order_by('-crt_date').first()
+                register_id=register_id).order_by('-crt_date').first()
+           
             total_student = student.objects.filter(
                 register_id=register_id).count()
+            
             rp_quota = payment_data.rp_quota
             if total_student >= rp_quota:
                 messages.error(request, "ไม่สามารถทำรายการได้ !")
