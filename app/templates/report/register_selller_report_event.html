@@ -232,14 +232,14 @@
 
       document.getElementById("ev_id").value = info.event.extendedProps.evs_id
              const iframe = document.getElementById('iframe_target');
-
-            // 4. Construct the new URL for the iframe's src
-            //    We'll send 'ev_id' as a query parameter.
-            //    Using encodeURIComponent is crucial for handling special characters safely.
             const newSrc = `/register/excel/sellerev/${encodeURIComponent(info.event.extendedProps.evs_id)}`;
-
-            // 5. Set the iframe's src, which will load/reload its content
             iframe.src = newSrc;
+
+
+
+            const iframe2 = document.getElementById('iframe_target2');
+            const newSrc2 = `/register/excel/sellerevover/${encodeURIComponent(info.event.extendedProps.evs_id)}`;
+            iframe2.src = newSrc2;
 
 
 

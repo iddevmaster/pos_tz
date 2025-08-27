@@ -1854,8 +1854,10 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     totalall = 0
     name_con = '-'
     for rs in customer_order_counts:
+            
             price_te_f = 0
             regbyev = register_main.objects.filter(ev_id=rs.ev)
+            
             total_rq_quta = 0
             for aaa in regbyev:
                 try:
@@ -1937,7 +1939,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             else :    
         
              if int(rs.pi_id) == 2:
-
+              
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               
               tis_compensation = rs.tis_compensation        
@@ -1982,7 +1984,10 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             sumtaxl += taxall
             totalall = totalp - sumtaxl
            
-          
+            print(rs.ev_id)
+            print(event.ev_date_start)
+            print(event.ev_date_end)
+           
    
             r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':price_te}
            
@@ -3101,8 +3106,7 @@ def register_report_compensation_withdraw_onemorefitter(request):
         
             obj.append(r)
 
-            print(obj)
-        
+          
         context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp,'user_id':user_id,'start_new':start_new,'end_new':end_new}
     except fact_teacher_user.DoesNotExist:
         getteachid = None
@@ -3402,12 +3406,12 @@ def register_excel_billtoday_summarize(request):
     )
 
    
-    print(queryset)
+  
     total = 0.0  # Initialize to 0.0
     for r in queryset:
         if r['result'] is not None:
             total += r['result']
-            print(total)
+        
 
     context = {'sales_data': list(queryset),'total_sum':total,'today':range_param}
         
@@ -3668,7 +3672,7 @@ def public_form_print(request):
 def print_consent(request,training_id):
    
     getid = training.objects.select_related("ev").get(training_id=training_id)
-    print(getid.ev.course)
+  
     content = []
     context = {'title': defaultTitle,  'data': getid}
     return render(request, 'print/register_print_consent.html', context)
@@ -3877,7 +3881,7 @@ def register_report_summary_user_withdraw_com(request):
 @login_required(login_url='/login')
 def register_report_summary_user_withdraw_com_one(request):
     user_id = request.user.id
-    print(user_id)
+   
     month_select_now = request.POST.get('monthss', date.today().month)
     
  
@@ -4017,7 +4021,7 @@ def register_report_summary_user_withdraw_com_overdue(request):
            
            
             r = {'user_id':rs.user_id,'totalp':rs.tis_com_before_tax,'sumtax':sumtax}
-            print(r)
+          
             obj.append(r)   
 
     result_dict = {}
@@ -4075,6 +4079,7 @@ def register_excel_seller_ev(request,ev_id):
         
         payment_list = register_payment_items.objects.select_related('rp','register').filter(register__register_id=r.register_id,type_payment='FullPayment').order_by("-rp__rp_id").first()
         cus = fact_customer.objects.get(register_id=r.register_id)
+        
         customer = customers.objects.get(customer_id=cus.customer_id)
         course_list = course.objects.get(course_id=r.course.course_id)
         
@@ -4097,13 +4102,13 @@ def register_excel_seller_evover(request,ev_id):
     
 
     status = ['Deposit']
-    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus__in=status).order_by("crt_date")
-    
+    content = register_main.objects.filter(status='Y',ev_id=ev_id,orderstatus='Deposit').order_by("crt_date")
+   
     obj = []
     total_sum = 0
     
     for r in content:
-        
+       
         payment_list = register_payment_items.objects.select_related('rp','register').filter(register__register_id=r.register_id,type_payment='Deposit').order_by("-rp__rp_id").first()
         cus = fact_customer.objects.get(register_id=r.register_id)
         customer = customers.objects.get(customer_id=cus.customer_id)
