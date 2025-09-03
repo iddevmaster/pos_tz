@@ -853,7 +853,7 @@ def calendar_event_apiall(request):
         
         billpa = register_payment.objects.select_related('register').filter(register__ev_id=r.ev_id)
         for bi in billpa:
-                
+                print(bi.rp_id)
                 t = register_payment_items.objects.get(rp_id=bi.rp_id)
                 to += t.rpi_quantity
         

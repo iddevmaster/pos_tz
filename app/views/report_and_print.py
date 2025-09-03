@@ -2034,7 +2034,7 @@ def register_report_summary_details_com(request ,id, year, m):
     default_end = str(year) + "-" + \
         str(m_n) + "-" + "20"
 
-  
+    today = datetime.date.today()
     get_last_day_m = last_day_of_month(
             datetime.date(int(year), m_l, 1))
     last_day_m = get_last_day_m.day
@@ -2042,7 +2042,14 @@ def register_report_summary_details_com(request ,id, year, m):
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
 
+    mage = signature.objects.filter(image_id=3).first()
+    gm = signature.objects.filter(image_id=5).first()
+
     customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id)
+    tax = 0
+    tax_all = 0
+    price = 0
+    price_total = 0
     for rs in customer_order_counts:
           
         com = fact_commission.objects.get(commit_id=rs.com_id)
@@ -2051,14 +2058,16 @@ def register_report_summary_details_com(request ,id, year, m):
         paymets = register_payment.objects.get(register_id=rs.register_id)
         evs = course_event.objects.get(ev_id=rs.ev_id)
  
-        
-        r = {'stage_name':comstate.stage_name,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs}
+        price += rs.tis_com_before_tax
+        price_total += rs.tis_com_after_tax
+        tax = rs.tis_com_before_tax - rs.tis_com_after_tax
+        tax_all += rs.tis_com_before_tax - rs.tis_com_after_tax
+        r = {'stage_name':comstate.stage_name,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs,'tis_com_before_tax':rs.tis_com_before_tax,'tis_com_after_tax':rs.tis_com_after_tax,'tax':tax}
            
         obj.append(r)   
    
 
- 
-    context = {'title': defaultTitle, 'data': obj,'code':getdatauser,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year}
+    context = {'title': defaultTitle, 'data': obj,'code':getdatauser,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'price':price,'price_total':price_total,'tax_all':tax_all,'mage':mage,'gm':gm,'today':today}
     return render(request, 'print/register_print_witdrawa_one_lasted_com.html',context)
 
 
