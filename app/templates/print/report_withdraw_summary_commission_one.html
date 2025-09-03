@@ -10,7 +10,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 <script type="text/javascript">
     function details(id,year,m) {
    let origin = location.origin;
-   let u = '/report/withdraw/all/summary/teacher/'
+   let u = '/report/withdraw/all/summary/comm/'
    window.open(origin+u+id+'/'+year+'/'+m,'_blank');
 
     }
@@ -95,6 +95,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>รวมเป็นเงิน</td>
       <td>หัก ณ ที่จ่าย</td>
       <td>รายได้สุทธิ</td>
+        <td></td>
     </tr>
 
     {% for res in result_dict %}
@@ -108,9 +109,10 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="center">{{res.total|floatformat:2|intcomma }}</td>
       <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.totalall|floatformat:2|intcomma }}</td>
-       {% comment %} <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
+     <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
             คลิกดูรายละเอียด
-          </button></td> {% endcomment %}
+          </button>  
+          </td>
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
     {% endfor %}

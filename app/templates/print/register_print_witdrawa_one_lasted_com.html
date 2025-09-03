@@ -1,0 +1,413 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}}</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
+  <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
+  <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
+  <script type="text/javascript">
+    function myFunction() {
+      var monney = "{{items.rpi_price_result }}";
+      var thaibath = ArabicNumberToText(monney);
+      document.getElementById("result").innerHTML = thaibath;
+    }
+
+    function RunDate() {
+      const today = new Date();
+      var time = today.getHours() + ":" + today.getMinutes();
+      const result = today.toLocaleDateString("th-TH", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      //  document.getElementById("showdate1").innerHTML = result;
+      //  document.getElementById("showdate2").innerHTML = result;
+      document.getElementById("showdate3").innerHTML =
+        " วันที่ " + result + " เวลา " + time;
+    }
+  </script>
+
+  <style scoped>
+
+  .a4-container {
+  max-width: 21cm;
+  margin: auto;
+  
+}
+
+    .page22 {
+    width: 21cm;
+    min-height: 29.7cm;
+      padding-left: 0.3cm;
+      padding-right: 0.3cm;
+    padding-top:2cm;
+    margin: 1cm auto;
+    border: 1px #D3D3D3 solid;
+    border-radius: 5px;
+    background: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+    body {
+      font-family: "Sarabun", sans-serif;
+      font-size: 12px;
+      left: 0;
+      position: relative;
+    }
+
+    .table-head {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-title {
+      position: relative;
+      bottom: 85px;
+    }
+
+    .table-detail {
+      position: relative;
+      bottom: 70px;
+    }
+
+    .table-footer {
+      position: relative;
+      bottom: 50px;
+    }
+
+    tr {
+      height: 35px;
+    }
+
+
+    .footer {
+      position: relative;
+      bottom: 60px;
+    }
+
+    .cutword {
+      white-space: nowrap;
+      width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fs10{
+      font-size:10px;
+    }
+  </style>
+</head>
+{% comment %} window.print() {% endcomment %}
+
+<body onLoad="myFunction();window.print();RunDate();">
+  <div class="page22">
+    <br>
+    <br>
+    <table style="width: 100%" border="0" class="table-head">
+      <tbody>
+        <tr>
+
+          <td colspan="3" style="vertical-align: middle" align="center">
+            <div style="font-size: 24px;margin-left: 150px;"><strong>บริษัท ไอดีไดรฟ์ จำกัด</strong></div>
+
+            <div style="font-size: 18px;margin-left: 150px;"><strong>ศูนย์เทรนนิ่ง TZ เซ็นเตอร์</strong></div>
+          </td>
+
+          <td colspan="1" style="vertical-align: middle" align="right">
+            <div>เลขที่ <strong>...................</strong></div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div align="center">
+              <div style="font-size: 18px;">
+                รายงาน ตั้งเบิกค่าCommission ชื่อ {{code.first_name}} {{code.last_name}} รหัสพนักงาน {{code}}
+              </div>
+            </div>
+
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div align="center">
+              <div style="font-size: 18px;">
+                วันที่ {{tis_group_l}} {{old_m}} {{year_current}} ถึง {{tis_group_f}} {{current_m}} {{year_current}}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+<div class="table-responsive a4-container">
+
+
+
+    <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
+      <tbody>
+        <tr>
+          <td colspan="12" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
+        </tr>
+        <tr>
+          <td colspan="1">ลำดับ</td>
+            <td colspan="3">ตำแหน่ง</td>
+          <td colspan="3">Event งาน(ชื่อหลักสูตร)</td>
+        
+          <td>วันที่จัดอบรม</td>
+          <td>เลขที่บิล</td>
+          <td>ยอดเงินรวม</td>
+          <td>ภาษีที่จ่าย</td>
+          <td colspan="1">จำนวนเงินสุทธิ</td>
+        </tr>
+
+        {% for res in data %}
+      
+        <tr>
+          <td>{{ forloop.counter }}</td>
+           <td  colspan="3" >{{ res.stage_name }}</td>
+          <td colspan="3">{{ res.course.course_name }}</td>
+         
+          <td>{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}</td>
+   
+          <td>{{res.rp_doc_number}}</td>
+          <td>{{res.price|floatformat:2|intcomma }}</td>
+          <td>{{res.tax|floatformat:2|intcomma }}</td>
+           <td colspan="1">{{res.totalall|floatformat:2|intcomma }}</td>
+
+        </tr>
+       
+        {% endfor %}
+
+
+        <tr>
+          <td colspan="8">รวมเป็นค่าตอบแทน</td>
+        
+          <td></td>
+           <td>{{totalp|floatformat:2|intcomma }}</td>
+          <td>{{sumtax|floatformat:2|intcomma }}</td>
+          <td>{{totalall|floatformat:2|intcomma }}</td>
+        </tr>
+        
+
+        
+<tr>
+
+            <td colspan="2" rowspan="1" >
+
+           
+        
+
+             {% if signature %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="{{signature.image_cover.url}}" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% else %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% endif %}
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;"><span class="fs10">{{factsignature.user.first_name}} {{factsignature.user.last_name}}</span> </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+              <span class="fs10">
+                วดป {{today}}
+                </span>
+              </div>
+            </div>
+          </td>
+
+                    <td colspan="2" rowspan="1" >
+
+            {% if mage %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="{{mage.image_cover.url}}" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% else %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% endif %}
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">
+              <span class="fs10">
+              (ศิริโรจน์ เสนาดี)
+              </span>
+              </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;"><span class="fs10">ผู้จัดการ </span> </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+              <span class="fs10">
+                วดป {{today}}
+                </span>
+              </div>
+            </div>
+          </td>
+
+                    <td colspan="2" rowspan="1" >
+
+            {% if gm %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="{{gm.image_cover.url}}" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% else %}
+ <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+              </div>
+            </div>
+              {% endif %}
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;"><span class="fs10">(เฉลิมชัย หุ่นนาครินร์ทร)</span></div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;"><span class="fs10">ผอ </span> </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+              <span class="fs10">
+                วดป {{today}}
+                </span>
+              </div>
+            </div>
+          </td>
+          <td colspan="2" rowspan="1" style="
+                width: 15%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;"> <span class="fs10">(...................................)</span></div>
+            </div>
+            <div style="display: flex;text-align: center;">
+            
+              <div style="flex: 1;margin-bottom: 10px;">
+              
+              
+                             <span class="fs10">
+             ฝ่ายบัญชี
+              </span>
+               </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+              <span class="fs10">
+                วดป {{today}}
+              </span>
+              </div>
+            </div>
+          </td>
+      <td colspan="2" rowspan="1" style="
+                width: 15%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">
+              <span class="fs10">
+              (...................................)
+              </span>
+              </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">
+         
+               <span class="fs10">
+             ฝ่ายการเงิน
+              </span>
+              
+              </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+           
+
+                  <span class="fs10">
+                วดป {{today}}
+              </span>
+              </div>
+            </div>
+          </td>
+     <td colspan="2" rowspan="1" style="
+                width: 15%;
+            ">
+
+            <div style="display: flex;text-align: center;">
+
+              <div style="flex: 1;">
+
+                <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 100px; height: 75px">
+
+              </div>
+
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">
+             
+                       <span class="fs10">
+                (...................................)
+              </span>
+              </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;margin-bottom: 10px;">
+              
+               
+
+               <span class="fs10">
+                หัวหน้าฝ่าย
+              </span>
+              
+               </div>
+            </div>
+            <div style="display: flex;text-align: center;">
+              <div style="flex: 1;">
+               <span class="fs10">
+                วดป {{today}}
+              </span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</body>
+
+</html>

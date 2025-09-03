@@ -18,7 +18,7 @@ from django.db.models import Count, Sum, F
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer,fact_signature,signature
+from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer,fact_signature,signature,commissionstages,fact_commission
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new,checkpermi
 
 
@@ -1984,9 +1984,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             sumtaxl += taxall
             totalall = totalp - sumtaxl
            
-            print(rs.ev_id)
-            print(event.ev_date_start)
-            print(event.ev_date_end)
+    
            
    
             r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':price_te}
@@ -2013,6 +2011,55 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     
     context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format,'signature':signa,'factsignature':factsignature,'mage':mage,'gm':gm}
     return render(request, 'print/register_print_witdrawa_one_lasted.html',context)
+
+
+
+
+
+
+@login_required(login_url='/login')
+def register_report_summary_details_com(request ,id, year, m):
+    obj = []
+    getdatauser = User.objects.get(pk=id)
+
+    month_select_now = request.POST.get('monthss', m)
+    
+    m_n = month_select_now
+    m_l = int(month_select_now) - 1
+    get_last_day = last_day_of_month(
+            datetime.date(int(year), int(m), 1))
+    last_day = get_last_day.day
+    default_start = str(year) + "-" + \
+        str(m_l) + "-" + "21"
+    default_end = str(year) + "-" + \
+        str(m_n) + "-" + "20"
+
+  
+    get_last_day_m = last_day_of_month(
+            datetime.date(int(year), m_l, 1))
+    last_day_m = get_last_day_m.day
+   
+    tis_group_l = f"21 - {last_day_m}"
+    tis_group_f = "1 - 20"
+
+    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id)
+    for rs in customer_order_counts:
+          
+        com = fact_commission.objects.get(commit_id=rs.com_id)
+        comstate = commissionstages.objects.get(stage_id=com.stage_id)
+        coursse = course.objects.get(course_id=rs.course_id)
+        paymets = register_payment.objects.get(register_id=rs.register_id)
+        evs = course_event.objects.get(ev_id=rs.ev_id)
+ 
+        
+        r = {'stage_name':comstate.stage_name,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs}
+           
+        obj.append(r)   
+   
+
+ 
+    context = {'title': defaultTitle, 'data': obj,'code':getdatauser,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year}
+    return render(request, 'print/register_print_witdrawa_one_lasted_com.html',context)
 
 
 @login_required(login_url='/login')

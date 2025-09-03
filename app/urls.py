@@ -222,6 +222,7 @@ urlpatterns = [
 
     path('report/withdraw/one/com', report_and_print.register_report_summary_sale_com_one), #ตั้งเบิกค่าคอม
     path('report/withdraw/all/withdraw/comm/one', report_and_print.register_report_summary_user_withdraw_com_one),
+    path('report/withdraw/all/summary/comm/<str:id>/<str:year>/<str:m>', report_and_print.register_report_summary_details_com),
 
     path('report/register/export/learning_status',
          report_and_print.register_report_learn_status),
