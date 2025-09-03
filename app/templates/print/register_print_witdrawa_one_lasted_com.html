@@ -174,9 +174,9 @@
           <td>{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}</td>
    
           <td>{{res.rp_doc_number}}</td>
-          <td>{{res.price|floatformat:2|intcomma }}</td>
+          <td>{{res.tis_com_before_tax|floatformat:2|intcomma }}</td>
           <td>{{res.tax|floatformat:2|intcomma }}</td>
-           <td colspan="1">{{res.totalall|floatformat:2|intcomma }}</td>
+           <td colspan="1">{{res.tis_com_after_tax|floatformat:2|intcomma }}</td>
 
         </tr>
        
@@ -187,9 +187,9 @@
           <td colspan="8">รวมเป็นค่าตอบแทน</td>
         
           <td></td>
-           <td>{{totalp|floatformat:2|intcomma }}</td>
-          <td>{{sumtax|floatformat:2|intcomma }}</td>
-          <td>{{totalall|floatformat:2|intcomma }}</td>
+           <td>{{price|floatformat:2|intcomma }}</td>
+          <td>{{tax_all|floatformat:2|intcomma }}</td>
+          <td>{{price_total|floatformat:2|intcomma }}</td>
         </tr>
         
 
