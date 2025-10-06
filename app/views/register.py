@@ -2266,7 +2266,7 @@ def update_close_the_event(request):
     payment = register_payment.objects.get(register_id=register_id)
     content = register_main.objects.get(pk=register_id)
     content.status = 'Y'
-    content.close_the_sale = 1
+    content.close_the_sale = 0
     content.orderstatus = 'FullPayment'
     content.save()
 
