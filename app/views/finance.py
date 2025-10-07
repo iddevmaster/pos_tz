@@ -1215,12 +1215,8 @@ def withdraw_list_one_com(request):
     
     obj = []
     for r in commit:
-        print(r.rpi_id)
-       
         content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
-       
         paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
-        
         stage = commissionstages.objects.get(stage_id=r.stage_id)
 
 
