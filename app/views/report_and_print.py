@@ -3896,7 +3896,7 @@ def register_report_summary_user_withdraw_com(request):
     
         getdatauser = User.objects.get(pk=item_id)
         code = getdatauser
-        name = getdatauser.first_name + '' + getdatauser.last_name
+        name = getdatauser.first_name + ' ' + getdatauser.last_name
    
         
         lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
