@@ -1235,7 +1235,6 @@ def withdraw_list_one_com(request):
         total = Decimal(after_vat_cal) * Decimal(getcom)
 
 
-        print(total)
        
         r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat,'after_vat_cal':after_vat_cal}
         obj.append(r)
@@ -1496,7 +1495,7 @@ def sendwithdrawcom(request):
         
         taxs = tax_setting.objects.get(tax_id=1)
         getdaybill = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
-        paymet = register_payment_items.objects.get(register_id=r.register_id)
+        paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
         
         stage = commissionstages.objects.get(stage_id=r.stage_id)
 
@@ -1514,7 +1513,7 @@ def sendwithdrawcom(request):
        
         total_result = total - taxaum
         ev_id = getdaybill.ev.ev_id
-        print(r)
+   
 
         com_id = r.commit_id
         active = 0
