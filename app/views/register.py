@@ -2064,9 +2064,9 @@ def register_management(request):
     # year_current = date.today().year
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
-
+    status = ['Y','I']
     content = register_main.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current,status='Y').exclude(register_number="-").order_by("-crt_date")
+        crt_date__month=month_current, crt_date__year=year_current,status__in=status).exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
         event = 'none'
@@ -2265,7 +2265,7 @@ def update_close_the_event(request):
    
     payment = register_payment.objects.get(register_id=register_id)
     content = register_main.objects.get(pk=register_id)
-    content.status = 'Y'
+    content.status = 'I'
     content.close_the_sale = 0
     content.orderstatus = 'FullPayment'
     content.save()
@@ -2407,6 +2407,51 @@ def approve_update_status(request):
     return redirect("/approve/update/payment")
 
 
+
+@login_required(login_url='/login')
+def approve_list_invoice_com(request):
+
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        obj = []
+    
+        # salesorder
+        billpa = register_payment.objects.select_related('register').filter(register__status='I',active=1,register__pay_type=2)
+       
+    
+        for r in billpa:  
+            
+            erv = event_register.objects.get(register=r.register.register_id)
+            
+            getsale = salesorder.objects.get(er_id=erv.er_id)
+            print(getsale)
+            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id}
+
+            obj.append(res)    
+           
+    except:
+        content = None
+        
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+
+    return render(request, 'register/approve_list_event_bill_credit.html',context)
+
 @login_required(login_url='/login')
 def approve_list_payment(request):
 
@@ -2491,6 +2536,49 @@ def approve_list_payment_accept(request,pk):
         return render(request, 'register/register_selller_report.html',context)
     else :
         return redirect("/approvebill/update/bill")
+    
+
+@login_required(login_url='/login')
+def approve_list_payment_accept_credit(request,pk):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
+
+    # try:
+    #     province_list = location_thai.objects.all().values(
+    #         'province_code', 'province_name').annotate(total=Count('province_code'))
+    # except location_thai.DoesNotExist:
+    #     province_list = None
+    
+    
+    
+    teacher_income = teacher_income_setting.objects.filter(id=pk,status='I').count()
+    income = teacher_income_setting.objects.filter(id=pk,status='I').first()
+    if teacher_income > 0:
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk,'pi':income.pi_id }
+        return render(request, 'register/register_selller_report.html',context)
+    else :
+        return redirect("/approvebill/update/bill")    
 
 # def upload_excel(request):
 #     if request.method == 'POST':
