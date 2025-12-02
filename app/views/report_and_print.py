@@ -1124,9 +1124,13 @@ def register_report_compensation_withdraw_onemore(request):
     obj = []
    
     teacher_one = teacher.objects.get(teacher_id=teac.teacher_id,cancelled=1)
+    teacherid = fact_teacher_user.objects.get(teacher_id=teac.teacher_id)
+    users = User.objects.get(id=teacherid.user_id)
+ 
+    
 
 
-    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'teacher_one':teacher_one,
+    context = {'title': defaultTitle, 'data': obj, 'list_user': result,'daterange': daterange,'teacher_one':teacher_one,'user':users,
                'listMenuPermission': objMenu}
     return render(request, 'report/billing_cycle_result_one.html', context)
 
@@ -3162,8 +3166,11 @@ def register_report_compensation_withdraw_onemorefitter(request):
         
             obj.append(r)
 
-          
-        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp,'user_id':user_id,'start_new':start_new,'end_new':end_new}
+      
+   
+        users = User.objects.get(id=user_id)
+        
+        context = {'title': defaultTitle, 'listMenuPermission': objMenu,'data':obj,'total_all':totalp,'user_id':user_id,'start_new':start_new,'end_new':end_new,'users':users}
     except fact_teacher_user.DoesNotExist:
         getteachid = None
         return redirect("/")
