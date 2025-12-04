@@ -588,7 +588,8 @@ def update_com(request):
     data = json.loads(request.body)
     commit_id = data.get("commit_id")
     user_id = data.get("user_id")
-    print(user_id)
+    type = data.get("type")
+    print(type)
     content = fact_commission.objects.get(commit_id=commit_id)
     content.user_id = user_id
     content.save()
