@@ -53,6 +53,9 @@ urlpatterns = [
 
     # Approve
     path('approve/update/payment', register.approve_list),
+    path('approve/invoice/com', register.approve_list_invoice_com),
+    path('approvebill/accept/invoice/<slug:pk>',
+         register.approve_list_payment_accept_credit  ,name='acceptbillcredit'),
     path('approve/update/set', register.approve_update_status,
          name="ApproveSetStatus"),
     path('approve/update/processevent', register.approve_lis_event_end),
@@ -104,6 +107,8 @@ urlpatterns = [
 
     path('calendar_event_api_totalbill/', course.calendar_event_api_totalbill),
 
+
+
     path('condition/management/', course.conditionlist),
     path('condition/management/<slug:conhead_id>', course.conditioncreate),
     path('condition/form/delete', course.condition_form_delete,
@@ -135,6 +140,7 @@ urlpatterns = [
     path('licenteachers/update/', teacher.teacher_formlicen_update,
          name="UpdateLic"),          
     path('approvlicen', teacher.teacher_list_appv),
+    
     path('approvlicen/form/delete', teacher.teacher_appv_delete,
          name="approvlicen_form_delete"),
     path('approvlicen/form/de', teacher.teacher_appv_de,

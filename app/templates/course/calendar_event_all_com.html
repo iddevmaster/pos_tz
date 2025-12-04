@@ -84,12 +84,27 @@
 
 
                      $selectElement.on('change', function() {
+
+                      const radioButtons = document.querySelectorAll('input[name="selectcom"]');
+
+  let selectedValueL = null;
+
+  // 2. วนลูปเพื่อตรวจสอบทีละตัว
+  radioButtons.forEach(radio => {
+    if (radio.checked) {
+      // เมื่อเจอตัวที่ถูกเลือก ให้เก็บค่าไว้ แล้วออกจากลูป
+      selectedValueL = radio.value;
+    }
+  });
+
+  console.log("ค่าที่เลือก:", selectedValueL);
                     
                        const selectedValue = $(this).val();
 
   const dataToSend = {
         commit_id: item.commit_id, // Assuming item.user_id is available in this scope
-        user_id: selectedValue
+        user_id: selectedValue,
+        type:selectedValueL
     };
 
             $.ajax({
@@ -98,7 +113,28 @@
         contentType: 'application/json',
         data: JSON.stringify(dataToSend),
         success: function(response) {
-            console.log('API update successful:', response);
+                let timerInterval;
+      Swal.fire({
+        title: "รอสักครู่",
+        html: "I will close in <b></b> milliseconds.",
+        timer: 500,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+   
+      });
+  $('#json-table-body-rate').empty(); // Clear previous cards
+              let com = findcommit(register_id,ev_id)
             // Optionally, show a success message to the user
         },
         error: function(xhr, status, error) {
@@ -401,6 +437,25 @@
         <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabelSeller"></h5>
       </div>
+  
+
+        <div class="modal-body">
+
+ <h5 class="modal-title" id="eventModalLabelSeller">ตัวเลือก</h5>
+        <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="selectcom" id="option1" value="group" checked>
+      <label class="form-check-label" for="option1">
+        รายกลุ่ม
+      </label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="selectcom" id="option2" value="option2Value">
+      <label class="form-check-label" for="option2">
+        รายบุคคล
+      </label>
+    </div>
+        </div>
+      
       <div class="modal-body">
 
         <input type="hidden" class="form-control" name="pi" id="pi" value="1" />

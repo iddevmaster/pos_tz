@@ -453,7 +453,8 @@ def data_bill_com(request):
 
       
  
-    content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1)
+    # content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1)
+    content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1,register__status='Y')
 
     for r in content:
         
@@ -588,15 +589,18 @@ def update_com(request):
     data = json.loads(request.body)
     commit_id = data.get("commit_id")
     user_id = data.get("user_id")
-    type = data.get("type")
-    print(type)
+    types = data.get("type")
     content = fact_commission.objects.get(commit_id=commit_id)
-    content.user_id = user_id
-    content.save()
-    obj = {'status':200}
- 
-   
-
+    if types == 'group':
+        content = fact_commission.objects.filter(rpi_id=content.rpi_id,status='N').update(
+            user_id=user_id
+        )
+        obj = {'status':200}
+    else :    
+        content = fact_commission.objects.get(commit_id=commit_id)
+        content.user_id = user_id
+        content.save()
+        obj = {'status':200}
     return JsonResponse(obj,safe=False)
 
 @csrf_exempt
