@@ -5,6 +5,8 @@
 <script>
 
   $(document).ready(function () {
+
+    
     // Initialize Select2
     $('#teacher').select2({
       dropdownParent: $('#select2Modal') // Ensures Select2 dropdown stays within modal
@@ -18,7 +20,50 @@
     });
   });
 
-  function setValueDeleteModal(register_id,ev_id,seller) {
+  
+
+  function save() {
+
+alert('ok');
+  }
+
+  function selectItemById(itemIdToSelect) {
+  // 1. รับ reference ของ select element
+  const selectElement = document.getElementById('item-select');
+
+  // 2. ตรวจสอบว่า select element มีอยู่จริงหรือไม่
+  if (!selectElement) {
+    console.error("ไม่พบ element ที่มี id='item-select'");
+    return;
+  }
+
+  // 3. กำหนดค่า .value ของ select element ให้เท่ากับ itemIdToSelect
+  //    (ค่านี้จะต้องตรงกับ value="..." ของ tag option)
+  selectElement.value = itemIdToSelect;
+  
+  // ตรวจสอบ:
+  console.log(`ตั้งค่า item-select เป็น ID: ${itemIdToSelect} สำเร็จ`);
+}
+
+
+    function setValueTypeComModal(register_id,rp_id,commit_head) {
+
+
+    const targetItemId = commit_head; // หรือ 5 หาก item.id เป็นตัวเลข
+    selectItemById(targetItemId);
+ 
+  $('#json-table-body-rate').empty(); 
+    document.getElementById("register_id").value = register_id;
+    document.getElementById('eventModalLabelSellerCom').innerText = 'เลือกประเภทการจ่ายค่าCom';
+    
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModalCom'));
+    eventModal.show();
+  
+    //  let com = findcommit(register_id,ev_id)
+  }
+
+
+  function setValueDeleteModal(register_id,ev_id,seller,rp_id) {
   $('#json-table-body-rate').empty(); // Clear previous cards
     document.getElementById("register_id").value = register_id;
     document.getElementById('eventModalLabelSeller').innerText = 'ผู้ประสานงาน : ' + seller;
@@ -26,10 +71,10 @@
     const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
     eventModal.show();
   
-     let com = findcommit(register_id,ev_id)
+     let com = findcommit(register_id,ev_id,rp_id)
   }
 
-    async function findcommit(register_id,ev_id) {
+    async function findcommit(register_id,ev_id,rp_id) {
 
 
     const table = document.getElementById('ttt');
@@ -45,7 +90,8 @@
         body: JSON.stringify({ // Convert your JavaScript object to a JSON string
           // Your data goes here
           register_id: register_id,
-          ev_id:ev_id
+          ev_id:ev_id,
+          rp_id:rp_id
         })
       });
       const data = await response.json();
@@ -85,26 +131,16 @@
 
                      $selectElement.on('change', function() {
 
-                      const radioButtons = document.querySelectorAll('input[name="selectcom"]');
+                    
 
-  let selectedValueL = null;
 
-  // 2. วนลูปเพื่อตรวจสอบทีละตัว
-  radioButtons.forEach(radio => {
-    if (radio.checked) {
-      // เมื่อเจอตัวที่ถูกเลือก ให้เก็บค่าไว้ แล้วออกจากลูป
-      selectedValueL = radio.value;
-    }
-  });
-
-  console.log("ค่าที่เลือก:", selectedValueL);
+ 
                     
                        const selectedValue = $(this).val();
 
   const dataToSend = {
         commit_id: item.commit_id, // Assuming item.user_id is available in this scope
-        user_id: selectedValue,
-        type:selectedValueL
+        user_id: selectedValue
     };
 
             $.ajax({
@@ -229,10 +265,20 @@
                     <td>${item.customer_type}</td>  
                     <td>${item.pay_type}</td>
                      <td>${item.seller}</td>
+
+                         <td>         <button
+                  type="button"
+                    onclick="setValueTypeComModal('${item.register_id}','${item.rp_id}','${item.commit_head}')"
+                  class="btn btn-warning"
+              
+                >
+                
+                 เลือก
+                </button></td> 
                       
                     <td>         <button
                   type="button"
-                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}','${item.seller}')"
+                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}','${item.seller}','${item.rp_id}')"
                   class="btn btn-danger"
               
                 >
@@ -280,6 +326,7 @@
 
       $('#cardContainer').empty(); // Clear previous cards
       document.getElementById('eventModalLabel').innerText = info.event.title;
+       document.getElementById('eventModalLabelCom').innerText = info.event.title;
 
       document.getElementById("ev_id").value = info.event.extendedProps.evs_id
 
@@ -408,6 +455,7 @@
             <th>ประเภทลูกค้า</th>
             <th>ประเภทการชำระเงิน</th>
             <th>ผู้ประสานงาน</th>
+              <th>ประเภทการจ่าย</th>
             <th>#</th>
           </tr>
         </thead>
@@ -418,6 +466,41 @@
     </div>
   </div>
 </section>
+
+<div class="modal fade" id="eventModalCom" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabelCom"></h5>
+     
+        <input type="hidden" name="ev_id" id="ev_id" required />
+ <input type="hidden" name="register_id" id="register_id" required />
+
+    
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+        <div class="modal-body">
+
+ <h5 class="modal-title" id="eventModalLabelSellerCom">ตัวเลือก</h5>
+<select id="item-select" name="selected_item_id">
+    <option value="0">-- เลือกรายการ --</option> 
+    
+    {% for item in commit %}
+        <option value="{{ item.id }}">
+            {{ item.name }}
+        </option>
+    {% endfor %}
+</select>
+        </div>
+      
+ 
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -439,30 +522,12 @@
       </div>
   
 
-        <div class="modal-body">
-
- <h5 class="modal-title" id="eventModalLabelSeller">ตัวเลือก</h5>
-        <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="selectcom" id="option1" value="group" checked>
-      <label class="form-check-label" for="option1">
-        รายกลุ่ม
-      </label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="selectcom" id="option2" value="option2Value">
-      <label class="form-check-label" for="option2">
-        รายบุคคล
-      </label>
-    </div>
-        </div>
+ 
       
       <div class="modal-body">
 
         <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
         <input type="hidden" name="teacher_id" id="teacher_id" required />
-
-
-
 
         <table class="table table-bordered table-striped">
           <thead>
