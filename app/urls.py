@@ -347,6 +347,9 @@ urlpatterns = [
     path('api/calendar_event_api_bill', desbill.data_bill),
     path('api/calendar_event_api_bill_com', desbill.data_bill_com),
 
+    path('api/billtypecommit', desbill.type_bill_com),
+
+
 
     path('api/calendar_event_api_billevent', desbill.data_bill_event),
     path('api/calendar_event_api_com', desbill.data_com),

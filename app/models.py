@@ -511,6 +511,7 @@ class commissionstages(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     seq = models.IntegerField(default=None, blank=False)
     types = models.CharField(max_length=1, blank=False)
+    com_head_id = models.IntegerField(default=None, blank=False) 
 
 
 class fact_commission(models.Model):
@@ -521,6 +522,7 @@ class fact_commission(models.Model):
     rpi_id = models.IntegerField(default=None, blank=False)  
     status = models.CharField(max_length=1, blank=False)
     types = models.CharField(max_length=1, blank=False)
+    com_head_id = models.IntegerField(default=None, blank=False) 
 
 class com_income_setting(models.Model):
     tis_com_before_tax = models.FloatField(default=0 , blank=False)

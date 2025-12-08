@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -499,6 +499,36 @@ def data_bill_com(request):
     return JsonResponse(obj,safe=False)
 
 
+
+
+
+@csrf_exempt
+def type_bill_com(request):
+ 
+    obj = []
+    data = json.loads(request.body)
+    register_id = data.get("register_id")
+    commit_headdaa= data.get("commit_head")
+    rps_id= data.get("rp_id")
+    print(rps_id)
+    content_approve = register_payment.objects.filter(register_id=register_id)
+    content_approve.update(commit_head=commit_headdaa)
+
+    last_entry = commissionstages.objects.filter(com_head_id=commit_headdaa)
+    for r in last_entry:
+        ontent = fact_commission(
+        register_id=register_id,
+        stage_id=r.stage_id,
+        rpi_id=rps_id,
+        status='N',
+        com_head_id=r.com_head_id,
+        )
+        ontent.save()
+ 
+
+    return JsonResponse(obj,safe=False)
+
+
 @csrf_exempt
 def data_bill_event(request):
     data = json.loads(request.body)
@@ -551,7 +581,7 @@ def data_com(request):
     print(bbbb.register_id)
 
     if bbbb.commit_head > 0:
-        print('if')
+        
         obj = []
         content = fact_commission.objects.filter(register_id=register_id,types='G').order_by("stage_id")
         for r in content:

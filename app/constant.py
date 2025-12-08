@@ -241,6 +241,12 @@ listMenu = [
         "group_label": "อนุมัติเอกสาร",
     },
     {
+        "value": "approve/invoice/com",
+        "label": "อนุมัติรายการค่าคอมเครดิต",
+        "group_value": "z2NIxi",
+        "group_label": "อนุมัติเอกสาร",
+    },
+    {
         "value": "finance/sale/commission",
         "label": "กำหนดรายการCommission",
         "group_value": "naSt0v",
