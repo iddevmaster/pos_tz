@@ -180,6 +180,7 @@ class register_payment(models.Model):
     user_create = models.IntegerField(default=0, blank=False)
     user_manage = models.IntegerField(default=0, blank=False)
     number_receipt = models.CharField(max_length=256, blank=True, default=None)
+    commit_head = models.IntegerField(default=0, blank=False)
 
     
 
@@ -459,7 +460,12 @@ class conhead(models.Model):
     name = models.CharField(max_length=20, unique=True, blank=True)
     is_active = models.CharField(max_length=20, unique=True, blank=True)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
-    
+
+class com_head(models.Model):
+    id = models.AutoField(primary_key=True) 
+    name = models.CharField(max_length=20, unique=True, blank=True)
+    is_active = models.CharField(max_length=20, unique=True, blank=True)
+
 class condition(models.Model):
     condition_id = models.AutoField(primary_key=True)
     student = models.IntegerField(default=0, blank=False)
@@ -504,6 +510,7 @@ class commissionstages(models.Model):
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     seq = models.IntegerField(default=None, blank=False)
+    types = models.CharField(max_length=1, blank=False)
 
 
 class fact_commission(models.Model):
@@ -513,6 +520,7 @@ class fact_commission(models.Model):
     user_id = models.IntegerField(default=None, blank=False)   
     rpi_id = models.IntegerField(default=None, blank=False)  
     status = models.CharField(max_length=1, blank=False)
+    types = models.CharField(max_length=1, blank=False)
 
 class com_income_setting(models.Model):
     tis_com_before_tax = models.FloatField(default=0 , blank=False)

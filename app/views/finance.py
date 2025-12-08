@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon,com_head
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -1184,7 +1184,9 @@ def withdraw_list_commission(request):
     listposition = pay_item.objects.filter(
             cancelled=1, active=1)
     list_teacher = teacher.objects.filter(cancelled=1, active=1)
-    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition}
+    commit = com_head.objects.filter(is_active=1)
+    
+    context = {'title': title,'listMenuPermission': objMenu,'teacher':list_teacher,'listposition':listposition,'commit':commit}
     return render(request, 'course/calendar_event_all_com.html', context)
 
 
