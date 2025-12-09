@@ -22,10 +22,53 @@
 
   
 
-  function save() {
+  async function save() {
   const selectElement = document.getElementById('item-select');
-  console.log(selectElement.value)
-alert('ok');
+  let reg =  document.getElementById("register_id").value;
+  const rps_id = document.getElementById("rp_id").value;
+
+const evss_id = document.getElementById("evss_id").value
+
+      try {
+        const response = await fetch('/api/billtypecommit', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          register_id:reg,
+          commit_head:selectElement.value,rp_id:rps_id
+        })
+      });
+
+
+
+        // Check if the request was successful (status code 200-299)
+        if (!response.ok) {
+            // If not successful, throw an error with the status
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const data = await response.json();
+
+        const existingModal = bootstrap.Modal.getInstance(document.getElementById('eventModalCom'));
+if (existingModal) {
+    existingModal.hide();
+}
+
+   let aaaa = findevid(evss_id)
+
+
+        return data; // Return the fetched data
+    } catch (error) {
+        console.error("Error fetching calendar events:", error);
+        // Handle the error appropriately, e.g., display an error message to the user
+        return null; // Or re-throw the error
+    }
+
   }
 
   function selectItemById(itemIdToSelect) {
@@ -55,11 +98,11 @@ alert('ok');
  
   $('#json-table-body-rate').empty(); 
     document.getElementById("register_id").value = register_id;
+    document.getElementById("rp_id").value = rp_id;
+  
     document.getElementById('eventModalLabelSellerCom').innerText = 'เลือกประเภทการจ่ายค่าCom';
-    
     const eventModal = new bootstrap.Modal(document.getElementById('eventModalCom'));
     eventModal.show();
-  
     //  let com = findcommit(register_id,ev_id)
   }
 
@@ -254,7 +297,8 @@ alert('ok');
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
-
+       
+        if(item.commit_head == 0){
         const row = document.createElement('tr');
 
              row.innerHTML = `
@@ -288,6 +332,35 @@ alert('ok');
                 </button></td>  
                 `;
         tableBody.appendChild(row);
+        }
+        if(item.commit_head !== 0){
+        const row = document.createElement('tr');
+
+             row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.register_number}</td>
+                     <td>${item.rp_doc_number}</td>
+                    <td> ${item.rpi_code} - ${item.rpi_name}</td>
+                    <td>${item.rp_name_customer}</td>
+                    <td>${item.customer_type}</td>  
+                    <td>${item.pay_type}</td>
+                     <td>${item.seller}</td>
+
+                         <td>        -</td> 
+                      
+                    <td>         <button
+                  type="button"
+                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}','${item.seller}','${item.rp_id}')"
+                  class="btn btn-danger"
+              
+                >
+                
+                 กำหนด
+                </button></td>  
+                `;
+        tableBody.appendChild(row);
+        }
+
       });
 
     } catch (error) {
@@ -356,6 +429,7 @@ alert('ok');
           console.log("I was closed by the timer");
         }
       });
+        document.getElementById("evss_id").value = info.event.extendedProps.evs_id
       let aaaa = findevid(info.event.extendedProps.evs_id)
 
     },
@@ -473,7 +547,9 @@ alert('ok');
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabelCom"></h5>
-     
+         <input type="text" name="evss_id" id="evss_id" required />
+             <input type="text" name="rp_id" id="rp_id" required />
+         
         <input type="hidden" name="ev_id" id="ev_id" required />
  <input type="hidden" name="register_id" id="register_id" required />
 
@@ -511,6 +587,8 @@ alert('ok');
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabel"></h5>
      
+
+        
         <input type="hidden" name="ev_id" id="ev_id" required />
  <input type="hidden" name="register_id" id="register_id" required />
 
