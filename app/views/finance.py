@@ -1797,7 +1797,8 @@ def payment_pay_deposit(request):
         upd_date=dateTimeNow(),
         register_id=register_id,
         user_create=user_id,
-        user_manage=user_man
+        user_manage=user_man,
+        commit_head=0
     )
     object.refresh_from_db()
   
@@ -1822,14 +1823,14 @@ def payment_pay_deposit(request):
 
     
         
-    com = commissionstages.objects.all()
-    for coms in com:
-        dtaf = fact_commission.objects.create( 
-        stage_id=coms.stage_id,
-        register_id=register_id,
-        rpi_id=object.rp_id,
-        status='N'
-    )   
+    # com = commissionstages.objects.all()
+    # for coms in com:
+    #     dtaf = fact_commission.objects.create( 
+    #     stage_id=coms.stage_id,
+    #     register_id=register_id,
+    #     rpi_id=object.rp_id,
+    #     status='N'
+    # )   
 
 
     messages.success(request, "ทำรายการสำเร็จ !")

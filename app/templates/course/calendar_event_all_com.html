@@ -85,8 +85,7 @@ if (existingModal) {
   //    (ค่านี้จะต้องตรงกับ value="..." ของ tag option)
   selectElement.value = itemIdToSelect;
   
-  // ตรวจสอบ:
-  console.log(`ตั้งค่า item-select เป็น ID: ${itemIdToSelect} สำเร็จ`);
+
 }
 
 
@@ -547,8 +546,8 @@ if (existingModal) {
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabelCom"></h5>
-         <input type="text" name="evss_id" id="evss_id" required />
-             <input type="text" name="rp_id" id="rp_id" required />
+         <input type="hidden" name="evss_id" id="evss_id" required />
+             <input type="hidden" name="rp_id" id="rp_id" required />
          
         <input type="hidden" name="ev_id" id="ev_id" required />
  <input type="hidden" name="register_id" id="register_id" required />

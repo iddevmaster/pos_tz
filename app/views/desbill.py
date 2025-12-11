@@ -510,7 +510,7 @@ def type_bill_com(request):
     register_id = data.get("register_id")
     commit_headdaa= data.get("commit_head")
     rps_id= data.get("rp_id")
-    print(rps_id)
+   
     content_approve = register_payment.objects.filter(register_id=register_id)
     content_approve.update(commit_head=commit_headdaa)
 
@@ -578,16 +578,16 @@ def data_com(request):
     data = json.loads(request.body)
     register_id = data.get("register_id")
     bbbb = register_payment.objects.get(register_id=register_id)
-    print(bbbb.register_id)
+
 
     if bbbb.commit_head > 0:
         
         obj = []
-        content = fact_commission.objects.filter(register_id=register_id,types='G').order_by("stage_id")
+        content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
         for r in content:
             print(r)
             s_name = 'ยังไม่ยืนยัน'
-            stages = commissionstages.objects.filter(stage_id=r.stage_id,types='G').first()
+            stages = commissionstages.objects.filter(stage_id=r.stage_id).first()
             print(stages)
             if r.status == 'Y':
                 s_name = 'ยืนยันแล้ว'

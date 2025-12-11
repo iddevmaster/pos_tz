@@ -116,7 +116,7 @@ def register_home(request):
     hundredDaysLater = _date + timedelta(days=365)
     obj = []
     
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2025, 6, 1), until=hundredDaysLater):
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2025, 12, 1), until=hundredDaysLater):
         
         _newdate = str(dt).split(" ")[0]
         yearstart = _newdate.split("-")[0]
@@ -864,7 +864,8 @@ def payment_create(request):
         upd_date=dateTimeNow(),
         register_id=register_id,
         user_create=user_id,
-        user_manage=user_man
+        user_manage=user_man,
+        commit_head=0
     )
     object.refresh_from_db()
     rp_id = object.rp_id
@@ -955,16 +956,16 @@ def payment_create(request):
         register_id=uuid_without_dashes,
         des_id=bill
     )    
-    if pay_type == 1:  
+    # if pay_type == 1:  
         
-        com = commissionstages.objects.all()
-        for coms in com:
-            dtaf = fact_commission.objects.create( 
-            stage_id=coms.stage_id,
-            register_id=uuid_without_dashes,
-            rpi_id=object.rp_id,
-            status='N'
-    )   
+    #     com = commissionstages.objects.all()
+    #     for coms in com:
+    #         dtaf = fact_commission.objects.create( 
+    #         stage_id=coms.stage_id,
+    #         register_id=uuid_without_dashes,
+    #         rpi_id=object.rp_id,
+    #         status='N'
+    # )   
 
 # commissionstages,fact_commission
 
@@ -1079,7 +1080,8 @@ def payment_createno(request):
         upd_date=dateTimeNow(),
         register_id=register_id,
         user_create=user_id,
-        user_manage=user_man
+        user_manage=user_man,
+        commit_head=0
     )
     object.refresh_from_db()
     rp_id = object.rp_id
@@ -2264,6 +2266,9 @@ def update_close_the_event(request):
     
    
     payment = register_payment.objects.get(register_id=register_id)
+    payment.active = 1
+    payment.save()
+
     content = register_main.objects.get(pk=register_id)
     content.status = 'Y'
     content.close_the_sale = 0
@@ -2275,14 +2280,14 @@ def update_close_the_event(request):
     contentev.save()
     uuid_without_dashes = str(register_id).replace('-', '')
 
-    com = commissionstages.objects.all()
-    for coms in com:
-        dtaf = fact_commission.objects.create( 
-        stage_id=coms.stage_id,
-        register_id=uuid_without_dashes,
-        rpi_id=payment.rp_id,
-        status='N'
-    )   
+    # com = commissionstages.objects.all()
+    # for coms in com:
+    #     dtaf = fact_commission.objects.create( 
+    #     stage_id=coms.stage_id,
+    #     register_id=uuid_without_dashes,
+    #     rpi_id=payment.rp_id,
+    #     status='N'
+    # )   
        
 
     savesal = salesorder.objects.create(
@@ -2299,9 +2304,13 @@ def update_close_the_event(request):
     checkev = event_register.objects.filter(ev_id=ev_id)
     all_passed = all(record.status == 'Y' for record in checkev)
     if all_passed:
+            # เช็ค ก่อนว่า Event มีการเปิดรึยัง
             content = course_event.objects.get(ev_id=ev_id)
-            content.status = 'Y'
-            content.save()
+            if content.status == 'N':
+                content.status = 'Y'
+                content.save()
+
+        
 
 
     # เช็ค ev นั้นว่า มีการ ยืนยันหมดรึยัง
