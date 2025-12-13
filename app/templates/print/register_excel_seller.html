@@ -171,7 +171,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="right">
         {{res.payment_list.rpi_price_result|floatformat:2|intcomma }}
       </td>
-      <td>{{res.customer_list.register.crt_date|date:"d/m/Y H:i"}}</td>
+      <td>{{res.payment_list.rp.crt_date|date:"d/m/Y H:i"}}</td>
       <td>{{res.payment_list.rp.rp_doc_number}}</td>
       <td>
         {% if res.customer_list.register.ev_id %}

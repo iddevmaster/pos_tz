@@ -425,6 +425,8 @@ def register_excel_seller(request):
     content = fact_customer.objects.select_related(
             "register","customer").filter(register__module=m.module)
     
+    
+    
     lastday = lastDateOfmonth(
         date.today().year,  date.today().month, date.today().day)
     default_start = str(date.today().year) + "-" + \
@@ -436,8 +438,7 @@ def register_excel_seller(request):
     if date_range is not None:
         start, end = format_daterange(date_range)
         if start == end:
-            content = content.filter(
-                register__crt_date__date=start)
+            content = content.filter(register__crt_date__date=start)
         else:
             content = content.filter(
                 register__crt_date__date__gte=start, register__crt_date__date__lte=end)
@@ -3250,16 +3251,16 @@ def register_excel_bill(request):
         
     if date_range is not None:
         start, end = format_daterange(date_range)
+
         if start == end:
-            content = content.filter(
-                register__crt_date__date=start)
+           
+            content = content.filter(crt_date__date=start)
         else:
-            content = content.filter(
-                register__crt_date__date__gte=start, register__crt_date__date__lte=end)
+            content = content.filter(crt_date__date__gte=start,crt_date__date__lte=end)
         range_param = date_range
+
     else:
-        content = content.filter(
-            register__crt_date__date__gte=default_start, register__crt_date__date__lte=default_end)
+        content = content.filter(crt_date__date__gte=default_start,crt_date__date__lte=default_end)
         range_param = str(ymdtodmy(default_start)) + \
             " - " + str(ymdtodmy(default_end))
 
