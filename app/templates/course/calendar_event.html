@@ -456,8 +456,10 @@
       const data = await response.json();
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
+      let money = 0; // ประกาศตัวแปรเริ่มต้น
+      
       data.forEach((item, index) => {
-
+        money = money + item.tis_sum;
         if (item.tis_unit == 'day') {
           var dt = 'วัน'
         }
@@ -517,6 +519,19 @@
 
         tableBody.appendChild(row);
       });
+
+
+      // 2. การนำค่าไปแสดงผลใน HTML
+// รับ Element ที่มี id เป็น "result"
+const resultElement = document.getElementById("result");
+
+// ตรวจสอบว่าหา Element เจอหรือไม่
+if (resultElement) {
+  // นำค่าของ money ไปใส่เป็นเนื้อหา (textContent) ของ Element
+  resultElement.textContent = `รวมทั้งหมด: ${money}`;
+} else {
+  console.error("ไม่พบ Element ที่มี id='result' บนหน้าเว็บ");
+}
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -1419,10 +1434,23 @@
             </tr>
           </thead>
           <tbody id="json-table-body"></tbody>
+
+          <tfoot>
+    <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+      <td></td>
+      <td id="result"></td>
+    </tr>
+  </tfoot>
+          
         </table>
+
+              
       </div>
       <div class="modal-footer">
-
         <button type="button" class="btn btn-primary" onclick="save()">บันทึก</button>
       </div>
     </div>
