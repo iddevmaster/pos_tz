@@ -2068,7 +2068,7 @@ def register_management(request):
     year_current = request.GET.get('qyear', date.today().year)
     statuss = ['Y','I']
     content = register_main.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current,status=statuss).exclude(register_number="-").order_by("-crt_date")
+        crt_date__month=month_current, crt_date__year=year_current,status__in=statuss).exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
         event = 'none'
