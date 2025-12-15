@@ -521,7 +521,6 @@ class fact_commission(models.Model):
     user_id = models.IntegerField(default=None, blank=False)   
     rpi_id = models.IntegerField(default=None, blank=False)  
     status = models.CharField(max_length=1, blank=False)
-    types = models.CharField(max_length=1, blank=False)
     com_head_id = models.IntegerField(default=None, blank=False) 
 
 class com_income_setting(models.Model):

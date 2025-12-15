@@ -139,13 +139,13 @@ listMenu = [
 
     {
         "value": "calendar_event",
-        "label": "ปฏิทินหลักสูตรอบรม ผอ",
+        "label": "ปฏิทิน จองครอส ผอ",
         "group_value": "pRem5",
         "group_label": "หลักสูตร",
     },
        {
         "value": "calendar_event_staff",
-        "label": "ปฏิทินหลักสูตรอบรม ผู้จัดการ",
+        "label": "ปฏิทิน จองครอส ผู้จัดการ",
         "group_value": "pRem5",
         "group_label": "หลักสูตร",
     },
