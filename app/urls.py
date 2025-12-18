@@ -54,6 +54,8 @@ urlpatterns = [
     # Approve
     path('approve/update/payment', register.approve_list),
     path('approve/invoice/com', register.approve_list_invoice_com),
+    path('approvebill/invoice/rv/',
+         register.approve_list_payment_accept_invoice  ,name='acceptbillcreditinvoice'),
     path('approvebill/accept/invoice/<slug:pk>',
          register.approve_list_payment_accept_credit  ,name='acceptbillcredit'),
     path('approve/update/set', register.approve_update_status,

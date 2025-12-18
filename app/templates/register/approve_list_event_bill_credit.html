@@ -200,13 +200,13 @@
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title white" id="myModalLabel160">
-          ปรับยอดเงิน
+          กำหนด
         </h5>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <i data-feather="x"></i>
         </button>
       </div>
-      <form action="{% url 'UpdateCloseEndTheEventAll' %}" method="post" autocomplete="off"
+      <form action="{% url 'acceptbillcreditinvoice' %}" method="post" autocomplete="off"
         enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -217,10 +217,18 @@
 
 
           <div class="form-group">
-            <label>ยอดเงิน</label>
+            <label>Invoice</label>
             <label style="color: red">*</label>
-            <input type="text" id="tis_sum_update" name="tis_sum" class="form-control"
-              onkeydown="allowOnlyNumbers(event)" />
+            <input type="text" id="invoice" name="invoice" class="form-control"
+              required />
+          </div>
+
+
+             <div class="form-group">
+            <label>RV</label>
+            <label style="color: red">*</label>
+            <input type="text" id="rv" name="rv" class="form-control"
+              required/>
           </div>
 
 

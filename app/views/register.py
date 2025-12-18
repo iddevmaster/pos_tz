@@ -2396,8 +2396,8 @@ def approve_list_invoice_com(request):
             erv = event_register.objects.get(register=r.register.register_id)
             
             getsale = salesorder.objects.get(er_id=erv.er_id)
-            print(getsale)
-            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id}
+            
+            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'er_id':erv.er_id}
 
             obj.append(res)    
            
@@ -2449,7 +2449,41 @@ def approve_list_payment_accept_credit(request,pk):
         context = {'title': defaultTitle, 'listMenuPermission': objMenu,'ev_id':pk,'pi':income.pi_id }
         return render(request, 'register/register_selller_report.html',context)
     else :
-        return redirect("/approvebill/update/bill")    
+        return redirect("/approve/invoice/com")    
+    
+
+@login_required(login_url='/login')
+def approve_list_payment_accept_invoice(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
+
+    print('xxx')
+    
+
+   
+    return redirect("/approve/invoice/com")    
+  
 
 
 @login_required(login_url='/login')
