@@ -395,6 +395,8 @@ class salesorder(models.Model):
     po = models.CharField(max_length=64, blank=True, default=None)
     sq = models.CharField(max_length=64, blank=True, default=None)
     so = models.CharField(max_length=64, blank=True, default=None)
+    invoice = models.CharField(max_length=128, blank=True, default=None)
+    rv = models.CharField(max_length=128, blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     img = models.ImageField(
