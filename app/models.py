@@ -401,6 +401,8 @@ class salesorder(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
     img = models.ImageField(
         upload_to=generate_unique_name('images/sales'), default=None)
+    status = models.CharField(max_length=128, blank=True, default=None)
+    
 
 class desciption_bill(models.Model):
     des_id = models.AutoField(primary_key=True)

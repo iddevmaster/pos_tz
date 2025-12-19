@@ -1,5 +1,15 @@
 {% extends 'base.html' %} {% block content %} {% load humanize static %}
 <script>
+
+
+
+
+  function MyMo(x) {
+
+
+    document.getElementById("sale_id").value = x;
+  }
+
   function goToDetail(slug, pk) {
 
     const url = `/${slug}/${pk}`;
@@ -144,6 +154,7 @@
             <th>SO</th>
             <th>Invoice</th>
             <th>RV</th>
+            <th>สถานะ</th>
             <th>#</th>
           </tr>
         </thead>
@@ -159,17 +170,42 @@
             <td>{{res.sq}}</td>
             <td>{{res.so}}</td>
 
-            <td>-</td>
-            <td>-</td>
+            <td>
+              {% if res.status == 'Y' %}
+              {{res.invoice}}
+              {% else %}
+              -
+              {% endif %}
+            </td>
 
+            <td>
+              {% if res.status == 'Y' %}
+              {{res.rv}}
+              {% else %}
+              -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if res.status == 'Y' %}
+              <span class="badge bg-info">เสร็จสิ้น</span>
+              {% else %}
+              <span class="badge bg-danger">ยังไม่ยืน</span>
+              {% endif %}
+            </td>
 
             <td>
 
+
+              {% if res.status == 'Y' %}
+              -
+              {% else %}
               <div class="btn-group me-1 mb-1">
                 <div class="dropdown">
-            
-                  <button class="btn btn-success btn-sm" type="button" id="dropdownMenuButtonIcon" data-bs-toggle="modal"
-                    data-bs-target="#UpdateClick1">
+
+                  <button class="btn btn-success btn-sm" type="button" id="dropdownMenuButtonIcon"
+                    data-bs-toggle="modal" data-bs-target="#UpdateClick1" data-id="{{res.er_id}}"
+                    onclick="MyMo('{{res.sale_id}}')">
                     Accept
                   </button>
 
@@ -181,6 +217,12 @@
 
                 </div>
               </div>
+
+
+              {% endif %}
+
+
+
 
 
 
@@ -206,12 +248,11 @@
           <i data-feather="x"></i>
         </button>
       </div>
-      <form action="{% url 'acceptbillcreditinvoice' %}" method="post" autocomplete="off"
-        enctype="multipart/form-data">
+      <form action="{% url 'acceptbillcreditinvoice' %}" method="post" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
 
 
-        <input type="hidden" id="id_update" name="id" required />
+        <input type="text" id="sale_id" name="sale_id" required />
 
         <div class="modal-body">
 
@@ -219,16 +260,14 @@
           <div class="form-group">
             <label>Invoice</label>
             <label style="color: red">*</label>
-            <input type="text" id="invoice" name="invoice" class="form-control"
-              required />
+            <input type="text" id="invoice" name="invoice" class="form-control" required />
           </div>
 
 
-             <div class="form-group">
+          <div class="form-group">
             <label>RV</label>
             <label style="color: red">*</label>
-            <input type="text" id="rv" name="rv" class="form-control"
-              required/>
+            <input type="text" id="rv" name="rv" class="form-control" required />
           </div>
 
 

@@ -2134,11 +2134,12 @@ def approve_lis_event(request):
     year_current = request.GET.get('qyear', date.today().year)
 
    
-    content = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2).order_by('-ev_id')
+    content = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2).order_by('-ev_id')[:30]
 
     obj = []
     if content:
      for r in content:
+     
    
         cus = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
@@ -2388,7 +2389,7 @@ def approve_list_invoice_com(request):
         obj = []
     
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__status='I',active=1,register__pay_type=2)
+        billpa = register_payment.objects.select_related('register').filter(register__status='I',active=1,register__pay_type=2)[:30]
        
     
         for r in billpa:  
@@ -2397,7 +2398,7 @@ def approve_list_invoice_com(request):
             
             getsale = salesorder.objects.get(er_id=erv.er_id)
             
-            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'er_id':erv.er_id}
+            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status}
 
             obj.append(res)    
            
@@ -2478,7 +2479,19 @@ def approve_list_payment_accept_invoice(request):
     
     list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
 
-    print('xxx')
+    invoice = request.POST['invoice']
+    rv = request.POST['rv']
+    sale_id = request.POST['sale_id']
+
+
+
+
+    content = salesorder.objects.get(pk=sale_id)
+    
+    content.invoice = invoice
+    content.rv = rv
+    content.status = 'Y'
+    content.save()
     
 
    
