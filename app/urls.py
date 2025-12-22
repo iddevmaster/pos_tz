@@ -279,6 +279,11 @@ urlpatterns = [
     path('finance/sale/commission', finance.withdraw_list_commission),
     path('finance/sale/com', finance.withdraw_list_one_com),
 
+    path('finance/billing/cancelbill', finance.listbill),
+    path('finance/billing/sendcancelbill', finance.cancellistbill, name="Cancelbill"
+    ),
+    
+
     path('finance/overduepayment', finance.withdraw_list_overduepayment),
     path('finance/overduepayment/<slug:register_id>', finance.withdraw_list_overduepayment_details),
     path('finance/pay/<slug:register_id>', finance.withdraw_list_pay),

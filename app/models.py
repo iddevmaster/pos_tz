@@ -181,9 +181,9 @@ class register_payment(models.Model):
     user_manage = models.IntegerField(default=0, blank=False)
     number_receipt = models.CharField(max_length=256, blank=True, default=None)
     commit_head = models.IntegerField(default=0, blank=False)
+    status_bill = models.CharField(max_length=256, blank=True, default=None)
 
     
-
 
 class register_payment_items(models.Model):
     rpi_id = models.AutoField(primary_key=True)
@@ -225,7 +225,10 @@ class customers(models.Model):
 class fact_customer(models.Model):
     fact_cus_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(customers, on_delete=models.CASCADE)  
-    register = models.ForeignKey(register_main, on_delete=models.CASCADE)    
+    register = models.ForeignKey(register_main, on_delete=models.CASCADE) 
+    status_bill = models.CharField(
+        max_length=512, blank=True, default=None)
+       
 
 # status 1 = อนุมัติ , 2 = ไม่อนุมัติ
 # doc_type 1 =  อนุมัติเพื่อแก้ไขใบเสร็จ / ใบเสนอราคา

@@ -1696,6 +1696,59 @@ def withdraw_list_pay(request, register_id):
 
 
 
+def listbill(request):
+   
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+        
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+        title = defaultTitle
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    
+     
+    rp_doc_numberd = request.GET.get('rp_doc_number')
+
+    content = register_payment.objects.select_related(
+        'register').filter(rp_doc_number=rp_doc_numberd)
+    for rs in content:
+        print(rs.register.ev_id)
+
+    
+    context = {'title': title, 'listMenuPermission': objMenu,'data':content}
+    return render(request, 'finance/billing_cycle_cancel.html', context)
+
+
+
+def cancellistbill(request):
+    
+    rp_ids = request.POST['rp_id']
+    ucon = register_payment.objects.get(rp_id=rp_ids,status='Y')
+    ucon.status = 'C'
+    ucon.save()
+    print(rp_ids)
+        
+
+    return redirect("/finance/billing/cancelbill")
+   
+
 def payment_pay_deposit(request):
     
     now = date.today()
