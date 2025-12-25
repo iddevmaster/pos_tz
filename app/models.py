@@ -547,4 +547,5 @@ class com_income_setting(models.Model):
     com_id = models.IntegerField(blank=True, default=None)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
     user_id = models.IntegerField(default=None, blank=False)
+    status_pay = models.CharField(max_length=15, blank=False)
     

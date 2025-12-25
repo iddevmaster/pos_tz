@@ -2050,17 +2050,17 @@ def register_report_summary_details_com(request ,id, year, m):
     mage = signature.objects.filter(image_id=3).first()
     gm = signature.objects.filter(image_id=5).first()
 
-    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id)
+    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id,status_pay='W')
     tax = 0
     tax_all = 0
     price = 0
     price_total = 0
     for rs in customer_order_counts:
-          
+        print(rs.register_id)
         com = fact_commission.objects.get(commit_id=rs.com_id)
         comstate = commissionstages.objects.get(stage_id=com.stage_id)
         coursse = course.objects.get(course_id=rs.course_id)
-        paymets = register_payment.objects.get(register_id=rs.register_id)
+        paymets = register_payment.objects.filter(register_id=rs.register_id,status_bill='Y').first()
         evs = course_event.objects.get(ev_id=rs.ev_id)
  
         price += rs.tis_com_before_tax
@@ -4063,13 +4063,13 @@ def register_report_summary_user_withdraw_com_overdue(request):
             datetime.date(int(year_current), int(day_current_m), 1))
     last_day = get_last_day.day
 
+    print(day_current_m)
 
-    
 
     content = com_income_setting.objects.filter(status='S',active=0,tis_start_date__day__gte=start,
                 tis_start_date__day__lte=last_day,
                 tis_start_date__month=day_current_m,
-                tis_start_date__year=year_current)
+                tis_start_date__year=year_current,status_pay='W')
     
     requirements = 'ไม่มี'
     name_con = '-'
@@ -4079,12 +4079,10 @@ def register_report_summary_user_withdraw_com_overdue(request):
     for rs in content:
             
     
-        
-            
             sumtax += rs.tis_com_before_tax - rs.tis_com_after_tax
-           
-           
-            r = {'user_id':rs.user_id,'totalp':rs.tis_com_before_tax,'sumtax':sumtax}
+            
+         
+            r = {'user_id':rs.user_id,'totalp':rs.tis_com_before_tax,'sumtax':rs.tis_com_before_tax - rs.tis_com_after_tax}
           
             obj.append(r)   
 
@@ -4097,6 +4095,7 @@ def register_report_summary_user_withdraw_com_overdue(request):
             name = getdatauser.first_name + ' ' + getdatauser.last_name
             qty = item["totalp"]
             ta = item["sumtax"]
+           
             total = item["totalp"] -item["sumtax"]
             aaaa = total
             if item_id not in result_dict:
