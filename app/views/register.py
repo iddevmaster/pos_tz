@@ -2276,6 +2276,11 @@ def update_close_the_event(request):
     content.orderstatus = 'FullPayment'
     content.save()
 
+
+    contentfact = fact_customer.objects.get(register_id=register_id)
+    contentfact.status_bill = 'Y'
+    contentfact.save()
+
     contentev = event_register.objects.get(register_id=register_id)
     contentev.status = 'Y'
     contentev.save()
@@ -2389,13 +2394,10 @@ def approve_list_invoice_com(request):
         obj = []
     
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__status='I',active=1,register__pay_type=2)[:30]
-       
-    
-        for r in billpa:  
-            
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale=1,register__pay_type=2).order_by("-crt_date")[:30]
+        for r in billpa:       
             erv = event_register.objects.get(register=r.register.register_id)
-            
+        
             getsale = salesorder.objects.get(er_id=erv.er_id)
             
             res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status}
@@ -2492,6 +2494,13 @@ def approve_list_payment_accept_invoice(request):
     content.rv = rv
     content.status = 'Y'
     content.save()
+
+    get_event_re = event_register.objects.get(er_id=content.er.er_id)
+    get_event_re.register
+
+    get_payments = register_payment.objects.get(register_id=get_event_re.register)
+    get_payments.status_bill = 'Y'
+    get_payments.save()
     
 
    

@@ -1740,12 +1740,20 @@ def listbill(request):
 def cancellistbill(request):
     
     rp_ids = request.POST['rp_id']
-    ucon = register_payment.objects.get(rp_id=rp_ids,status='Y')
-    ucon.status = 'C'
+    ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+    ucon.status_bill = 'C'
     ucon.save()
-    print(rp_ids)
-        
+    uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
 
+    com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
+    
+    for rs in com:
+        
+        coms = com_income_setting.objects.get(com_id=rs.com_id)
+        coms.status = 'C'
+        coms.save()
+
+    
     return redirect("/finance/billing/cancelbill")
    
 
