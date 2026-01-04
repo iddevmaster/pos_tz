@@ -771,7 +771,7 @@ def payment_create(request):
         request.POST.get("rp_date_delivery", now.strftime("%d/%m/%Y")))
     uuid_without_dashes = str(register_id).replace('-', '')
     factbilldes.objects.filter(register_id=uuid_without_dashes).delete()  # Keeps the record with id=1
-    
+    status_bills = ''
     user_man = request.POST.get('user_manage')  # ใช้ .get() เพื่อตรวจสอบ
     if not user_man:  # ตรวจสอบว่าคีย์ 'name' ไม่มีค่า
         user_man = 0
@@ -826,6 +826,8 @@ def payment_create(request):
         instecent.status = 'Y'
         instecent.orderstatus = type_payment
         instecent.save()
+
+        status_bills = 'Y'
        
     if pay_type == 2:
         instecent = register_main.objects.get(register_id=register_id)
@@ -865,6 +867,7 @@ def payment_create(request):
         register_id=register_id,
         user_create=user_id,
         user_manage=user_man,
+        status_bill=status_bills,
         commit_head=0
     )
     object.refresh_from_db()
