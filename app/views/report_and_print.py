@@ -4075,8 +4075,14 @@ def register_report_summary_user_withdraw_com_one(request):
 def register_report_summary_user_withdraw_com_overdue(request):
 
    
-    day_current_m = request.POST.get('monthss', date.today().month - 1)
-    year_current = request.GET.get('qyear', date.today().year)
+    day_current_m = request.POST.get('monthss', date.today().month)
+    year_current = request.POST.get('qyear', date.today().year)
+    
+
+
+    m_l = get_previous_month(int(day_current_m),int(year_current))
+    yearxx = get_previous_year(int(day_current_m),int(year_current))
+
 
     start = None
     end = None
@@ -4090,16 +4096,15 @@ def register_report_summary_user_withdraw_com_overdue(request):
     bill = billing_cycle_setting.objects.get(id=2)
     start = bill.bcs_start_day
     get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(day_current_m), 1))
+            datetime.date(int(yearxx), int(m_l), 1))
     last_day = get_last_day.day
 
-    print(day_current_m)
-
-
+  
     content = com_income_setting.objects.filter(status='S',active=0,tis_start_date__day__gte=start,
                 tis_start_date__day__lte=last_day,
-                tis_start_date__month=day_current_m,
-                tis_start_date__year=year_current,status_pay='W')
+                tis_start_date__month=m_l,
+                tis_start_date__year=yearxx)
+    
     
     requirements = 'ไม่มี'
     name_con = '-'
@@ -4139,7 +4144,7 @@ def register_report_summary_user_withdraw_com_overdue(request):
     totalall = totalp - sumtax
       
 
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(day_current_m),'year_current':year_current,'m':day_current_m}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(m_l),'year_current':yearxx,'m':m_l}
   
     return render(request, 'print/report_withdraw_summary_overdue_com.html', context)    
 
