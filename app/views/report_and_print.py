@@ -3857,13 +3857,16 @@ def register_report_summary_user_withdraw_com(request):
     
  
     m_n = month_select_now
-    m_l = int(month_select_now) - 1
+ 
  
     day_same_m = request.POST.get('monthss', date.today().month)
+   
  
     day_current_m = request.POST.get('monthss', date.today().month - 1)
 
-    year_current = request.GET.get('qyear', date.today().year)
+    year_current = request.POST.get('qyear', date.today().year)
+    m_l = get_previous_month(int(day_same_m),int(year_current))
+    yearxx = get_previous_year(int(day_same_m),int(year_current))
     
     start = None
     end = None
@@ -3874,11 +3877,11 @@ def register_report_summary_user_withdraw_com(request):
     
 
     get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(day_current_m), 1))
+            datetime.date(int(yearxx), int(m_l), 1))
     last_day = get_last_day.day
-    default_start = str(date.today().year) + "-" + \
+    default_start = str(yearxx) + "-" + \
         str(m_l) + "-" + "21"
-    default_end = str(date.today().year) + "-" + \
+    default_end = str(year_current) + "-" + \
         str(m_n) + "-" + "20"
     
 
@@ -3888,7 +3891,6 @@ def register_report_summary_user_withdraw_com(request):
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
-    
 
 
     day_current_day = date.today().day
@@ -3916,7 +3918,7 @@ def register_report_summary_user_withdraw_com(request):
    
         
         lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
-  
+        
         price = 0
         totalp = 0
         totalp_f = 0
@@ -3943,7 +3945,7 @@ def register_report_summary_user_withdraw_com(request):
                 result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
             
     result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f,'yearold':yearxx}
   
     return render(request, 'print/report_withdraw_summary_commission.html', context)   
 
