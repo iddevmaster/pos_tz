@@ -195,6 +195,7 @@ def chek_image_from_request(requestFile):
 
 def month_fomat(value):
     month_set = int(value)
+
     if month_set == 1:
         f = "มกราคม"
     elif month_set == 2:
@@ -220,6 +221,26 @@ def month_fomat(value):
     elif month_set == 12:
         f = "ธันวาคม"
     return f
+
+
+def get_previous_month(month, year):
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        
+    return prev_month
+
+
+def get_previous_year(month, year):
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+    return prev_year
 
 
 def treeDigit(value):
