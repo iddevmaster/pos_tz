@@ -2030,33 +2030,41 @@ def register_report_summary_details_com(request ,id, year, m):
     month_select_now = request.POST.get('monthss', m)
     
     m_n = month_select_now
-    m_l = int(month_select_now) - 1
+    m_l = get_previous_month(int(m),int(year))
+    yearxx = get_previous_year(int(m),int(year))
     get_last_day = last_day_of_month(
-            datetime.date(int(year), int(m), 1))
+            datetime.date(int(yearxx), int(m_l), 1))
+    
+    
     last_day = get_last_day.day
-    default_start = str(year) + "-" + \
+    default_start = str(yearxx) + "-" + \
         str(m_l) + "-" + "21"
     default_end = str(year) + "-" + \
         str(m_n) + "-" + "20"
+    
 
     today = datetime.date.today()
     get_last_day_m = last_day_of_month(
-            datetime.date(int(year), m_l, 1))
+            datetime.date(int(yearxx), m_l, 1))
     last_day_m = get_last_day_m.day
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
-
+    
     mage = signature.objects.filter(image_id=3).first()
     gm = signature.objects.filter(image_id=5).first()
 
-    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id,status_pay='W')
+
+
+    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id,active=0)
+   
     tax = 0
     tax_all = 0
     price = 0
     price_total = 0
+    
     for rs in customer_order_counts:
-        print(rs.register_id)
+       
         com = fact_commission.objects.get(commit_id=rs.com_id)
         comstate = commissionstages.objects.get(stage_id=com.stage_id)
         coursse = course.objects.get(course_id=rs.course_id)
@@ -2072,7 +2080,7 @@ def register_report_summary_details_com(request ,id, year, m):
         obj.append(r)   
    
 
-    context = {'title': defaultTitle, 'data': obj,'code':getdatauser,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'price':price,'price_total':price_total,'tax_all':tax_all,'mage':mage,'gm':gm,'today':today}
+    context = {'title': defaultTitle, 'data': obj,'code':getdatauser,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'price':price,'price_total':price_total,'tax_all':tax_all,'mage':mage,'gm':gm,'today':today,'yearold':yearxx}
     return render(request, 'print/register_print_witdrawa_one_lasted_com.html',context)
 
 
@@ -3984,7 +3992,8 @@ def register_report_summary_user_withdraw_com_one(request):
     default_end = str(year_current) + "-" + \
         str(m_n) + "-" + "20"
     
-
+    print(default_start)
+    print(default_end)
 
     get_last_day_m = last_day_of_month(
             datetime.date(int(year_current), m_l, 1))
