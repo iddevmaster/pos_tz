@@ -3981,15 +3981,16 @@ def register_report_summary_user_withdraw_com_one(request):
 
     default_start = str(yearxx) + "-" + \
         str(m_l) + "-" + "21"
-    default_end = str(date.today().year) + "-" + \
+    default_end = str(year_current) + "-" + \
         str(m_n) + "-" + "20"
     
-    print(default_start)
-    print(default_end)
+
 
     get_last_day_m = last_day_of_month(
             datetime.date(int(year_current), m_l, 1))
     last_day_m = get_last_day_m.day
+
+  
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
@@ -4012,41 +4013,47 @@ def register_report_summary_user_withdraw_com_one(request):
     totalall = 0
 
    
-    for customer_order in customer_order_counts:
-        item_id = customer_order['user_id']
-    
-        getdatauser = User.objects.get(pk=item_id)
-        code = getdatauser
-        name = getdatauser.first_name + '' + getdatauser.last_name
-   
-        
-        lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
-  
-        price = 0
-        totalp = 0
-        totalp_f = 0
-        sumtaxall = 0
-        sumtaxl = 0
-        sumtaxf = 0
-        totalall = 0
-        for rs in lassssst:
-            totalp += rs.tis_com_before_tax
-            sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
-          
-        first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
 
-        for rsf in first:
+        
+    getdatauser = User.objects.get(pk=user_id)
+    code = getdatauser
+    name = getdatauser.first_name + '' + getdatauser.last_name
+   
+     
+    lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=user_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+        
+    
+    price = 0
+    totalp = 0
+    totalp_f = 0
+    sumtaxall = 0
+    sumtaxl = 0
+    sumtaxf = 0
+    totalall = 0
+    for rs in lassssst:
+          
+            
+            totalp += rs.tis_com_before_tax
+
+            sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
+
+
+          
+    first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=user_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+    
+    for rsf in first:
+     
+     
+        totalp_f += rsf.tis_com_before_tax
+        sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
            
-           totalp_f += rsf.tis_com_before_tax
-           sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
-           
-        if item_id not in result_dict:
+    if user_id not in result_dict:
                 aa = totalp_f + totalp
                 sumtaxall = sumtaxl + sumtaxf
                 
                 totalall = aa - sumtaxall
-                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
-            
+                result_dict[user_id] = {"Id": user_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
+    print('test')        
     result_list = list(result_dict.values())
     context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f,'yearold':yearxx}
   
