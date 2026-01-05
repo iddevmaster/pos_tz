@@ -1830,34 +1830,42 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     month_select_now = request.POST.get('monthss', m)
     
     m_n = month_select_now
-    m_l = int(month_select_now) - 1
+    m_l = get_previous_month(int(m),int(year))
+    yearxx = get_previous_year(int(m),int(year))
 
 
     obj = []
 
     get_last_day = last_day_of_month(
-            datetime.date(int(year), int(m), 1))
+            datetime.date(int(yearxx), int(m), 1))
     last_day = get_last_day.day
-    default_start = str(year) + "-" + \
+    default_start = str(yearxx) + "-" + \
         str(m_l) + "-" + "21"
-    default_end = str(year) + "-" + \
+    default_end = str((year) ) + "-" + \
         str(m_n) + "-" + "20"
+    
+    
     
   
     get_last_day_m = last_day_of_month(
-            datetime.date(int(year), m_l, 1))
+            datetime.date(int(yearxx), m_l, 1))
     last_day_m = get_last_day_m.day
    
     tis_group_l = f"21 - {last_day_m}"
     tis_group_f = "1 - 20"
 
 
+  
+
+
     day_current_day = date.today().day
     today = datetime.date.today()
     us_format = today.strftime("%d/%m/%Y")
 
-    
+    print(default_start)
+    print(default_end)
     customer_order_counts = teacher_income_setting.objects.filter(status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,teacher=teacher_id)
+    print(customer_order_counts)
     price = 0
     totalp = 0
     totalp_f = 0
@@ -2022,7 +2030,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     if sure:
        signa = sure
     
-    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format,'signature':signa,'factsignature':factsignature,'mage':mage,'gm':gm}
+    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format,'signature':signa,'factsignature':factsignature,'mage':mage,'gm':gm,'yearold':yearxx}
     return render(request, 'print/register_print_witdrawa_one_lasted.html',context)
 
 
