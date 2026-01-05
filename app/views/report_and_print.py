@@ -1537,15 +1537,22 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
     obj = []
 
     day_current_day = date.today().day
+
+
+   
+    yearxx = get_previous_year(int(m),int(year))
     
  
     bill = billing_cycle_setting.objects.get(id=2)
     start = bill.bcs_start_day
     get_last_day = last_day_of_month(
-            datetime.date(int(year), int(m), 1))
+            datetime.date(int(yearxx), int(m), 1))
     last_day = get_last_day.day
 
-
+    print(start)
+    print(last_day)
+    print(m)
+    print(yearxx)
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',active=0,tis_start_date__day__gte=start,teacher_id=teacher_id,
                 tis_end_date__day__lte=last_day,
                 tis_end_date__month=m,
@@ -1561,6 +1568,7 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
     total = 0
     totalall = 0
     for rs in content:
+            print(rs.id)
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             
             total_rq_quta = 0
@@ -2763,9 +2771,13 @@ def register_report_summary_teacher_withdraw(request):
 def register_report_summary_withdraw(request):
 
    
-   
+    day_same_m = request.POST.get('monthss', date.today().month)
     day_current_m = request.POST.get('monthss', date.today().month - 1)
-    year_current = request.GET.get('qyear', date.today().year)
+    year_current = request.POST.get('qyear', date.today().year)
+
+
+    m_l = get_previous_month(int(day_same_m),int(year_current))
+    yearxx = get_previous_year(int(day_same_m),int(year_current))
 
     start = None
     end = None
@@ -2779,14 +2791,16 @@ def register_report_summary_withdraw(request):
     bill = billing_cycle_setting.objects.get(id=2)
     start = bill.bcs_start_day
     get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(day_current_m), 1))
+            datetime.date(int(yearxx), int(m_l), 1))
     last_day = get_last_day.day
+
+
     
 
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',active=0,tis_end_date__day__gte=start,
                 tis_end_date__day__lte=last_day,
-                tis_end_date__month=day_current_m,
-                tis_end_date__year=year_current).order_by('teacher_id')
+                tis_end_date__month=m_l,
+                tis_end_date__year=yearxx).order_by('teacher_id')
  
     requirements = 'ไม่มี'
     name_con = '-'
@@ -2794,7 +2808,7 @@ def register_report_summary_withdraw(request):
     sumtax = 0
     totalall = 0
     for rs in content:
-            print(rs.tis_compensation)
+            
             regbyev = register_main.objects.filter(ev_id=rs.ev)
             total_rq_quta = 0
             for aaa in regbyev:
@@ -2944,7 +2958,7 @@ def register_report_summary_withdraw(request):
     totalall = totalp - sumtax
       
 
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(day_current_m),'year_current':year_current,'m':day_current_m}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(m_l),'year_current':yearxx,'m':m_l}
   
     return render(request, 'print/report_withdraw_summary.html', context)    
 
@@ -3994,9 +4008,6 @@ def register_report_summary_user_withdraw_com_one(request):
         str(m_l) + "-" + "21"
     default_end = str(year_current) + "-" + \
         str(m_n) + "-" + "20"
-    
-    print(default_start)
-    print(default_end)
 
     get_last_day_m = last_day_of_month(
             datetime.date(int(year_current), m_l, 1))
