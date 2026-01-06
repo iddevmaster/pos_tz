@@ -147,8 +147,9 @@
         <thead>
           <tr>
             <th>ลำดับ</th>
-            <th>เลขที่ใบเสร็จ</th>
-            <th>เลขรายการ</th>
+            <th>เลขใบเสนอ</th>
+            <th>ชื่อลูกค้า</th>
+            <th>หลักสูตรและวันที่จัด</th>
             <th>PO</th>
             <th>SQ</th>
             <th>SO</th>
@@ -163,8 +164,8 @@
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.rp_doc_number}}</td>
-
-            <td>{{res.register_number}}</td>
+            <td>{{res.custom}}</td>
+            <td>{{res.course_name}} รุ่น {{res.ev_generation}} <br>วันที่ {{res.start}} - {{res.end}}</td>
 
             <td>{{res.po}}</td>
             <td>{{res.sq}}</td>
@@ -252,7 +253,7 @@
         {% csrf_token %}
 
 
-        <input type="text" id="sale_id" name="sale_id" required />
+        <input type="hidden" id="sale_id" name="sale_id" required />
 
         <div class="modal-body">
 

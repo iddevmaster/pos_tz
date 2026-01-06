@@ -133,6 +133,7 @@
           <td>วันที่จัดอบรม</td>
           <td>ครูฝึก</td>
           <td>ชั่วโมง / วัน</td>
+          <td>ค่าเดินทาง</td>
           <td>ยอดเงินรวม</td>
           <td>ภาษีที่จ่าย</td>
           <td>จำนวนเงินสุทธิ</td>
@@ -145,7 +146,8 @@
           <td>{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
           <td>{{ res.pi }}</td>
           <td>{{ res.tis_quantity }} / {{res.tis_unit}}</td>
-        
+           <td>0</td>
+    
           <td>{{res.price|floatformat:2|intcomma }}</td>
           <td>{{res.tax|floatformat:2|intcomma }}</td>
            <td>{{res.total|floatformat:2|intcomma }}</td>
@@ -158,6 +160,7 @@
           <td colspan="3">รวมเป็นค่าตอบแทน</td>
           <td></td>
           <td></td>
+           <td>0</td>
            <td>{{totalp|floatformat:2|intcomma }}</td>
           <td>{{sumtax|floatformat:2|intcomma }}</td>
           <td>{{totalall|floatformat:2|intcomma }}</td>
