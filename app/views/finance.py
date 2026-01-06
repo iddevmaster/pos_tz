@@ -18,6 +18,8 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Coalesce
+from django.utils import timezone
+import datetime
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
 
 
@@ -1739,21 +1741,26 @@ def listbill(request):
 
 def cancellistbill(request):
     
-    rp_ids = request.POST['rp_id']
-    ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
-    ucon.status_bill = 'C'
-    ucon.save()
-    uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
+    # rp_ids = request.POST['rp_id']
+    # ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+    # ucon.status_bill = 'C'
+    # ucon.save()
+    # uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
 
-    com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
+    # com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
     
-    for rs in com:
+    # for rs in com:
         
-        coms = com_income_setting.objects.get(com_id=rs.com_id)
-        coms.status = 'C'
-        coms.save()
+    #     coms = com_income_setting.objects.get(com_id=rs.com_id)
+    #     coms.status = 'C'
+    #     coms.save()
 
-    
+    naive_dt = datetime.datetime.now()
+    aware_dt = timezone.make_aware(naive_dt)
+    local_dt = timezone.localtime(aware_dt)
+    print(naive_dt)
+
+    messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
     return redirect("/finance/billing/cancelbill")
    
 
