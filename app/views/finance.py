@@ -1741,8 +1741,11 @@ def listbill(request):
 
 def cancellistbill(request):
     
-    # rp_ids = request.POST['rp_id']
-    # ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+    rp_ids = request.POST['rp_id']
+    ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+   
+    crtdate = ucon.crt_date.strftime('%Y-%m-%d')
+
     # ucon.status_bill = 'C'
     # ucon.save()
     # uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
@@ -1756,11 +1759,23 @@ def cancellistbill(request):
     #     coms.save()
 
     naive_dt = datetime.datetime.now()
-    aware_dt = timezone.make_aware(naive_dt)
-    local_dt = timezone.localtime(aware_dt)
-    print(naive_dt)
+    formatted_date = naive_dt.strftime('%Y-%m-%d')
 
-    messages.error(request, "รหัสครูท่านนี้ได้ถูกบันทึกไว้แล้ว กรุณาทำรายการใหม่!")
+
+
+    if formatted_date > crtdate:
+        messages.error(request, "ไม่สามารถยกเลิกได้ ติดต่อแอดมิน!")
+    else :
+        ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+        ucon.status_bill = 'C'
+        ucon.save()
+        uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
+        com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
+        for rs in com:
+            coms = com_income_setting.objects.get(com_id=rs.com_id)
+            coms.status = 'C'
+            coms.save()
+        messages.success(request, "ยกเลิกเรียบร้อย!")
     return redirect("/finance/billing/cancelbill")
    
 
