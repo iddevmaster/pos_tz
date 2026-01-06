@@ -225,14 +225,16 @@
 
     const tableBody = document.getElementById('json-table-body');
     jsonData.forEach((item, index) => {
+      
       const row = document.createElement('tr');
       row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
                     <td>${item.pi_name}</td>
                     <td>${item.compensation}</td>
-                    <td>${item.tis_quantity}} </td>  
-                    <td>${item.tis_sum}</td>
+                    <td>${item.tis_quantity}} </td> 
+                      <td>${item.tis_sum}</td> 
+                    <td>${item.tis_expenses}</td>
                     <td>#</td>  
                 `;
       tableBody.appendChild(row);
@@ -440,7 +442,7 @@
 
 
   async function findevid(evid) { // <-- ADD async here
-    console.log(evid)
+    
     try {
       const response = await fetch('/api/calendar_event_api_data', {
         method: 'POST', // Specify the HTTP method as POST
@@ -480,7 +482,8 @@
                     <td>${item.pi_name}</td>
                     <td>${item.compensation} / ${dt}</td>
                     <td>${item.tis_quantity} </td>  
-                    <td>${item.tis_sum}</td>
+                     <td>${item.tis_sum}</td>
+                    <td>${item.tis_expenses}</td>
                       <td><span style="color:#ea7731">รอการยืนยัน</span></td>
                     <td>         <button
                   type="button"
@@ -675,8 +678,8 @@ if (resultElement) {
     let tis_quantity = document.getElementById("tis_quantity").value
     let tis_sum = document.getElementById("tis_sum").value
     const ev_id = document.getElementById("ev_id").value
-
-
+    let expenses = document.getElementById("tis_expenses").value
+    
     if (te == "") {
       Swal.fire({
         title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
@@ -729,7 +732,7 @@ if (resultElement) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum })
+      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum,'tis_expenses':expenses })
     })
       .then(response => response.json())
       .then(data => {
@@ -1376,6 +1379,13 @@ if (resultElement) {
             </select>
           </div>
         </div>
+
+           <div class="col-12 col-lg-6 col-md-6">
+            <span class="font-default">ค่าเดินทาง:</span>
+            <label style="color: red"> *</label>
+            <input type="text" class="form-control" name="tis_expenses" id="tis_expenses" value="0" />
+          </div>
+
         <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
         <input type="hidden" name="teacher_id" id="teacher_id" required />
 
@@ -1429,6 +1439,7 @@ if (resultElement) {
               <th>ค่าตอบแทน</th>
               <th>จำนวนหน่วย</th>
               <th>รายได้สุทธิ</th>
+              <th>ค่าเดินทาง</th>
               <th>สถานะ</th>
               <th>#</th>
             </tr>

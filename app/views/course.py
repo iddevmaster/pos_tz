@@ -795,6 +795,7 @@ def calendar_event_api(request):
                 "id":x.id,
                 "status":x.status,
                 "teacher_id": x.teacher_id,
+                "tis_expenses":x.tis_expenses,
                 "tis_sum": x.tis_sum
             }
             for x in teacher_data

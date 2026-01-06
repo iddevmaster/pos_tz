@@ -639,7 +639,9 @@ def saveeventadmin(request):
             tis_quantity = data.get("tis_quantity")
             tis_sum = data.get("tis_sum")
             tis_unit = data.get("tis_unit")
+            expenses = data.get("tis_expenses")
             
+         
                  
        
           
@@ -660,6 +662,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
                 )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -683,6 +686,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
   
@@ -708,6 +712,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
   
@@ -731,6 +736,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -760,6 +766,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -787,6 +794,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -808,6 +816,7 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='Y',
                 register_id='-',
+                tis_expenses=expenses
             )
               content.save()
               pi_x = ['1','2','3','4','5','7']
@@ -1760,8 +1769,6 @@ def cancellistbill(request):
 
     naive_dt = datetime.datetime.now()
     formatted_date = naive_dt.strftime('%Y-%m-%d')
-
-
 
     if formatted_date > crtdate:
         messages.error(request, "ไม่สามารถยกเลิกได้ ติดต่อแอดมิน!")

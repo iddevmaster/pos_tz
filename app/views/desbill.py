@@ -399,7 +399,8 @@ def data_event(request):
                 "id":x.id,
                 "status":x.status,
                 "teacher_id": x.teacher_id,
-                "tis_sum": x.tis_sum
+                "tis_sum": x.tis_sum,
+                "tis_expenses": x.tis_expenses
             }
             obj.append(sff)
             
