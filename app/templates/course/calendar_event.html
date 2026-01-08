@@ -70,7 +70,7 @@
 
     const ev_id = document.getElementById("ev_id");
     const myDiv = document.getElementById("myDiv");
-    console.log(myRadio.value);
+
 
     if (myRadio.value == 0) {
 
@@ -149,11 +149,11 @@
 
 
             const ev_id = document.getElementById("ev_id").value
-
+          
             let aaaa = findevid(ev_id)
 
         
- 
+          
 
          
         }, 100);
@@ -668,7 +668,7 @@ if (resultElement) {
 
   async function save() {
 
-
+    await this.CheckHourbeforeSave()
 
     const pi = document.getElementById("pi").value
     const hour = document.getElementById("ev_hour").value  ////จำนวนชั่วโมงที่ คอรสระบุ
@@ -679,7 +679,9 @@ if (resultElement) {
     let tis_sum = document.getElementById("tis_sum").value
     const ev_id = document.getElementById("ev_id").value
     let expenses = document.getElementById("tis_expenses").value
-    
+    let expenses_type = document.getElementById("expenses_type").value
+  
+ 
     if (te == "") {
       Swal.fire({
         title: 'กรุณาเลือกรายชื่อครู - วิทยากร!',
@@ -732,7 +734,7 @@ if (resultElement) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum,'tis_expenses':expenses })
+      body: JSON.stringify({ 'ev_id': ev_id, 'pi': pi, 'teacher_id': te, 'tis_unit': tis_unit, 'tis_compensation': tis_compensation, 'tis_quantity': tis_quantity, 'tis_sum': tis_sum,'tis_expenses':expenses,'expenses_type':expenses_type })
     })
       .then(response => response.json())
       .then(data => {
@@ -1378,13 +1380,28 @@ if (resultElement) {
               {% endfor %}
             </select>
           </div>
-        </div>
+
+             <div class="col-12 col-lg-6 col-md-6">
+            <span class="font-default">ค่าใช้จ่าย:</span>
+            <label style="color: red"> *</label>
+           <select id="expenses_type" class="form-select"  name="expenses_type"
+              style="width: 100%;">
+              <option value="ค่าเดินทาง">
+                ค่าเดินทาง
+              </option>
+              <option value="ค่าใช้จ่ายอื่นๆ">
+                ค่าใช้จ่ายอื่นๆ
+              </option>
+            </select>
+          </div>
 
            <div class="col-12 col-lg-6 col-md-6">
-            <span class="font-default">ค่าเดินทาง:</span>
+            <span class="font-default">ยอดเงิน:</span>
             <label style="color: red"> *</label>
             <input type="text" class="form-control" name="tis_expenses" id="tis_expenses" value="0"  readonly/>
           </div>
+        </div> 
+      
 
         <input type="hidden" class="form-control" name="pi" id="pi" value="1" />
         <input type="hidden" name="teacher_id" id="teacher_id" required />

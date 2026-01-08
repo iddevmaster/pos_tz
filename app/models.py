@@ -308,6 +308,8 @@ class teacher_income_setting(models.Model):
     register_id  = models.CharField(max_length=254, blank=True, default="-")
     tax = models.IntegerField(blank=True, default=None)
     tis_expenses = models.IntegerField(default=0 , blank=False)
+    expenses_type  = models.CharField(max_length=254, blank=True, default="-")
+    
 
 
 class tax_setting(models.Model):

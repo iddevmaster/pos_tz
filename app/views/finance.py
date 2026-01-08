@@ -640,9 +640,10 @@ def saveeventadmin(request):
             tis_sum = data.get("tis_sum")
             tis_unit = data.get("tis_unit")
             expenses = data.get("tis_expenses")
+            tis_expenses_type = data.get("expenses_type")
             
          
-                 
+   
        
           
             instance = course_event.objects.filter(pk=ev_id).first()
@@ -662,7 +663,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
                 )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -686,7 +688,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
   
@@ -712,7 +715,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
   
@@ -736,7 +740,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -766,7 +771,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -794,7 +800,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='W',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
               x = course_event.objects.get(ev_id=ev_id)
@@ -816,7 +823,8 @@ def saveeventadmin(request):
                 upd_date=dateTimeNow(),
                 status='Y',
                 register_id='-',
-                tis_expenses=expenses
+                tis_expenses=expenses,
+                expenses_type=tis_expenses_type
             )
               content.save()
               pi_x = ['1','2','3','4','5','7']
