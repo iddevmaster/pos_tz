@@ -102,7 +102,8 @@
           <td colspan="4">
             <div align="center">
               <div style="font-size: 18px;">
-                รายงาน ค้างจ่ายค่าตอบแทนครูฝึก ชื่อ {{list_teacher.teacher_firstname_th}} {{list_teacher.teacher_lastname_th}} รหัสพนักงาน {{getdatauser}}
+                รายงาน ค้างจ่ายค่าตอบแทนครูฝึก ชื่อ {{list_teacher.teacher_firstname_th}}
+                {{list_teacher.teacher_lastname_th}} รหัสพนักงาน {{getdatauser}}
               </div>
             </div>
 
@@ -133,9 +134,11 @@
           <td>วันที่จัดอบรม</td>
           <td>ครูฝึก</td>
           <td>ชั่วโมง / วัน</td>
-          <td>ค่าเดินทาง</td>
+
           <td>ยอดเงินรวม</td>
+          <td>ค่าใข้จ่ายอื่นๆ</td>
           <td>ภาษีที่จ่าย</td>
+        
           <td>จำนวนเงินสุทธิ</td>
         </tr>
 
@@ -146,11 +149,12 @@
           <td>{{ res.ev_date_start }} - {{ res.ev_date_end }}</td>
           <td>{{ res.pi }}</td>
           <td>{{ res.tis_quantity }} / {{res.tis_unit}}</td>
-           <td>0</td>
-    
+
           <td>{{res.price|floatformat:2|intcomma }}</td>
-          <td>{{res.tax|floatformat:2|intcomma }}</td>
-           <td>{{res.total|floatformat:2|intcomma }}</td>
+        
+          <td>{{res.expenses}} - {{ res.total_tis_expenses }} </td>
+            <td>{{res.tax|floatformat:2|intcomma }}</td>
+          <td>{{res.total|floatformat:2|intcomma }}</td>
 
         </tr>
         {% endfor %}
@@ -160,9 +164,11 @@
           <td colspan="3">รวมเป็นค่าตอบแทน</td>
           <td></td>
           <td></td>
-           <td>0</td>
-           <td>{{totalp|floatformat:2|intcomma }}</td>
+
+          <td>{{totalp|floatformat:2|intcomma }}</td>
+            <td>{{total_tis_expenses|floatformat:2|intcomma }}</td>
           <td>{{sumtax|floatformat:2|intcomma }}</td>
+        
           <td>{{totalall|floatformat:2|intcomma }}</td>
         </tr>
         <tr>
@@ -183,7 +189,7 @@
               <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
             </div>
             <div style="display: flex;text-align: center;">
-              <div style="flex: 1;margin-bottom: 10px;">ผู้พิมพ์บันทึก  </div>
+              <div style="flex: 1;margin-bottom: 10px;">ผู้พิมพ์บันทึก </div>
             </div>
             <div style="display: flex;text-align: center;">
               <div style="flex: 1;">
@@ -191,7 +197,7 @@
               </div>
             </div>
           </td>
-      <td colspan="3" rowspan="1" style="
+          <td colspan="3" rowspan="1" style="
                 width: 25%;
             ">
 
@@ -208,15 +214,15 @@
               <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
             </div>
             <div style="display: flex;text-align: center;">
-              <div style="flex: 1;margin-bottom: 10px;">ฝ่ายการเงิน  </div>
+              <div style="flex: 1;margin-bottom: 10px;">ฝ่ายการเงิน </div>
             </div>
             <div style="display: flex;text-align: center;">
               <div style="flex: 1;">
-                 วดป {{today}}
+                วดป {{today}}
               </div>
             </div>
           </td>
-     <td colspan="3" rowspan="1" style="
+          <td colspan="3" rowspan="1" style="
                 width: 25%;
             ">
 
@@ -233,7 +239,7 @@
               <div style="flex: 1;margin-bottom: 10px;">(...................................)</div>
             </div>
             <div style="display: flex;text-align: center;">
-              <div style="flex: 1;margin-bottom: 10px;">หัวหน้าฝ่าย  </div>
+              <div style="flex: 1;margin-bottom: 10px;">หัวหน้าฝ่าย </div>
             </div>
             <div style="display: flex;text-align: center;">
               <div style="flex: 1;">

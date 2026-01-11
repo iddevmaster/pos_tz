@@ -1549,10 +1549,7 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
             datetime.date(int(yearxx), int(m), 1))
     last_day = get_last_day.day
 
-    print(start)
-    print(last_day)
-    print(m)
-    print(yearxx)
+
     content = teacher_income_setting.objects.select_related('ev').filter(status='S',active=0,tis_start_date__day__gte=start,teacher_id=teacher_id,
                 tis_end_date__day__lte=last_day,
                 tis_end_date__month=m,
@@ -1567,6 +1564,9 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
     sumtax = 0
     total = 0
     totalall = 0
+    total_tis_expenses = 0
+    totalall_expen = 0
+    
     for rs in content:
             print(rs.id)
             regbyev = register_main.objects.filter(ev_id=rs.ev)
@@ -1671,9 +1671,12 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
          
             taxall = price * (rs.tax / 100)
             sumtax += taxall
-            total = price - taxall
+            total = (price - taxall) + rs.tis_expenses
             totalall += total
-            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'total':total}
+            total_tis_expenses += rs.tis_expenses
+       
+            
+            r = {'pay_name':pay.pi_name,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'total':total,'total_tis_expenses':rs.tis_expenses,'expenses':'ค่ารถ'}
         
             obj.append(r)
     today = datetime.date.today()
@@ -1681,7 +1684,7 @@ def register_report_summary_print_overdue_one(request,teacher_id, year, m):
 
 
     context = {'title': defaultTitle, 'data': obj,'list_teacher':list_teacher,'cou':content.count(),'totalp':totalp,'getdatauser':getdatauser,'m':month_fomat(m),'year':year,
-             'start_new':start,'end_new':last_day,'sumtax':sumtax,'totalall':totalall,'today':us_format}
+             'start_new':start,'end_new':last_day,'sumtax':sumtax,'totalall':totalall,'today':us_format,'total_tis_expenses':total_tis_expenses}
     return render(request, 'print/register_print_overdue_one.html',context)
 
 
@@ -1862,10 +1865,9 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     today = datetime.date.today()
     us_format = today.strftime("%d/%m/%Y")
 
-    print(default_start)
-    print(default_end)
+
     customer_order_counts = teacher_income_setting.objects.filter(status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,teacher=teacher_id)
-    print(customer_order_counts)
+   
     price = 0
     totalp = 0
     totalp_f = 0
@@ -1874,6 +1876,9 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     sumtaxf = 0
     totalall = 0
     name_con = '-'
+    tis_expenses_l = 0
+    tis_expenses_f = 0
+    tis_expenses_all = 0
     for rs in customer_order_counts:
             
             price_te_f = 0
@@ -1998,17 +2003,18 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             pay = pay_item.objects.get(id=rs.pi_id)
             
             totalp += price
+
+            tis_expenses_all += rs.tis_expenses
             
 
             taxall = price * (rs.tax / 100)
-            price_te = price - taxall
+            price_te = (price - taxall) + rs.tis_expenses 
             sumtaxl += taxall
-            totalall = totalp - sumtaxl
+            totalall = (totalp - sumtaxl) + tis_expenses_all
            
     
-           
-   
-            r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':price_te}
+        
+            r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':price_te,'tis_expenses':rs.tis_expenses}
            
             obj.append(r)   
 
@@ -2030,7 +2036,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
     if sure:
        signa = sure
     
-    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format,'signature':signa,'factsignature':factsignature,'mage':mage,'gm':gm,'yearold':yearxx}
+    context = {'title': defaultTitle, 'data': obj,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year,'m':m_n,'totalp':totalp,'totalall':totalall,'sumtax':sumtaxl,'teacher':teacher_one,'code':getdatauser,'today':us_format,'signature':signa,'factsignature':factsignature,'mage':mage,'gm':gm,'yearold':yearxx,'tis_expenses_all':tis_expenses_all}
     return render(request, 'print/register_print_witdrawa_one_lasted.html',context)
 
 
@@ -2483,6 +2489,9 @@ def register_report_summary_teacher_withdraw(request):
     sumtaxf = 0
     totalall = 0
 
+    tis_expenses_f = 0
+    tis_expenses_l = 0
+
    
     for customer_order in customer_order_counts:
         item_id = customer_order['teacher']
@@ -2502,6 +2511,8 @@ def register_report_summary_teacher_withdraw(request):
         sumtaxl = 0
         sumtaxf = 0
         totalall = 0
+        tis_expenses_l = 0
+        tis_expenses_f = 0
         for rs in lassssst:
             print(rs)
             regbyev = register_main.objects.filter(ev_id=rs.ev)
@@ -2624,7 +2635,7 @@ def register_report_summary_teacher_withdraw(request):
               
               price = int(rs.tis_quantity) * (rs.tis_compensation) 
               tis_compensation = rs.tis_compensation 
-          
+              tis_expenses_l = rs.tis_expenses
               
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
@@ -2636,6 +2647,7 @@ def register_report_summary_teacher_withdraw(request):
             
             taxall = price * (rs.tax / 100)
             sumtaxl += taxall
+            tis_expenses_l = rs.tis_expenses
         first = teacher_income_setting.objects.filter(tis_group=tis_group_f,teacher=customer_order['teacher'],status='S',tis_end_date__gte=default_start,tis_end_date__lte=default_end,active=0)
        
         for rs in first:
@@ -2761,11 +2773,15 @@ def register_report_summary_teacher_withdraw(request):
             totalp_f += price
             taxall = price * (rs.tax / 100)
             sumtaxf += taxall
+            tis_expenses_f = rs.tis_expenses
         if item_id not in result_dict:
-                aa = totalp_f + totalp
+              
+
+                tis_expenses_all = tis_expenses_f + tis_expenses_l
+                aa = (totalp_f + totalp) + tis_expenses_all
                 sumtaxall = sumtaxl + sumtaxf
-                totalall = aa - sumtaxall
-                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
+                totalall = (aa - sumtaxall)
+                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall,'tis_expenses_l':tis_expenses_l,'tis_expenses_f':tis_expenses_f}   
             
     
 
@@ -2832,6 +2848,8 @@ def register_report_summary_withdraw(request):
             select = 0
             price = 0
             tis_compensation = 0
+            tis_expenses = 0
+             
             if int(event.condition_type) == 1:
                 requirements = 'มี'
             if int(rs.pi_id) == 1:
@@ -2939,8 +2957,8 @@ def register_report_summary_withdraw(request):
          
             taxall = price * (rs.tax / 100)
             sumtax += taxall
-           
-           
+            total_tis_expenses =+ rs.tis_expenses
+            
             r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'requirements':requirements,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'total_tis_expenses':total_tis_expenses}
         
             obj.append(r)   
@@ -2957,12 +2975,16 @@ def register_report_summary_withdraw(request):
             ta = item["tax"]
             total = item["price"] -item["tax"]
             aaaa = total
+            tiss_expenses = item["total_tis_expenses"]
+          
+        
             if item_id not in result_dict:
-                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,"total":0,'name':name,'username':getdatauser.username}
+                result_dict[item_id] = {"Id": item_id, "price": 0, "tax": 0,"total":0,'name':name,'username':getdatauser.username,'tiss_expenses':0}
             result_dict[item_id]["price"] += qty
             result_dict[item_id]["tax"] += ta
-            result_dict[item_id]["total"] += aaaa
-
+            result_dict[item_id]["total"] += aaaa + tiss_expenses
+            result_dict[item_id]["tiss_expenses"] += tiss_expenses
+      
     result_list = list(result_dict.values())
     totalall = totalp - sumtax
       

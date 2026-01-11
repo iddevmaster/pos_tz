@@ -150,7 +150,7 @@
     <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
       <tbody>
         <tr>
-          <td colspan="12" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
+          <td colspan="13" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
         </tr>
         <tr>
           <td colspan="1">ลำดับ</td>
@@ -160,6 +160,7 @@
           <td>วันที่จัดอบรม</td>
           <td>ชั่วโมง / วัน</td>
           <td>ยอดเงินรวม</td>
+           <td>ค่าใข้จ่ายอื่นๆ</td>
           <td>ภาษีที่จ่าย</td>
           <td colspan="1">จำนวนเงินสุทธิ</td>
         </tr>
@@ -175,7 +176,9 @@
           {% comment %} <td>{{ res.pi }}</td> {% endcomment %}
           <td>{{ res.tis_quantity }} / {{res.tis_unit}}</td>
           <td>{{res.price|floatformat:2|intcomma }}</td>
-          <td>{{res.tax|floatformat:2|intcomma }}</td>
+   
+             <td>{{res.tis_expenses|floatformat:2|intcomma }}</td>
+                <td>{{res.tax|floatformat:2|intcomma }}</td>
            <td colspan="1">{{res.totalall|floatformat:2|intcomma }}</td>
 
         </tr>
@@ -188,7 +191,9 @@
         
           <td></td>
            <td>{{totalp|floatformat:2|intcomma }}</td>
+             <td>{{tis_expenses_all|floatformat:2|intcomma }}</td>
           <td>{{sumtax|floatformat:2|intcomma }}</td>
+           
           <td>{{totalall|floatformat:2|intcomma }}</td>
         </tr>
         
@@ -363,7 +368,7 @@
               </div>
             </div>
           </td>
-     <td colspan="2" rowspan="1" style="
+     <td colspan="3" rowspan="1" style="
                 width: 15%;
             ">
 
