@@ -3066,7 +3066,7 @@ def register_report_compensation_withdraw_onemorefitter(request):
             for aaa in regbyev:
                 
                 try:
-                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id,status_bill='Y').first()
                     if bbbb:
                         total_rq_quta += bbbb.rp_quota
                 except register_payment.DoesNotExist:  
