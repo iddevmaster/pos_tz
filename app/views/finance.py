@@ -1309,7 +1309,7 @@ def withdraw_list_one(request):
             for aaa in regbyev:
                 
                 try:
-                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id,status_bill='Y').first()
                     if bbbb:
                         total_rq_quta += bbbb.rp_quota
                 except register_payment.DoesNotExist:  
@@ -1331,7 +1331,7 @@ def withdraw_list_one(request):
              if event.condition_type == '1':  # เช็คว่า วิทยากร มีเงื่อนไขไหม
                 
                 checkcourse = condition.objects.filter(conhead=event.condition_id).first() 
-                print(rs.ev_id)
+                
                 checkhead = conhead.objects.filter(conhead_id=checkcourse.conhead_id).first() 
                 checkcourse_con = course.objects.get(course_id=checkhead.course_id)
           
