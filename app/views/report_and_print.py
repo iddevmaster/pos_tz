@@ -1887,7 +1887,7 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             total_rq_quta = 0
             for aaa in regbyev:
                 try:
-                    bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
+                    bbbb = register_payment.objects.filter(register_id=aaa.register_id,status_bill='Y').first()
                     if bbbb:
                         total_rq_quta += bbbb.rp_quota
                 except register_payment.DoesNotExist:  
