@@ -1896,6 +1896,7 @@ def payment_pay_deposit(request):
         register_id=register_id,
         user_create=user_id,
         user_manage=user_man,
+        status_bill='Y',
         commit_head=0
     )
     object.refresh_from_db()

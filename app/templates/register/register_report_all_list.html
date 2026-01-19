@@ -461,7 +461,9 @@ fileInput.value = ''; // Clear the selected file
             <th>รหัสบัตร ปชช./ Passport</th>
             <th>ชื่อ - นามสกุล ภาษาไทย</th>
             <th>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
-            <th>วันที่ทำรายการ</th>
+          
+              <th>เบอร์</th>
+                <th>วันที่ทำรายการ</th>
            
            
             <th hidden>รหัสบัตร ปชช./ Passport</th>
@@ -486,6 +488,10 @@ fileInput.value = ''; // Clear the selected file
             <td>
               {{res.student_prefix_eng}} {{res.student_firstname_eng}}
               {{res.student_lastname_eng}}
+            </td>
+
+              <td>
+              {{res.tel}}
             </td>
             
             <td>

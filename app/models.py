@@ -508,6 +508,8 @@ class training(models.Model):
         max_length=128, blank=True, default=None)
     student_learning_status = models.IntegerField(default=0, blank=False)
     student_code = models.CharField(max_length=64, blank=True, default=None)
+    tel = models.CharField(
+        max_length=200, blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     ev = models.ForeignKey(
