@@ -59,7 +59,7 @@
         {% if main.pay_type == 2 %}
         <span>แก้ไขใบเสนอราคา</span>
         {% else %}
-        <span>แก้ไขใบเสร็จ</span>
+        <!-- <span>แก้ไขใบเสร็จ</span> -->
 
         {% endif %}
       </button>
@@ -103,6 +103,14 @@
                   role="group"
                   aria-label="Basic example"
                 >
+                     <button
+                    type="button"
+                    class="btn btn-danger"
+                    onclick="window.open('/finance/sale/commission'); return false;"
+                  >
+               
+                    กำหนดค่าคอม
+                  </button>
                   <button
                     type="button"
                     class="btn btn-secondary"
