@@ -3294,6 +3294,8 @@ def register_excel_bill(request):
     event = int(request.POST.get('event', 0))
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=1, active=1,register__module=m.module,status_bill='Y')
+    
+    
 
     lastday = lastDateOfmonth(
         date.today().year, date.today().month, date.today().day)
