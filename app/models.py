@@ -554,4 +554,15 @@ class com_income_setting(models.Model):
     course = models.ForeignKey(course, on_delete=models.CASCADE)
     user_id = models.IntegerField(default=None, blank=False)
     status_pay = models.CharField(max_length=15, blank=False)
+    notifications = models.CharField(max_length=1, blank=False)
+
+
+class notifications(models.Model):
+    notifications_id = models.AutoField(primary_key=True)
+    scheduled_at = models.DateTimeField(blank=True, null=True)
+    notification_type = models.CharField(max_length=1, blank=False)
+    is_sent  = models.CharField(max_length=1, blank=False)
+    sent_at = models.DateTimeField(blank=True, null=True) 
+    ev = models.ForeignKey(
+        course_event, on_delete=models.CASCADE)
     
