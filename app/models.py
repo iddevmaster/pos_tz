@@ -559,10 +559,17 @@ class com_income_setting(models.Model):
 
 class notifications(models.Model):
     notifications_id = models.AutoField(primary_key=True)
-    scheduled_at = models.DateTimeField(blank=True, null=True)
+    user_id = models.IntegerField(blank=True, default=None)
     notification_type = models.CharField(max_length=1, blank=False)
-    is_sent  = models.CharField(max_length=1, blank=False)
-    sent_at = models.DateTimeField(blank=True, null=True) 
-    ev = models.ForeignKey(
-        course_event, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255, blank=False)
+    message = models.CharField(max_length=255, blank=False)
+    reference_id = models.CharField(max_length=1, blank=False)
+    reference_type = models.CharField(max_length=255, blank=False)
+    is_read = models.CharField(max_length=1, blank=False)
+    read_at = models.DateTimeField(blank=True, null=True)
+    action_url = models.CharField(max_length=1, blank=False)
+    priority = models.CharField(max_length=1, blank=False)
+    created_by = models.IntegerField(blank=True, default=None)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
     

@@ -83,6 +83,111 @@
       src="{% static 'libs/daterangepicker/daterangepicker.js' %}"
     ></script>
 
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bellIcon = document.getElementById('bellIcon');
+            const modalOverlay = document.getElementById('notificationModal');
+            const modalClose = document.getElementById('modalClose');
+
+            // Open modal when bell is clicked
+            if (bellIcon) {
+                bellIcon.addEventListener('click', function() {
+                    modalOverlay.classList.add('active');
+                });
+            }
+
+            // Close modal when close button is clicked
+            if (modalClose) {
+                modalClose.addEventListener('click', function() {
+                    modalOverlay.classList.remove('active');
+                });
+            }
+
+            // Close modal when clicking outside
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    modalOverlay.classList.remove('active');
+                }
+            });
+
+            // Mark all as read functionality
+            const markAllRead = document.getElementById('markAllRead');
+            if (markAllRead) {
+                markAllRead.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const unreadItems = document.querySelectorAll('.notification-item.unread');
+                    unreadItems.forEach(item => {
+                        item.classList.remove('unread');
+                        const dot = item.querySelector('.unread-dot');
+                        if (dot) dot.remove();
+                    });
+                    
+                    // Update badge count
+                    const badge = document.querySelector('.badge');
+                    if (badge) badge.textContent = '0';
+                    
+                    // Update tab counts
+                    const allTab = document.querySelectorAll('.tab')[0];
+                    const unreadTab = document.querySelectorAll('.tab')[1];
+                    if (allTab) allTab.textContent = 'ทั้งหมด (5)';
+                    if (unreadTab) unreadTab.textContent = 'ยังไม่อ่าน (0)';
+                });
+            }
+
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const notificationItems = document.querySelectorAll('.notification-item');
+                    if (this.textContent.includes('ยังไม่อ่าน')) {
+                        notificationItems.forEach(item => {
+                            if (!item.classList.contains('unread')) {
+                                item.style.display = 'none';
+                            } else {
+                                item.style.display = 'flex';
+                            }
+                        });
+                    } else {
+                        notificationItems.forEach(item => {
+                            item.style.display = 'flex';
+                        });
+                    }
+                });
+            });
+
+            // Click notification item to mark as read
+            const notificationItems = document.querySelectorAll('.notification-item');
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('unread')) {
+                        this.classList.remove('unread');
+                        const dot = this.querySelector('.unread-dot');
+                        if (dot) dot.remove();
+                        
+                        // Update badge count
+                        const badge = document.querySelector('.badge');
+                        if (badge) {
+                            const currentCount = parseInt(badge.textContent);
+                            if (currentCount > 0) {
+                                badge.textContent = currentCount - 1;
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -95,31 +200,478 @@
     <style>
 
 /* Container หลัก */
-.fab-container {
-    position: fixed;
+
+
+
+    * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            font-size: 22px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+
+        /* Database Schema Styles */
+        .schema-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .table-schema {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: #3498db;
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .table-content {
+            padding: 15px;
+        }
+
+        .field {
+            display: grid;
+            grid-template-columns: 200px 120px 1fr;
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .field:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .field-type {
+            color: #7f8c8d;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .field-desc {
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* UI Section Styles */
+        .ui-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Notification Bell */
+        .notification-bell {
+             position: fixed;
     bottom: 20px;
     right: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
     z-index: 1000;
-}
+        }
 
-/* ตกแต่งปุ่มวงกลม */
-.fab-item {
-    position: relative; /* สำคัญ: เพื่อให้ Badge อิงตำแหน่งกับปุ่มนี้ */
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    text-decoration: none;
-    font-size: 22px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: 0.3s;
-}
+        .bell-icon {
+            width: 50px;
+            height: 50px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .bell-icon:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .bell-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 400px;
+            margin-top: 20px;
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .mark-all-read {
+            color: #3498db;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+
+        .notification-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f5;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            gap: 12px;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #e3f2fd;
+        }
+
+        .notification-item.unread:hover {
+            background: #d6ebfa;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.manager {
+            background: #fff3cd;
+        }
+
+        .notification-icon.director {
+            background: #d1ecf1;
+        }
+
+        .notification-icon.sale {
+            background: #d4edda;
+        }
+
+        .notification-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .notification-message {
+            color: #6c757d;
+            font-size: 13px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            color: #95a5a6;
+            font-size: 12px;
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 16px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: #3498db;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            fill: #dee2e6;
+        }
+
+        /* Role Badge */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-badge.manager {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .role-badge.director {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .role-badge.sale {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            animation: slideDown 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f3f5;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #e9ecef;
+            transform: rotate(90deg);
+        }
+
+        .modal-close svg {
+            width: 18px;
+            height: 18px;
+            fill: #495057;
+        }
+
+        .bell-demo-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .bell-demo-section h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .bell-demo-section p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notification-dropdown {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .field {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e83e8c;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
 
 .bell { background-color: #f1c40f; } /* สีเหลืองทอง */
 .line { background-color: #00c300; }
@@ -571,17 +1123,143 @@
           </div>
           </footer> -->
 
-          <div class="fab-container">
-  <a href="" class="fab-item call" title="ปิดงานEvent">
-<i class="fas fa-bell"></i>
-<span class="notification-badge" id="news-count">5</span>
-  </a>
-  
+<div >
+             
+                <div class="notification-bell">
+                    <div class="bell-icon" id="bellIcon" style="cursor: pointer;">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                        </svg>
+                        <span class="badge">5</span>
+                    </div>
+                </div>
+            </div>
 
-</div>
+<div class="modal-overlay" id="notificationModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="modalClose">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="notification-dropdown" style="width: 100%; box-shadow: none; margin: 0;">
+                        <div class="dropdown-header">
+                            <h3>การแจ้งเตือน</h3>
+                            <a href="#" class="mark-all-read" id="markAllRead">ทำเครื่องหมายอ่านทั้งหมด</a>
+                        </div>
+
+                        <div class="tabs">
+                            <div class="tab active">ทั้งหมด (5)</div>
+                            <div class="tab">ยังไม่อ่าน (3)</div>
+                        </div>
+
+                        <div class="notification-list">
+                            <!-- Manager: Approve Task -->
+                            <div class="notification-item unread">
+                                <div class="notification-icon manager">
+                                    <svg viewBox="0 0 24 24" fill="#856404" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <span class="role-badge manager">ผู้จัดการ</span>
+                                        มีงานรออนุมัติ
+                                    </div>
+                                    <div class="notification-message">
+                                        โครงการ "พัฒนาระบบ CRM" รอการอนุมัติจากคุณ - งบประมาณ 450,000 บาท
+                                    </div>
+                                    <div class="notification-time">5 นาทีที่แล้ว</div>
+                                </div>
+                                <div class="unread-dot"></div>
+                            </div>
+
+                            <!-- Manager: Handover Task -->
+                            <div class="notification-item unread">
+                                <div class="notification-icon manager">
+                                    <svg viewBox="0 0 24 24" fill="#856404" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V19z"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <span class="role-badge manager">ผู้จัดการ</span>
+                                        งานพร้อมส่งมอบ
+                                    </div>
+                                    <div class="notification-message">
+                                        งาน "ตรวจสอบเอกสารสัญญา" เสร็จสมบูรณ์ พร้อมส่งมอบให้ลูกค้า
+                                    </div>
+                                    <div class="notification-time">1 ชั่วโมงที่แล้ว</div>
+                                </div>
+                                <div class="unread-dot"></div>
+                            </div>
+
+                            <!-- Director: Assign Team -->
+                            <div class="notification-item unread">
+                                <div class="notification-icon director">
+                                    <svg viewBox="0 0 24 24" fill="#0c5460" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <span class="role-badge director">ผู้อำนวยการ</span>
+                                        ต้องกำหนดทีมงาน
+                                    </div>
+                                    <div class="notification-message">
+                                        โปรเจค "ออกแบบเว็บไซต์องค์กร" ต้องการการมอบหมายทีมพัฒนา
+                                    </div>
+                                    <div class="notification-time">2 ชั่วโมงที่แล้ว</div>
+                                </div>
+                                <div class="unread-dot"></div>
+                            </div>
+
+                            <!-- Sale: Commission Ready -->
+                            <div class="notification-item">
+                                <div class="notification-icon sale">
+                                    <svg viewBox="0 0 24 24" fill="#155724" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <span class="role-badge sale">Sale</span>
+                                        ค่าคอมมิชชั่นพร้อมเบิก
+                                    </div>
+                                    <div class="notification-message">
+                                        ค่าคอมยอดขาย Q1/2026 จำนวน 25,000 บาท พร้อมให้เบิกแล้ว
+                                    </div>
+                                    <div class="notification-time">3 ชั่วโมงที่แล้ว</div>
+                                </div>
+                            </div>
+
+                            <!-- Sale: Commission Ready 2 -->
+                            <div class="notification-item">
+                                <div class="notification-icon sale">
+                                    <svg viewBox="0 0 24 24" fill="#155724" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <span class="role-badge sale">Sale</span>
+                                        โบนัสพิเศษอนุมัติแล้ว
+                                    </div>
+                                    <div class="notification-message">
+                                        โบนัสการขายเกินเป้า 15,000 บาท ได้รับการอนุมัติแล้ว
+                                    </div>
+                                    <div class="notification-time">1 วันที่แล้ว</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </div>
+
     <script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
 
