@@ -84,7 +84,67 @@
     ></script>
 
      <script>
+
+      document.addEventListener('DOMContentLoaded', fetchNotifications);
+// หรือตั้งเวลาให้ดึงข้อมูลทุกๆ 1 นาที (Polling)
+setInterval(fetchNotifications, 10000);
+
+      async function fetchNotifications() {
+        console.log('first')
+
+        try {
+        const response = await fetch('/api/notifications'); // แก้ URL ให้ตรงกับ urls.py
+        const data = await response.json();
+        
+
+
+        const notificationData = {
+    "total_count": 5,
+    "unread_count": 3,
+    "notifications": data
+};
+console.log(notificationData)
+        renderNotifications(notificationData)
+
+        // // 1. อัปเดตตัวเลขที่ Badge
+        // const badge = document.querySelector('.badge');
+        // if (badge) {
+        //     badge.textContent = data.unread_count;
+        //     badge.style.display = data.unread_count > 0 ? 'flex' : 'none';
+        // }
+
+        // // 2. ล้างรายการเก่าและเพิ่มรายการใหม่
+        // const listContainer = document.querySelector('.notification-list');
+        // if (data.notifications.length === 0) {
+        //     listContainer.innerHTML = '<div class="empty-state">ไม่มีการแจ้งเตือนใหม่</div>';
+        //     return;
+        // }
+
+        // listContainer.innerHTML = ''; // ล้างรายการเดิม
+        // data.notifications.forEach(item => {
+        //     const html = `
+        //         <div class="notification-item unread" onclick="markAsRead(${item.id})">
+        //             <div class="notification-icon ${item.type.toLowerCase()}">
+        //                 <svg viewBox="0 0 24 24" fill="#856404"><path d="M12 2L1 21h22L12 2z"/></svg>
+        //             </div>
+        //             <div class="notification-content">
+        //                 <div class="notification-title">${item.title}</div>
+        //                 <div class="notification-message">${item.message}</div>
+        //                 <div class="notification-time">${item.time}</div>
+        //             </div>
+        //             <div class="unread-dot"></div>
+        //         </div>
+        //     `;
+        //     listContainer.insertAdjacentHTML('beforeend', html);
+        // });
+
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+    }
+      }
         document.addEventListener('DOMContentLoaded', function() {
+
+          
             const bellIcon = document.getElementById('bellIcon');
             const modalOverlay = document.getElementById('notificationModal');
             const modalClose = document.getElementById('modalClose');
@@ -186,6 +246,58 @@
                 });
             });
         });
+
+
+        function renderNotifications(data) {
+          
+    const listContainer = document.querySelector('.notification-list');
+    const tabAll = document.querySelectorAll('.tab')[0];
+    const tabUnread = document.querySelectorAll('.tab')[1];
+
+    // 1. อัปเดตตัวเลขบน Tabs
+    if (tabAll) tabAll.textContent = `ทั้งหมด (${data.total_count})`;
+    if (tabUnread) tabUnread.textContent = `ยังไม่อ่าน (${data.unread_count})`;
+
+    // 2. ล้างรายการเดิมใน List
+    listContainer.innerHTML = '';
+
+    // 3. วนลูปสร้าง HTML รายการแจ้งเตือน
+    data.notifications.forEach(item => {
+        const unreadClass = item.is_unread ? 'unread' : '';
+        const unreadDot = item.is_unread ? '<div class="unread-dot"></div>' : '';
+        
+        // เลือก Icon ตามประเภท (ตัวอย่าง)
+        let iconSvg = '';
+        if (item.category_label === 'manager') {
+            iconSvg = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>';
+        } else if (item.category_label === 'director') {
+            iconSvg = '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>';
+        } else {
+            iconSvg = '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>';
+        }
+
+        const itemHtml = `
+            <div class="notification-item ${unreadClass}" data-id="${item.id}">
+                <div class="notification-icon ${item.category_label}">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        ${iconSvg}
+                    </svg>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                      
+                        ${item.title}
+                    </div>
+                    <div class="notification-message">${item.message}</div>
+                    <div class="notification-time">${item.crt_date}</div>
+                </div>
+                ${unreadDot}
+            </div>
+        `;
+
+        listContainer.insertAdjacentHTML('beforeend', itemHtml);
+    });
+}
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -372,6 +484,8 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        
 
         .dropdown-header h3 {
             margin: 0;
@@ -584,8 +698,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
+         
             animation: slideDown 0.3s ease;
             overflow: hidden;
         }
@@ -1125,25 +1238,23 @@
 
 <div >
              
-                <div class="notification-bell">
+                <!-- <div class="notification-bell">
                     <div class="bell-icon" id="bellIcon" style="cursor: pointer;">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
                         </svg>
                         <span class="badge">5</span>
                     </div>
-                </div>
+                </div> -->
             </div>
 
-<div class="modal-overlay" id="notificationModal">
-                <div class="modal-content">
-                    <button class="modal-close" id="modalClose">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                    </button>
-                    
-                    <div class="notification-dropdown" style="width: 100%; box-shadow: none; margin: 0;">
+
+
+
+
+            <div class="modal-overlay" id="notificationModal">
+    <div class="modal-content">
+             <div class="notification-dropdown" style="width: 100%; box-shadow: none; margin: 0;">
                         <div class="dropdown-header">
                             <h3>การแจ้งเตือน</h3>
                             <a href="#" class="mark-all-read" id="markAllRead">ทำเครื่องหมายอ่านทั้งหมด</a>
@@ -1153,109 +1264,11 @@
                             <div class="tab active">ทั้งหมด (5)</div>
                             <div class="tab">ยังไม่อ่าน (3)</div>
                         </div>
-
-                        <div class="notification-list">
-                            <!-- Manager: Approve Task -->
-                            <div class="notification-item unread">
-                                <div class="notification-icon manager">
-                                    <svg viewBox="0 0 24 24" fill="#856404" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                    </svg>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-title">
-                                        <span class="role-badge manager">ผู้จัดการ</span>
-                                        มีงานรออนุมัติ
-                                    </div>
-                                    <div class="notification-message">
-                                        โครงการ "พัฒนาระบบ CRM" รอการอนุมัติจากคุณ - งบประมาณ 450,000 บาท
-                                    </div>
-                                    <div class="notification-time">5 นาทีที่แล้ว</div>
-                                </div>
-                                <div class="unread-dot"></div>
-                            </div>
-
-                            <!-- Manager: Handover Task -->
-                            <div class="notification-item unread">
-                                <div class="notification-icon manager">
-                                    <svg viewBox="0 0 24 24" fill="#856404" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V19z"/>
-                                    </svg>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-title">
-                                        <span class="role-badge manager">ผู้จัดการ</span>
-                                        งานพร้อมส่งมอบ
-                                    </div>
-                                    <div class="notification-message">
-                                        งาน "ตรวจสอบเอกสารสัญญา" เสร็จสมบูรณ์ พร้อมส่งมอบให้ลูกค้า
-                                    </div>
-                                    <div class="notification-time">1 ชั่วโมงที่แล้ว</div>
-                                </div>
-                                <div class="unread-dot"></div>
-                            </div>
-
-                            <!-- Director: Assign Team -->
-                            <div class="notification-item unread">
-                                <div class="notification-icon director">
-                                    <svg viewBox="0 0 24 24" fill="#0c5460" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                                    </svg>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-title">
-                                        <span class="role-badge director">ผู้อำนวยการ</span>
-                                        ต้องกำหนดทีมงาน
-                                    </div>
-                                    <div class="notification-message">
-                                        โปรเจค "ออกแบบเว็บไซต์องค์กร" ต้องการการมอบหมายทีมพัฒนา
-                                    </div>
-                                    <div class="notification-time">2 ชั่วโมงที่แล้ว</div>
-                                </div>
-                                <div class="unread-dot"></div>
-                            </div>
-
-                            <!-- Sale: Commission Ready -->
-                            <div class="notification-item">
-                                <div class="notification-icon sale">
-                                    <svg viewBox="0 0 24 24" fill="#155724" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-                                    </svg>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-title">
-                                        <span class="role-badge sale">Sale</span>
-                                        ค่าคอมมิชชั่นพร้อมเบิก
-                                    </div>
-                                    <div class="notification-message">
-                                        ค่าคอมยอดขาย Q1/2026 จำนวน 25,000 บาท พร้อมให้เบิกแล้ว
-                                    </div>
-                                    <div class="notification-time">3 ชั่วโมงที่แล้ว</div>
-                                </div>
-                            </div>
-
-                            <!-- Sale: Commission Ready 2 -->
-                            <div class="notification-item">
-                                <div class="notification-icon sale">
-                                    <svg viewBox="0 0 24 24" fill="#155724" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-                                    </svg>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-title">
-                                        <span class="role-badge sale">Sale</span>
-                                        โบนัสพิเศษอนุมัติแล้ว
-                                    </div>
-                                    <div class="notification-message">
-                                        โบนัสการขายเกินเป้า 15,000 บาท ได้รับการอนุมัติแล้ว
-                                    </div>
-                                    <div class="notification-time">1 วันที่แล้ว</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="notification-list">
             </div>
+             </div>
+    </div>
+</div>
         </div>
       </div>
     </div>
