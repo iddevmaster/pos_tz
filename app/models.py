@@ -559,7 +559,6 @@ class com_income_setting(models.Model):
 
 class notifications(models.Model):
     notifications_id = models.AutoField(primary_key=True)
-    user_id = models.IntegerField(blank=True, default=None)
     notification_type = models.CharField(max_length=1, blank=False)
     title = models.CharField(max_length=255, blank=False)
     message = models.CharField(max_length=255, blank=False)
@@ -572,4 +571,6 @@ class notifications(models.Model):
     created_by = models.IntegerField(blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
+    cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
+
     

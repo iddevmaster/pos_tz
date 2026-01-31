@@ -471,7 +471,7 @@ def data_bill_com(request):
     year_current = request.GET.get('qyear', date.today().year)
     obj = []
 
-      
+   
  
     # content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1)
     content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1,register__status='Y',status_bill='Y')
@@ -512,7 +512,7 @@ def data_bill_com(request):
         
         namessell = seller.first_name + '-' + seller.last_name
         
-        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':payment.rp_id,'commit_head':payment.commit_head}
+        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':r.rp_id,'commit_head':payment.commit_head}
         obj.append(res)
 
 
@@ -597,18 +597,22 @@ def data_bill_event(request):
 def data_com(request):
     data = json.loads(request.body)
     register_id = data.get("register_id")
-    bbbb = register_payment.objects.get(register_id=register_id)
-
+    rp_id = data.get("rp_id")
+ 
+    print(register_id)
+    print(rp_id)
+    bbbb = register_payment.objects.get(register_id=register_id,rp_id=rp_id)
+    
 
     if bbbb.commit_head > 0:
         
         obj = []
         content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
         for r in content:
-            print(r)
+        
             s_name = 'ยังไม่ยืนยัน'
             stages = commissionstages.objects.filter(stage_id=r.stage_id).first()
-            print(stages)
+            
             if r.status == 'Y':
                 s_name = 'ยืนยันแล้ว'
             res = {'commit_id':r.commit_id,'stage_id':r.stage_id,'user_id':r.user_id,'register_id':r.register_id,'stages_name':stages.stage_name,'rates':stages.commission_rate,'s_name':s_name}
@@ -627,12 +631,7 @@ def data_com(request):
 @csrf_exempt
 def user_com(request):
     data = json.loads(request.body)
-  
-
-
-
     content = User.objects.filter()
-
     obj = []
     for r in content:
   
@@ -645,6 +644,8 @@ def user_com(request):
 
 @csrf_exempt
 def update_com(request):
+
+    print('update')
     data = json.loads(request.body)
     commit_id = data.get("commit_id")
     user_id = data.get("user_id")

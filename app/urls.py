@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification
 
 urlpatterns = [
     # Register
@@ -365,6 +365,9 @@ urlpatterns = [
 
      path('calendar_event_apiall_overdue/', course.calendar_event_apialloverdue),
      path('api/bill_overdue', desbill.data_bill_overdue),
+     path('api/notifications', notification.fetch_notification),
+
+   
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

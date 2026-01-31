@@ -107,6 +107,7 @@ if (existingModal) {
 
 
   function setValueDeleteModal(register_id,ev_id,seller,rp_id) {
+   
   $('#json-table-body-rate').empty(); // Clear previous cards
     document.getElementById("register_id").value = register_id;
     document.getElementById('eventModalLabelSeller').innerText = 'ผู้ประสานงาน : ' + seller;
@@ -119,7 +120,7 @@ if (existingModal) {
 
     async function findcommit(register_id,ev_id,rp_id) {
 
-
+   
     const table = document.getElementById('ttt');
     table.style.display = 'block';
 
@@ -213,7 +214,7 @@ if (existingModal) {
    
       });
   $('#json-table-body-rate').empty(); // Clear previous cards
-              let com = findcommit(register_id,ev_id)
+              let com = findcommit(register_id,ev_id,rp_id)
             // Optionally, show a success message to the user
         },
         error: function(xhr, status, error) {
@@ -236,6 +237,7 @@ if (existingModal) {
 
 
   async function populateTable() {
+    
     try {
         const response = await fetch('/api/calendar_event_api_user', {
         method: 'POST', // Specify the HTTP method as POST
@@ -296,7 +298,7 @@ if (existingModal) {
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
-       
+        
         if(item.commit_head == 0){
         const row = document.createElement('tr');
 
