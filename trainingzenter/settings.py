@@ -111,9 +111,9 @@ WSGI_APPLICATION = 'trainingzenter.wsgi.application'
 DATABASES = {
        'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'postz',
+        'NAME': 'idss_new',
         'USER': 'root',
-        'HOST': '27.254.149.244',
+        'HOST': '27.254.149.247',
         'PASSWORD': '@P@SS.W0rd',
         'PORT': '3306',
         'OPTIONS': {
