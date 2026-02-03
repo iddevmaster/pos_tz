@@ -97,7 +97,7 @@ def register_print(request, rp_id):
     else:   
        t = 0
 
-    print(t)   
+     
     
  
     context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,'total':t,
