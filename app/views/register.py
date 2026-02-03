@@ -2111,7 +2111,7 @@ def register_management(request):
             if event_re != None:
                sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
                getso = sale_re
-        
+        print(factcustomer_list.register.customer_type)
         res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,'seller':seller,'saleorder':getso,
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
