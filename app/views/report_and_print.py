@@ -2090,7 +2090,7 @@ def register_report_summary_details_com(request ,id, year, m):
         com = fact_commission.objects.get(commit_id=rs.com_id)
         comstate = commissionstages.objects.get(stage_id=com.stage_id)
         coursse = course.objects.get(course_id=rs.course_id)
-        paymets = register_payment.objects.filter(register_id=rs.register_id,status_bill='Y').first()
+        paymets = register_payment.objects.filter(register_id=rs.register_id).first()
         evs = course_event.objects.get(ev_id=rs.ev_id)
  
         price += rs.tis_com_before_tax
