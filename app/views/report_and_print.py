@@ -74,6 +74,8 @@ def register_print(request, rp_id):
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
     signama = signature.objects.filter(user_id=content.user_manage).first()
+
+    print(signa)
     try:
         mange = User.objects.get(id=content.user_manage)
     except User.DoesNotExist:
@@ -88,7 +90,6 @@ def register_print(request, rp_id):
     else:
         rpi_price_default = items.rpi_price_total
 
-    
     t = 0
     if items.type_payment == 'FullPayment':
        t = 0

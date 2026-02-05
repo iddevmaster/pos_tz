@@ -55,41 +55,18 @@ def course_list(request):
 def fetch_notification(request):
     # data = json.loads(request.body)
     user_id = request.user.id
-  
+    print(user_id)
+    obj = []
     # ev_id = data.get("ev_id")
 
     content = user_detail.objects.get(user_id=user_id)
-    
-    # regbyev = notifications.objects.select_related("cm").filter()
-    # print(regbyev.cm)
-    # total_rq_quta = 0
-    
-    # for aaa in regbyev:
-        
-    #     try:
-    #         bbbb = register_payment.objects.filter(register_id=aaa.register_id).first()
-    #         if bbbb:
-    #          total_rq_quta += bbbb.rp_quota
-    #     except register_payment.DoesNotExist:  
-    #         bbbb = 0
 
-    datas = notifications.objects.select_related("cm").filter(
-        # ใส่ Filter ตามที่ต้องการ
-    ).annotate(
-        # ดึง cm_name จากตาราง category_program มาไว้ในชื่อใหม่
-        category_label=F('cm__cm_name') 
-    ).values(
-        'notifications_id',
-        'notification_type',
-        'title',
-        'message',
-        'is_read',
-        'category_label', # ใช้ชื่อที่ตั้งใหม่จาก annotate
-        'crt_date'
-    ).order_by('-crt_date')
+    datas = notifications.objects.select_related("cm").filter(user_id=user_id)
+    for aaa in datas:
+        res = {'notifications_id':aaa.notifications_id,'notification_type':aaa.notification_type,'title': aaa.title,'message':aaa.message,'is_read':aaa.is_read,'crt_date':aaa.crt_date}
+        obj.append(res)
+    print(obj)
 
-
-    data = list(datas)
-    return JsonResponse(data, status=200, safe=False)  
+    return JsonResponse(obj, status=200, safe=False)  
 
     

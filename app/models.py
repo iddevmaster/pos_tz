@@ -572,5 +572,6 @@ class notifications(models.Model):
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
     cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     

@@ -98,13 +98,19 @@ setInterval(fetchNotifications, 100000);
         
 
 
-        const notificationData = {
+         allNotificationsData = {
     "total_count": 5,
     "unread_count": 3,
     "notifications": data
 };
-console.log(notificationData)
-        renderNotifications(notificationData)
+
+
+
+        renderNotifications(data,5,3)
+
+        initTabEvents();
+
+       
 
         // // 1. อัปเดตตัวเลขที่ Badge
         // const badge = document.querySelector('.badge');
@@ -248,23 +254,60 @@ console.log(notificationData)
         });
 
 
-        function renderNotifications(data) {
+
+
+
+function initTabEvents() {
+    document.querySelectorAll('.tab').forEach((tab, index) => {
+        tab.addEventListener('click', function() {
+            // สลับ Class Active
+            console.log('สลับ');
+            document.querySelector('.tab.active').classList.remove('active');
+            this.classList.add('active');
+            console.log(allNotificationsData.notifications.length)
+            let filtered;
+            const total = allNotificationsData.notifications.length;
+            const unread = allNotificationsData.notifications.filter(n => n.is_read == 'false').length;
+
+            if (index === 1) { // Tab "ยังไม่อ่าน"
+                filtered = allNotificationsData.notifications.filter(n => n.is_read === 'false');
+            } else { // Tab "ทั้งหมด"
+                filtered = allNotificationsData.notifications;
+            }
+            
+            // ส่งข้อมูลที่กรองแล้วไปวาดใหม่
+            renderNotifications(filtered,5,3);
+        });
+    });
+}
+
+
+
+
+        function renderNotifications(data,totalall,unread) {
+          
           
     const listContainer = document.querySelector('.notification-list');
     const tabAll = document.querySelectorAll('.tab')[0];
     const tabUnread = document.querySelectorAll('.tab')[1];
 
     // 1. อัปเดตตัวเลขบน Tabs
-    if (tabAll) tabAll.textContent = `ทั้งหมด (${data.total_count})`;
-    if (tabUnread) tabUnread.textContent = `ยังไม่อ่าน (${data.unread_count})`;
+    if (tabAll) tabAll.textContent = `ทั้งหมด (${totalall})`;
+    if (tabUnread) tabUnread.textContent = `ยังไม่อ่าน (${unread})`;
 
     // 2. ล้างรายการเดิมใน List
     listContainer.innerHTML = '';
 
     // 3. วนลูปสร้าง HTML รายการแจ้งเตือน
-    data.notifications.forEach(item => {
-        const unreadClass = item.is_unread ? 'unread' : '';
-        const unreadDot = item.is_unread ? '<div class="unread-dot"></div>' : '';
+
+    if (data.length === 0) {
+        listContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">ไม่มีการแจ้งเตือน</div>';
+        return;
+    }
+    data.forEach(item => {  
+        
+        const unreadClass = item.is_read ? 'true' : '';
+        const unreadDot = item.is_read ? '<div class="unread-dot"></div>' : '';
         
         // เลือก Icon ตามประเภท (ตัวอย่าง)
         let iconSvg = '';
@@ -286,7 +329,7 @@ console.log(notificationData)
                 <div class="notification-content">
                     <div class="notification-title">
                       
-                        ${item.title}
+                        ${item.title} 
                     </div>
                     <div class="notification-message">${item.message}</div>
                     <div class="notification-time">${item.crt_date}</div>
