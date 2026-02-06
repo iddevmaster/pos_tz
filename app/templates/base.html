@@ -96,17 +96,18 @@ setInterval(fetchNotifications, 100000);
         const response = await fetch('/api/notifications'); // แก้ URL ให้ตรงกับ urls.py
         const data = await response.json();
         
-
+         
 
          allNotificationsData = {
-    "total_count": 5,
-    "unread_count": 3,
-    "notifications": data
+    "total_count": data.total,
+    "unread_count": data.total,
+    "notifications": data.data
 };
+total = data.total
+unread = data.unread
 
 
-
-        renderNotifications(data,5,3)
+        renderNotifications(data.data,total,unread)
 
         initTabEvents();
 
@@ -261,10 +262,10 @@ function initTabEvents() {
     document.querySelectorAll('.tab').forEach((tab, index) => {
         tab.addEventListener('click', function() {
             // สลับ Class Active
-            console.log('สลับ');
+            
             document.querySelector('.tab.active').classList.remove('active');
             this.classList.add('active');
-            console.log(allNotificationsData.notifications.length)
+           
             let filtered;
             const total = allNotificationsData.notifications.length;
             const unread = allNotificationsData.notifications.filter(n => n.is_read == 'false').length;
@@ -275,8 +276,9 @@ function initTabEvents() {
                 filtered = allNotificationsData.notifications;
             }
             
+    
             // ส่งข้อมูลที่กรองแล้วไปวาดใหม่
-            renderNotifications(filtered,5,3);
+            renderNotifications(filtered,total,unread);
         });
     });
 }

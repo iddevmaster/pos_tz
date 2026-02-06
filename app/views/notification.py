@@ -55,18 +55,23 @@ def course_list(request):
 def fetch_notification(request):
     # data = json.loads(request.body)
     user_id = request.user.id
-    print(user_id)
+    
     obj = []
     # ev_id = data.get("ev_id")
 
     content = user_detail.objects.get(user_id=user_id)
 
     datas = notifications.objects.select_related("cm").filter(user_id=user_id)
+
+    all = notifications.objects.select_related("cm").filter(user_id=user_id).count()
+    unread = notifications.objects.select_related("cm").filter(user_id=user_id,is_read='false').count()
     for aaa in datas:
         res = {'notifications_id':aaa.notifications_id,'notification_type':aaa.notification_type,'title': aaa.title,'message':aaa.message,'is_read':aaa.is_read,'crt_date':aaa.crt_date}
         obj.append(res)
-    print(obj)
 
-    return JsonResponse(obj, status=200, safe=False)  
+    s = {'total':all,'data':obj,'unread':unread}
+    
+
+    return JsonResponse(s, status=200, safe=False)  
 
     
