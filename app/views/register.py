@@ -3053,7 +3053,7 @@ def report_register_listall(request,evs_id):
     count = 0
     for rs in list(mains):
         count += 1
-        r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date}
+        r = {'training_id':rs.training_id,'student_identification_number':rs.student_identification_number,'student_prefix_th':rs.student_prefix_th,'student_firstname_th':rs.student_firstname_th,'student_lastname_th':rs.student_lastname_th,'student_firstname_eng':rs.student_firstname_eng,'student_lastname_eng':rs.student_lastname_eng,'student_prefix_eng':rs.student_prefix_eng,'crt_date':rs.crt_date,'upd_date':rs.upd_date,'tel':rs.tel}
         obj.append(r)
     
     context = {'title': title, 'listMenuPermission': objMenu,'main_data': c_evet,'data':obj,'count':count,'api_id_card': api_id_card}
