@@ -317,7 +317,7 @@ def register_createnoevent(request):
     )
     object.refresh_from_db()
     register_id = object.register_id
-    print(register_id)
+    
     request.session['register_id'] = str(register_id)
     return redirect("/salesnotevent")
 
@@ -740,7 +740,7 @@ def paymentnoevent(request, register_id):
     addon = add_on.objects.filter(register_id=uuid_without_dashes,status='Y')
     course_c = course.objects.get(is_show_order='Y',cancelled=1,course_id=content_regist.course_id)
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
-    print(uuid_without_dashes)
+    
     context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'course':course_c,'register_id':register_id,
                'content_regist': content_regist, 'student_data': student_data,'ev_training':content_regist,'list_user':list_user}
     return render(request, 'register/register_noeventpayment.html', context)    
@@ -3184,7 +3184,7 @@ def approve_internal_doc_print(request,doc_id):
 
     users = User.objects.get(id=payment.user_create)
     signa = signature.objects.filter(user_id=payment.user_create).first()
-    print(totaldata.created_at)
+    
     mange = User.objects.get(id=payment.user_manage)
     
     running_number = treeDigit(totaldata + 1)
@@ -3425,7 +3425,7 @@ def get_customer_data(request):
     data = json.loads(request.body)
     obj = []
     customer_id = data.get("customer_id")
-    print(customer_id)
+    
     dat = customers.objects.get(customer_id=customer_id)
 
     r = {'customer_address':dat.customer_address,'customer_phone':dat.customer_phone,'customer_code':dat.customer_code,'customer_name':dat.customer_name}
