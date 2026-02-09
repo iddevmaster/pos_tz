@@ -420,7 +420,7 @@ def customer_create(request):
         totaldata = student.objects.filter(
             crt_date__month=month_current, crt_date__year=year_current).count()
         running_number = treeDigit(totaldata + 1)
-        student_code = "TZ" + str(twoDigit(month_current)) + \
+        student_code = "IDSS" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
         student.objects.create(
             student_identification_number=custr.customer_tax,
@@ -537,7 +537,7 @@ def customer_createno(request):
         totaldata = student.objects.filter(
             crt_date__month=month_current, crt_date__year=year_current).count()
         running_number = treeDigit(totaldata + 1)
-        student_code = "TZ" + str(twoDigit(month_current)) + \
+        student_code = "IDSS" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
         student.objects.create(
             student_identification_number=custr.customer_tax,
@@ -798,7 +798,7 @@ def payment_create(request):
     totaldata = register_payment.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current).count()
     running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+    rp_doc_number = "IDSS" + year_current_f[2:4] + "/" + \
         str(twoDigit(month_current)) + "/" + str(running_number)
     # Item
     rpi_code = request.POST['rpi_code']
@@ -939,7 +939,7 @@ def payment_create(request):
         totaldata = student.objects.filter(
             crt_date__month=month_current, crt_date__year=year_current).count()
         running_number = treeDigit(totaldata + 1)
-        student_code = "TZ" + str(twoDigit(month_current)) + \
+        student_code = "IDSS" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
         student.objects.create(
             student_identification_number=rp_tax,
@@ -1026,7 +1026,7 @@ def payment_createno(request):
     totaldata = register_payment.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current).count()
     running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
+    rp_doc_number = "IDSS" + year_current_f[2:4] + "/" + \
         str(twoDigit(month_current)) + "/" + str(running_number)
     # Item
     rpi_code = request.POST['rpi_code']
@@ -1480,7 +1480,7 @@ def student_form_create(request, register_id):
             totaldata = student.objects.filter(
                 crt_date__month=month_current, crt_date__year=year_current).count()
             running_number = treeDigit(totaldata + 1)
-            student_code = "TZ" + str(twoDigit(month_current)) + \
+            student_code = "IDSS" + str(twoDigit(month_current)) + \
                 str(running_number) + "/" + str(year_current)
 
             student.objects.create(
@@ -1999,7 +1999,7 @@ def student_create_idcard(request):
     totaldata = student.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current).count()
     running_number = treeDigit(totaldata + 1)
-    student_code = "TZ" + str(twoDigit(month_current)) + \
+    student_code = "IDSS" + str(twoDigit(month_current)) + \
         str(running_number) + "/" + str(year_current)
 
     student.objects.create(
@@ -2728,7 +2728,7 @@ def upload_excel(request):
                
                         totaldata = student.objects.filter(crt_date__month=month_current, crt_date__year=year_current).count()
                         running_number = treeDigit(totaldata + 1)
-                        student_code = "TZ" + str(twoDigit(month_current)) + \
+                        student_code = "IDSS" + str(twoDigit(month_current)) + \
                         str(running_number) + "/" + str(year_current)
               
                         student.objects.create(
@@ -2783,7 +2783,7 @@ def upload_excel_ev(request):
                         if row[0]:  # Assuming the first column is not empty
                             res = {'รหัสบัตร':row[0],'นาม':row[1],'ชื่อ':row[2],'นามสกุล':row[3],'นามอัง':row[4],'Name':row[5],'LastName':row[6]}
                             excel_data.append(res) 
-                            student_code = "TZ" + str(twoDigit(month_current)) + "/" + str(year_current)
+                            student_code = "IDSS" + str(twoDigit(month_current)) + "/" + str(year_current)
                             training.objects.create(
                         student_identification_number=row[0],
                         student_prefix_th=row[1],
