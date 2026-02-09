@@ -55,7 +55,7 @@ def course_list(request):
 def fetch_notification(request):
     # data = json.loads(request.body)
     user_id = request.user.id
-    
+    print(user_id)
     obj = []
     # ev_id = data.get("ev_id")
 
@@ -73,5 +73,17 @@ def fetch_notification(request):
     
 
     return JsonResponse(s, status=200, safe=False)  
+
+
+@csrf_exempt
+def fetch_notification_read(request):
+    # data = json.loads(request.body)
+    user_id = request.user.id
+   
+    datas = notifications.objects.select_related("cm").filter(user_id=user_id,is_read='false').update(is_read='true')
+    datas = []
+    
+
+    return JsonResponse(datas, status=200, safe=False)  
 
     

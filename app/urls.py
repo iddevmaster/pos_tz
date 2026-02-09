@@ -366,7 +366,7 @@ urlpatterns = [
      path('calendar_event_apiall_overdue/', course.calendar_event_apialloverdue),
      path('api/bill_overdue', desbill.data_bill_overdue),
      path('api/notifications', notification.fetch_notification),
-
+     path('api/notifications/read', notification.fetch_notification_read),
    
 
     #     API

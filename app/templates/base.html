@@ -85,28 +85,35 @@
 
      <script>
 
+
+  
+
       document.addEventListener('DOMContentLoaded', fetchNotifications);
+
+
 // หรือตั้งเวลาให้ดึงข้อมูลทุกๆ 1 นาที (Polling)
 setInterval(fetchNotifications, 100000);
 
       async function fetchNotifications() {
-        console.log('first')
+
+
 
         try {
         const response = await fetch('/api/notifications'); // แก้ URL ให้ตรงกับ urls.py
         const data = await response.json();
-        
-         
+
 
          allNotificationsData = {
     "total_count": data.total,
-    "unread_count": data.total,
+    "unread_count": data.unread,
     "notifications": data.data
 };
 total = data.total
 unread = data.unread
 
 
+   const badgeElement = document.getElementById('badge2x');
+   badgeElement.innerText = data.unread; 
         renderNotifications(data.data,total,unread)
 
         initTabEvents();
@@ -188,6 +195,8 @@ unread = data.unread
             const markAllRead = document.getElementById('markAllRead');
             if (markAllRead) {
                 markAllRead.addEventListener('click', function(e) {
+                  
+                  const response = fetch('/api/notifications/read'); // แก้ URL ให้ตรงกับ urls.py
                     e.preventDefault();
                     const unreadItems = document.querySelectorAll('.notification-item.unread');
                     unreadItems.forEach(item => {
@@ -195,7 +204,9 @@ unread = data.unread
                         const dot = item.querySelector('.unread-dot');
                         if (dot) dot.remove();
                     });
-                    
+
+                fetchNotifications()
+                    console.log(allNotificationsData)
                     // Update badge count
                     const badge = document.querySelector('.badge');
                     if (badge) badge.textContent = '0';
@@ -203,7 +214,7 @@ unread = data.unread
                     // Update tab counts
                     const allTab = document.querySelectorAll('.tab')[0];
                     const unreadTab = document.querySelectorAll('.tab')[1];
-                    if (allTab) allTab.textContent = 'ทั้งหมด (5)';
+                    if (allTab) allTab.textContent = 'ทั้งหมด '+ '(' +allNotificationsData.total_count + ')';
                     if (unreadTab) unreadTab.textContent = 'ยังไม่อ่าน (0)';
                 });
             }
@@ -1288,7 +1299,7 @@ function initTabEvents() {
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
                         </svg>
-                        <span class="badge2x">5</span>
+                        <span class="badge2x" id='badge2x'></span>
                     </div>
                 </div>
             </div>
