@@ -1157,6 +1157,39 @@ if (resultElement) {
     }, 200);
 
   }
+
+
+      function allowOnlyNumbersExp(event) {
+
+
+    // Allow: Backspace, Tab, Arrow keys, Delete
+    if (
+      event.key === "Backspace" ||
+      event.key === "Tab" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "Delete"
+    ) {
+
+
+
+      return true; // Allow default behavior
+    }
+
+    // Allow only numbers (0-9)
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault(); // Block other characters
+      return false; // Prevent default behavior
+    }
+
+
+   
+        setTimeout(() => {
+
+      Caculate()
+    }, 200);
+
+  }
 </script>
 <style scoped>
 
@@ -1395,7 +1428,7 @@ if (resultElement) {
            <div class="col-12 col-lg-6 col-md-6">
             <span class="font-default">ยอดเงิน:</span>
             <label style="color: red"> *</label>
-            <input type="text" class="form-control" name="tis_expenses" id="tis_expenses" value="0"  />
+            <input type="text" class="form-control" name="tis_expenses" id="tis_expenses" value="0"   onkeydown="allowOnlyNumbersExp(event)"  />
           </div>
         </div> 
       
