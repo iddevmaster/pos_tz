@@ -732,22 +732,27 @@ def calendar_event_api(request):
         return render(request, '404.html')
     start = request.GET.get('start', None)
     end = request.GET.get('end', None)
-    _date = date.today()
+ 
+    _date = date(2026, 1, 1)
+
+    a = date(2026, 1, 1)
+    b = date(2026, 12, 31)
+  
     if start is not None and end is not None:
         # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        sobj = str(start).split("T")[0]
+        sobj = a
         # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        eobj = str(end).split("T")[0]
+        eobj = b
+   
     else:
         sobj = _date + timedelta(days=0)
-        eobj = _date + timedelta(days=60)
+        eobj = _date + timedelta(days=1000)
     status = ['W','Y','I']
     # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
-    
- 
+
     content = course_event.objects.select_related(
         "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
-   
+    
     obj = []
 
     sff = []
