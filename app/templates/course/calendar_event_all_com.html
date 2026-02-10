@@ -298,7 +298,7 @@ if (existingModal) {
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
-        
+        console.log(item);
         if(item.commit_head == 0){
         const row = document.createElement('tr');
 
@@ -322,15 +322,7 @@ if (existingModal) {
                  เลือก
                 </button></td> 
                       
-                    <td>         <button
-                  type="button"
-                    onclick="setValueDeleteModal('${item.register_id}','${item.ev_id}','${item.seller}','${item.rp_id}')"
-                  class="btn btn-danger"
-              
-                >
-                
-                 กำหนด
-                </button></td>  
+                    <td>      -    </td>  
                 `;
         tableBody.appendChild(row);
         }
@@ -360,6 +352,9 @@ if (existingModal) {
                 </button></td>  
                 `;
         tableBody.appendChild(row);
+        }else {
+
+          
         }
 
       });

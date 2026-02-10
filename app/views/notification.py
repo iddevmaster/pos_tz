@@ -66,7 +66,7 @@ def fetch_notification(request):
     all = notifications.objects.select_related("cm").filter(user_id=user_id).count()
     unread = notifications.objects.select_related("cm").filter(user_id=user_id,is_read='false').count()
     for aaa in datas:
-        res = {'notifications_id':aaa.notifications_id,'notification_type':aaa.notification_type,'title': aaa.title,'message':aaa.message,'is_read':aaa.is_read,'crt_date':aaa.crt_date}
+        res = {'notifications_id':aaa.notifications_id,'notification_type':aaa.notification_type,'title': aaa.title,'message':aaa.message,'is_read':aaa.is_read,'crt_date':aaa.crt_date,'action_url':aaa.action_url}
         obj.append(res)
 
     s = {'total':all,'data':obj,'unread':unread}

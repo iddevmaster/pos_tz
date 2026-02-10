@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head,notifications
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -645,21 +645,49 @@ def user_com(request):
 @csrf_exempt
 def update_com(request):
 
-    print('update')
+   
     data = json.loads(request.body)
     commit_id = data.get("commit_id")
     user_id = data.get("user_id")
     types = data.get("type")
     content = fact_commission.objects.get(commit_id=commit_id)
+
+
+    noti = notifications(
+    notification_type='com',
+    title='แจ้งเตือน',
+    message='ยืนยันค่าคอม',
+    reference_id='123',
+    reference_type='task',
+    is_read='false',
+    read_at=dateTimeNow(),
+    action_url='/finance/sale/com',
+    priority='easy',
+    user_id=user_id,
+    created_by='1',
+    cm_id=1,
+    crt_date=dateTimeNow(),
+    upd_date=dateTimeNow())
+    noti.save()
+ 
     if types == 'group':
         content = fact_commission.objects.filter(rpi_id=content.rpi_id,status='N').update(
             user_id=user_id
         )
+
+ 
         obj = {'status':200}
     else :    
         content = fact_commission.objects.get(commit_id=commit_id)
         content.user_id = user_id
         content.save()
+
+       
+
+
+
+    
+        
         obj = {'status':200}
     return JsonResponse(obj,safe=False)
 
