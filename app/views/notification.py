@@ -59,7 +59,6 @@ def fetch_notification(request):
     obj = []
     # ev_id = data.get("ev_id")
 
-    content = user_detail.objects.get(user_id=user_id)
 
     datas = notifications.objects.select_related("cm").filter(user_id=user_id)
 
