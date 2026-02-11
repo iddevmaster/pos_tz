@@ -159,23 +159,20 @@
         </div>
 
         <div style="font-size: 35px; font-weight: bold">
-         {{data.student_prefix_th}} {{data.student_firstname_th}}
-          {{data.student_lastname_th}}
+          {{data.student_prefix_eng}} {{data.student_firstname_eng}}
+          {{data.student_lastname_eng}}
         </div>
         <div>
           <img src="{% static "images/newlogo_resize.png"%}" class="ls">
         </div>
         <div style="font-size: 1.5em">has successfully complete</div>
-          <div style="font-weight: bold; font-size: 35px">
-          {{detail.course.course_name}}
-        </div> 
         <div style="font-weight: bold; font-size: 35px">
           {{detail.course.course_name_eng}}
         </div>
         <div style="font-size: 35px; font-weight: bold">
-          {% comment %} {% language 'en' %}
+          {% language 'en' %}
           <span> {{detail.ev_date_start|date:'d F Y'}} </span>
-          {% endlanguage %} {% endcomment %}
+          {% endlanguage %}
 <!--- <span>  {{detail.ev_date_start|date:'d F Y'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
       -->
         </div>
