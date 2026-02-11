@@ -55,11 +55,11 @@ def course_list(request):
 def fetch_notification(request):
     # data = json.loads(request.body)
     user_id = request.user.id
-    
+    print(user_id)
     obj = []
     # ev_id = data.get("ev_id")
 
-  
+    content = user_detail.objects.get(user_id=user_id)
 
     datas = notifications.objects.select_related("cm").filter(user_id=user_id)
 
