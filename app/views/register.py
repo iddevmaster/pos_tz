@@ -43,7 +43,7 @@ def customer_read_idcard(request):
 def register_home(request):
     title = defaultTitle
     user_id = request.user.id
-    
+
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:

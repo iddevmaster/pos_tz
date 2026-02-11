@@ -42,6 +42,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'django_crontab',
+]
+
+CRONJOBS = [
+    # ทุกๆ 5 นาที: ('รหัสเวลา', 'ตำแหน่งฟังก์ชัน')
+    ('*/5 * * * *', 'myapp.cron.my_scheduled_job')
 ]
 
 MIDDLEWARE = [

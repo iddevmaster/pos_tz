@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 
 from django.db.models import Count, Sum, Value, F
-from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training,register_payment_items
+from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training,register_payment_items,notifications
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd,checkpermi
 from django.views.decorators.csrf import csrf_exempt
@@ -1385,8 +1385,26 @@ def update_course_even(request):
     ev_id = data.get("evs_id")
 
     content = course_event.objects.get(ev_id=ev_id)
-    content.status = 'Y'
-    content.save()
+    # content.status = 'Y'
+    # content.save()
+
+    conte = course.objects.get(course_id=content.course.course_id)
+    noti = notifications(
+    notification_type='app',
+    title='แจ้งเตือน',
+    message='วันจัดอบรม'+ conte.course_name,
+    reference_id='123',
+    reference_type='app',
+    is_read='false',
+    read_at=dateTimeNow(),
+    action_url='/calendar_event/',
+    priority='easy',
+    user_id=6,
+    created_by='1',
+    cm_id=1,
+    crt_date=dateTimeNow(),
+    upd_date=dateTimeNow())
+    noti.save()
 
     return JsonResponse({"status": "ok"}, status=200)      
 
