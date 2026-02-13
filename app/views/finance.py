@@ -1237,7 +1237,7 @@ def withdraw_list_one_com(request):
     commit = fact_commission.objects.filter(status='N',user_id=user_id)
     total_all = 0
     obj = []
-  
+    s = '0'
     for r in commit:
         content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
         paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
