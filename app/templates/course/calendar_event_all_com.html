@@ -18,6 +18,8 @@
         dropdownParent: $('#select2Modal')
       });
     });
+
+    
   });
 
   
@@ -463,6 +465,10 @@ if (existingModal) {
     z-index: 1055 !important;
     /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
   }
+
+  .select2-container--open {
+    z-index: 9999999 !important;
+}
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -577,7 +583,7 @@ if (existingModal) {
 
 
 
-<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="xxlModalLabel" aria-hidden="true">
+<div class="modal fade" id="eventModal"  aria-labelledby="xxlModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xxl">
     <div class="modal-content">
       <div class="modal-header">
