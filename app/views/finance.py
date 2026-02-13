@@ -1,10 +1,12 @@
 from datetime import date
 import datetime
+import decimal
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
+
 from django.db.models.functions import TruncMonth
 from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon,com_head
 from ..constant import defaultTitle, thai_months,unitPayChoices
@@ -1265,9 +1267,9 @@ def withdraw_list_one_com(request):
         obj.append(r)
 
         
-       
+        dec = decimal.Decimal(total_all)
 
-        total_all = str(total_all)
+        total_all = str(dec)
  
         
     context = {'title': title,'listMenuPermission': objMenu,'data':obj,'user_id':user_id,'total_all':total_all}
