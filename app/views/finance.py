@@ -1235,6 +1235,7 @@ def withdraw_list_one_com(request):
     commit = fact_commission.objects.filter(status='N',user_id=user_id)
     total_all = 0
     obj = []
+  
     for r in commit:
         content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
         paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
@@ -1263,9 +1264,9 @@ def withdraw_list_one_com(request):
         r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat,'after_vat_cal':after_vat_cal}
         obj.append(r)
 
-        total_all = Decimal(total_all)
+        
       
-        total_all = f"{total_all:.2f}"
+ 
         
     context = {'title': title,'listMenuPermission': objMenu,'data':obj,'user_id':user_id,'total_all':total_all}
     return render(request, 'finance/commit_withdraw.html',context)
