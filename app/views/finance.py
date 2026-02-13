@@ -1267,10 +1267,8 @@ def withdraw_list_one_com(request):
         obj.append(r)
 
         d = Decimal(total_all)
-        s = '{0:f}'.format(d)
+        s = '{0:.2f}'.format(d)
 
-        print(s)
- 
         
     context = {'title': title,'listMenuPermission': objMenu,'data':obj,'user_id':user_id,'total_all':s}
     return render(request, 'finance/commit_withdraw.html',context)
