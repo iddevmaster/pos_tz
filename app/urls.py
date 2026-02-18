@@ -237,6 +237,9 @@ urlpatterns = [
     path('report/register/export/approve_list',
          report_and_print.register_report_approve),
     path('register/print/<slug:rp_id>', report_and_print.register_print),
+
+
+     path('register/export/endevent',report_and_print.report_end_event),
     
 
     path('salesnotevent/print/<slug:rp_id>', report_and_print.register_printnoev),

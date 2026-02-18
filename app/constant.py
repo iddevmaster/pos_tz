@@ -350,6 +350,13 @@ listMenu = [
         "group_label": "รายงาน",
     },
     {
+        "value": "register/export/endevent",
+        "label": "รายงานส่งมอบงานทั้งหมด",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+
+    {
         "value": "report/teacher/export",
         "label": "รายงานค่าตอบแทน",
         "group_value": "WRltr2",
@@ -410,7 +417,13 @@ listMenu = [
         "group_value": "naSt14",
         "group_label": "ทะเบียนเข้าอบรม",
     },
-        {
+  {
+        "value": "rt/sale",
+        "label": "เปิดการขายแบบไม่มีอีเวน",
+        "group_value": "WR14515",
+        "group_label": "เปิดการขาย",
+    },
+     {
         "value": "rt/sale",
         "label": "เปิดการขายแบบไม่มีอีเวน",
         "group_value": "WR14515",
