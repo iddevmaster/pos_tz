@@ -3749,6 +3749,46 @@ def register_report_approve(request):
     context = {'title': defaultTitle,  'data': content, 'listMenuPermission': objMenu}
     return render(request, 'report/register_report_approve.html', context)
 
+
+
+@login_required(login_url='/login')
+def report_end_event(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+      # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+
+    
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        
+        objMenu.append(r)
+    month_current = request.GET.get('qmonths', date.today().month)
+    year_current = request.GET.get('qyear', date.today().year)
+    print(month_current)
+    print(year_current)
+    status = ['I','S','W']
+
+    content = course_event.objects.select_related('course').filter(module=m.module,status__in=status).order_by("-ev_id")
+    
+    context = {'title': defaultTitle,  'data': content, 'listMenuPermission': objMenu}
+    return render(request, 'report/register_report_end_event.html', context)
+
+
 def student_print_certificate(request, student_id):
     
     lang = request.GET.get('lang', 'eng')
