@@ -105,7 +105,7 @@
             <th>วันที่อบรบ</th>
             <th>สถานะ</th>
            
-            <th>วันที่ทำรายการ</th>
+            <th>อัพเดทล่าสุด</th>
           </tr>
         </thead>
         <tbody>
@@ -121,9 +121,9 @@
             <td>   {{res.ev_date_start}} - {{res.ev_date_end}}</td>
             <td>
               {% if res.status == 'S' %}
-              <span class="badge bg-info">จบอบรมเรียบร้อย</span>
+              <span class="badge bg-success">จบอบรมเรียบร้อย</span>
               {% elif res.status == 'I' %}
-              <span class="badge bg-success">รอการยืนยันวันจบอบรม</span>
+              <span class="badge bg-info">รอการยืนยันวันจบอบรม</span>
               {% elif res.status == 'Y' %}
               <span class="badge bg-warning">ทีมงานพร้อมทำงาน</span>
               {% elif res.status == 'W' %}

@@ -3783,7 +3783,7 @@ def report_end_event(request):
     print(year_current)
     status = ['I','S','W']
 
-    content = course_event.objects.select_related('course').filter(module=m.module,status__in=status).order_by("-ev_id")
+    content = course_event.objects.select_related('course').filter(module=m.module,status__in=status,ev_date_start__month=month_current, ev_date_start__year=year_current).order_by("-ev_id")
     
     context = {'title': defaultTitle,  'data': content, 'listMenuPermission': objMenu}
     return render(request, 'report/register_report_end_event.html', context)
