@@ -400,6 +400,13 @@ listMenu = [
     },
 
     {
+        "value": "register/sale/credit",
+        "label": "รายงานใบเสนอราคารายบุคคล",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
+
+    {
         "value": "register/report/event/all",
         "label": "รายงานผู้เข้าอบรม",
         "group_value": "naSt14",
@@ -429,6 +436,7 @@ listMenu = [
         "group_value": "WR14515",
         "group_label": "เปิดการขาย",
     },
+
 
     
 
