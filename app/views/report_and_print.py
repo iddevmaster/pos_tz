@@ -890,7 +890,7 @@ def register_excel_quotation_byuser(request):
     close_the_sale = int(request.POST.get('qclose_the_sale', -1))
     course_id = int(request.POST.get('qcourse', 0))
     generation = request.POST.get('qgeneration', 0)
-    seller = user_id
+    seller = 11
     customer_name = request.POST.get('qcustomer_name', None)
     event = int(request.POST.get('event', 0))
     content = register_payment.objects.select_related(
@@ -942,17 +942,18 @@ def register_excel_quotation_byuser(request):
         seller_param = str(u.first_name) + " " + str(u.last_name)
     if customer_name != None:
         content = content.filter(Q(rp_name_customer__icontains=customer_name))
-    if event == 1:
-        content = content.filter(register__ev__ev_id__isnull=False)
-    if event == 2:
-        content = content.filter(register__ev__ev_id__isnull=True)    
+
     obj = []
     
     total_sum = 0
     for r in content:
-        print(r.register_id)
+
+        customer_listaa = fact_customer.objects.filter(
+            register=r.register_id).first()
+        
         customer_list = customers.objects.filter(
-            register=r.register_id).select_related('location').first()
+            customer_id=customer_listaa.customer_id).select_related('location').first()
+  
         payment_list = register_payment_items.objects.filter(
             rp_id=r.rp_id).order_by("-rp__rp_id").first()
         if payment_list is not None:
