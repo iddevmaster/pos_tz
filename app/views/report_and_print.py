@@ -725,6 +725,57 @@ def register_report_quotation(request):
                'list_user': list_user, 'course_list': course_list, 'daterange': daterange,'listMenuPermission': objMenu}
     return render(request, 'report/register_report_quotation.html', context)
 
+
+
+@login_required(login_url='/login')
+def register_report_quotation_by_sale(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    
+    list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
+    lastday = lastDateOfmonth(
+        date.today().year, date.today().month, date.today().day)
+    default_start = "01" + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    default_end = str(lastday) + "/" + \
+        str(date.today().month) + "/" + str(date.today().year)
+    daterange = str(default_start) + " - " + str(default_end)
+    course_list = course.objects.filter(
+        cancelled=1, active=1).order_by("-course_id")
+    try:
+        province_list = location_thai.objects.all().values(
+            'province_code', 'province_name').annotate(total=Count('province_code'))
+    except location_thai.DoesNotExist:
+        province_list = None
+    context = {'title': defaultTitle,  'province_list': province_list,
+               'list_user': list_user, 'course_list': course_list, 'daterange': daterange,'listMenuPermission': objMenu}
+    return render(request, 'report/register_report_quotation_user.html', context)
+
 @login_required(login_url='/login')
 def register_excel_quotation(request):
     user_id = request.user.id
@@ -822,6 +873,107 @@ def register_excel_quotation(request):
     context = {'title': defaultTitle, 'data': obj,
                'param': param, 'total_sum': total_sum}
     return render(request, 'print/register_excel_quotation.html', context)
+
+
+
+
+@login_required(login_url='/login')
+def register_excel_quotation_byuser(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    
+    date_range = request.POST.get('date_range', None)
+    close_the_sale = int(request.POST.get('qclose_the_sale', -1))
+    course_id = int(request.POST.get('qcourse', 0))
+    generation = request.POST.get('qgeneration', 0)
+    seller = user_id
+    customer_name = request.POST.get('qcustomer_name', None)
+    event = int(request.POST.get('event', 0))
+    content = register_payment.objects.select_related(
+        'register').filter(register__pay_type=2, active=1,register__module=m.module)
+    
+    lastday = lastDateOfmonth(
+        date.today().year, date.today().month, date.today().day)
+    default_start = str(date.today().year) + "-" + \
+        str(date.today().month) + "-" + "01"
+    default_end = str(date.today().year) + "-" + \
+        str(date.today().month) + "-" + str(lastday)
+    if date_range is not None:
+        start, end = format_daterange(date_range)
+        if start == end:
+            content = content.filter(
+                register__crt_date__date=start)
+        else:
+            content = content.filter(
+                register__crt_date__date__gte=start, register__crt_date__date__lte=end)
+        range_param = date_range
+    else:
+        content = content.filter(
+            register__crt_date__date__gte=default_start, register__crt_date__date__lte=default_end)
+        range_param = str(ymdtodmy(default_start)) + \
+            " - " + str(ymdtodmy(default_end))
+
+    close_the_sale_param = "ทุกประเภท"
+    if close_the_sale != -1:
+        content = content.filter(register__close_the_sale=close_the_sale)
+        if close_the_sale == 0:
+            close_the_sale_param = "กำลังขาย"
+        elif close_the_sale == 1:
+            close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
+        elif close_the_sale == 2:
+            close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
+    course_param = "ทุกหลักสูตร"
+    if course_id != 0:
+        content = content.filter(register__ev__course_id=course_id)
+        c = course.objects.get(course_id=course_id)
+        course_param = str(c.course_code) + " " + str(c.course_name)
+    generation_param = "ทุกรุ่น"
+    if generation:
+        content = content.filter(register__ev__ev_generation=generation)
+        generation_param = generation
+    seller_param = "ทุกคน"
+    if seller != 0:
+        content = content.filter(register__seller_id=seller)
+        u = User.objects.get(id=seller)
+        seller_param = str(u.first_name) + " " + str(u.last_name)
+    if customer_name != None:
+        content = content.filter(Q(rp_name_customer__icontains=customer_name))
+    if event == 1:
+        content = content.filter(register__ev__ev_id__isnull=False)
+    if event == 2:
+        content = content.filter(register__ev__ev_id__isnull=True)    
+    obj = []
+    
+    total_sum = 0
+    for r in content:
+        print(r.register_id)
+        customer_list = customers.objects.filter(
+            register=r.register_id).select_related('location').first()
+        payment_list = register_payment_items.objects.filter(
+            rp_id=r.rp_id).order_by("-rp__rp_id").first()
+        if payment_list is not None:
+            rpi_price_result = payment_list.rpi_price_result
+        else:
+            rpi_price_result = 0
+        total_sum += rpi_price_result
+
+        course_list = course_event.objects.select_related(
+            'course').filter(ev_id=r.register.ev_id).first()
+        res = {'main': r, 'customer_list': customer_list,
+               'course_list': course_list, 'payment_list': payment_list}
+        obj.append(res)
+
+    
+    # print(total_sum)
+    param = {'total_data': len(content), 'range_param': range_param, 'close_the_sale_param': close_the_sale_param,
+             'course_param': course_param, 'generation_param': generation_param, 'seller_param': seller_param}
+    context = {'title': defaultTitle, 'data': obj,
+               'param': param, 'total_sum': total_sum}
+    return render(request, 'print/register_excel_quotation_user.html', context)
 
 
 @login_required(login_url='/login')
@@ -1373,6 +1525,41 @@ def register_report_summary_teacher(request):
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
     return render(request, 'report/billing_cycle_result_summary_withdraw.html', context) 
+
+
+
+@login_required(login_url='/login')
+def register_report_summary_creadit_all_user(request):
+    user_id = request.user.id
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')    
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    obj = []
+    day_current_m = date.today().month
+  
+    context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
+    return render(request, 'report/billing_cycle_result_summary_withdraw_credit.html', context) 
 
 
 
