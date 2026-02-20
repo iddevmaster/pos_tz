@@ -849,9 +849,13 @@ def register_excel_quotation(request):
     
     total_sum = 0
     for r in content:
-        print(r.register_id)
+       
+       
+        customer_listaa = fact_customer.objects.filter(
+            register=r.register_id).first()
+        
         customer_list = customers.objects.filter(
-            register=r.register_id).select_related('location').first()
+            customer_id=customer_listaa.customer_id).select_related('location').first()
         payment_list = register_payment_items.objects.filter(
             rp_id=r.rp_id).order_by("-rp__rp_id").first()
         if payment_list is not None:
