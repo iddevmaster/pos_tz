@@ -890,9 +890,9 @@ def register_excel_quotation_byuser(request):
     close_the_sale = int(request.POST.get('qclose_the_sale', -1))
     course_id = int(request.POST.get('qcourse', 0))
     generation = request.POST.get('qgeneration', 0)
-    seller = 11
+    seller = user_id
     customer_name = request.POST.get('qcustomer_name', None)
-    event = int(request.POST.get('event', 0))
+    
     content = register_payment.objects.select_related(
         'register').filter(register__pay_type=2, active=1,register__module=m.module)
     
