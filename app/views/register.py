@@ -2287,6 +2287,8 @@ def update_close_the_event(request):
     content.orderstatus = 'FullPayment'
     content.save()
 
+    print(content.seller.id)
+
 
     contentfact = fact_customer.objects.get(register_id=register_id)
     contentfact.status_bill = 'Y'
@@ -2305,6 +2307,14 @@ def update_close_the_event(request):
     #     rpi_id=payment.rp_id,
     #     status='N'
     # )   
+
+    dtaf = fact_commission.objects.create( 
+        stage_id=5,
+        register_id=uuid_without_dashes,
+        rpi_id=payment.rp_id,
+        com_head_id=2,
+        user_id=content.seller.id,
+        status='W')
        
 
     savesal = salesorder.objects.create(
