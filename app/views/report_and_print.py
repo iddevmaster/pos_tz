@@ -2186,6 +2186,13 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
               price = rs.tis_compensation
               tis_compensation =  rs.tis_compensation
 
+
+             elif int(rs.pi_id) == 6:
+              tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=6).count()
+              all = 0 
+              price = rs.tis_sum
+              tis_compensation =  rs.tis_compensation
+
              elif int(rs.pi_id) == 8:
               tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=7).count()
               all = 1000 
@@ -2204,13 +2211,15 @@ def register_report_summary_teacher_all(request ,teacher_id, year, m):
             price_te = (price - taxall) + rs.tis_expenses 
             sumtaxl += taxall
             totalall = (totalp - sumtaxl) + tis_expenses_all
-           
+
     
-        
+            print(price_te)  
             r = {'teacher':rs.teacher_id,'ev_date_start':event.ev_date_start,'ev_date_end':event.ev_date_end,'ev_generation':event.ev_generation,'pi':pay.pi_name,'course_code':cours.course_code,'course_name':cours.course_name,'tis_sum':rs.tis_sum,'tis_unit':rs.tis_unit,'tis_quantity':rs.tis_quantity,'tis_compensation':rs.tis_compensation,'total_rq_quta':total_rq_quta,'price':price,'name_con':name_con,'tis_compensation':tis_compensation,'tax':taxall,'totalall':price_te,'tis_expenses':rs.tis_expenses}
            
-            obj.append(r)   
+            obj.append(r) 
 
+            
+            
        
         
     teacher_one = teacher.objects.get(teacher_id=teacher_id)
