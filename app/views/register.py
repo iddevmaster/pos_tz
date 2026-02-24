@@ -2317,7 +2317,7 @@ def update_close_the_event(request):
         status='W')
        
 
-    savesal = salesorder.objects.create(
+    savesal = salesorder.objects.create( 
         er_id=contentev.er_id,
         type_sa=accept_terms,
         po=pos,
