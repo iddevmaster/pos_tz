@@ -2148,6 +2148,7 @@ def approve_lis_event(request):
     obj = []
     if content:
      for r in content:
+        print(r.register_id)
 
      
      
@@ -2170,6 +2171,7 @@ def approve_lis_event(request):
             'course').filter(ev_id=r.ev_id).first()
         res = {'customer_list': customer_list,'register_id':r.register_id,
                'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item,'register':reg}
+    
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
 
@@ -2317,16 +2319,16 @@ def update_close_the_event(request):
         status='W')
        
 
-    savesal = salesorder.objects.create( 
-        er_id=contentev.er_id,
-        type_sa=accept_terms,
-        po=pos,
-        sq=sqs,
-        so=sos,
-        img=ev_logo,
-        crt_date=dateTimeNow(),
-        upd_date=dateTimeNow()
-    )
+    # savesal = salesorder.objects.create( 
+    #     er_id=contentev.er_id,
+    #     type_sa=accept_terms,
+    #     po=pos,
+    #     sq=sqs,
+    #     so=sos,
+    #     img=ev_logo,
+    #     crt_date=dateTimeNow(),
+    #     upd_date=dateTimeNow()
+    # )
 
     checkev = event_register.objects.filter(ev_id=ev_id)
     all_passed = all(record.status == 'Y' for record in checkev)
