@@ -30,16 +30,121 @@
   }
 
   window.onload = default_date;
+
+
+  async function findevid(evid) { // <-- ADD async here
+
+    try {
+      const response = await fetch('/api/calendar_event_api_data_lable', {
+        method: 'POST', // Specify the HTTP method as POST
+        headers: {
+          'Content-Type': 'application/json' // Tell the server we're sending JSON
+          // You might need other headers like 'Authorization' if your API requires it
+        },
+        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
+          // Your data goes here
+          evid: evid,
+        })
+      });
+      const data = await response.json();
+
+      const tableBody = document.getElementById('json-table-body');
+      const tableBodyTr = document.getElementById('json-table-body_traning');
+      tableBody.innerHTML = ''; // Clears all rows
+      tableBodyTr.innerHTML = ''; // Clears all rows
+      let money = 0; // ประกาศตัวแปรเริ่มต้น
+
+      data.data.forEach((item, index) => {
+        money = money + item.tis_sum;
+        if (item.tis_unit == 'day') {
+          var dt = 'วัน'
+        }
+        if (item.tis_unit == 'hour') {
+          var dt = 'ชั่วโมง'
+        }
+        if (item.tis_unit == 'work') {
+          var dt = 'งาน'
+        }
+
+        const row = document.createElement('tr');
+
+     
+
+          row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.teacher_prefix_th} ${item.teacher_firstname_th} ${item.teacher_lastname_th}</td>
+                    <td>${item.pi_name}</td>
+                    <td>${item.compensation} / ${dt}</td>
+                    <td>${item.tis_quantity} </td>  
+                     <td>${item.tis_sum}</td>
+                    <td>${item.tis_expenses}</td>
+                      <td>- </td>
+                    <td>  -</td>  
+                `;
+
+        
+
+
+        tableBody.appendChild(row);
+      });
+
+
+      data.teacher.forEach((item, index) => {
+
+
+        const rowf = document.createElement('tr');
+
+
+
+        rowf.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.student_prefix_th} ${item.student_firstname_th} ${item.student_lastname_th}</td>
+                   
+                `;
+
+
+        tableBodyTr.appendChild(rowf);
+
+
+
+
+        // หรือถ้าใช้ jQuery (Bootstrap 3/4)
+      
+      });
+
+
+      // 2. การนำค่าไปแสดงผลใน HTML
+      // รับ Element ที่มี id เป็น "result"
+      const resultElement = document.getElementById("result");
+  $('#UpdateClick2').modal('show');
+      // ตรวจสอบว่าหา Element เจอหรือไม่
+      if (resultElement) {
+        // นำค่าของ money ไปใส่เป็นเนื้อหา (textContent) ของ Element
+        resultElement.textContent = `รวมทั้งหมด: ${money}`;
+      } else {
+        console.error("ไม่พบ Element ที่มี id='result' บนหน้าเว็บ");
+      }
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+
+  async function handleClick(evid) {
+
+    console.log(evid);
+
+  }
+
+
 </script>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
     <h3>รายงานการส่งมอบงาน</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="/">หน้าหลัก</a>
@@ -54,11 +159,7 @@
 <section class="section">
   <div class="card">
     <div class="card-body">
-      <form
-        method="get"
-        action="/register/export/endevent"
-        autocomplete="off"
-      >
+      <form method="get" action="/register/export/endevent" autocomplete="off">
         <div class="row">
           <div class="col-lg-3 col-md-6">
             <select class="form-select" id="qmonths" name="qmonths">
@@ -78,14 +179,7 @@
           </div>
 
           <div class="col-lg-3 col-md-6">
-            <input
-              type="number"
-              class="form-control"
-              id="qyear"
-              name="qyear"
-              required
-              placeholder="ปี (ค.ศ.)"
-            />
+            <input type="number" class="form-control" id="qyear" name="qyear" required placeholder="ปี (ค.ศ.)" />
           </div>
           <div class="col-lg-3 col-md-6">
             <button type="submit" class="btn btn-success">
@@ -104,7 +198,7 @@
             <th>รุ่น</th>
             <th>วันที่อบรบ</th>
             <th>สถานะ</th>
-           
+
             <th>อัพเดทล่าสุด</th>
           </tr>
         </thead>
@@ -113,17 +207,26 @@
           <tr>
             <td align="center">{{ forloop.counter }}</td>
             <td>
-             {{res.course.course_name}}
+              {{res.course.course_name}}
             </td>
             <td>
               {{res.ev_generation}}
             </td>
-            <td>   {{res.ev_date_start}} - {{res.ev_date_end}}</td>
+            <td> {{res.ev_date_start}} - {{res.ev_date_end}}</td>
             <td>
               {% if res.status == 'S' %}
-              <span class="badge bg-success">จบอบรมเรียบร้อย</span>
+
+
+              <button class="btn btn-success btn-sm" type="button" id="dropdownMenuButtonIcon"
+                onclick="findevid('{{res.ev_id}}')">
+                จบอบรมเรียบร้อย {{res}}
+              </button>
               {% elif res.status == 'I' %}
-              <span class="badge bg-info">รอการยืนยันวันจบอบรม</span>
+
+              <button class="btn btn-info btn-sm" type="button" id="dropdownMenuButtonIcon" data-bs-toggle="modal"
+                data-bs-target="#UpdateClick2" onclick="findevid('{{res.ev_id}}')">
+                รอการยืนยันวันจบอบรม {{res.ev_id}}
+              </button>
               {% elif res.status == 'Y' %}
               <span class="badge bg-warning">ทีมงานพร้อมทำงาน</span>
               {% elif res.status == 'W' %}
@@ -139,6 +242,207 @@
       </table>
     </div>
   </div>
-</section>
 
+
+
+  <div class="modal fade" id="UpdateClick2">
+    <div class="modal-dialog modal-xxl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventModalLabel">รายละเอียด หลักสูตร</h5>
+          <br>
+
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- <div class="modal-header">
+          <div class="modal-title" id="address"></div>
+        </div>
+        <div class="modal-header">
+          <div class="modal-title" id="details"></div>
+        </div> -->
+        <div class="modal-body">
+
+
+
+
+          <!-- <div class="row">
+            <div class="col-12 col-lg-2 col-md-2">
+              <span class="font-default"> จำนวนนักเรียนปัจจุบันที่มี คือ <span class="font-default" style="color: red"
+                  id="bill"> </span> คน</span>
+            </div>
+            <div class="col-12 col-lg-2 col-md-2">
+              <label style="color: red" class="font-default">วิทยากร <span id="ev_hour" class="font-default"></span>
+                ชั่วโมง </label> <label style="color: red" class="font-default">จำนวน <span id="ev_people"></span> ท่าน
+              </label>
+            </div>
+            <div class="col-12 col-lg-2 col-md-2">
+              <label style="color: red" class="font-default">ครูฝึก <span id="ev_hour_two"></span> ชั่วโมง</label>
+              <label style="color: red" class="font-default">จำนวน <span id="ev_people_two"></span> ท่าน </label>
+            </div>
+
+          </div> -->
+
+<div class="modal-header">
+          <div class="modal-title"> ข้อมูลวิทยาการ</div>
+        </div>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>ครู-วิทยากร</th>
+                <th>ตำแหน่ง/หน้าที่</th>
+                <th>ค่าตอบแทน</th>
+                <th>จำนวนหน่วย</th>
+                <th>รายได้สุทธิ</th>
+                <th>ค่าเดินทาง</th>
+                <th>สถานะ</th>
+                <th>#</th>
+              </tr>
+            </thead>
+            <tbody id="json-table-body"></tbody>
+
+            <tfoot>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td id="result"></td>
+              </tr>
+            </tfoot>
+
+          </table>
+
+
+<div class="modal-header">
+          <div class="modal-title"> ข้อมูลผู้เข้าอมรบ</div>
+        </div>
+
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>ชื่อ - นามสกุล</th>
+              </tr>
+            </thead>
+            <tbody id="json-table-body_traning"></tbody>
+
+            <tfoot>
+              <tr>
+                <td></td>
+                <td></td>
+
+
+
+              </tr>
+            </tfoot>
+
+          </table>
+
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+</section>
+<style scoped>
+  /* อาจจะต้องเพิ่ม !important เพื่อบังคับให้ใช้ */
+  .modal-body {
+    overflow: visible !important;
+    /* ถ้า modal-body ไปตัดขอบ */
+  }
+
+  /* หรือถ้าปัญหาอยู่ที่ Select2 dropdown เอง */
+  .select2-container--open .select2-dropdown {
+    position: fixed !important;
+    /* บังคับให้ตำแหน่งเป็น Fixed */
+    top: 50% !important;
+    /* เลื่อนลงมา 50% จากขอบบนของ viewport */
+    left: 40% !important;
+    /* เลื่อนมา 50% จากขอบซ้ายของ viewport */
+    transform: translate(-50%, -50%) !important;
+    /* เลื่อนตัวเองกลับมาครึ่งหนึ่งของความกว้าง/สูง */
+    width: auto !important;
+    /* ให้ความกว้างปรับตามเนื้อหา (หรือกำหนดเองได้) */
+    max-width: 90% !important;
+    /* เพื่อไม่ให้กว้างเกินไปบนจอเล็ก */
+    z-index: 99999 !important;
+    /* ให้แน่ใจว่าอยู่ด้านบนสุด */
+  }
+
+  .my-custom-modal-width {
+    max-width: 700px;
+    /* Example: set a custom max-width */
+    /* You can also adjust margin if needed, though Bootstrap handles it well */
+  }
+
+  /* Example: Making it wider for larger screens, but still custom */
+  @media (min-width: 992px) {
+
+    /* For large devices (lg breakpoint) */
+    .my-custom-modal-width {
+      max-width: 900px;
+      /* Wider on larger screens */
+    }
+  }
+
+  @media (min-width: 1200px) {
+
+    /* For extra large devices (xl breakpoint) */
+    .my-custom-modal-width {
+      max-width: 1050px;
+      /* Even wider on very large screens */
+    }
+  }
+
+  .modal-xxl {
+    max-width: 90%;
+    width: 90%;
+  }
+
+  /* Ensure modal-content scales properly */
+  .modal-xxl .modal-content {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Optional: Add responsive styling */
+  @media (max-width: 768px) {
+    .modal-xxl {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .select2-container {
+    z-index: 1055 !important;
+    /* Bootstrap modal z-index is 1050, so ensure Select2 stays on top */
+  }
+
+
+  .hidden {
+    display: none;
+    /* Initially hide the div */
+  }
+
+  .visible {
+    display: block;
+    /* Make the div visible */
+  }
+
+  .clickable-header {
+    cursor: pointer;
+    /* Indicate that the header is clickable */
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+</style>
 {% endblock %}

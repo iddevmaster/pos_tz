@@ -158,7 +158,9 @@ function readURL(input) {
             <td>{{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}</td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
-              {% if res.customer_list.register.pay_type == 1 %}
+              {% if res.register.pay_type == 1 %}
+
+
               <div class="btn-group me-1 mb-1">
                 <div class="dropdown">
                   <button
@@ -169,7 +171,7 @@ function readURL(input) {
                     data-bs-target="#UpdateClick1"
                     onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
                   >
-                   ยืนยันวันอบรม
+                  {{res.register}}
                   </button>
 
                   <button

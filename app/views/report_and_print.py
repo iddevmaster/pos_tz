@@ -3980,9 +3980,8 @@ def report_end_event(request):
         objMenu.append(r)
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
-    print(month_current)
-    print(year_current)
-    status = ['I','S','W']
+
+    status = ['S']
 
     content = course_event.objects.select_related('course').filter(module=m.module,status__in=status,ev_date_start__month=month_current, ev_date_start__year=year_current).order_by("-ev_id")
     

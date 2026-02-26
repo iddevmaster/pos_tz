@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head,notifications
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head,notifications,training
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -409,6 +409,54 @@ def data_event(request):
             sff = []
 
     return JsonResponse(obj,safe=False)
+
+
+
+@csrf_exempt
+def data_event_label(request):
+    data = json.loads(request.body)
+    ev_id = data.get("evid")
+    mains  = training.objects.filter(ev=ev_id)
+    mains = list(training.objects.filter(ev=ev_id).values('student_prefix_th', 'student_firstname_th', 'student_lastname_th'))
+
+
+    
+    teacher_data = teacher_income_setting.objects.filter(ev_id=ev_id)
+    datas = {
+       'obj':''
+    }
+    sff = []
+    obj = []
+    if teacher_data.count() > 0:
+        
+        for x in teacher_data:
+            sff = {
+                "teacher_prefix_th": x.teacher.teacher_prefix_th,
+                "teacher_firstname_th": x.teacher.teacher_firstname_th,
+                "teacher_lastname_th": x.teacher.teacher_lastname_th,
+                "pi_id":x.pi_id,
+                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "tis_quantity": x.tis_quantity,
+                "tis_unit": x.tis_unit,
+                "compensation":x.tis_compensation,
+                "id":x.id,
+                "status":x.status,
+                "teacher_id": x.teacher_id,
+                "tis_sum": x.tis_sum,
+                "tis_expenses": x.tis_expenses
+            }
+            obj.append(sff)
+            
+         
+        else :
+            sff = []
+
+
+    datas = {
+    'name':'ss','data':obj,'teacher':mains
+    }    
+
+    return JsonResponse(datas,safe=False)
 
 
 @csrf_exempt
