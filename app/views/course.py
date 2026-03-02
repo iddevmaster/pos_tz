@@ -842,7 +842,7 @@ def calendar_event_apiall(request):
         eobj = b
     else:
         sobj = _date + timedelta(days=0)
-        eobj = _date + timedelta(days=60)
+        eobj = _date + timedelta(days=1000)
     status = ['W','Y','I','S']
     # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
     
