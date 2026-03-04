@@ -167,8 +167,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
 
       <td>
-
-        {% if res.customer_list.register.ev_id %}
+          
+        {% if res.main.register.is_event == 'Y' %}
         <span>มี Event</span>
         {% else %}
         <span>ไม่มี Event</span>
