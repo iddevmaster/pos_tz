@@ -1116,7 +1116,7 @@ def calendar_event_api2(request,id):
     sss = id
     pi = ['1','2','3','4','5','6','7','8']
     _date = date.today()
-    date_60_days_ago = _date - timedelta(days=45)
+    date_60_days_ago = _date - timedelta(days=90)
     # content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,tis_start_date__gt=datetime.date.today())
     content = teacher_income_setting.objects.select_related('ev').filter(teacher_id=id,pi__in=pi,tis_start_date__gte=date_60_days_ago).order_by(F('ev__ev_date_start').desc())
    
