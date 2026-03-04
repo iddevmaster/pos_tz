@@ -132,8 +132,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>{{res.customer_list.customer_code}}</td>
       <td>{{res.customer_list.customer_name}}</td>
       <td>
-        {{res.course_list.course.course_code}}
-        {{res.course_list.course.course_name}}
+        {{res.course.course_code}}
+        {{res.course.course_name}}
       </td>
       <td align="center">{{res.course_list.ev_generation}}</td>
       <td>{{res.main.crt_date|date:"d/m/Y H:i"}}</td>
@@ -167,7 +167,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
 
       <td>
-          
+         
         {% if res.main.register.is_event == 'Y' %}
         <span>มี Event</span>
         {% else %}

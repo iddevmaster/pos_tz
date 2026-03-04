@@ -3555,7 +3555,7 @@ def register_excel_bill(request):
     obj = []
     total_sum = 0
     for r in content:
-        print(r.register.is_event)
+        print(r.register)
         cus = fact_customer.objects.filter(register=r.register_id).first()
         customer_list = customers.objects.filter(
             customer_id=cus.customer_id).select_related('location').first()
@@ -3569,7 +3569,10 @@ def register_excel_bill(request):
 
         course_list = course_event.objects.select_related(
             'course').filter(ev_id=r.register.ev_id).first()
-        res = {'main': r, 'customer_list': customer_list,
+
+        course_n = course.objects.filter(course_id=r.register.course_id).first()
+        
+        res = {'main': r, 'customer_list': customer_list,'course':course_n,
                'course_list': course_list, 'payment_list': payment_list}
         obj.append(res)
     # print(total_sum)
