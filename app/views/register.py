@@ -1084,6 +1084,7 @@ def payment_createno(request):
         register_id=register_id,
         user_create=user_id,
         user_manage=user_man,
+        status_bill='Y',
         commit_head=0
     )
     object.refresh_from_db()
@@ -1136,13 +1137,13 @@ def payment_createno(request):
         check_bill.update(active=0)
 
     # ตรวจสอบว่ามีการอนุมัติให้แก้ไขหรือยัง จากนั้นให้ทำการเปลี่ยน complete เป็น 1 ทันที
-    content_approve = register_applove.objects.filter(
-        register_id=register_id, doc_type=1, status=1, complete=0)
-    if content_approve.count() > 0:
-        content_approve.update(complete=1)
-        if pay_type == 2:
-            content_main.close_the_sale = 0
-            content_main.save()
+    # content_approve = register_applove.objects.filter(
+    #     register_id=register_id, doc_type=1, status=1, complete=0)
+    # if content_approve.count() > 0:
+    #     content_approve.update(complete=1)
+    #     if pay_type == 2:
+    #         content_main.close_the_sale = 0
+    #         content_main.save()
 
     # ถ้าเป็นประเภทนักเรียน ให้ นำข้อมูลการสมัครมาบันทึกที่ฐานข้อมูลนักเรียนทันที
 
