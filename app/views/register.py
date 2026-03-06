@@ -2081,6 +2081,7 @@ def register_management(request):
         crt_date__month=month_current, crt_date__year=year_current,status__in=statuss).exclude(register_number="-").order_by("-crt_date")
     obj = []
     for r in content:
+        print(r.register_number)
         event = 'none'
         if r.ev_id :
             event = 'yes'
@@ -2149,11 +2150,7 @@ def approve_lis_event(request):
     obj = []
     if content:
      for r in content:
-      
-
-     
-     
-   
+    
         cus = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
         
@@ -2416,22 +2413,21 @@ def approve_list_invoice_com(request):
         objMenu.append(r)
     try:
         obj = []
-    
+        st = [0,1]
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale=1,register__pay_type=2)
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2).order_by("-crt_date")[:30]
         
-        for r in billpa:   
-               
+        for r in billpa:    
+            print(r.rp_doc_number)
             erv = event_register.objects.get(register=r.register.register_id)
+              
             evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            
-            print(erv.ev_id) 
+
 
             getsale = salesorder.objects.get(er_id=erv.er_id)
-            print(getsale) 
             
             res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
-
+            
             obj.append(res)    
            
     except:
