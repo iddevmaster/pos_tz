@@ -2149,7 +2149,7 @@ def approve_lis_event(request):
     obj = []
     if content:
      for r in content:
-        print(r.register_id)
+      
 
      
      
@@ -2320,16 +2320,16 @@ def update_close_the_event(request):
         status='W')
        
 
-    # savesal = salesorder.objects.create( 
-    #     er_id=contentev.er_id,
-    #     type_sa=accept_terms,
-    #     po=pos,
-    #     sq=sqs,
-    #     so=sos,
-    #     img=ev_logo,
-    #     crt_date=dateTimeNow(),
-    #     upd_date=dateTimeNow()
-    # )
+    savesal = salesorder.objects.create( 
+        er_id=contentev.er_id,
+        type_sa=accept_terms,
+        po=pos,
+        sq=sqs,
+        so=sos,
+        img=ev_logo,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow()
+    )
 
     checkev = event_register.objects.filter(ev_id=ev_id)
     all_passed = all(record.status == 'Y' for record in checkev)
@@ -2418,13 +2418,18 @@ def approve_list_invoice_com(request):
         obj = []
     
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale=1,register__pay_type=2).order_by("-crt_date")[:30]
-        for r in billpa:       
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale=0,register__pay_type=2)
+        
+        for r in billpa:   
+               
             erv = event_register.objects.get(register=r.register.register_id)
             evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
             
+            print(erv.ev_id) 
 
             getsale = salesorder.objects.get(er_id=erv.er_id)
+            print(getsale) 
+            
             res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
 
             obj.append(res)    
