@@ -116,13 +116,13 @@ def register_home(request):
     hundredDaysLater = _date + timedelta(days=365)
     obj = []
     
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2025, 11, 1), until=hundredDaysLater):
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2026, 2, 1), until=hundredDaysLater):
         
         _newdate = str(dt).split(" ")[0]
         yearstart = _newdate.split("-")[0]
         monthstart = _newdate.split("-")[1]
         label = month_fomat(monthstart) + " " + yearstart
-        status = ['N','W','I','S','Y']
+        status = ['W','I','S','Y']
         # print(label)
         result = course_event.objects.select_related("course").filter(status__in=status,
             cancelled=1, active=1, ev_date_start__month=int(monthstart), ev_date_start__year=int(yearstart), module=m.module).order_by("ev_date_start")
