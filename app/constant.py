@@ -301,6 +301,12 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+       {
+        "value": "approve/invoice/acco",
+        "label": "Invoice",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
     {
         "value": "report/register/export/seller",
         "label": "รายงานข้อมูลการขาย",
