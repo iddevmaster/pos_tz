@@ -59,3 +59,9 @@ def contains_parent(path):
     print(group_value)
     # ส่งค่า group_value ไปยัง template
     return group_value
+
+
+
+@register.filter
+def subtractt(value, arg):
+    return value - arg

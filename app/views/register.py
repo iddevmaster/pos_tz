@@ -892,6 +892,8 @@ def payment_create(request):
         new_total = rpi_price_total
     else:
         new_total = float(rpi_price_total) - float(rpi_price_vat)
+
+    new_result= float(rpi_price) * float(rpi_quantity)   
        
     register_payment_items.objects.create(
         rpi_code=rpi_code,
@@ -902,7 +904,7 @@ def payment_create(request):
         rpi_price_discount=rpi_price_discount,
         rpi_price_total=new_total,
         rpi_price_vat=rpi_price_vat,
-        rpi_price_result=rpi_price_result,
+        rpi_price_result=new_result,
         rpi_pay=rpi_price_result,
         rpi_price_pay=rpi_price_pay,
         rp_id=rp_id,

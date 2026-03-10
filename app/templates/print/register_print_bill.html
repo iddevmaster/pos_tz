@@ -12,7 +12,7 @@
   <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
   <script type="text/javascript">
     function myFunction() {
-      var monney = "{{items.rpi_price_result }}";
+      var monney = "{{items.rpi_pay }}";
       var thaibath = ArabicNumberToText(monney);
       document.getElementById("result").innerHTML = thaibath;
     }
@@ -223,7 +223,7 @@
           <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
           <td align="right">{{items.rpi_price_discount}}</td>
           <td align="right">
-            {{items.rpi_price |floatformat:2|intcomma }}
+            {{items.rpi_price_result |floatformat:2|intcomma }}
           </td>
         </tr>
 
@@ -242,13 +242,13 @@
 
           <td colspan="2">รวมเงิน</td>
           <td align="right">
-            {{items.rpi_price |floatformat:2|intcomma }}
+            {{items.rpi_price_result |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>
           <td colspan="2">มัดจำ</td>
           <td align="right">
-            {{rpi_price_default |floatformat:2|intcomma }}
+            {{items.rpi_price_pay |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>
@@ -267,15 +267,20 @@
          
           <td colspan="2"> ยอดรวมสุทธิ</td>
           <td align="right">
-            {{items.rpi_price_result |floatformat:2|intcomma }}
+            {{items.rpi_price_pay |floatformat:2|intcomma }}
+          </td>
+        </tr>
+               <tr>
+         
+          <td colspan="2"> คงเหลือ</td>
+          <td align="right">
+            {{total |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>
           <td colspan="3">ตัวอักษร (<span id="result"></span>)</td>
         </tr>
-           <tr>
-          <td colspan="3">คงเหลือ {{total |floatformat:2|intcomma }} </td>
-        </tr>
+       
         <tr>
           <td colspan="8">
             <table style="width: 100%; border-collapse: collapse" border="1">
@@ -411,7 +416,7 @@
         <tr>
           <td colspan="2">มัดจำ</td>
           <td align="right">
-            {{rpi_price_default |floatformat:2|intcomma }}
+            {{items.rpi_price_pay |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>

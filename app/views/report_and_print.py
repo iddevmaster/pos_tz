@@ -94,13 +94,13 @@ def register_print(request, rp_id):
     if items.type_payment == 'FullPayment':
        t = 0
     elif items.type_payment == 'Deposit':
-       t = items.rpi_price - items.rpi_price_pay
+       t = items.rpi_price_result - items.rpi_price_pay
     else:   
        t = 0
 
-     
+    print(items.rpi_price_total) 
     
- 
+    
     context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,'total':t,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:

@@ -1715,8 +1715,9 @@ def withdraw_list_pay(request, register_id):
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
     price_orver = register_payment_items.objects.get(register_id=register_id)
     
-    orver = price_orver.rpi_price - price_orver.rpi_price_pay
-    
+    orver = (price_orver.rpi_price * price_orver.rpi_quantity)  - price_orver.rpi_price_pay
+
+   
     context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,'orver':orver,
                'content_regist': content_regist, 'content_course': content_course, 'student_data': student_data,'quata':total_ca_quta,'ev_training':content_regist.ev.ev_training,'list_user':list_user}
     return render(request, 'register/register_payment_pay.html', context)
@@ -1919,7 +1920,7 @@ def payment_pay_deposit(request):
         rpi_price_total=new_total,
         rpi_price_vat=rpi_price_vat,
         rpi_price_result=rpi_price_result,
-        rpi_pay=rpi_price_result,
+        rpi_pay=rpi_price,
         rp_id=object.rp_id,
         register_id=register_id,
         vat=rpi_price_vat,
