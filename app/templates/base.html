@@ -1090,6 +1090,8 @@ function initTabEvents() {
                   <li
                     class="{% if request.path|contains:rsc.page_route %} submenu-item active {% else %} submenu-item {% endif %}"
                   >
+
+
                     <a href="/{{rsc.page_route}}">
                       <span class="font-default"> {{rsc.page_label}} </span>
                     </a>
@@ -1279,6 +1281,27 @@ function initTabEvents() {
                    <li class="submenu-item">
                     <a href="/setting/form/bill/create">
                       <span class="font-default">ตั้งค่าบิล</span>
+                    </a>
+                  </li>
+                </ul>
+              
+              </li>
+
+
+               <li class="sidebar-item has-sub">
+                <a href="#" class="sidebar-link">
+                  <i class="icon dripicons-export"></i>
+                  <span class="font-default">แบบประเมินการทดสอบรถ</span>
+                </a>
+                <ul class="submenu">
+                   <li class="submenu-item">
+                    <a href="https://forms.gle/FjMysUQ6i7iAUHLF6" target="_blank">
+                      <span class="font-default">แบบประเมินทดสอบการขับรถจริง</span>
+                    </a>
+                  </li>
+                           <li class="submenu-item">
+                    <a href="https://forms.gle/7fMGAt5n4CG5okxc7" target="_blank">
+                      <span class="font-default">แบบประเมินทดสอบการขับรถ สพฉ.</span>
                     </a>
                   </li>
                 </ul>
