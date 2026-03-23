@@ -301,7 +301,7 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
-       {
+    {
         "value": "approve/invoice/acco",
         "label": "Invoice",
         "group_value": "naSt0v",
@@ -436,11 +436,18 @@ listMenu = [
         "group_value": "WR14515",
         "group_label": "เปิดการขาย",
     },
-     {
-        "value": "rt/sale",
-        "label": "เปิดการขายแบบไม่มีอีเวน",
-        "group_value": "WR14515",
-        "group_label": "เปิดการขาย",
+
+    {
+        "value": "https://forms.gle/FjMysUQ6i7iAUHLF6",
+        "label": "แบบประเมินทดสอบการขับรถจริง",
+        "group_value": "naStxx",
+        "group_label": "แบบประเมินการทดสอบรถ",
+    },
+        {
+        "value": "https://forms.gle/7fMGAt5n4CG5okxc7",
+        "label": "แบบประเมินทดสอบการขับรถ สพฉ",
+        "group_value": "naStxx",
+        "group_label": "แบบประเมินการทดสอบรถ",
     },
 
 
