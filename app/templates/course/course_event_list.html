@@ -832,9 +832,9 @@
             <td align="right">{{ res.ev_price|floatformat:2|intcomma }}</td>
             <td align="center">
               {% if res.ev_vat == 1 %}
-              <font style="color: blue">ใช่</font>
+              <font style="color: blue">รวม VAT</font>
               {% else %}
-              <font style="color: red">ไม่ใช่</font>
+              <font style="color: red">ไม่รวม VAT</font>
               {% endif %}
             </td>
 
@@ -1072,8 +1072,8 @@
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select class="form-control" name="ev_vat" id="ev_vat" required>
               <option value="">--เลือกข้อมูล--</option>
-              <option value="0">ไม่ใช่</option>
-              <option value="1">ใช่</option>
+              <option value="0">ไม่รวม VAT</option>
+              <option value="1">รวม VAT</option>
             </select>
           </div>
           <div class="form-group">
@@ -1299,8 +1299,8 @@
             <label>ราคานี้รวม VAT</label> <label style="color: red">*</label>
             <select class="form-control" name="ev_vat" id="ev_vat_update" required>
               <option value="">--เลือกข้อมูล--</option>
-              <option value="0">ไม่ใช่</option>
-              <option value="1">ใช่</option>
+              <option value="0">ไม่รวม VAT</option>
+              <option value="1">รวม VAT</option>
             </select>
           </div>
 

@@ -890,10 +890,10 @@ def payment_create(request):
     
     if ev_vat == 0:
         new_total = rpi_price_total
+        new_result= (float(rpi_price) * float(rpi_quantity)) + float(rpi_price_vat)
     else:
         new_total = float(rpi_price_total) - float(rpi_price_vat)
-
-    new_result= float(rpi_price) * float(rpi_quantity)   
+        new_result= float(rpi_price) * float(rpi_quantity)   
        
     register_payment_items.objects.create(
         rpi_code=rpi_code,
