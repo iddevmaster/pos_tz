@@ -1787,19 +1787,17 @@ def cancellistbill(request):
     naive_dt = datetime.datetime.now()
     formatted_date = naive_dt.strftime('%Y-%m-%d')
 
-    if formatted_date > crtdate:
-        messages.error(request, "ไม่สามารถยกเลิกได้ ติดต่อแอดมิน!")
-    else :
-        ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
-        ucon.status_bill = 'C'
-        ucon.save()
-        uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
-        com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
-        for rs in com:
+
+    ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
+    ucon.status_bill = 'C'
+    ucon.save()
+    uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
+    com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
+    for rs in com:
             coms = com_income_setting.objects.get(com_id=rs.com_id)
             coms.status = 'C'
             coms.save()
-        messages.success(request, "ยกเลิกเรียบร้อย!")
+    messages.success(request, "ยกเลิกเรียบร้อย!")
     return redirect("/finance/billing/cancelbill")
    
 
