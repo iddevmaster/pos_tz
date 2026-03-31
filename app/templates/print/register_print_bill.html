@@ -553,7 +553,7 @@
           <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
           <td align="right">{{items.rpi_price_discount}}</td>
           <td align="right">
-            {{rpi_price_default |floatformat:2|intcomma }}
+            {{rpi_price_all |floatformat:2|intcomma }}
           </td>
         </tr>
 
@@ -566,13 +566,11 @@
             {{data.rp_ref1}}
             <br>
             {{data.rp_ref2}}
-
-
           </td>
 
           <td colspan="2">รวมเงิน</td>
           <td align="right">
-            {{rpi_price_default |floatformat:2|intcomma }}
+            {{rpi_price_all |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>
@@ -597,7 +595,7 @@
           <!-- จำนวนเงิน 7&#37; -->
           <td colspan="2"> ยอดรวมสุทธิ</td>
           <td align="right">
-            {{items.rpi_price_result |floatformat:2|intcomma }}
+            {{rpi_price_default |floatformat:2|intcomma }}
           </td>
         </tr>
         <tr>

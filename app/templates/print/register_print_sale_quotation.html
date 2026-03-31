@@ -54,7 +54,7 @@
     <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
     <script type="text/javascript">
       function myFunction() {
-        var monney = "{{items.rpi_price_result }}";
+        var monney = "{{items.rpi_price_default }}";
         var thaibath = ArabicNumberToText(monney);
         document.getElementById("result").innerHTML = thaibath;
       }
@@ -207,7 +207,7 @@
             <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
             <td align="right">{{items.rpi_price_discount}}</td>
             <td align="right">
-              {{items.rpi_price |floatformat:2|intcomma }}
+              {{rpi_price_all |floatformat:2|intcomma }}
             </td>
           </tr>
           {% for add_ons in add_on %}
@@ -261,7 +261,7 @@
             <td></td>
             <td>รวมเงิน</td>
             <td align="right">
-              {{rpi_price_default |floatformat:2|intcomma }}
+              {{rpi_price_all |floatformat:2|intcomma }}
             </td>
           </tr>
           <tr>
@@ -297,7 +297,7 @@
               <span id="result"></span>
             </td>
             <td align="right">
-              {{items.rpi_price_result |floatformat:2|intcomma }}
+              {{rpi_price_default |floatformat:2|intcomma }}
             </td>
           </tr>
           <tr>

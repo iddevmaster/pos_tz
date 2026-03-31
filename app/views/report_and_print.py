@@ -75,7 +75,7 @@ def register_print(request, rp_id):
     signa = signature.objects.filter(user_id=content.user_create).first()
     signama = signature.objects.filter(user_id=content.user_manage).first()
 
-    print(content.user_create)
+
     try:
         mange = User.objects.get(id=content.user_manage)
     except User.DoesNotExist:
@@ -84,11 +84,28 @@ def register_print(request, rp_id):
     
     factcustomer = fact_customer.objects.get(register_id=content.register_id)
     customer = customers.objects.get(pk=factcustomer.customer_id)
+    
     if content_regist.ev.ev_vat == 1:
+        ## ราคาก่อน vat
+        rpi_price_default_before_vat = float(
+            items.rpi_price_result) - float(items.rpi_price_discount) 
+        ## ยอดสุทธิ
         rpi_price_default = float(
             items.rpi_price_total) + float(items.rpi_price_vat)
+        rpi_price_all = float(
+            items.rpi_quantity) * float(items.rpi_price) 
+     
+        
+       
     else:
-        rpi_price_default = items.rpi_price_total
+        ## ยอดสุทธิ
+        rpi_price_default = items.rpi_price_total + float(items.rpi_price_vat)
+         ## ราคาก่อน vat
+        rpi_price_default_before_vat = float(
+            items.rpi_price_result) - float(items.rpi_price_discount) 
+        ## ยอดดิบ
+        rpi_price_all = float(
+            items.rpi_quantity) * float(items.rpi_price) 
 
     t = 0
     if items.type_payment == 'FullPayment':
@@ -97,11 +114,13 @@ def register_print(request, rp_id):
        t = items.rpi_price_result - items.rpi_price_pay
     else:   
        t = 0
+   
+    
 
-    print(items.rpi_price_total) 
+   
     
     
-    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,'total':t,
+    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'is_show_signature':bill.is_show_signature,'total':t,'rpi_price_default_before_vat':rpi_price_default_before_vat,'rpi_price_all':rpi_price_all,
                'items': items, "content_regist": content_regist, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ

@@ -1260,6 +1260,8 @@ def withdraw_list_one_com(request):
 
         total_all += total
 
+        print(total_all)
+
 
 
        
