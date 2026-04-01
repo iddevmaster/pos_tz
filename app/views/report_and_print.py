@@ -45,6 +45,7 @@ def register_print(request, rp_id):
     user_id_authen = current_user.id
     try:
         content = register_payment.objects.get(pk=rp_id)
+
         
 
     except register_payment.DoesNotExist:
@@ -73,6 +74,7 @@ def register_print(request, rp_id):
     
     users = User.objects.get(id=content.user_create)
     signa = signature.objects.filter(user_id=content.user_create).first()
+    print(bill.is_show_signature)
     signama = signature.objects.filter(user_id=content.user_manage).first()
     try:
         mange = User.objects.get(id=content.user_manage)
