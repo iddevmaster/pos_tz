@@ -1274,7 +1274,8 @@ def payment_history(request, register_id):
     obj = []
     for r in content:
         items = register_payment_items.objects.filter(rp_id=r.rp_id).first()
-        res = {'main': r, 'items': items}
+        rpi_price_default = items.rpi_price_total + float(items.rpi_price_vat)
+        res = {'main': r, 'items': items,'rpi_price_default':rpi_price_default}
         obj.append(res)
     context = {'title': title,  'data': obj, 'main': main, 'list_user': list_user, 'listMenuPermission': objMenu,
                'content_approve': content_approve, 'content_approve_p': content_approve_p}
