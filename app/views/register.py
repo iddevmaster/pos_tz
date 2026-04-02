@@ -2238,9 +2238,16 @@ def update_close_the_sale(request):
         content = None
         return redirect("/register/management")
     # เปรียบเทียบราคาเพื่อยืนยันการปิดการขาย
+    check_payment_cout = register_payment_items.objects.filter(register_id=register_id).order_by("-rpi_id").first()
+
+
+    rpi_price_default = check_payment_cout.rpi_price_total + float(check_payment_cout.rpi_price_vat)
+
+    if confirm_price != rpi_price_default :
+        messages.error(request, "ไม่สามารถทำรายการได้ !")
+        return redirect("/register/management")
     check_payment = register_payment_items.objects.filter(
-        rpi_price_result=confirm_price, register_id=register_id).order_by("-rpi_id").first()
-    
+        rpi_pay=confirm_price, register_id=register_id).order_by("-rpi_id").first()
     if check_payment:
         set_active = register_payment.objects.get(rp_id=check_payment.rp_id)
         set_active.active = 1
