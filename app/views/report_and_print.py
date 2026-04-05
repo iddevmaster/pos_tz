@@ -3574,16 +3574,26 @@ def register_excel_bill(request):
     obj = []
     total_sum = 0
     for r in content:
-        print(r.register)
+        
         cus = fact_customer.objects.filter(register=r.register_id).first()
         customer_list = customers.objects.filter(
             customer_id=cus.customer_id).select_related('location').first()
         payment_list = register_payment_items.objects.filter(
             rp_id=r.rp_id).order_by("-rp__rp_id").first()
+        
         if payment_list is not None:
-            rpi_price_result = payment_list.rpi_price_result
+            if payment_list.type_payment == 'Deposit':
+                rpi_price_result = payment_list.rpi_price_pay   
+            elif payment_list.type_payment == 'Deposit2': 
+                rpi_price_result = payment_list.rpi_pay
+            else :     
+                
+                rpi_price_result = payment_list.rpi_pay
+                
+            
         else:
             rpi_price_result = 0
+        
         total_sum += rpi_price_result
 
         course_list = course_event.objects.select_related(

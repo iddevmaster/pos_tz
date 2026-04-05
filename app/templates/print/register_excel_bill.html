@@ -122,6 +122,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>ภาษีมูลค่าเพิ่ม</td>
       <td>รวม</td>
       <td>สถานะการขาย</td>
+      <td>ประเภทการชำระ</td>
       <td>ชื่อผู้ขาย</td>
       <td>ประเภท</td>  <td>STM โอน</td>
 
@@ -148,7 +149,29 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
         {{res.payment_list.rpi_price_vat|floatformat:2|intcomma }}
       </td>
       <td align="right">
-        {{res.payment_list.rpi_price_result|floatformat:2|intcomma}}
+         {% if res.payment_list.type_payment == 'Deposit' %}
+         {{res.payment_list.rpi_price_pay|floatformat:2|intcomma}}
+        {% elif res.payment_list.type_payment == 'Deposit2' %}
+        {{res.payment_list.rpi_pay|floatformat:2|intcomma}}
+     {% else %}
+     {{res.payment_list.rpi_price_result|floatformat:2|intcomma}}
+      {% endif %}
+
+        
+      </td>
+
+       <td>
+          {% if res.payment_list.type_payment == 'Deposit' %}
+        <span>มัดจำงวด 1 </span>
+        {% elif res.payment_list.type_payment == 'Deposit2' %}
+       <span>จ่ายมัดจำงวด 2</span>
+     {% else %}
+     <span>จ่ายเต็ม</span>
+      {% endif %}
+      
+        
+        
+   
       </td>
       <td>
         {% if res.main.register.close_the_sale == 1 %}
