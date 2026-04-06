@@ -1401,11 +1401,14 @@ def student_list(request, register_id):
     content = student.objects.filter(
         register_id=register_id).order_by('-crt_date')
     payment_data = register_payment.objects.filter(
-        register_id=register_id).order_by('-crt_date').first()
+        register_id=register_id).order_by('crt_date').first()
+    
+
     if payment_data:
         rp_quota = payment_data.rp_quota
     else:
         rp_quota = content.count()
+
         
     context = {'title': title,  'data': content, 'listMenuPermission': objMenu,
                'main': main, 'detail': detail, 'rp_quota': rp_quota, 'total_student': content.count(), 'ref_data': ref_data, 'api_id_card': api_id_card,'register_id':register_id}
@@ -1469,12 +1472,16 @@ def student_form_create(request, register_id):
             student_lastname_eng = form.cleaned_data['student_lastname_eng']
             # ตรวจสอบโควต้า
             payment_data = register_payment.objects.filter(
-                register_id=register_id).order_by('-crt_date').first()
+                register_id=register_id).order_by('crt_date').first()
            
             total_student = student.objects.filter(
                 register_id=register_id).count()
             
+
+            
             rp_quota = payment_data.rp_quota
+
+
             if total_student >= rp_quota:
                 messages.error(request, "ไม่สามารถทำรายการได้ !")
                 return redirect("/register/studentlist/" + str(register_id))
