@@ -254,7 +254,8 @@
         <tr>
           <td colspan="2">ราคาก่อน VAT</td>
           <td align="right">
-            {{items.rpi_price_total |floatformat:2|intcomma }}
+            0
+            {% comment %} {{items.rpi_price_total |floatformat:2|intcomma }} {% endcomment %}
           </td>
         </tr>
         <tr>
@@ -267,7 +268,8 @@
          
           <td colspan="2"> ยอดรวมสุทธิ</td>
           <td align="right">
-            {{items.rpi_price_result |floatformat:2|intcomma }}
+            0
+            {% comment %} {{items.rpi_price_result |floatformat:2|intcomma }} {% endcomment %}
           </td>
         </tr>
         <tr>
@@ -417,13 +419,15 @@
         <tr>
           <td colspan="2">ราคาก่อน VAT</td>
           <td align="right">
-            {{items.rpi_price_total |floatformat:2|intcomma }}
+            0
+            {% comment %} {{items.rpi_price_total |floatformat:2|intcomma }} {% endcomment %}
           </td>
         </tr>
         <tr>
           <td colspan="2">ภาษีมูลค่าเพิ่ม 7&#37;</td>
           <td align="right">
-            {{items.rpi_price_vat |floatformat:2|intcomma }}
+            0
+            {% comment %} {{items.rpi_price_vat |floatformat:2|intcomma }} {% endcomment %}
           </td>
         </tr>
         <tr>
