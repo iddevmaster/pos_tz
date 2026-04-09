@@ -2578,7 +2578,7 @@ def approve_list_payment_accept_invoice(request):
 
     content = salesorder.objects.get(pk=sale_id)
     
-    content.invoice = invoice
+    # content.invoice = invoice
     content.rv = rv
     content.status = 'Y'
     content.save()
@@ -2629,7 +2629,7 @@ def approve_list_payment_accept_invoice_iv(request):
 
 
     content = salesorder.objects.get(pk=sale_id)
-    print(invoice)
+
     content.invoice = invoice
     content.save()
 
