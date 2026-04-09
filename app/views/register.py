@@ -2304,7 +2304,7 @@ def update_close_the_event(request):
     content.orderstatus = 'FullPayment'
     content.save()
 
-    print(content.seller.id)
+
 
 
     contentfact = fact_customer.objects.get(register_id=register_id)
@@ -2333,7 +2333,7 @@ def update_close_the_event(request):
         user_id=content.seller.id,
         status='W')
        
-
+    print(contentev.er_id)
     savesal = salesorder.objects.create( 
         er_id=contentev.er_id,
         type_sa=accept_terms,
@@ -2344,6 +2344,8 @@ def update_close_the_event(request):
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow()
     )
+
+
 
     checkev = event_register.objects.filter(ev_id=ev_id)
     all_passed = all(record.status == 'Y' for record in checkev)
@@ -2432,15 +2434,12 @@ def approve_list_invoice_com(request):
         obj = []
         st = [0,1]
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2).order_by("-crt_date")[:30]
-        
-        for r in billpa:    
-            print(r.rp_doc_number)
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:60]
+        # billpa = event_register.objects.filter(status='Y')
+        for r in billpa:  
+            
             erv = event_register.objects.get(register=r.register.register_id)
-            print(erv)
             evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            print(evcourse)
-            print(erv.er_id)
             getsale = salesorder.objects.get(er_id=erv.er_id)
             
             res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
@@ -2478,12 +2477,16 @@ def approve_list_invoice_inv(request):
         obj = []
         st = [0,1]
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2).order_by("-crt_date")[:30]
-        
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:60]
+        print(billpa)
         for r in billpa:    
+            
             erv = event_register.objects.get(register=r.register.register_id)
+            print(erv)
             evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
+            print(erv.er_id)
             getsale = salesorder.objects.get(er_id=erv.er_id)
+            
 
             res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
             
@@ -2566,7 +2569,7 @@ def approve_list_payment_accept_invoice(request):
     
     list_user = User.objects.filter(is_staff=0, is_active=1,user_group_ref__module=m.module).prefetch_related('user_group_ref')
 
-    invoice = request.POST['invoice']
+    # invoice = request.POST['invoice']
     rv = request.POST['rv']
     sale_id = request.POST['sale_id']
 
