@@ -2155,13 +2155,12 @@ def approve_lis_event(request):
     year_current = request.GET.get('qyear', date.today().year)
 
    
-    content = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2).order_by('-er_id')[:30]
+    content = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2).order_by('-er_id')[:90]
     
     obj = []
     if content:
      for r in content:
-        print(r)
-        print(r)
+      
         cus = fact_customer.objects.select_related('register').filter(
             register_id=r.register_id).first()
         
