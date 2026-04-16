@@ -281,7 +281,12 @@ unread = data.unread
 
 async function handleNotificationClick(id, actionUrl) {
 
-  
+   if (actionUrl) {
+        window.open(url, '_blank');
+    }
+
+
+
 }
 
 function initTabEvents() {
