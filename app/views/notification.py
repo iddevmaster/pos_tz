@@ -83,6 +83,19 @@ def fetch_notification_read(request):
     datas = []
     
 
+    return JsonResponse(datas, status=200, safe=False) 
+
+
+
+@csrf_exempt
+def fetch_notification_read_one(request):
+    data = json.loads(request.body)
+    id = data.get("id")
+    datas = notifications.objects.select_related("cm").filter(notifications_id=id,is_read='false').update(is_read='true')
+    datas = []
+    
+
     return JsonResponse(datas, status=200, safe=False)  
+
 
     

@@ -281,8 +281,34 @@ unread = data.unread
 
 async function handleNotificationClick(id, actionUrl) {
 
-   if (actionUrl) {
-        window.open(url, '_blank');
+
+
+
+          try {
+        // ยิง API เพื่อ mark as read
+        await fetch(`/api/notifications/readone`, {
+            method: 'POST', // หรือ PUT ตามที่คุณตั้ง route
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({'id': id})
+
+        });
+
+         if (actionUrl) {
+            window.open(actionUrl, '_blank'); // ✅ แก้จาก url → actionUrl
+        }
+
+        
+
+        // redirect หลัง update สำเร็จ
+     
+
+    } catch (error) {
+        console.error('error:', error);
+
+        // fallback: ถึง error ก็ยังเปิด link ได้
+
     }
 
 
@@ -345,7 +371,7 @@ function initTabEvents() {
         const unreadClass = isUnread ? 'true' : '';
         const unreadDot = isUnread ? '<div class="unread-dot"></div>' : '';
       
-        console.log(item.action_url)
+        console.log(item)
         // เลือก Icon ตามประเภท (ตัวอย่าง)
         let iconSvg = '';
         if (item.notification_type === 'event') {

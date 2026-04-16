@@ -383,7 +383,9 @@ urlpatterns = [
      path('api/bill_overdue', desbill.data_bill_overdue),
      path('api/notifications', notification.fetch_notification),
      path('api/notifications/read', notification.fetch_notification_read),
-   
+
+     path('api/notifications/readone', notification.fetch_notification_read_one),
+  
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),
