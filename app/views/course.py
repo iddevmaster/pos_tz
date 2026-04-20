@@ -1123,7 +1123,7 @@ def calendar_event_api2(request,id):
     obj = []
     
     for r in content:  
-       
+     
        start = str(r.ev.ev_date_start)
        end = str(r.ev.ev_date_end)
        
@@ -1144,7 +1144,7 @@ def calendar_event_api2(request,id):
    
 
        
-        fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa),'register_id':r.register_id}
+        fs = {'fname':a.teacher_firstname_th,'lname':a.teacher_lastname_th,'status':x.status,'position':x.pi_id,'pay_name':str(pa),'register_id':r.register_id,'tis_unit':r.tis_unit,'tis_quantity':r.tis_quantity}
         
         te.append(fs)  
         

@@ -210,16 +210,16 @@ if((card.evs_status == 'S') || (card.evs_status == 'I') || (card.evs_status == '
 
     $.each(card.teach, function (i, item) {
       if(item.status == 'N'){
-        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style= 'color:#e2360c'> รอยันยัน</span></p>");
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-('  + item.tis_quantity + '/' + item.tis_unit + ')' + "<span style= 'color:#e2360c'> รอยันยัน</span></p>");
       }
       if(item.status == 'Y'){
-        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-(' + + item.tis_quantity + '/' + item.tis_unit + ')' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
       }
       if(item.status == 'I'){
-        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-(' + item.tis_quantity  + '/' + item.tis_unit + ')' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
       }
        if(item.status == 'S'){
-        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
+        $mainCard6.append("<p>" + item.fname + '-' + item.lname + '-' + item.pay_name + '-(' +  item.tis_quantity + '/' + item.tis_unit + ')' + "<span style='color:#4be01b'> ยันยันแล้ว</span></p>");
       }
   
     });
