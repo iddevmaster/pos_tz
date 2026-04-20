@@ -1391,10 +1391,10 @@ def update_course_even(request):
     ev_id = data.get("evs_id")
 
     content = course_event.objects.get(ev_id=ev_id)
-    # content.status = 'Y'
-    # content.save()
+    content.status = 'Y'
+    content.save()
 
-    print(content.ev_date_end)
+  
 
     cou = course.objects.get(course_id=content.course.course_id)
 
