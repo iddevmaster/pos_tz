@@ -18,6 +18,11 @@ class Command(BaseCommand):
 
         url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 
+        requests.post(url, data={
+            "chat_id": CHAT_ID,
+            "text": "ทดสอบว่าเข้าจริง"})
+ 
+
         commit = fact_commission.objects.filter(status='N',user_id__isnull=False).values('user_id').distinct()
         today = timezone.now().date()
         if today.day == 30:
