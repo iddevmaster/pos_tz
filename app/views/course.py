@@ -1394,7 +1394,6 @@ def update_course_even(request):
     content.status = 'Y'
     content.save()
 
-  
 
     cou = course.objects.get(course_id=content.course.course_id)
 
