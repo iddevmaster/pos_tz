@@ -57,6 +57,9 @@ urlpatterns = [
 
     path('approve/invoice/acco', register.approve_list_invoice_inv),
 
+    path('finance/invoiceall', register.approve_list_invoice_invall),
+    path('finance/overdueinvoice', register.approve_list_invoice_overdue),
+
 
     path('approvebill/invoice/rv/',
          register.approve_list_payment_accept_invoice  ,name='acceptbillcreditinvoice'),

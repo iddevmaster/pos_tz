@@ -252,6 +252,18 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+        {
+        "value": "finance/invoiceall",
+        "label": "ใบเสนอราคาทั้งหมด",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
+        {
+        "value": "finance/overdueinvoice",
+        "label": "ใบเสนอราคาค้าง",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
       {
         "value": "finance/overduepayment",
         "label": "ค้างชำระ",
