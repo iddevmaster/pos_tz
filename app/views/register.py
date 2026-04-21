@@ -2588,8 +2588,7 @@ def approve_list_invoice_overdue(request):
         
         for r in billpa:    
             pay = register_payment.objects.get(register_id=r.register.register_id)
-            print(r.register.register_id)
-            print(pay.rp_doc_number)
+       
             item = register_payment_items.objects.get(rp_id=pay.rp_id)
             # erv = event_register.objects.get(register=r.register.register_id)
             evcourse = course_event.objects.get(ev_id=r.ev.ev_id)
