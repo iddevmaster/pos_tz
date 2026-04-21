@@ -148,64 +148,31 @@
           <tr>
             <th>ลำดับ</th>
    <th>วันที่ออก</th>
-           
             <th>เลขใบเสนอ</th>
             <th>ชื่อลูกค้า</th>
             <th>หลักสูตรและวันที่จัด</th>
-            <th>PO</th>
-            <th>SQ</th>
-            <th>SO</th>
-            <th>Invoice</th>
-          
-         
-            <th>#</th>
+            <th>ราคา</th>
+             <th>หมายเหตุ</th>
           </tr>
         </thead>
         <tbody>
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.rp_doc_number}}</td>
+          
             <td>{{res.bill_create}}</td>
+              <td>{{res.rp_doc_number}}</td>
             <td>{{res.custom}}</td>
             <td>{{res.course_name}} รุ่น {{res.ev_generation}} <br>วันที่ {{res.start}} - {{res.end}}</td>
 
-            <td>{{res.po}}</td>
+            <!-- <td>{{res.po}}</td>
             <td>{{res.sq}}</td>
-            <td>{{res.so}}</td>
+            <td>{{res.so}}</td> -->
 
-            <td>
-              {{res.invoice}}
-            </td>
-
-           
-
-            <td>
-
-
-              {% if res.status == 'Y' %}
-              -
-              {% else %}
-              <div class="btn-group me-1 mb-1">
-                <div class="dropdown">
-                  <button class="btn btn-success btn-sm" type="button" id="dropdownMenuButtonIcon"
-                    data-bs-toggle="modal" data-bs-target="#UpdateClick1" data-id="{{res.er_id}}"
-                    onclick="MyMo('{{res.sale_id}}')">
-                    กรอก Inv
-                  </button>
-                </div>
-              </div>
-
-
-              {% endif %}
-
-
-
-
-
-
-
-
+         <td>
+          {{res.rpi_pay}}
+            </td><td>
+          -
             </td>
           </tr>
           {% endfor %}
