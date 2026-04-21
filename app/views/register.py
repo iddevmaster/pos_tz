@@ -2526,20 +2526,23 @@ def approve_list_invoice_invall(request):
     try:
         obj = []
         st = [0,1]
-        # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:60]
-        print(billpa)
-        for r in billpa:    
-            
-            erv = event_register.objects.get(register=r.register.register_id)
-            print(erv)
-            evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            print(erv.er_id)
-            getsale = salesorder.objects.get(er_id=erv.er_id)
-            
+        
+        today = timezone.now()
 
-            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
-            
+        # วันแรกของเดือนนี้
+        first_day_this_month = today.replace(day=1)
+
+        # วันแรกของเดือนก่อนหน้า
+        first_day_last_month = first_day_this_month - relativedelta(months=1)
+        
+        billpa = event_register.objects.select_related('ev','register').filter(status='Y',register__pay_type=2,register__crt_date__gte=first_day_last_month).order_by('-ev__ev_id')
+
+        for r in billpa:    
+            pay = register_payment.objects.get(register_id=r.register.register_id)
+            item = register_payment_items.objects.get(rp_id=pay.rp_id)
+            # erv = event_register.objects.get(register=r.register.register_id)
+            evcourse = course_event.objects.get(ev_id=r.ev.ev_id)
+            res = {'rp_doc_number':pay.rp_doc_number,'register_number':r.register.register_number,'po':'-','sq':'-','so':'-','register_id':r.register.register_id,'sale_id':'-','invoice':'-','rv':'-','status':'-','custom':pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation,'bill_create':r.register.crt_date,'rpi_pay':item.rpi_pay}
             obj.append(res)    
            
     except:
@@ -2573,7 +2576,7 @@ def approve_list_invoice_overdue(request):
     try:
         obj = []
         st = [0,1]
-
+        
         today = timezone.now()
 
         # วันแรกของเดือนนี้
@@ -2588,12 +2591,10 @@ def approve_list_invoice_overdue(request):
         
         for r in billpa:    
             pay = register_payment.objects.get(register_id=r.register.register_id)
-       
             item = register_payment_items.objects.get(rp_id=pay.rp_id)
             # erv = event_register.objects.get(register=r.register.register_id)
             evcourse = course_event.objects.get(ev_id=r.ev.ev_id)
             res = {'rp_doc_number':pay.rp_doc_number,'register_number':r.register.register_number,'po':'-','sq':'-','so':'-','register_id':r.register.register_id,'sale_id':'-','invoice':'-','rv':'-','status':'-','custom':pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation,'bill_create':r.register.crt_date,'rpi_pay':item.rpi_pay}
-            
             obj.append(res)    
            
     except:
