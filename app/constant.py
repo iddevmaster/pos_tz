@@ -254,7 +254,7 @@ listMenu = [
     },
         {
         "value": "finance/invoiceall",
-        "label": "ใบเสนอราคาทั้งหมด",
+        "label": "ใบเสนอราคาที่ยืนยัน",
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
