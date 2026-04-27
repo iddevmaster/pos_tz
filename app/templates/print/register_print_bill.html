@@ -12,7 +12,7 @@
   <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
   <script type="text/javascript">
     function myFunction() {
-      var monney = "{{items.rpi_pay }}";
+      var monney = "{{items.rpi_price_pay }}";
       var thaibath = ArabicNumberToText(monney);
       document.getElementById("result").innerHTML = thaibath;
     }
