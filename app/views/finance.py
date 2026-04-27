@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon,com_head
+from ..models import category_program_permission, course, course_event,notifications,teacher_income_setting, billing_cycle_setting, user_group, user_detail, teacher,pay_item,compensation,event_register,salesorder,com_income_setting,register_main,location_thai,document,fact_teacher_user,register_payment,condition,conhead,tax_setting,fact_commission,commissionstages,register_payment_items,customers,fact_customer,desciption_bill,fact_signature,add_on,User,student,factbilldes,register_applove,fact_addon,com_head
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -840,8 +840,34 @@ def saveeventadmin(request):
               x = course_event.objects.get(ev_id=ev_id)
               x.status = status
               x.save()  
-         
+
+            y = course_event.objects.get(ev_id=ev_id)
+          
+            uuid_without_dashes = str(teacher_id).replace('-', '')
+            teact_user = fact_teacher_user.objects.get(teacher_id=uuid_without_dashes)
+            getuserde = user_detail.objects.get(user_id=teact_user.user_id)
             
+            msg = 'แจ้งเตือนกดรับงาน'
+            
+          
+            noti = notifications(
+                 notification_type='app',
+                 title='แจ้งเตือน',
+                 message=msg,
+                 reference_id='123',
+                 reference_type='task',
+                 is_read='false',
+                 read_at=dateTimeNow(),
+                 action_url='/calendarteachers',
+                 priority='easy',
+                 user_id=teact_user.user_id,
+                 created_by='1',cm_id=getuserde.cm_id,
+                 crt_date=dateTimeNow(),
+                 upd_date=dateTimeNow())
+            noti.save()
+            
+
+
             datas = {'status':200}
             return JsonResponse(datas, status=200,safe=False)
 
