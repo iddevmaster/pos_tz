@@ -574,6 +574,36 @@ function initTabEvents() {
             border: 2px solid white;
         }
 
+        .submenu-item {
+    border-radius: 8px;
+    margin: 4px 8px;
+    transition: all 0.2s ease;
+}
+
+/* hover */
+.submenu-item:hover {
+    background-color: #f5f7ff;
+}
+
+/* 🔥 active */
+.submenu-item.active-menu {
+    background: linear-gradient(90deg, #696cff, #5f61e6);
+    color: #fff;
+    border-left: 4px solid #4f46e5;
+    box-shadow: 0 4px 10px rgba(105,108,255,0.2);
+}
+
+/* text ข้างใน */
+.submenu-item.active-menu a {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+/* hover ตอน active */
+.submenu-item.active-menu:hover {
+    opacity: 0.95;
+}
+
         /* Notification Dropdown */
         .notification-dropdown {
             background: white;
@@ -1119,7 +1149,7 @@ function initTabEvents() {
                   {% for rsc in rs.children %}
                   
                   <li
-                    class="{% if request.path|contains:rsc.page_route %} submenu-item active {% else %} submenu-item {% endif %}"
+                    class="{% if request.path|contains:rsc.page_route %} submenu-item active-menu {% else %} submenu-item {% endif %}"
                   >
 
 
