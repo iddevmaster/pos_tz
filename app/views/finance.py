@@ -1717,7 +1717,7 @@ def withdraw_list_pay(request, register_id):
     total_price = add_on.objects.filter(register_id=uuid_without_dashes,status='Y').aggregate(Sum('rpi_price_result'))["rpi_price_result__sum"] or 0
     price_orver = register_payment_items.objects.get(register_id=register_id)
     
-    orver = (price_orver.rpi_price * price_orver.rpi_quantity)  - price_orver.rpi_price_pay
+    orver = ((price_orver.rpi_price * price_orver.rpi_quantity)) - ((price_orver.rpi_price_pay)  + (price_orver.rpi_price_discount))
 
    
     context = {'title': title,  'data': content.customer, 'listMenuPermission': objMenu,'des_bill':des_bill,'manage':signature,'course_list':course_list,'addon':addon,'total_price_add_on':total_price,'datas':register_id,'orver':orver,

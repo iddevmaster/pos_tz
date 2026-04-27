@@ -12,8 +12,26 @@
   <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
   <script type="text/javascript">
     function myFunction() {
-      var monney = "{{items.rpi_price_pay }}";
+   
+
+      var type = "{{items.type_payment }}";
+      
+      if(type == 'Deposit2'){
+        var monney = "{{items.rpi_price_result }}";
+      }else if (type == 'FullPayment') {
+        
+        var monney = "{{rpi_price_default }}";
+       
+      }
+      else {
+         var monney = "{{items.rpi_price_pay }}";
+      }
+      
+
+
       var thaibath = ArabicNumberToText(monney);
+
+      
       document.getElementById("result").innerHTML = thaibath;
     }
 
