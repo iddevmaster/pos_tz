@@ -111,7 +111,9 @@ def register_print(request, rp_id):
     if items.type_payment == 'FullPayment':
        t = 0
     elif items.type_payment == 'Deposit':
-       t = items.rpi_price_result - items.rpi_price_pay
+       t = (items.rpi_price_result) - (items.rpi_price_pay + items.rpi_price_discount) 
+    #    t = items.rpi_price_result - items.rpi_price_pay 
+       print(t)
     else:   
        t = 0
    
