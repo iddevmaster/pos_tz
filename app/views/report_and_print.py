@@ -2310,7 +2310,7 @@ def register_report_summary_details_com(request ,id, year, m):
 
 
 
-    customer_order_counts = com_income_setting.objects.filter(status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,user_id=id,active=0)
+    customer_order_counts = com_income_setting.objects.filter(status='S',user_id=id,active=0,crt_date__year=year,crt_date__month=m)
    
     tax = 0
     tax_all = 0
@@ -2330,7 +2330,6 @@ def register_report_summary_details_com(request ,id, year, m):
         tax = rs.tis_com_before_tax - rs.tis_com_after_tax
         tax_all += rs.tis_com_before_tax - rs.tis_com_after_tax
         r = {'stage_name':comstate.stage_name,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs,'tis_com_before_tax':rs.tis_com_before_tax,'tis_com_after_tax':rs.tis_com_after_tax,'tax':tax}
-           
         obj.append(r)   
    
 
