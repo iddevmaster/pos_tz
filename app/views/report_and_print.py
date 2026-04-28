@@ -4305,9 +4305,11 @@ def register_report_summary_user_withdraw_com_one(request):
     user_id = request.user.id
    
     month_select_now = request.POST.get('monthss', date.today().month)
+    year_select_now = request.POST.get('qyear', date.today().year)
     
  
     m_n = month_select_now
+    m_y = year_select_now
    
  
     day_same_m = request.POST.get('monthss', date.today().month)
@@ -4316,11 +4318,7 @@ def register_report_summary_user_withdraw_com_one(request):
 
     year_current = request.POST.get('qyear', date.today().year)
    
-    m_l = get_previous_month(int(day_same_m),int(year_current))
-    yearxx = get_previous_year(int(day_same_m),int(year_current))
 
-   
-   
 
 
     start = None
@@ -4329,35 +4327,17 @@ def register_report_summary_user_withdraw_com_one(request):
     end_new = None
     obj = []
 
-    
-  
-    get_last_day = last_day_of_month(
-            datetime.date(int(year_current), int(month_select_now), 1))
-   
-    
-    last_day = get_last_day.day
 
-    default_start = str(yearxx) + "-" + \
-        str(m_l) + "-" + "21"
-    default_end = str(year_current) + "-" + \
-        str(m_n) + "-" + "20"
-
-    get_last_day_m = last_day_of_month(
-            datetime.date(int(year_current), m_l, 1))
-    last_day_m = get_last_day_m.day
 
   
    
-    tis_group_l = f"21 - {last_day_m}"
-    tis_group_f = "1 - 20"
-    
-
+  
 
     day_current_day = date.today().day
 
   
     result_dict = {}
-    customer_order_counts = com_income_setting.objects.filter(status='S',user_id=user_id).values('user_id')
+    customer_order_counts = com_income_setting.objects.filter(status='S',user_id=user_id,crt_date__year=m_y,crt_date__month=m_n).values('user_id')
     
     
     price = 0
@@ -4375,9 +4355,8 @@ def register_report_summary_user_withdraw_com_one(request):
     code = getdatauser
     name = getdatauser.first_name + '' + getdatauser.last_name
    
-     
-    lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=user_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
-        
+    
+  
     
     price = 0
     totalp = 0
@@ -4386,16 +4365,9 @@ def register_report_summary_user_withdraw_com_one(request):
     sumtaxl = 0
     sumtaxf = 0
     totalall = 0
-    for rs in lassssst:
-          
-            
-            totalp += rs.tis_com_before_tax
-
-            sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
 
 
-          
-    first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=user_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+    first = com_income_setting.objects.filter(status='S',user_id=user_id,crt_date__year=m_y,crt_date__month=m_n,active=0)
     
     for rsf in first:
      
@@ -4409,9 +4381,9 @@ def register_report_summary_user_withdraw_com_one(request):
                 
                 totalall = aa - sumtaxall
                 result_dict[user_id] = {"Id": user_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
-    print('test')        
+       
     result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f,'yearold':yearxx}
+    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f}
   
     return render(request, 'print/report_withdraw_summary_commission_one.html', context)   
 
