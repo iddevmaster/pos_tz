@@ -2537,9 +2537,22 @@ def approve_list_invoice_invall(request):
         first_day_last_month = first_day_this_month - relativedelta(months=1)
         
         billpa_qs = event_register.objects.select_related('ev','register').filter(status='Y',register__pay_type=2,register__crt_date__gte=first_day_last_month).order_by('-ev__ev_id')
-        if user_id not in [6, 3, 11,1]:
-            billpa_qs = billpa_qs.filter(register__seller_id=user_id)
-        billpa = billpa_qs.order_by('-ev__ev_id')
+        # if user_id in [11]:
+        #     billpa_qs = billpa_qs.filter(register__seller_id_in=[54,55,56,91,57,17])
+        # elif user_id not in [6,3,1]:
+        #     billpa_qs = billpa_qs.filter(register__seller_id=user_id)
+        # else :    
+        if user_id in [6, 3, 1,11]:
+            if user_id == 11:
+                billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17])
+            billpa = billpa_qs.order_by('-ev__ev_id')    
+     
+        # elif user_id == 11:
+        #     billpa_qs = billpa_qs.filter(register__seller_id_in=[54,55,56,91,57,17])
+        #     billpa = billpa_qs.order_by('-ev__ev_id')
+        # else:    
+        #     billpa_qs = billpa_qs.filter(register__seller_id=user_id)
+
         for r in billpa:    
             pay = register_payment.objects.get(register_id=r.register.register_id)
             item = register_payment_items.objects.get(rp_id=pay.rp_id)
@@ -2593,9 +2606,10 @@ def approve_list_invoice_overdue(request):
         
         billpa_qs = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2,register__crt_date__gte=first_day_last_month).order_by('-ev__ev_id')
 
-        if user_id not in [6, 3, 11,1]:
-            billpa_qs = billpa_qs.filter(register__seller_id=user_id)
-        billpa = billpa_qs.order_by('-ev__ev_id')
+        if user_id in [6, 3, 1,11]:
+            if user_id == 11:
+                billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17])
+            billpa = billpa_qs.order_by('-ev__ev_id')    
         
         for r in billpa:    
             pay = register_payment.objects.get(register_id=r.register.register_id)
