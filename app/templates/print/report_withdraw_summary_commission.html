@@ -84,32 +84,31 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     </tr>
     <tr style="font-weight: bold">
      
-      <td colspan="10" align="center">ระหว่างวันที่  {{tis_group_l}} {{old_m}} {{yearold}} ถึง {{tis_group_f}} {{current_m}} {{year_current}} </td>
+      <td colspan="10" align="center">ประจำเดือน {{mon}} ปี {{year}}</td>
     </tr>
     <tr>
       <td>ลำดับ</td>
       <td>รหัสพนักงาน</td>
       <td>ชื่อ-สกุล</td>
-      <td>รวมค่าตอบแทน        ค้าง {{tis_group_l}} {{old_m}} {{yearold}} </td>
-      <td>รวมค่าตอบแทน    {{tis_group_f}} {{current_m}} {{year_current}}</td>
+      <td>รวมค่าตอบแทน    {{mon}}</td>
       <td>รวมเป็นเงิน</td>
       <td>หัก ณ ที่จ่าย</td>
       <td>รายได้สุทธิ</td>
       <td></td>
     </tr>
 
-    {% for res in result_dict %}
+    {% for res in qs  %}
     <tr>
       <td align="center">{{ forloop.counter }}</td>
-      <td align="center">{{res.code}}</td>
-      <td align="center">{{res.username}}</td>
+      <td align="center">{{res.user__username}}</td>
+      <td align="center">{{res.user__first_name}} {{res.user__last_name}}</td>
    
-      <td align="center">{{res.price|floatformat:2|intcomma }}</td>
-      <td align="center">{{res.price_f|floatformat:2|intcomma }}</td>
-      <td align="center">{{res.total|floatformat:2|intcomma }}</td>
+
+      <td align="center">{{res.total_before_tax|floatformat:2|intcomma }}</td>
+      <td align="center">{{res.total_before_tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
-      <td align="center">{{res.totalall|floatformat:2|intcomma }}</td>
-       <td align="center"><button type="button" onclick="details('{{res.Id}}','{{year_current}}','{{m}}')">
+      <td align="center">{{res.total_after_tax|floatformat:2|intcomma }}</td>
+       <td align="center"><button type="button" onclick="details('{{res.user_id}}','{{year}}','{{m}}')">
             คลิกดูรายละเอียด
         </button></td>
       <!-- <td align="center">{{res.requirements}}</td> -->

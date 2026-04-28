@@ -1286,10 +1286,10 @@ def withdraw_list_one_com(request):
 
         total_all += total
 
-        print(total_all)
+        
 
 
-
+    
        
         r = {'rpi_price_result':paymet.rpi_price_result,'register_number':content_main.register_number,"course_name":content_main.course.course_name,'ev_generation':content_main.ev.ev_generation,'stage_name':stage.stage_name,'commission_rate':stage.commission_rate,"couse_name":content_main.course.course_name,"ev_date_start":content_main.ev.ev_date_start,"ev_date_end":content_main.ev.ev_date_end,'price_com':total,'getpricebill_after_vat':getpricebill_after_vat,'after_vat_cal':after_vat_cal}
         obj.append(r)

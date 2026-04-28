@@ -552,7 +552,7 @@ class com_income_setting(models.Model):
     tax = models.IntegerField(blank=True, default=None)
     com_id = models.IntegerField(blank=True, default=None)
     course = models.ForeignKey(course, on_delete=models.CASCADE)
-    user_id = models.IntegerField(default=None, blank=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 👈 แก้ตรงนี้
     status_pay = models.CharField(max_length=15, blank=False)
     notifications = models.CharField(max_length=1, blank=False)
 

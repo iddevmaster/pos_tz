@@ -14,7 +14,9 @@ import json
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..forms.form_month import MyFormWithThai
 from django.db.models.functions import TruncMonth
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, ExpressionWrapper, FloatField
+
+from django.db.models.functions import Coalesce
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
@@ -125,7 +127,7 @@ def register_print(request, rp_id):
        rpi_price_all_dis = (float(items.rpi_quantity) * float(items.rpi_price)) - float(items.rpi_price_discount)
    
     
-
+    print(rpi_price_default)
    
     
     
@@ -4184,99 +4186,116 @@ def register_report_summary_sale_com_one(request):
 def register_report_summary_user_withdraw_com(request):
 
     month_select_now = request.POST.get('monthss', date.today().month)
+    year_select_now = request.POST.get('qyear', date.today().year)
     
- 
     m_n = month_select_now
- 
- 
-    day_same_m = request.POST.get('monthss', date.today().month)
+    m_y = year_select_now
+
+    
+    # day_same_m = request.POST.get('monthss', date.today().month)
    
  
-    day_current_m = request.POST.get('monthss', date.today().month - 1)
+    # day_current_m = request.POST.get('monthss', date.today().month - 1)
 
-    year_current = request.POST.get('qyear', date.today().year)
-    m_l = get_previous_month(int(day_same_m),int(year_current))
-    yearxx = get_previous_year(int(day_same_m),int(year_current))
+    # year_current = request.POST.get('qyear', date.today().year)
+    # m_l = get_previous_month(int(day_same_m),int(year_current))
+    # yearxx = get_previous_year(int(day_same_m),int(year_current))
     
-    start = None
-    end = None
-    start_new = None
-    end_new = None
+    # start = None
+    # end = None
+    # start_new = None
+    # end_new = None
     obj = []
 
+    qs = com_income_setting.objects.filter(status='S',active=0,crt_date__year=m_y,crt_date__month=m_n).values('user_id','user__username','user__first_name','user__last_name').annotate(
+    total_before_tax=Coalesce(Sum('tis_com_before_tax'), 0.0),
+    total_after_tax=Coalesce(Sum('tis_com_after_tax'), 0.0),
+    tax=ExpressionWrapper(
+        Coalesce(Sum('tis_com_before_tax'), 0.0) - Coalesce(Sum('tis_com_after_tax'), 0.0),
+        output_field=FloatField()
+    )
+)
+        
+
     
 
-    get_last_day = last_day_of_month(
-            datetime.date(int(yearxx), int(m_l), 1))
-    last_day = get_last_day.day
-    default_start = str(yearxx) + "-" + \
-        str(m_l) + "-" + "21"
-    default_end = str(year_current) + "-" + \
-        str(m_n) + "-" + "20"
+    # get_last_day = last_day_of_month(
+    #         datetime.date(int(yearxx), int(m_l), 1))
+    # last_day = get_last_day.day
+    # default_start = str(yearxx) + "-" + \
+    #     str(m_l) + "-" + "21"
+    # default_end = str(year_current) + "-" + \
+    #     str(m_n) + "-" + "20"
     
 
-    get_last_day_m = last_day_of_month(
-            datetime.date(int(year_current), m_l, 1))
-    last_day_m = get_last_day_m.day
+    # get_last_day_m = last_day_of_month(
+    #         datetime.date(int(year_current), m_l, 1))
+    # last_day_m = get_last_day_m.day
    
-    tis_group_l = f"21 - {last_day_m}"
-    tis_group_f = "1 - 20"
+    # tis_group_l = f"21 - {last_day_m}"
+    # tis_group_f = "1 - 20"
 
 
-    day_current_day = date.today().day
+    # day_current_day = date.today().day
 
   
-    result_dict = {}
-    customer_order_counts = com_income_setting.objects.filter(status='S').values('user_id').distinct()
+    # result_dict = {}
+    # customer_order_counts = com_income_setting.objects.filter(status='S',crt_date__year=m_y,crt_date__month=m_n).values('user_id').distinct()
     
     
-    price = 0
-    totalp = 0
-    totalp_f = 0
-    sumtaxall = 0
-    sumtaxl = 0
-    sumtaxf = 0
-    totalall = 0
+    # price = 0
+    # totalp = 0
+    # totalp_f = 0
+    # sumtaxall = 0
+    # sumtaxl = 0
+    # sumtaxf = 0
+    # totalall = 0
 
-   
-    for customer_order in customer_order_counts:
-        item_id = customer_order['user_id']
+
+    # for customer_order in customer_order_counts:
+    #     item_id = customer_order['user_id']
     
-        getdatauser = User.objects.get(pk=item_id)
-        code = getdatauser
-        name = getdatauser.first_name + ' ' + getdatauser.last_name
+    #     getdatauser = User.objects.get(pk=item_id)
+    #     code = getdatauser
+    #     name = getdatauser.first_name + ' ' + getdatauser.last_name
    
         
-        lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+        # lassssst = com_income_setting.objects.filter(tis_group=tis_group_l,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
         
-        price = 0
-        totalp = 0
-        totalp_f = 0
-        sumtaxall = 0
-        sumtaxl = 0
-        sumtaxf = 0
-        totalall = 0
-        for rs in lassssst:
-            totalp += rs.tis_com_before_tax
-            sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
+        # price = 0
+        # totalp = 0
+        # totalp_f = 0
+        # sumtaxall = 0
+        # sumtaxl = 0
+        # sumtaxf = 0
+        # totalall = 0
+        # for rs in lassssst:
+        #     totalp += rs.tis_com_before_tax
+        #     sumtaxl += rs.tis_com_before_tax - rs.tis_com_after_tax
           
-        first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+        # first = com_income_setting.objects.filter(tis_group=tis_group_f,user_id=item_id,status='S',tis_start_date__gte=default_start,tis_start_date__lte=default_end,active=0)
+        # first = com_income_setting.objects.filter(status='S',active=0)
 
-        for rsf in first:
+        # first = com_income_setting.objects.filter(status='S',active=0,crt_date__year=m_y,crt_date__month=m_n,user_id=item_id)
+
+
+ 
+    #     for rsf in first:
+    #        totalp_f += rsf.tis_com_before_tax
+    #        sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
            
-           totalp_f += rsf.tis_com_before_tax
-           sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
-           
-        if item_id not in result_dict:
-                aa = totalp_f + totalp
-                sumtaxall = sumtaxl + sumtaxf
+    #     if item_id not in result_dict:
+    #             aa = totalp_f + totalp
+    #             sumtaxall = sumtaxl + sumtaxf
                 
-                totalall = aa - sumtaxall
-                result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
-            
-    result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f,'yearold':yearxx}
-  
+    #             totalall = aa - sumtaxall
+    #             result_dict[item_id] = {"Id": item_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}
+                 
+
+    # result_list = list(result_dict.values())
+    # context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'tis_group_f':tis_group_f,'tis_group_l':tis_group_l,'old_m':month_fomat(m_l),'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f,'yearold':yearxx}
+    context = {'title': defaultTitle, 'data': obj,'mon':month_fomat(m_n),'year':m_y,'m':m_n,'qs':qs}
+
     return render(request, 'print/report_withdraw_summary_commission.html', context)   
 
 
