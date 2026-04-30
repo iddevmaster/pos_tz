@@ -2436,7 +2436,7 @@ def approve_list_invoice_com(request):
         obj = []
         st = [0,1]
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:60]
+        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:120]
         # billpa = event_register.objects.filter(status='Y')
         for r in billpa:  
             
