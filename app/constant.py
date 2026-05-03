@@ -423,6 +423,12 @@ listMenu = [
         "group_value": "WRltr2",
         "group_label": "รายงาน",
     },
+    {
+        "value": "report/commit/credit",
+        "label": "รายงานค่าคอมค้างเครดิต",
+        "group_value": "WRltr2",
+        "group_label": "รายงาน",
+    },
 
     {
         "value": "register/report/event/all",

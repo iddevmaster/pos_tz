@@ -1,0 +1,131 @@
+{% extends 'base.html' %} {% block content %}
+
+
+
+<script>
+
+
+  function default_date() {
+    const d = new Date();
+    let month = d.getMonth() + 1;
+    let year = d.getFullYear();
+    let formattedNumberMonth = month.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+
+    const url = new URL(location.href);
+    //alert(url.searchParams.get("qteacher"));
+    let qyear = url.searchParams.get("qyear");
+
+    if (qyear !== null) {
+      document.getElementById("qyear").value = qyear;
+    } else {
+      document.getElementById("qyear").value = year;
+    }
+  }
+  window.onload = default_date;
+</script>
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>   สรุปค้างจ่ายค่าคอม Credit</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+          สรุปค้างจ่ายค่าคอม Credit
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form
+        method="post"
+        action="/report/commit/all/summary/credit"
+        autocomplete="off"
+        target="iframe_target"
+      >
+        {% csrf_token %}
+        <div class="row">
+         
+          <div class="col-lg-4 col-md-6 mb-4">
+             <label for="exampleFormControlInput1" class="form-label">วันที่ค้นหา</label>
+          <input
+          type="number"
+          class="form-control"
+          id="qyear"
+          name="qyear"
+          required
+          placeholder="ปี (ค.ศ.)"
+        />
+          </div>
+
+
+               <div class="col-lg-4 col-md-6 mb-4">
+             <label for="exampleFormControlInput1" class="form-label">เดือน</label>
+                <select name="monthss" id="monthss" class="form-control">
+                  {% for value, display in thai_months %}
+        <option value="{{ value }}"  {% if value == current_month %}selected{% endif %} >
+            {{ display }}
+        </option>
+    {% endfor %}
+  
+            </select>
+
+            
+   
+          </div>
+
+
+
+ 
+
+
+
+          
+        </div>
+        <div class="form-goup" align="center" style="padding-top: 25px">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i>
+            กรอง
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-warning"
+            onclick="window.location.href='/register/export/bill'"
+          >
+            <i class="icon dripicons-clockwise"></i>
+            รีเซ็ต
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <iframe
+id="iframe_target"
+name="iframe_target"
+src="/report/commit/all/summary/credit"
+style="height: 1000px; width: 100%; border: thin; background-color: #fff"
+></iframe>
+</section>
+
+
+{% endblock %}
+
+
+

@@ -239,6 +239,10 @@ urlpatterns = [
     path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
 
 
+    path('report/commit/credit', report_and_print.register_report_summary_com_credit),  #ค้างจ่ายค่าคอม  ///
+    path('report/commit/all/summary/credit', report_and_print.register_report_summary_com_overdue_credit),
+
+
     path('report/withdraw/one/com', report_and_print.register_report_summary_sale_com_one), #ตั้งเบิกค่าคอม
     path('report/withdraw/all/withdraw/comm/one', report_and_print.register_report_summary_user_withdraw_com_one),
     path('report/withdraw/all/summary/comm/<str:id>/<str:year>/<str:m>', report_and_print.register_report_summary_details_com),

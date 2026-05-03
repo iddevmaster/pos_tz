@@ -20,7 +20,7 @@ from django.db.models.functions import Coalesce
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer,fact_signature,signature,commissionstages,fact_commission
+from ..models import category_program_permission,event_register,salesorder, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer,fact_signature,signature,commissionstages,fact_commission
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new,checkpermi,get_previous_month,get_previous_year
 
 
@@ -4117,6 +4117,40 @@ def register_report_summary_com(request):
 
 
 @login_required(login_url='/login')
+def register_report_summary_com_credit(request):
+    user_id = request.user.id
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    path = request.path
+    cleaned_path = path.strip('/')    
+    checkpa = checkpermi(cleaned_path,cm_id)
+    if checkpa == 0:
+        return render(request, '403.html')     
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        m = None
+        return render(request, '404.html')
+    obj = []
+    day_current_m = date.today().month - 1
+  
+    context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
+    return render(request, 'report/billing_cycle_result_summary_overdue_com_credit.html', context) 
+
+
+@login_required(login_url='/login')
 def register_report_summary_sale_com(request):
     user_id = request.user.id
     try:
@@ -4464,6 +4498,49 @@ def register_report_summary_user_withdraw_com_overdue(request):
     context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'start_new':start_new,'end_new':end_new,'start':start,'end':last_day,'sumtax':sumtax,'totalp':totalp,'totalall':totalall,'day_current_m':month_fomat(m_l),'year_current':yearxx,'m':m_l}
   
     return render(request, 'print/report_withdraw_summary_overdue_com.html', context)    
+
+
+@login_required(login_url='/login')
+def register_report_summary_com_overdue_credit(request):
+
+   
+    day_current_m = request.POST.get('monthss', date.today().month)
+    year_current = request.POST.get('qyear', date.today().year)
+    try:
+        obj = []
+        st = [0,1]
+        # salesorder
+        billpa = salesorder.objects.select_related('er').filter(status__isnull=True)
+        # billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:200]
+        # billpa = event_register.objects.filter(status='Y')
+        for r in billpa:  
+
+            print(r.er)
+            
+            evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
+           
+            money = register_payment_items.objects.get(register_id=r.er.register.register_id)
+            main = register_main.objects.get(register_id=r.er.register.register_id)
+            main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
+         
+
+
+           
+            res = {'rpi_price_result':money.rpi_price_result,'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':main.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
+            
+            obj.append(res)    
+           
+    except:
+        content = None
+    
+
+
+   
+      
+
+    context = {'title': defaultTitle, 'data': obj}
+  
+    return render(request, 'print/report_overdue_credie.html', context)   
 
 
 
