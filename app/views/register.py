@@ -2476,27 +2476,67 @@ def approve_list_invoice_inv(request):
         r = {'group_label': rs['group_label'],
              'group_value': rs['group_value'], 'children': children}
         objMenu.append(r)
+    today = date.today()    
+    current_month = int(request.POST.get('monthss', today.month))
+    current_year = int(request.POST.get('qyear', today.year))
+
+    if current_month == 1:
+        prev_month = 12
+        prev_year = current_year - 1
+    else:
+        prev_month = current_month - 1
+        prev_year = current_year
     try:
         obj = []
         st = [0,1]
         # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:60]
-        
-        for r in billpa:    
-            
-            erv = event_register.objects.get(register=r.register.register_id)
-            
-            evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            
-            getsale = salesorder.objects.get(er_id=erv.er_id)
-            
+        billpa = salesorder.objects.select_related('er').filter(
+    status__isnull=True
+).filter(
+    Q(crt_date__month=current_month, crt_date__year=current_year) |
+    Q(crt_date__month=prev_month, crt_date__year=prev_year)
+)
+        # billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:200]
+        # billpa = event_register.objects.filter(status='Y')
+        for r in billpa:  
 
-            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
+           
+            
+            evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
+           
+            money = register_payment_items.objects.get(register_id=r.er.register.register_id)
+            main = register_main.objects.get(register_id=r.er.register.register_id)
+            main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
+         
+           
+            res = {'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':r.er.register.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
             
             obj.append(res)    
            
     except:
         content = None
+        
+    # try:
+    #     obj = []
+    #     st = [0,1]
+    #     # salesorder
+    #     billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:130]
+        
+    #     for r in billpa:    
+    #         print(r.register.register_id)
+    #         erv = event_register.objects.get(register=r.register.register_id)
+            
+    #         evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
+            
+    #         getsale = salesorder.objects.get(er_id=erv.er_id)
+            
+
+    #         res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
+            
+    #         obj.append(res)    
+           
+    # except:
+    #     content = None
         
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
 
