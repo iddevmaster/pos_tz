@@ -4144,7 +4144,7 @@ def register_report_summary_com_credit(request):
         m = None
         return render(request, '404.html')
     obj = []
-    day_current_m = date.today().month - 1
+    day_current_m = date.today().month
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
     return render(request, 'report/billing_cycle_result_summary_overdue_com_credit.html', context) 
@@ -4506,16 +4506,19 @@ def register_report_summary_com_overdue_credit(request):
    
     day_current_m = request.POST.get('monthss', date.today().month)
     year_current = request.POST.get('qyear', date.today().year)
+
+    print(day_current_m)
+    print(year_current)
     try:
         obj = []
         st = [0,1]
         # salesorder
-        billpa = salesorder.objects.select_related('er').filter(status__isnull=True)
+        billpa = salesorder.objects.select_related('er').filter(status__isnull=True,crt_date__month=day_current_m,crt_date__year=year_current)
         # billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:200]
         # billpa = event_register.objects.filter(status='Y')
         for r in billpa:  
 
-            print(r.er)
+           
             
             evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
            
@@ -4523,8 +4526,6 @@ def register_report_summary_com_overdue_credit(request):
             main = register_main.objects.get(register_id=r.er.register.register_id)
             main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
          
-
-
            
             res = {'rpi_price_result':money.rpi_price_result,'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':main.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
             

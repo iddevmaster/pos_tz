@@ -55,12 +55,12 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 
 <div style="padding-bottom: 65px">
   <div style="float: left">
-  <input
+  {% comment %} <input
       type="button"
        onclick="window.open('/teacher/print/all/overdue/{{year_current}}/{{m}}','','width=950,height=650'); return false;"
       value="Print"
       style="height: 35px"
-    />
+    /> {% endcomment %}
   </div>
   <div style="float: right">
     <input
@@ -73,7 +73,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
 </div>
 
 
-<table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
+<table style="width: 100%; border-collapse: collapse" border="1" class="table-detail" id="testTable">
   <tbody>
    
     <tr>
