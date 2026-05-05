@@ -66,9 +66,9 @@ REST_FRAMEWORK = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = ["https://pos.trainingzenter.com"]
-CSRF_ALLOWED_ORIGINS = ["https://pos.trainingzenter.com"]
-CORS_ORIGINS_WHITELIST = ["https://pos.trainingzenter.com"]
+CSRF_TRUSTED_ORIGINS = ["https://pos-idc.iddrives.co.th"]
+CSRF_ALLOWED_ORIGINS = ["https://pos-idc.iddrives.co.th"]
+CORS_ORIGINS_WHITELIST = ["https://pos-idc.iddrives.co.th"]
 
 
 TEMPLATES = [
