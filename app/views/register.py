@@ -2763,12 +2763,17 @@ def approve_list_payment_accept_invoice(request):
 
         # ระบุ ค่าคอมไปเลย
 
-    # uuid_without_dashes = str(get_event_re.register.register_id).replace('-', '')
+    uuid_without_dashes = str(get_event_re.register.register_id).replace('-', '')
 
   
 
     # sale = register_main.objects.get(register_id=uuid_without_dashes)
-    # pay_item = register_payment_items.objects.get(register_id=uuid_without_dashes)
+    pay_item = register_payment_items.objects.get(register_id=uuid_without_dashes)
+
+    # factcom
+    get_com = fact_commission.objects.get(register_id=uuid_without_dashes,rpi_id=pay_item.rp_id)
+    get_com.status = 'N'
+    get_com.save()
     
 
     # last_entry = commissionstages.objects.filter(com_head_id=2)
