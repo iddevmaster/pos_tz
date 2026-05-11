@@ -580,7 +580,7 @@ def type_bill_com(request):
     rps_id= data.get("rp_id")
    
     content_approve = register_payment.objects.filter(register_id=register_id)
-    content_approve.update(commit_head=commit_headdaa)
+    content_approve.update(commit_head=2)
 
     last_entry = commissionstages.objects.filter(com_head_id=commit_headdaa)
     # for r in last_entry:
