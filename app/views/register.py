@@ -2746,15 +2746,13 @@ def approve_list_payment_accept_invoice(request):
 
 
     content = salesorder.objects.get(pk=sale_id)
-    
-    # content.invoice = invoice
     content.rv = rv
     content.status = 'Y'
     content.save()
 
     get_event_re = event_register.objects.get(er_id=content.er.er_id)
     
-    get_event_re.register
+
 
     get_payments = register_payment.objects.get(register_id=get_event_re.register)
     get_payments.status_bill = 'Y'
@@ -2766,9 +2764,10 @@ def approve_list_payment_accept_invoice(request):
         # ระบุ ค่าคอมไปเลย
 
     # uuid_without_dashes = str(get_event_re.register.register_id).replace('-', '')
+
   
 
-    # sale = register_main.objects.filter(register_id=uuid_without_dashes)
+    # sale = register_main.objects.get(register_id=uuid_without_dashes)
     # pay_item = register_payment_items.objects.get(register_id=uuid_without_dashes)
     
 
@@ -2787,7 +2786,7 @@ def approve_list_payment_accept_invoice(request):
     
 
    
-    return redirect("/approve/invoice/com")    
+    return redirect("/approve/invoice/com")  
 
 
 
