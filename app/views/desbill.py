@@ -583,15 +583,15 @@ def type_bill_com(request):
     content_approve.update(commit_head=commit_headdaa)
 
     last_entry = commissionstages.objects.filter(com_head_id=commit_headdaa)
-    for r in last_entry:
-        ontent = fact_commission(
-        register_id=register_id,
-        stage_id=r.stage_id,
-        rpi_id=rps_id,
-        status='N',
-        com_head_id=r.com_head_id,
-        )
-        ontent.save()
+    # for r in last_entry:
+    #     ontent = fact_commission(
+    #     register_id=register_id,
+    #     stage_id=r.stage_id,
+    #     rpi_id=rps_id,
+    #     status='N',
+    #     com_head_id=r.com_head_id,
+    #     )
+    #     ontent.save()
  
 
     return JsonResponse(obj,safe=False)
@@ -647,8 +647,6 @@ def data_com(request):
     register_id = data.get("register_id")
     rp_id = data.get("rp_id")
  
-    print(register_id)
-    print(rp_id)
     bbbb = register_payment.objects.get(register_id=register_id,rp_id=rp_id)
     
 
@@ -657,7 +655,7 @@ def data_com(request):
         obj = []
         content = fact_commission.objects.filter(register_id=register_id).order_by("stage_id")
         for r in content:
-        
+            print(r)
             s_name = 'ยังไม่ยืนยัน'
             stages = commissionstages.objects.filter(stage_id=r.stage_id).first()
             
