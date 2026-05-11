@@ -2753,28 +2753,37 @@ def approve_list_payment_accept_invoice(request):
     content.save()
 
     get_event_re = event_register.objects.get(er_id=content.er.er_id)
+    
     get_event_re.register
 
     get_payments = register_payment.objects.get(register_id=get_event_re.register)
     get_payments.status_bill = 'Y'
+    get_payments.commit_head = 2
     get_payments.save()
 
 
-    # ระบุ ค่าคอมไปเลย
 
-    # content_approve = register_payment.objects.filter(register_id=register_id)
-    # content_approve.update(commit_head=commit_headdaa)
+        # ระบุ ค่าคอมไปเลย
 
-    # last_entry = commissionstages.objects.filter(com_head_id=commit_headdaa)
+    # uuid_without_dashes = str(get_event_re.register.register_id).replace('-', '')
+  
+
+    # sale = register_main.objects.filter(register_id=uuid_without_dashes)
+    # pay_item = register_payment_items.objects.get(register_id=uuid_without_dashes)
+    
+
+    # last_entry = commissionstages.objects.filter(com_head_id=2)
     # for r in last_entry:
     #     ontent = fact_commission(
-    #     register_id=register_id,
+    #     register_id=uuid_without_dashes,
     #     stage_id=r.stage_id,
-    #     rpi_id=rps_id,
+    #     rpi_id=pay_item.rpi_id,
     #     status='N',
+    #     user_id=sale.seller_id,
     #     com_head_id=r.com_head_id,
     #     )
     #     ontent.save()
+    
     
 
    
