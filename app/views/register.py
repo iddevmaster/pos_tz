@@ -2650,21 +2650,30 @@ def approve_list_invoice_overdue(request):
             if user_id == 11:
                 billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17])
             billpa = billpa_qs.order_by('-ev__ev_id')    
-        
-        for r in billpa:    
+        total_com = 0
+        total_com_user = 0
+        for r in billpa:   
             pay = register_payment.objects.get(register_id=r.register.register_id)
             item = register_payment_items.objects.get(rp_id=pay.rp_id)
             # erv = event_register.objects.get(register=r.register.register_id)
             evcourse = course_event.objects.get(ev_id=r.ev.ev_id)
             getuser = User.objects.get(id=r.register.seller_id)
+
+            com = ( item.rpi_pay * 3) / 100
+            total_com += com
+
+            if user_id == r.register.seller_id:
+                com = ( item.rpi_pay * 3) / 100
+                total_com_user += com
+
             
-            res = {'rp_doc_number':pay.rp_doc_number,'register_number':r.register.register_number,'po':'-','sq':'-','so':'-','register_id':r.register.register_id,'sale_id':'-','invoice':'-','rv':'-','status':'-','custom':pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation,'bill_create':r.register.crt_date,'rpi_pay':item.rpi_pay,'first_name':getuser.first_name,'last_name':getuser.last_name}
+            res = {'rp_doc_number':pay.rp_doc_number,'register_number':r.register.register_number,'po':'-','sq':'-','so':'-','register_id':r.register.register_id,'sale_id':'-','invoice':'-','rv':'-','status':'-','custom':pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation,'bill_create':r.register.crt_date,'rpi_pay':item.rpi_pay,'first_name':getuser.first_name,'last_name':getuser.last_name,'com':com}
             obj.append(res)    
            
     except:
         content = None
-        
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+    
+    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'total_com':total_com,'total_com_user':total_com_user}
 
     return render(request, 'register/approve_list_event_bill_credit_over.html',context)   
 
