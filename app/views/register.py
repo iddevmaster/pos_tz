@@ -2635,7 +2635,7 @@ def approve_list_invoice_overdue(request):
         st = [0,1]
 
         
-        
+        print(user_id)
         today = timezone.now()
 
         # วันแรกของเดือนนี้
@@ -2643,6 +2643,8 @@ def approve_list_invoice_overdue(request):
 
         # วันแรกของเดือนก่อนหน้า
         first_day_last_month = first_day_this_month - relativedelta(months=1)
+        total_com = 0
+        total_com_user = 0
         
         billpa_qs = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2,register__crt_date__gte=first_day_last_month).order_by('-ev__ev_id')
 
@@ -2650,8 +2652,11 @@ def approve_list_invoice_overdue(request):
             if user_id == 11:
                 billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17,11])
             billpa = billpa_qs.order_by('-ev__ev_id')    
-        total_com = 0
-        total_com_user = 0
+        else :
+            billpa_qs = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2,register__crt_date__gte=first_day_last_month).order_by('-ev__ev_id')
+            billpa_qs = billpa_qs.filter(register__seller_id=user_id)
+            billpa = billpa_qs.order_by('-ev__ev_id') 
+        
         for r in billpa:   
             pay = register_payment.objects.get(register_id=r.register.register_id)
             item = register_payment_items.objects.get(rp_id=pay.rp_id)
