@@ -106,8 +106,8 @@
 <div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
   <div class="card">
     <div class="card-body">
-      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมทั้งหมด(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{total_com}}</span></p>
-      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมตัวเอง(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{total_com_user}}</span></p>
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมทั้งหมด(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{ total_com|floatformat:2 }}</span></p>
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมตัวเอง(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{ total_com_user|floatformat:2 }}</span></p>
     </div>
     
   </div>
