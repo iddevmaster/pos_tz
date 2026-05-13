@@ -102,6 +102,18 @@
   </div>
 </div>
 
+
+<div class="col-12 col-md-12 col-sm-12 col-xs-12" style="border-top-left-radius: 10px;border-top-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;">
+  <div class="card">
+    <div class="card-body">
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมทั้งหมด(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{total_com}}</span></p>
+      <p class="card-text"><span style="font-size: 24px;"> ยอดรวมค่าคอมตัวเอง(ใบเสนอราคา) : </span><span style="font-size: 24px;color:red">{{total_com_user}}</span></p>
+    </div>
+    
+  </div>
+</div>
+
+
 <section class="section">
   <div class="card">
     <div class="card-body">
@@ -152,6 +164,7 @@
             <th>ชื่อลูกค้า</th>
             <th>หลักสูตรและวันที่จัด</th>
             <th>ราคา</th>
+              <th>ค่าคอม 3%</th>
              <th>หมายเหตุ</th>
              <th>ผู้ขาย</th>
           </tr>
@@ -172,7 +185,9 @@
 
          <td>
           {{res.rpi_pay}}
-            </td><td>
+            </td>
+              <td>{{res.com}}</td>
+            <td>
           -
             </td>
             <td>
@@ -182,171 +197,13 @@
           {% endfor %}
         </tbody>
       </table>
+
+    
     </div>
   </div>
 </section>
 
-<div class="modal fade text-left" id="UpdateClick1">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title white" id="myModalLabel160">
-          กำหนด Invoice
-        </h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'acceptbillcreditin' %}" method="post" autocomplete="off" enctype="multipart/form-data">
-        {% csrf_token %}
 
-
-        <input type="hidden" id="sale_id" name="sale_id" required />
-
-        <div class="modal-body">
-
-
-          <div class="form-group">
-            <label>Invoice</label>
-            <label style="color: red">*</label>
-            <input type="text" id="invoice" name="invoice" class="form-control" required />
-          </div>
-
-
-       
-
-
-          <p id="datecrt"></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">บันทึก</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade text-left" id="UpdateClick2">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title white" id="myModalLabel160">
-          ปรับสถานะ ปิดการขาย
-        </h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'UpdateCloseTheEvent' %}" method="post" autocomplete="off" enctype="multipart/form-data">
-        {% csrf_token %}
-
-
-        <input type="hidden" id="register_id_update2" name="register_id" required />
-        <input type="hidden" name="ev_id" id="ev_id_update2" required />
-        <div class="modal-body">
-
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Public" id="flexCheckDefault"
-              name="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">
-              Public
-            </label>
-          </div>
-
-          <div class="form-group">
-            <label>Po</label>
-            <label style="color: red">*</label>
-            <input type="text" id="po" name="po" required class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label>Sq</label>
-            <label style="color: red">*</label>
-            <input type="text" id="sq" name="sq" class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label>So</label>
-            <label style="color: red">*</label>
-            <input type="text" id="so" name="so" class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label>Upload File</label>
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="imageupload.click()">
-              File
-            </button>
-            <div>
-              <input type="file" name="ev_logo" id="imageupload" onchange="readURL(this);" style="display: none"
-                accept=".pdf, .xls, .xlsx, .doc, .docx" />
-
-            </div>
-          </div>
-
-
-          <p id="datecrt"></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">บันทึก</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade text-left" id="DeleteClick">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title white" id="myModalLabel160">
-          ยกเลิกวันอบรม
-        </h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'DeleteCloseTheEvent' %}" method="post" autocomplete="off">
-        {% csrf_token %}
-
-
-        <input type="hidden" id="register_id_delete" name="register_id" required />
-        <input type="hidden" name="ev_id" id="ev_id_delete" required />
-        <div class="modal-body">
-
-
-
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">บันทึก</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 
 {% endblock %}
