@@ -2648,7 +2648,7 @@ def approve_list_invoice_overdue(request):
 
         if user_id in [6, 3, 1,11]:
             if user_id == 11:
-                billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17])
+                billpa_qs = billpa_qs.filter(register__seller_id__in=[54,55,56,91,57,17,11])
             billpa = billpa_qs.order_by('-ev__ev_id')    
         total_com = 0
         total_com_user = 0
