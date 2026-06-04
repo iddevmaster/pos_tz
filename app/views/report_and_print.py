@@ -616,6 +616,8 @@ def register_excel_seller_accept(request,ev_id):
     count_credit = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=2).count()
     totaldata = document.objects.filter().count()
     payment = register_payment.objects.get(register_id=r.register_id)
+    payment.user_manage = 3
+    payment.save()
    
     month_current = date.today().month
     year_current = date.today().year
@@ -628,7 +630,7 @@ def register_excel_seller_accept(request,ev_id):
     student_code = "TOP" + str(twoDigit(month_current)) + \
             str(running_number) + "/" + str(year_current)
  
-   
+    
     context = {'title': defaultTitle,'data':obj,'teacher_income_setting':tincome,'course_ev':cou_ev,'tax_number':tincome.teacher.tax_number,'fname':tincome.teacher.teacher_firstname_th,'lname':tincome.teacher.teacher_lastname_th,'status':tincome.status,'pi':tincome.pi_id,'day':day_current,'month_current':month_fomat(month_current),'year_current':year_current,'today':date.today(),
                'course_code':cou_ev.course.course_code,'course_name':cou_ev.course.course_name,'total_payment':total_payment,'total_credit':total_credit,'total':total,'total_bill_payment':count_payment,'total_bill_credit':count_credit,'totalhours':totalhours,'doc':student_code,'teach_in_come':ev_id,'tis_compensation':tincome.tis_compensation}
     return render(request, 'print/register_excel_seller_accept.html', context)
@@ -646,7 +648,9 @@ def register_excel_seller_view(request,doc_id):
 
     obj = []
     getdoc = document.objects.get(doc_id=doc_id)
+    print(getdoc.teacher_income_id)
     tincome = teacher_income_setting.objects.select_related('teacher').get(pk=getdoc.teacher_income_id)
+    
     cou_ev = course_event.objects.select_related('course').get(pk=tincome.ev_id)
     # teach = teacher.objects.get(teacher_id=tincome.teacher)
     status = ['N','Y']
@@ -676,6 +680,7 @@ def register_excel_seller_view(request,doc_id):
     count_payment = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=1).count()
     count_credit = register_main.objects.filter(ev_id=tincome.ev_id,status__in=status,pay_type=2).count()
     totaldata = document.objects.filter().count()
+    print(r.register_id)
     payment = register_payment.objects.get(register_id=r.register_id)
    
     month_current = date.today().month
