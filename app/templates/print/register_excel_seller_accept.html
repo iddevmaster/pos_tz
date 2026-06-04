@@ -397,7 +397,7 @@ body: JSON.stringify({'ev_id':teach_in_come,'doc_document':doc_document,'doc_in_
       </div>
       <form action="" method="post">
         {% csrf_token %}
-         <input type="text" id="rp_doc_number" name="rp_doc_number" required />
+         <input type="hidden" id="rp_doc_number" name="rp_doc_number" required />
    
   
         <div class="modal-body">
