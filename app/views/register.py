@@ -3491,7 +3491,8 @@ def approve_internal_doc_print(request,doc_id):
          
          payment = register_payment.objects.get(register_id=r.register_id)
          item = register_payment_items.objects.get(register_id=r.register_id)
-         custo = customers.objects.get(register_id=r.register_id)
+         factcusto = fact_customer.objects.get(register_id=r.register_id)
+         custo = customers.objects.get(customer_id=factcusto.customer_id)
       
          if r.pay_type == 1:
              total_payment += item.rpi_price_total
