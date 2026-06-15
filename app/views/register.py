@@ -2490,8 +2490,14 @@ def approve_list_invoice_inv(request):
         obj = []
         st = [0,1]
         # salesorder
+        print(current_month)
+        print(prev_month)
+        print(current_year)
+        print(prev_year)
         billpa = salesorder.objects.select_related('er').filter(
     status__isnull=True
+    
+
 ).filter(
     Q(crt_date__month=current_month, crt_date__year=current_year) |
     Q(crt_date__month=prev_month, crt_date__year=prev_year)
@@ -2500,18 +2506,24 @@ def approve_list_invoice_inv(request):
         # billpa = event_register.objects.filter(status='Y')
         for r in billpa:  
 
-           
             
-            evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
-           
-            money = register_payment_items.objects.get(register_id=r.er.register.register_id)
-            main = register_main.objects.get(register_id=r.er.register.register_id)
-            main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
-         
-           
-            res = {'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':r.er.register.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
-            
-            obj.append(res)    
+
+            main = register_main.objects.filter(register_id=r.er.register_id).first()
+            if main is None:
+                print("ไม่พบข้อมูล")
+            else:
+                
+                evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
+                money = register_payment_items.objects.get(register_id=r.er.register.register_id)
+                main = register_main.objects.filter(register_id=r.er.register_id).first()
+                main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
+                res = {'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':r.er.register.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
+                obj.append(res)
+
+                
+
+        
+       
            
     except:
         content = None
