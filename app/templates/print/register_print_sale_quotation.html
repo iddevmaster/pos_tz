@@ -1,5 +1,6 @@
 
  {% load humanize %} {% load static %}
+ <!--
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -124,7 +125,7 @@
                   </tr>
                   <tr align="center">
                     <td style="background-color: #e7e6e6">วันที่</td>
-                    <td>{{data.crt_date|date:"d/m/Y H:i"}}</td>
+                    <td>{{data.crt_date|date:"d/m/Y H:i"}} </td>
                   </tr>
                 </tbody>
               </table>
@@ -238,11 +239,7 @@
           </tr>
           {% endcomment %}
           <tr>
-            <!-- <td colspan="3" rowspan="5" style="vertical-align: top">
-              หมายเหตุ <br />
-              {{data.rp_ref1}}<br />
-              {{data.rp_ref2}}
-            </td> -->
+    
             <td colspan="3" rowspan="5" style="vertical-align: top;padding-left: 3px;font-size: 14px;">
               หมายเหตุ <br />
              
@@ -353,10 +350,7 @@
               <div style="display: flex;padding-top: 5px;">
                 <div style="flex: 1;">E-mail:&nbsp;&nbsp;idfinance@iddrives.co.th </div>
               </div>
-              <!-- <div style="display: flex;padding-top: 1px;">
-                <div style="flex: 1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idfinance@iddrives.co.th </div>
-              </div> -->
-  
+        
             </td>  
           </tr>
 
@@ -440,8 +434,7 @@
   </body>
 </html>
 
-
-<!--
+-->
 
 <!DOCTYPE html>
 <html lang="th">
@@ -530,13 +523,15 @@
                 margin: 0;
                 box-shadow: none;
             }
+
+   
         }
 
         /* โครงสร้าง Layout เอกสาร */
         .header-container {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            /* margin-bottom: 20px; */
         }
         .logo-company-wrapper {
             display: table-cell;
@@ -565,12 +560,7 @@
             color: #444444;
             line-height: 1.4;
         }
-        .quote-title-container {
-            display: table-cell;
-            width: 35%;
-            vertical-align: top;
-            text-align: right;
-        }
+
         .quote-badge {
             background-color: #e66430;
             color: white;
@@ -692,7 +682,7 @@
         .signatures-container {
             display: table;
             width: 100%;
-            margin-top: 30px;
+            margin-top: 10px;
             border: 1px solid #666666;
             font-size: 9.5pt;
         }
@@ -717,7 +707,7 @@
             margin-top: 8px;
             text-align: left;
             font-size: 9pt;
-            padding-left: 15px;
+            /* padding-left: 15px; */
         }
         .footer-note {
             text-align: right;
@@ -731,70 +721,90 @@
 
 <div class="page-container">
 
-    <div style="text-align: right; font-size: 8pt; color: #666666; margin-bottom: 5px;">หน้า 1/1</div>
+    <!-- <div style="text-align: right; font-size: 8pt; color: #666666; margin-bottom: 5px;">หน้า 1/1</div> -->
 
 
-    <div class="header-container">
-        <div class="logo-company-wrapper">
-            <div class="logo-container">
-                <svg width="65" height="55" viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="15" y="32" width="16" height="45" rx="4" fill="#1e3a5f"/>
-                    <circle cx="23" y="15" r="9" fill="#e66430"/>
-                    <path d="M40 10 H60 C78 10, 92 24, 92 43 C92 62, 78 77, 60 77 H40 V10 Z" fill="none" stroke="#1e3a5f" stroke-width="15" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="company-info">
-                <div class="company-name">บริษัท ไอดีไดรฟ์ จำกัด</div>
-                <div class="company-details">
-                    (สำนักงานใหญ่) 200/222 หมู่ 2 ถนนชัยพฤกษ์ ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น 40000<br>
-                    เลขที่ผู้เสียภาษี 0405536000531 โทร : 043-228899<br>
-                    E-mail: idofficer@iddrives.co.th, www.iddrives.co.th, ID Line : @iddrives
-                </div>
-            </div>
+<div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+    
+    <div class="logo-company-wrapper" style="display: flex; align-items: flex-start; flex: 1; padding-right: 15px;">
+        <div class="logo-container" style="margin-right: 15px; margin-top: 5px; flex-shrink: 0;">
+           <img
+                src="{% static 'images/IDdrives.png' %}"
+                alt="IDLOGO"
+                style="width: 60px; height: 60px"
+              />
+              <br>
+             
         </div>
-        <div class="quote-title-container">
-            <div class="quote-badge">ใบเสนอราคา<br><span style="font-size: 10pt; font-weight: normal; display:block; margin-top:-2px;">Quotation</span></div>
-            <table class="quote-meta-table">
-                <tr>
-                    <td>เลขที่</td>
-                    <td class="val">SQEL126060006</td>
-                </tr>
-                <tr>
-                    <td>วันที่</td>
-                    <td class="val">16/06/2026</td>
-                </tr>
-            </table>
+        <div class="company-info">
+            <div class="company-name" style="font-size: 15pt; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">บริษัท ไอดีไดรฟ์ จำกัด</div>
+            <div class="company-details" style="font-size: 10.5pt; color: #444444; line-height: 1.4;">
+                (สำนักงานใหญ่) 200/222  หมู่  2  ถนนชัยพฤกษ์  ตำบลในเมือง  อำเภอเมืองขอนแก่น จังหวัดขอนแก่น 40000<br>
+                เลขที่ผู้เสียภาษี 0405536000531 โทร : 043-228899<br>
+                E-mail: idc@iddrives.co.th, www.iddrives.co.th
+            </div>
+             <img
+                src="{% static 'images/all-logo-03.png' %}"
+                alt="TZLOGO"
+                style="width: 100%; height: auto"
+              />
         </div>
+         <img
+                src="{% static 'images/newlogo_resize11.png' %}"
+                alt="IDLOGO"
+                style="width: 60px; height: 60px"
+              />
+    </div>
+    
+    <div class="quote-title-container" style="flex-shrink: 0; text-align: right; width: 200px;">
+      
+        <div class="quote-badge" style="background-color: #e66430; color: white; padding: 8px 0; font-weight: bold; font-size: 13pt; text-align: center; display: block; width: 100%; border: 1px solid #c85020;">
+            ใบเสนอราคา<br>
+            <span style="font-size: 10pt; font-weight: normal; display:block; margin-top:-2px;">Quotation</span>
+        </div>
+        <table class="quote-meta-table" style="width: 100%; margin-top: 5px; border-collapse: collapse;">
+            <tr>
+                <td style="border: 1px solid #888888; padding: 5px 8px; font-size: 9.5pt; text-align: left;">เลขที่</td>
+                <td class="val" style="border: 1px solid #888888; padding: 5px 4px; font-size: 9.5pt; text-align: center; background-color: #f9f9f9;">{{data.rp_doc_number}}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #888888; padding: 5px 8px; font-size: 9.5pt; text-align: left;">วันที่</td>
+                <td class="val" style="border: 1px solid #888888; padding: 5px 4px; font-size: 9pt; text-align: center; background-color: #f9f9f9; white-space: nowrap;">{{data.crt_date|date:"d/m/Y H:i"}}</td>
+            </tr>
+        </table>
     </div>
 
+</div>
+
+    
 
     <div class="info-grid">
         <div class="info-row">
             <div class="info-cell w-60">
-                <span class="label">ชื่อลูกค้า :</span> <span class="val-text">ราชวิทยาลัยจุฬาภรณ์</span><br>
-                <span class="label">ID TAX :</span> <span class="val-text">0994001097011</span>
+                <span class="label">ชื่อลูกค้า :</span> <span class="val-text">{{data.rp_name_customer}}</span><br>
+                <span class="label">ID TAX :</span> <span class="val-text">{{data.rp_tax}}</span>
             </div>
             <div class="info-cell w-40">
-                <span class="label">รหัสลูกค้า :</span> <span class="val-text">C2213</span><br>
-                <span class="label">ผู้เสนอขาย :</span> <span class="val-text">ทินรัตน์ บุบผามาลา</span>
+                <span class="label">รหัสลูกค้า :</span> <span class="val-text">{{customer.customer_code}}</span><br>
+                <span class="label">ผู้เสนอขาย :</span> <span class="val-text">{{data.rp_name_seller}}</span>
             </div>
         </div>
         <div class="info-row">
             <div class="info-cell w-60">
                 <span class="label">ชื่อผู้ติดต่อ :</span> <span class="val-text"></span><br>
-                <span class="label">ที่อยู่ :</span> <span class="val-text">906 ถ.กำแพงเพชร6 แขวงตลาดบางเขน เขตหลักสี่ กทม. 10210</span>
+                <span class="label">ที่อยู่ :</span> <span class="val-text">{{data.rp_address}}</span>
             </div>
             <div class="info-cell w-40">
-                <span class="label">ฝ่าย :</span> <span class="val-text">ITI</span><br>
-                <span class="label">ยืนยันราคาภายใน(วัน) :</span> <span class="val-text"></span>
+                <span class="label">ฝ่าย :</span> <span class="val-text">IT</span><br>
+                <span class="label">ยืนยันราคาภายใน(วัน) :</span> <span class="val-text"> {{data.rp_confirm_date_price|date:"d/m/Y"}}</span>
             </div>
         </div>
         <div class="info-row">
             <div class="info-cell w-60">
-                <span class="label">โทร :</span> <span class="val-text">0846625159</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="label" style="width:auto;">Fax :</span> <span class="val-text"></span>
+                <span class="label">โทร :</span> <span class="val-text"> {{data.rp_phone}}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="label" style="width:auto;">Fax :</span> <span class="val-text"></span>
             </div>
             <div class="info-cell w-40">
-                <span class="label">วันที่ส่งของ :</span> <span class="val-text">16/07/2026</span>
+                <span class="label">วันที่ส่งของ :</span> <span class="val-text">{{data.rp_date_delivery|date:"d/m/Y"}}</span>
             </div>
         </div>
     </div>
@@ -814,18 +824,20 @@
             </tr>
         </thead>
         <tbody>
+
+      
             <tr>
                 <td class="text-center">1</td>
-                <td class="text-center">10110050</td>
-                <td>ระบบจัดการงานวิจัยจริยธรรมออนไลน์(REB)</td>
-                <td class="text-center">1</td>
-                <td class="text-center">ระบบ</td>
-                <td class="text-right">467,289.72</td>
-                <td class="text-right"></td>
-                <td class="text-right">467,289.72</td>
+                <td class="text-center">{{items.rpi_code}}</td>
+                <td>{{items.rpi_name}}</td>
+                <td class="text-center">{{items.rpi_quantity}}</td>
+                <td class="text-center">{{items.rpi_unit}}</td>
+                <td class="text-right">{{items.rpi_price |floatformat:2|intcomma }}</td>
+                <td class="text-right">{{items.rpi_price_discount}}</td>
+                <td class="text-right"> {{rpi_price_all |floatformat:2|intcomma }}</td>
             </tr>
             <tr>
-                <td style="height: 180px; border-bottom: 1px solid #666666;"></td>
+                <td style="height: 100px; border-bottom: 1px solid #666666;"></td>
                 <td style="border-bottom: 1px solid #666666;"></td>
                 <td style="border-bottom: 1px solid #666666;"></td>
                 <td style="border-bottom: 1px solid #666666;"></td>
@@ -843,37 +855,49 @@
             <strong>หมายเหตุ :</strong><br>
             กรุณาชำระเงิน ทั้งหมดตามรายละเอียดข้างล่างนี้<br>
             <strong>ดังรายละเอียดธนาคารดังต่อไปนี้</strong><br>
-            1.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนศรีจันทร์ บัญชีออมทรัพย์ เลขที่ 437-0-54040-2<br>
-            2.บจก.ไอดีไดรฟ์ ธ.ไทยพาณิชย์ สาขาสี่แยกมะลิวัลย์ (ขอนแก่น) บัญชีกระแสรายวัน เลขที่ 729-3-00017-0<br>
-            3.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนมะลิวัลย์ เลขที่ 424-1-31174-1<br>
-            ส่ง หัวหน้าฝ่ายการเงิน คุณยุวดี แสงสุรศักดิ์ / ฝ่ายบัญชี<br>
-            หรือ E-mail : idsale@iddrives.co.th , idfinance@iddrives.co.th
+            1.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนมะลิวัลย์ เลขที่ 424-1-31174-1<br>
+            โทรฝ่ายการเงิน  (043) 228899 / ฝ่ายบัญชี<br>
+            หรือ E-mail : idsale@iddrives.co.th , idfinance@iddrives.co.th<br>
+                    <img
+                  src="{% static 'images/402827.png' %}"
+                  alt="IDLOGO"
+                  style="width: 200px; height: 100px"
+                />
         </div>
+
+
+  
+
+
         <div class="summary-cell">
             <table class="summary-table">
                 <tr>
                     <td style="width: 55%;">มัดจำ %</td>
-                    <td class="text-right" style="width: 45%;"></td>
+                    <td class="text-right" style="width: 45%;">0</td>
                 </tr>
                 <tr>
                     <td>รวมเงิน</td>
-                    <td class="text-right">467,289.72</td>
+                    <td class="text-right"> {{rpi_price_all |floatformat:2|intcomma }}</td>
                 </tr>
                 <tr>
                     <td>ส่วนลดสินค้า</td>
-                    <td class="text-right"></td>
+                    <td class="text-right"> {{items.rpi_price_discount |floatformat:2|intcomma }}</td>
                 </tr>
                 <tr>
                     <td>เงินหลังหักส่วนลด</td>
-                    <td class="text-right">467,289.72</td>
+                    <td class="text-right"> {{rpi_price_default |floatformat:2|intcomma }}</td>
+                </tr>
+                 <tr>
+                    <td>ราคาก่อน vat</td>
+                    <td class="text-right">    {{items.rpi_price_total |floatformat:2|intcomma }}</td>
                 </tr>
                 <tr>
                     <td>ภาษีมูลค่าเพิ่ม 7 %</td>
-                    <td class="text-right">32,710.28</td>
+                    <td class="text-right"> {{items.rpi_price_vat |floatformat:2|intcomma }}</td>
                 </tr>
                 <tr>
                     <td>จำนวนเงินทั้งสิ้น</td>
-                    <td class="text-right">500,000.00</td>
+                    <td class="text-right"> {{rpi_price_default |floatformat:2|intcomma }}</td>
                 </tr>
             </table>
         </div>
@@ -883,18 +907,18 @@
     <div class="signatures-container">
         <div class="sig-box">
             <div class="sig-line"></div>
-            <div>ผู้จัดการ</div>
-            <div class="sig-date">วันที่: 16 มิ.ย. 2569</div>
+            <div>ผู้เสนอราคา</div>
+            <div class="sig-date"> {{time|date:"d/m/Y"}}</div>
         </div>
         <div class="sig-box">
             <div class="sig-line"></div>
-            <div>ผู้เสนอราคา</div>
-            <div class="sig-date">วันที่: 16 มิ.ย. 2569</div>
+            <div>ผู้จัดการ</div>
+            <div class="sig-date"> {{time|date:"d/m/Y"}}</div>
         </div>
         <div class="sig-box">
             <div class="sig-line"></div>
             <div>ผู้อนุมัติสั่งซื้อ</div>
-            <div class="sig-date">วันที่:</div>
+            <div class="sig-date"> {{time|date:"d/m/Y"}}</div>
         </div>
     </div>
 
@@ -912,3 +936,4 @@
         window.print();
     });
 </script>
+
