@@ -439,3 +439,476 @@
     </div>
   </body>
 </html>
+
+
+<!--
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ใบเสนอราคา - บริษัท ไอดีไดรฟ์ จำกัด</title>
+    <style>
+        /* CSS สำหรับตั้งค่ามาตรฐานหน้ากระดาษ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        /* ตั้งค่าหน้ากระดาษ A4 */
+        @page {
+            size: A4;
+            margin: 20mm; /* ขอบกระดาษมาตรฐานระยะ 20mm รอบด้าน */
+        }
+@media print {
+    /* 1. ตั้งค่าหน้ากระดาษและระยะขอบ (Margin) */
+    @page {
+        size: A4;          /* กำหนดขนาดเป็น A4 (หรือเปลี่ยนเป็น letter ตามใช้งาน) */
+        margin: 15mm;      /* เว้นระยะขอบกระดาษทุกด้าน 15 มิลลิเมตร (ระยะกำลังสวย ไม่ชิดไป) */
+    }
+
+    /* 2. ล้างค่าพื้นฐานเพื่อให้เนื้อหาแสดงผลถูกต้องตอนพิมพ์ */
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        font-size: 14pt;   /* ขนาดตัวอักษรที่เหมาะกับการอ่านบนกระดาษ */
+        -webkit-print-color-adjust: exact; /* บังคับให้สีและพื้นหลังแสดงผลตามจริง */
+        print-color-adjust: exact;
+    }
+
+    /* 3. จัดการโครงสร้างกล่องข้อความให้ขยายเต็มหน้ากระดาษที่กำหนด */
+    .signatures-container, table {
+        width: 100% !important; /* บังคับให้ตารางและบล็อกลายเซ็นกว้างพอดีกระดาษ */
+        page-break-inside: avoid; /* ป้องกันไม่ให้บล็อกนี้โดนตัดแบ่งครึ่งหน้า (กรณีขึ้นหน้าใหม่) */
+    }
+
+    /* 4. ดันส่วนท้าย (Footer Note) ให้ไปอยู่ล่างสุดของหน้า */
+    .footer-note {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: right;
+        font-size: 10pt;
+    }
+}
+        
+        body {
+            font-family: 'Sarabun', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+            font-size: 10.5pt;
+            line-height: 1.4;
+            background-color: #ffffff;
+        }
+
+        /* สำหรับการจำลองหน้าจอก่อนพิมพ์ (Screen View) ให้ดูเหมือนกระดาษจริง */
+        @media screen {
+            body {
+                background-color: #f0f2f5;
+                padding: 40px 0;
+            }
+            .page-container {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 0 auto;
+                background: #ffffff;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+        }
+
+        /* จัดระเบียบสไตล์สำหรับพิมพ์ (Print View) */
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            .page-container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+
+        /* โครงสร้าง Layout เอกสาร */
+        .header-container {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .logo-company-wrapper {
+            display: table-cell;
+            width: 65%;
+            vertical-align: top;
+        }
+        .logo-container {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+        .company-info {
+            display: inline-block;
+            vertical-align: top;
+            max-width: 78%;
+        }
+        .company-name {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        .company-details {
+            font-size: 9.5pt;
+            color: #444444;
+            line-height: 1.4;
+        }
+        .quote-title-container {
+            display: table-cell;
+            width: 35%;
+            vertical-align: top;
+            text-align: right;
+        }
+        .quote-badge {
+            background-color: #e66430;
+            color: white;
+            padding: 8px 20px;
+            font-weight: bold;
+            font-size: 13pt;
+            text-align: center;
+            display: inline-block;
+            width: 180px;
+            border: 1px solid #c85020;
+        }
+        .quote-meta-table {
+            width: 180px;
+            margin-top: 5px;
+            border-collapse: collapse;
+            float: right;
+        }
+        .quote-meta-table td {
+            border: 1px solid #888888;
+            padding: 5px 8px;
+            font-size: 9.5pt;
+            text-align: left;
+        }
+        .quote-meta-table td.val {
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        /* ตารางข้อมูลผู้ซื้อ-ผู้ขาย */
+        .info-grid {
+            display: table;
+            width: 100%;
+            border: 1px solid #666666;
+            margin-bottom: 20px;
+            font-size: 10pt;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-cell {
+            display: table-cell;
+            padding: 8px;
+            border-bottom: 1px solid #888888;
+            vertical-align: top;
+        }
+        .info-row:last-child .info-cell {
+            border-bottom: none;
+        }
+        .w-60 { width: 62%; border-right: 1px solid #666666; }
+        .w-40 { width: 38%; }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 110px;
+        }
+        .val-text {
+            display: inline-block;
+        }
+
+        /* ตารางรายการสินค้า */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            font-size: 10pt;
+        }
+        .items-table th {
+            background-color: #eaebed;
+            border: 1px solid #666666;
+            padding: 8px 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .items-table td {
+            border-left: 1px solid #666666;
+            border-right: 1px solid #666666;
+            padding: 8px;
+            vertical-align: top;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* พื้นที่เนื้อหารายละเอียดด้านล่าง */
+        .bottom-section {
+            display: table;
+            width: 100%;
+            border: 1px solid #666666;
+            border-top: none;
+            font-size: 9.5pt;
+        }
+        .notes-cell {
+            display: table-cell;
+            width: 62%;
+            padding: 12px;
+            border-right: 1px solid #666666;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        .summary-cell {
+            display: table-cell;
+            width: 38%;
+            vertical-align: top;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #cccccc;
+        }
+        .summary-table tr:last-child td {
+            border-bottom: none;
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+
+        /* โซนลายเซ็น */
+        .signatures-container {
+            display: table;
+            width: 100%;
+            margin-top: 30px;
+            border: 1px solid #666666;
+            font-size: 9.5pt;
+        }
+        .sig-box {
+            display: table-cell;
+            width: 33.33%;
+            border-right: 1px solid #666666;
+            padding: 30px 10px 10px 10px;
+            text-align: center;
+            vertical-align: bottom;
+        }
+        .sig-box:last-child {
+            border-right: none;
+        }
+        .sig-line {
+            border-bottom: 1px dotted #333333;
+            width: 85%;
+            margin: 0 auto 8px auto;
+            height: 30px;
+        }
+        .sig-date {
+            margin-top: 8px;
+            text-align: left;
+            font-size: 9pt;
+            padding-left: 15px;
+        }
+        .footer-note {
+            text-align: right;
+            font-size: 8pt;
+            color: #666666;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+
+    <div style="text-align: right; font-size: 8pt; color: #666666; margin-bottom: 5px;">หน้า 1/1</div>
+
+
+    <div class="header-container">
+        <div class="logo-company-wrapper">
+            <div class="logo-container">
+                <svg width="65" height="55" viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="32" width="16" height="45" rx="4" fill="#1e3a5f"/>
+                    <circle cx="23" y="15" r="9" fill="#e66430"/>
+                    <path d="M40 10 H60 C78 10, 92 24, 92 43 C92 62, 78 77, 60 77 H40 V10 Z" fill="none" stroke="#1e3a5f" stroke-width="15" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="company-info">
+                <div class="company-name">บริษัท ไอดีไดรฟ์ จำกัด</div>
+                <div class="company-details">
+                    (สำนักงานใหญ่) 200/222 หมู่ 2 ถนนชัยพฤกษ์ ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น 40000<br>
+                    เลขที่ผู้เสียภาษี 0405536000531 โทร : 043-228899<br>
+                    E-mail: idofficer@iddrives.co.th, www.iddrives.co.th, ID Line : @iddrives
+                </div>
+            </div>
+        </div>
+        <div class="quote-title-container">
+            <div class="quote-badge">ใบเสนอราคา<br><span style="font-size: 10pt; font-weight: normal; display:block; margin-top:-2px;">Quotation</span></div>
+            <table class="quote-meta-table">
+                <tr>
+                    <td>เลขที่</td>
+                    <td class="val">SQEL126060006</td>
+                </tr>
+                <tr>
+                    <td>วันที่</td>
+                    <td class="val">16/06/2026</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">ชื่อลูกค้า :</span> <span class="val-text">ราชวิทยาลัยจุฬาภรณ์</span><br>
+                <span class="label">ID TAX :</span> <span class="val-text">0994001097011</span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">รหัสลูกค้า :</span> <span class="val-text">C2213</span><br>
+                <span class="label">ผู้เสนอขาย :</span> <span class="val-text">ทินรัตน์ บุบผามาลา</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">ชื่อผู้ติดต่อ :</span> <span class="val-text"></span><br>
+                <span class="label">ที่อยู่ :</span> <span class="val-text">906 ถ.กำแพงเพชร6 แขวงตลาดบางเขน เขตหลักสี่ กทม. 10210</span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">ฝ่าย :</span> <span class="val-text">ITI</span><br>
+                <span class="label">ยืนยันราคาภายใน(วัน) :</span> <span class="val-text"></span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">โทร :</span> <span class="val-text">0846625159</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="label" style="width:auto;">Fax :</span> <span class="val-text"></span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">วันที่ส่งของ :</span> <span class="val-text">16/07/2026</span>
+            </div>
+        </div>
+    </div>
+
+  
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 7%;">ลำดับที่</th>
+                <th style="width: 15%;">รหัสสินค้า</th>
+                <th style="width: 38%;">รายการสินค้า</th>
+                <th style="width: 8%;">จำนวน</th>
+                <th style="width: 8%;">หน่วย</th>
+                <th style="width: 12%;">ราคาต่อหน่วย</th>
+                <th style="width: 12%;">ส่วนลด</th>
+                <th style="width: 12%;">จำนวนเงิน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-center">1</td>
+                <td class="text-center">10110050</td>
+                <td>ระบบจัดการงานวิจัยจริยธรรมออนไลน์(REB)</td>
+                <td class="text-center">1</td>
+                <td class="text-center">ระบบ</td>
+                <td class="text-right">467,289.72</td>
+                <td class="text-right"></td>
+                <td class="text-right">467,289.72</td>
+            </tr>
+            <tr>
+                <td style="height: 180px; border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+            </tr>
+        </tbody>
+    </table>
+
+   
+    <div class="bottom-section">
+        <div class="notes-cell">
+            <strong>หมายเหตุ :</strong><br>
+            กรุณาชำระเงิน ทั้งหมดตามรายละเอียดข้างล่างนี้<br>
+            <strong>ดังรายละเอียดธนาคารดังต่อไปนี้</strong><br>
+            1.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนศรีจันทร์ บัญชีออมทรัพย์ เลขที่ 437-0-54040-2<br>
+            2.บจก.ไอดีไดรฟ์ ธ.ไทยพาณิชย์ สาขาสี่แยกมะลิวัลย์ (ขอนแก่น) บัญชีกระแสรายวัน เลขที่ 729-3-00017-0<br>
+            3.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนมะลิวัลย์ เลขที่ 424-1-31174-1<br>
+            ส่ง หัวหน้าฝ่ายการเงิน คุณยุวดี แสงสุรศักดิ์ / ฝ่ายบัญชี<br>
+            หรือ E-mail : idsale@iddrives.co.th , idfinance@iddrives.co.th
+        </div>
+        <div class="summary-cell">
+            <table class="summary-table">
+                <tr>
+                    <td style="width: 55%;">มัดจำ %</td>
+                    <td class="text-right" style="width: 45%;"></td>
+                </tr>
+                <tr>
+                    <td>รวมเงิน</td>
+                    <td class="text-right">467,289.72</td>
+                </tr>
+                <tr>
+                    <td>ส่วนลดสินค้า</td>
+                    <td class="text-right"></td>
+                </tr>
+                <tr>
+                    <td>เงินหลังหักส่วนลด</td>
+                    <td class="text-right">467,289.72</td>
+                </tr>
+                <tr>
+                    <td>ภาษีมูลค่าเพิ่ม 7 %</td>
+                    <td class="text-right">32,710.28</td>
+                </tr>
+                <tr>
+                    <td>จำนวนเงินทั้งสิ้น</td>
+                    <td class="text-right">500,000.00</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+  
+    <div class="signatures-container">
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div>ผู้จัดการ</div>
+            <div class="sig-date">วันที่: 16 มิ.ย. 2569</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div>ผู้เสนอราคา</div>
+            <div class="sig-date">วันที่: 16 มิ.ย. 2569</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div>ผู้อนุมัติสั่งซื้อ</div>
+            <div class="sig-date">วันที่:</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        FD-OD/AC-001/1:00:19-02-25
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        window.print();
+    });
+</script>
