@@ -593,8 +593,8 @@ def register_excel_seller_accept(request,ev_id):
     for r in content_regist:  
        
          
-         payment = register_payment.objects.get(register_id=r.register_id)
-         item = register_payment_items.objects.get(register_id=r.register_id)
+         payment = register_payment.objects.filter(register_id=r.register_id).first()
+         item = register_payment_items.objects.filter(register_id=r.register_id).first()
          cus = fact_customer.objects.get(register_id=r.register_id)
          custo = customers.objects.get(customer_id=cus.customer_id)
          nmscr = ''
