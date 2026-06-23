@@ -135,7 +135,7 @@ def register_home(request):
    
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,'customers':getcustomer,
                'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
-    return render(request, 'register/register.html', context)
+    return render(request, 'dashboard/index.html', context)
 
 @login_required(login_url='/login')
 def register_homenotevent(request):

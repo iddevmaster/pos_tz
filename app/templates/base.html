@@ -1123,14 +1123,14 @@ function initTabEvents() {
               <li class="{% if request.path == "/" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/" class="sidebar-link">
                   <i class="icon dripicons-store"></i>
-                  <span class="font-default">เปิดการขาย</span>
+                  <span class="font-default">หน้าหลัก</span>
                 </a>
               </li>
 
               <li class="{% if request.path == "/salesnotevent" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/salesnotevent" class="sidebar-link">
                   <i class="icon dripicons-store"></i>
-                  <span class="font-default">เปิดการขายแบบไม่มีอีเวน</span>
+                  <span class="font-default">เปิดการขาย</span>
                 </a>
               </li>
               {% comment %}
@@ -1327,7 +1327,7 @@ function initTabEvents() {
               
               </li>
               {% endif %}
-              <li class="{% if request.path == "/manual/idcard" %} sidebar-item active {% else %} sidebar-item {% endif %}">
+              {% comment %} <li class="{% if request.path == "/manual/idcard" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/manual/idcard" class="sidebar-link">
                   <i class="icon dripicons-document"></i>
                   <span class="font-default">คู่มือติดตั้งเครื่องอ่านบัตร</span>
@@ -1346,10 +1346,10 @@ function initTabEvents() {
                   </li>
                 </ul>
               
-              </li>
+              </li> {% endcomment %}
 
 
-               <li class="sidebar-item has-sub">
+               {% comment %} <li class="sidebar-item has-sub">
                 <a href="#" class="sidebar-link">
                   <i class="icon dripicons-export"></i>
                   <span class="font-default">แบบประเมินการทดสอบรถ</span>
@@ -1367,7 +1367,7 @@ function initTabEvents() {
                   </li>
                 </ul>
               
-              </li>
+              </li> {% endcomment %}
 
               <li class="sidebar-item">
                 <a href="/logout" class="sidebar-link">

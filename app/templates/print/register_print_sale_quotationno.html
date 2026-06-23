@@ -1,50 +1,268 @@
 
  {% load humanize %} {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
-    <link
-      rel="shortcut icon"
-      type="image/png"
-      href="{% static 'images/logo.png' %}"
-    />
-    <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
-    <link
-    href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
-    rel="stylesheet"
-  />
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ใบเสนอราคา - บริษัท ไอดีไดรฟ์ จำกัด</title>
     <style>
-      @media print {
-        body {
-          -webkit-print-color-adjust: exact;
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
-      }
-      body {
-        font-family: "Sarabun", sans-serif;
-        font-size: 16px;
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        font-size: 14pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .signatures-container, table {
+        width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    .footer-note {
+        position: fixed;
+        bottom: 0;
         left: 0;
-        position: relative;
-      }
-      .table-head {
-        position: relative;
-        bottom: 80px;
-      }
-      .table-title {
-        position: relative;
-        bottom: 78px;
-      }
-      .table-detail {
-        position: relative;
-        bottom: 60px;
-      }
-      .table-footer {
-        position: relative;
-        bottom: 50px;
-      }
+        width: 100%;
+        text-align: right;
+        font-size: 10pt;
+    }
+}
+
+        body {
+            font-family: 'Sarabun', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+            font-size: 10.5pt;
+            line-height: 1.4;
+            background-color: #ffffff;
+        }
+
+        @media screen {
+            body {
+                background-color: #f0f2f5;
+                padding: 40px 0;
+            }
+            .page-container {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 0 auto;
+                background: #ffffff;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            .page-container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+
+        .header-container {
+            display: table;
+            width: 100%;
+        }
+        .logo-company-wrapper {
+            display: table-cell;
+            width: 65%;
+            vertical-align: top;
+        }
+        .logo-container {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+        .company-info {
+            display: inline-block;
+            vertical-align: top;
+            max-width: 78%;
+        }
+        .company-name {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        .company-details {
+            font-size: 9.5pt;
+            color: #444444;
+            line-height: 1.4;
+        }
+
+        .quote-badge {
+            background-color: #e66430;
+            color: white;
+            padding: 8px 20px;
+            font-weight: bold;
+            font-size: 13pt;
+            text-align: center;
+            display: inline-block;
+            width: 180px;
+            border: 1px solid #c85020;
+        }
+        .quote-meta-table {
+            width: 180px;
+            margin-top: 5px;
+            border-collapse: collapse;
+            float: right;
+        }
+        .quote-meta-table td {
+            border: 1px solid #888888;
+            padding: 5px 8px;
+            font-size: 9.5pt;
+            text-align: left;
+        }
+        .quote-meta-table td.val {
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .info-grid {
+            display: table;
+            width: 100%;
+            border: 1px solid #666666;
+            margin-bottom: 20px;
+            font-size: 10pt;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-cell {
+            display: table-cell;
+            padding: 8px;
+            border-bottom: 1px solid #888888;
+            vertical-align: top;
+        }
+        .info-row:last-child .info-cell {
+            border-bottom: none;
+        }
+        .w-60 { width: 62%; border-right: 1px solid #666666; }
+        .w-40 { width: 38%; }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 110px;
+        }
+        .val-text {
+            display: inline-block;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            font-size: 10pt;
+        }
+        .items-table th {
+            background-color: #eaebed;
+            border: 1px solid #666666;
+            padding: 8px 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .items-table td {
+            border-left: 1px solid #666666;
+            border-right: 1px solid #666666;
+            padding: 8px;
+            vertical-align: top;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        .bottom-section {
+            display: table;
+            width: 100%;
+            border: 1px solid #666666;
+            border-top: none;
+            font-size: 9.5pt;
+        }
+        .notes-cell {
+            display: table-cell;
+            width: 62%;
+            padding: 12px;
+            border-right: 1px solid #666666;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        .summary-cell {
+            display: table-cell;
+            width: 38%;
+            vertical-align: top;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #cccccc;
+        }
+        .summary-table tr:last-child td {
+            border-bottom: none;
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+
+        .signatures-container {
+            display: table;
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid #666666;
+            font-size: 9.5pt;
+        }
+        .sig-box {
+            display: table-cell;
+            width: 33.33%;
+            border-right: 1px solid #666666;
+            padding: 10px;
+            text-align: center;
+            vertical-align: bottom;
+        }
+        .sig-box:last-child {
+            border-right: none;
+        }
+        .sig-line {
+            border-bottom: 1px dotted #333333;
+            width: 85%;
+            margin: 0 auto 8px auto;
+            height: 30px;
+        }
+        .sig-date {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 9pt;
+        }
+        .footer-note {
+            text-align: right;
+            font-size: 8pt;
+            color: #666666;
+            margin-top: 8px;
+        }
     </style>
     <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
     <script type="text/javascript">
@@ -54,386 +272,225 @@
         document.getElementById("result").innerHTML = thaibath;
       }
     </script>
-  </head>
-  {% comment %} onLoad="myFunction();window.print()" {% endcomment %}
-  <body onLoad="myFunction();window.print()">
-    <div class="page">
-      <table style="width: 100%" border="0" class="table-head">
-        <tbody>
-          <tr>
-            <td style="vertical-align: middle" align="left">
-              <img
+</head>
+<body onLoad="myFunction();window.print()">
+
+<div class="page-container">
+
+<div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+
+    <div class="logo-company-wrapper" style="display: flex; align-items: flex-start; flex: 1; padding-right: 15px;">
+        <div class="logo-container" style="margin-right: 15px; margin-top: 5px; flex-shrink: 0;">
+           <img
                 src="{% static 'images/IDdrives.png' %}"
                 alt="IDLOGO"
-                style="width: 100px; height: 100px"
+                style="width: 60px; height: 60px"
               />
-            </td>
-            <td style="vertical-align: middle" align="center">
-              <h3>POS IDC</h3>
-              <h4>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</h4>
-            </td>
-
-            <td style="vertical-align: middle" align="right">
-              <img
-                src="{% static 'images/newlogo_resize11.png' %}"
-                alt="TZLOGO"
-                style="width: 100px; height: 100px"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table border="0" style="width: 100%" class="table-title">
-        <tbody>
-          <tr>
-            <td style="width: 70%" align="center">
-              <div>
-                สาขา 00018 58/1 หมู่ 9 ถนนมิตรภาพ ตำบลทับกวาง อำเภอแก่งคอย
-                จังหวัดสระบุรี 18260
-              </div>
-              <div>Tax ID 0405536000531 Tel. 088-5713023 , 088-5643772</div>
-              <div>
-                www.trainingzenter.com www.iddrives.co.th www.iddriver.com
-              </div>
-              <img
+              <br>
+        </div>
+        <div class="company-info">
+ <div class="company-name" style="font-size: 15pt; font-weight: bold; color: #1a1a1a; margin-bottom: 5px;">บริษัท ไอดีไดรฟ์ จำกัด</div>        
+     <div class="company-details" style="font-size: 10.5pt; color: #444444; line-height: 1.4;">
+               (สำนักงานใหญ่) 200/222  หมู่  2  ถนนชัยพฤกษ์  ตำบลในเมือง  อำเภอเมืองขอนแก่น จังหวัดขอนแก่น 40000<br>
+                เลขที่ผู้เสียภาษี 0405536000531 โทร: 043-228899<br>
+                
+                E-mail:idofficer@iddrives.co.th,www.iddrives.co.th
+            </div>
+             <img
                 src="{% static 'images/all-logo-05.png' %}"
                 alt="TZLOGO"
                 style="width: 100%; height: auto"
               />
-            </td>
-            <td>
-              <table style="width: 100%; border-collapse: collapse" border="1">
-                <tbody>
-                  <tr align="center" style="background-color: #d0cece">
-                    <td colspan="2" rowspan="1">
-                      <h4>
-                        ใบเสนอราคา <br />
-                        Quotation
-                      </h4>
-                    </td>
-                  </tr>
-                  <tr align="center">
-                    <td style="background-color: #e7e6e6">เลขที่</td>
-                    <td>{{data.rp_doc_number}}</td>
-                  </tr>
-                  <tr align="center">
-                    <td style="background-color: #e7e6e6">วันที่</td>
-                    <td>{{data.crt_date|date:"d/m/Y H:i"}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table style="width: 100%" border="0" class="table-title">
-        <tbody>
-          <tr>
-            <td style="width: 15%">ชื่อลูกค้า</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_name_customer}}
-            </td>
-            <td style="width: 15%">รหัสลูกค้า</td>
-            <td style="border-bottom: black 1px dotted">
-              {{customer.customer_code}}
-            </td>
-          </tr>
-          <tr>
-            <td style="width: 15%">Tax ID</td>
-            <td style="border-bottom: black 1px dotted">{{data.rp_tax}}</td>
-            <td style="width: 15%">ผู้เสนอโครงการ</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_name_seller}}
-            </td>
-          </tr>
+        </div>
+         <img
+                src="{% static 'images/newlogo_resize11.png' %}"
+                alt="IDLOGO"
+                style="width: 60px; height: 60px"
+              />
+    </div>
 
-          <tr>
-            <td style="width: 15%">ชื่อผู้ติดต่อ</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_name_contact}}
-            </td>
-            <td style="width: 15%">ฝ่าย / สาขา</td>
-            <td style="border-bottom: black 1px dotted">TN</td>
-          </tr>
-          <tr>
-            <td style="width: 15%">ที่อยู่</td>
-            <td style="border-bottom: black 1px dotted">{{data.rp_address}}</td>
-            <td style="width: 15%">ยืนยันราคาภายในวัน</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_confirm_date_price|date:"d/m/Y"}}
-            </td>
-          </tr>
-          <tr>
-            <td style="width: 15%">Tel</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_phone}} | E-mail : {{data.rp_email}}
-            </td>
-            <td style="width: 15%">วันที่ส่งของ</td>
-            <td style="border-bottom: black 1px dotted">
-              {{data.rp_date_delivery|date:"d/m/Y"}}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="quote-title-container" style="flex-shrink: 0; text-align: right; width: 200px;">
+        <div class="quote-badge" style="background-color: #e66430; color: white; padding: 8px 0; font-weight: bold; font-size: 13pt; text-align: center; display: block; width: 100%; border: 1px solid #c85020;">
+            ใบเสนอราคา<br>
+            <span style="font-size: 10pt; font-weight: normal; display:block; margin-top:-2px;">Quotation</span>
+        </div>
+        <table class="quote-meta-table" style="width: 100%; margin-top: 5px; border-collapse: collapse;">
+            <tr>
+                <td style="border: 1px solid #888888; padding: 5px 8px; font-size: 9.5pt; text-align: left;">เลขที่</td>
+                <td class="val" style="border: 1px solid #888888; padding: 5px 4px; font-size: 9.5pt; text-align: center; background-color: #f9f9f9;">{{data.rp_doc_number}}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #888888; padding: 5px 8px; font-size: 9.5pt; text-align: left;">วันที่</td>
+                <td class="val" style="border: 1px solid #888888; padding: 5px 4px; font-size: 9pt; text-align: center; background-color: #f9f9f9; white-space: nowrap;">{{data.crt_date|date:"d/m/Y H:i"}}</td>
+            </tr>
+        </table>
+    </div>
 
-      <table
-        style="width: 100%; border-collapse: collapse"
-        border="1"
-        class="table-detail"
-      >
+</div>
+
+
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">ชื่อลูกค้า :</span> <span class="val-text">{{data.rp_name_customer}}</span><br>
+                <span class="label">Tax ID :</span> <span class="val-text">{{data.rp_tax}}</span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">รหัสลูกค้า :</span> <span class="val-text">{{customer.customer_code}}</span><br>
+                <span class="label">ผู้เสนอขาย :</span> <span class="val-text">{{data.rp_name_seller}}</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">ชื่อผู้ติดต่อ :</span> <span class="val-text">{{data.rp_name_contact}}</span><br>
+                <span class="label">ที่อยู่ :</span> <span class="val-text">{{data.rp_address}}</span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">ฝ่าย / สาขา :</span> <span class="val-text">IT</span><br>
+                <span class="label">ยืนยันราคาภายใน:</span> <span class="val-text"> - </span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-cell w-60">
+                <span class="label">โทร :</span> <span class="val-text">{{data.rp_phone}}</span> &nbsp;&nbsp;&nbsp; <span class="label" style="width:auto;">E-mail :</span> <span class="val-text">{{data.rp_email}}</span>
+            </div>
+            <div class="info-cell w-40">
+                <span class="label">วันที่ส่งของ :</span> <span class="val-text"> - </span>
+            </div>
+        </div>
+    </div>
+
+{% comment %} {{data.rp_date_delivery|date:"d/m/Y"}} {% endcomment %}
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 7%;">ลำดับที่</th>
+                <th style="width: 15%;">รหัสสินค้า</th>
+                <th style="width: 38%;">รายการสินค้า</th>
+                <th style="width: 8%;">จำนวน</th>
+                <th style="width: 8%;">หน่วย</th>
+                <th style="width: 12%;">ราคาต่อหน่วย</th>
+                <th style="width: 12%;">ส่วนลด</th>
+                <th style="width: 12%;">จำนวนเงิน</th>
+            </tr>
+        </thead>
         <tbody>
-          <tr>
-            <td>ลำดับ</td>
-            <td>รหัสสินค้า</td>
-            <td>รายการสินค้า</td>
-            <td>จำนวน</td>
-            <td>หน่วย</td>
-            <td>ราคาต่อหน่วย</td>
-            <td>ส่วนลด</td>
-            <td>จำนวนเงิน</td>
-          </tr>
-          <tr>
-            <td align="center">1</td>
-            <td>{{items.rpi_code}}</td>
-            <td>{{items.rpi_name}}</td>
-            <td align="center">{{items.rpi_quantity}}</td>
-            <td>{{items.rpi_unit}}</td>
-            <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
-            <td align="right">{{items.rpi_price_discount}}</td>
-            <td align="right">
-           {{rpi_price_rpi_pri |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          {% for add_ons in add_on %}
-          <tr>
-            <td align="center">{{ forloop.counter|add:1 }}</td>
-            <td>{{add_ons.course_code}}</td>
-            <td>{{add_ons.order_list}}</td>
-            <td align="center">{{add_ons.qty}}</td>
-            <td>{{add_ons.unit}}</td>
-            <td align="right">{{add_ons.rpi_price |floatformat:2|intcomma }}</td>
-            <td align="right">{{add_ons.rpi_price_discount}}</td>
-            <td align="right">
-              {{add_ons.rpi_price_result |floatformat:2|intcomma }}
-            </td>
+            <tr>
+                <td class="text-center">1</td>
+                <td class="text-center">{{items.rpi_code}}</td>
+                <td>{{items.rpi_name}}</td>
+                <td class="text-center">{{items.rpi_quantity}}</td>
+                <td class="text-center">{{items.rpi_unit}}</td>
+                <td class="text-right">{{items.rpi_price |floatformat:2|intcomma }}</td>
+                <td class="text-right">{{items.rpi_price_discount}}</td>
+                <td class="text-right">{{rpi_price_rpi_pri |floatformat:2|intcomma }}</td>
+            </tr>
+            {% for add_ons in add_on %}
+            <tr>
+                <td class="text-center">{{ forloop.counter|add:1 }}</td>
+                <td class="text-center">{{add_ons.course_code}}</td>
+                <td>{{add_ons.order_list}}</td>
+                <td class="text-center">{{add_ons.qty}}</td>
+                <td class="text-center">{{add_ons.unit}}</td>
+                <td class="text-right">{{add_ons.rpi_price |floatformat:2|intcomma }}</td>
+                <td class="text-right">{{add_ons.rpi_price_discount}}</td>
+                <td class="text-right">{{add_ons.rpi_price_result |floatformat:2|intcomma }}</td>
+            </tr>
             {% endfor %}
-          </tr>
+            <tr>
+                <td style="height: 80px; border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+                <td style="border-bottom: 1px solid #666666;"></td>
+            </tr>
+        </tbody>
+    </table>
 
-          {% comment %}
-          <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-          </tr>
-          {% endcomment %}
-          <tr>
-            <!-- <td colspan="3" rowspan="5" style="vertical-align: top">
-              หมายเหตุ <br />
-              {{data.rp_ref1}}<br />
-              {{data.rp_ref2}}
-            </td> -->
-            <td colspan="3" rowspan="5" style="vertical-align: top;padding-left: 3px;font-size: 14px;">
-              หมายเหตุ <br />
-             
-              {% for etcs in etc %}
-            -  {{etcs.name}}<br />
-            
-              {% endfor %}
 
-              <br />
-              {{data.rp_ref1}}<br />
-              {{data.rp_ref2}}
-  
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>รวมเงิน</td>
-            <td align="right">
-              {{rpi_total |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>ส่วนลด</td>
-            <td align="right">
-              {{items.rpi_price_discount |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>ราคาก่อน VAT</td>
-            <td align="right">
-              {{items.rpi_price_total |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>ภาษีมูลค่าเพิ่ม 7&#37;</td>
-            <td align="right">
-              {{items.rpi_price_vat |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          <tr>
-            <td align="center">จำนวนเงิน</td>
-            <td colspan="3" rowspan="1" align="center">
-              <span id="result"></span>
-            </td>
-            <td align="right">
-              {{items.rpi_price_result |floatformat:2|intcomma }}
-            </td>
-          </tr>
-          <tr>
-            <td colspan="4" rowspan="1" style="padding: 10px;">
-
-              
-      
-            
-      
-              <div style="display: flex;">
-                <div style="flex: 1;">
-                  <img
+    <div class="bottom-section">
+        <div class="notes-cell">
+            <strong>หมายเหตุ :</strong><br>
+            กรุณาชำระเงิน ทั้งหมดตามรายละเอียดข้างล่างนี้<br>
+            <strong>ดังรายละเอียดธนาคารดังต่อไปนี้</strong><br>
+            1.บจก.ไอดีไดรฟ์ ธ.กรุงไทย สาขาถนนมะลิวัลย์ เลขที่ 424-1-31174-1<br>
+            โทรฝ่ายการเงิน  (043) 228899 / ฝ่ายบัญชี<br>
+            หรือ E-mail :  idfinance@iddrives.co.th<br>
+                    <img
                   src="{% static 'images/402827.png' %}"
                   alt="IDLOGO"
                   style="width: 200px; height: 100px"
                 />
-               
-                </div>
-      
-              </div>
-              
-       
+        </div>
 
-            </td>
-            <td colspan="3" rowspan="1">
-              <div style="display: flex;padding-top: 5px;">
-                <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
-              </div>
-              <br>
-              <div style="display: flex;">
-                <div style="flex: 1;"> โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ สาขาสี่แยกมะลิวัลย์(ขอนแก่น) ธ.ไทยพานิชย์ เลขที่ 729-3-01791-5</div>
-              </div>
-              <br>
-              <div style="display: flex;">
-                <div style="flex: 1;"> สั่งจ่ายเช็คธนาคาร นาม บจก.ไอดีไดรฟ์ เมื่อสั่งจ่ายแล้วกรุณาโทร
-                  088-5713023 ส่งใบ payin ทาง Line ID : TZ00018 </div>
-              </div>
-<br>
-
-           
-              
-            </td>
-            <td>
-              <img
-                src="{% static 'images/line_contract_update.jpg' %}"
-                alt="Line"
-                style="width: 80px; height: 80px"
-              />
-            </td>
-          </tr>
-          <tr>
-     
-            <td colspan="8" rowspan="1">
-              <div style="display: flex;padding-top: 5px;">
-                <div style="flex: 1;">E-mail:&nbsp;&nbsp;idfinance@iddrives.co.th </div>
-              </div>
-              <div style="display: flex;padding-top: 5px;">
-                <div style="flex: 1;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idfinance@iddrives.co.th </div>
-              </div>
-  
-            </td>  
-          </tr>
-
-
-          <tr>
-            <td colspan="3" rowspan="1">
-
-              <div style="display: flex;text-align: center;">
-             
-                <div style="flex: 1;">
-                 
-                  <img
-               
-                  
-                  src="{{signa.image_cover.url}}"
-                 
-                  alt="IDLOGO"
-                  style="width: 200px; height: 100px"
-                />
-               
-                </div>
-      
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{user.first_name}} {{user.last_name}}</div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ผู้เสนอราคา </div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">
-                  {{time|date:"d/m/Y"}}
-                </div>
-              </div>
-        
-            </td>
-            <td colspan="3" rowspan="1">
-
-              <div style="flex: 1;text-align: center;">
-                <img
-                src="{{signama.image_cover.url}}"
-                alt="IDLOGO"
-                style="width: 200px; height: 100px"
-              />
-             
-              </div>
-   
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{manger.first_name}} {{manger.last_name}}</div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ผู้จัดการ </div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{time|date:"d/m/Y"}}</div>
-              </div>
-            </td>
-            <td colspan="3" rowspan="1">
-              <div style="flex: 1;text-align: center;">
-                <img
-                src="{% static 'images/wh.png' %}"
-                alt="IDLOGO"
-                style="width: 200px; height: 100px"
-              />
-             
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;"></div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">ผู้อนุมัติสั่งซื้อ </div>
-              </div>
-              <div style="display: flex;text-align: center;">
-                <div style="flex: 1;">{{time|date:"d/m/Y"}}</div>
-              </div>
-            </td>
-          </tr>
 
         
-        </tbody>
-      </table>
+        <div class="summary-cell">
+            <table class="summary-table">
+                <tr>
+                    <td style="width: 55%;">มัดจำ %</td>
+                    <td class="text-right" style="width: 45%;">0</td>
+                </tr>
+                <tr>
+                    <td>รวมเงิน</td>
+                    <td class="text-right">{{rpi_total |floatformat:2|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>ส่วนลดสินค้า</td>
+                    <td class="text-right">{{items.rpi_price_discount |floatformat:2|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>เงินหลังหักส่วนลด</td>
+                    <td class="text-right">{{items.rpi_price_result |floatformat:2|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>ราคาก่อน VAT</td>
+                    <td class="text-right">{{items.rpi_price_total |floatformat:2|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>ภาษีมูลค่าเพิ่ม 7 %</td>
+                    <td class="text-right">{{items.rpi_price_vat |floatformat:2|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>จำนวนเงินทั้งสิ้น</td>
+                    <td class="text-right">{{items.rpi_price_result |floatformat:2|intcomma }}</td>
+                </tr>
+            </table>
+            <div style="padding: 6px 8px; font-size: 9pt; border-top: 1px solid #cccccc;">
+                <span id="result"></span>
+            </div>
+        </div>
     </div>
-  </body>
+
+
+    <div class="signatures-container">
+        <div class="sig-box"><br>
+            <br>
+            <br>
+            <div class="sig-line"></div>
+            <div>ผู้เสนอราคา</div>
+            <div class="sig-date" style="text-align: center;"> {{time|date:"d/m/Y"}}</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div>ผู้จัดการ</div>
+            <div class="sig-date" style="text-align: center;"> {{time|date:"d/m/Y"}}</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div>ผู้อนุมัติสั่งซื้อ</div>
+            <div class="sig-date" style="text-align: center;"> {{time|date:"d/m/Y"}}</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        FD-OD/AC-001/1:00:18-6/2026
+    </div>
+
+</div>
+
+</body>
 </html>
