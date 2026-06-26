@@ -3979,7 +3979,7 @@ def spa_sale_step3(request):
 
     # ── 6. อัปเดต register_main ──
     content_main.register_number = reg_no
-    content_main.status = 'Y'
+    content_main.status = 'Y' if pay_type == 1 else 'W'
     content_main.orderstatus = 'FullPayment'
     content_main.seller_id = rp_name_seller
     content_main.save()

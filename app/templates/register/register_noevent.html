@@ -306,15 +306,7 @@
           <input type="hidden" id="s3_pay_type">
           <input type="hidden" id="s3_customer_type">
           <div class="row g-3">
-            <div class="col-md-4" id="s3IndivFields">
-              <label class="form-label">ชื่อ <span style="color:var(--red)">*</span></label>
-              <input type="text" class="form-control" id="s3_firstname">
-            </div>
-            <div class="col-md-4" id="s3IndivFields2">
-              <label class="form-label">นามสกุล <span style="color:var(--red)">*</span></label>
-              <input type="text" class="form-control" id="s3_lastname" oninput="s3AutoName()">
-            </div>
-            <div class="col-md-4" id="s3CorpField" style="display:none;">
+            <div class="col-md-4" id="s3CorpField">
               <label class="form-label">ชื่อลูกค้า <span style="color:var(--red)">*</span></label>
               <input type="text" class="form-control" id="s3_custname_corp">
             </div>
@@ -680,12 +672,12 @@ async function doStep2(){
     
     // info badges
     document.getElementById('s3CourseBadge').innerHTML = '<i class="bi bi-box-seam"></i> ' + data.course_code + ' ' + data.course_name;
-    document.getElementById('s3DocBadge').innerHTML    = '<i class="bi bi-receipt"></i> ' + data.register_number;
+    document.getElementById('s3DocBadge').innerHTML    = '<i class="bi bi-receipt"></i> ' + data.customer.cus_code;
     document.getElementById('s3PtypeBadge').innerHTML  = '<i class="bi bi-cash"></i> ' + (data.pay_type == 1 ? 'เงินสด':'เครดิต');
 
     // customer fields
     const cust = data.customer;
-    console.log(cust)
+    
     document.getElementById('s3_cust_code').value = cust.cus_code;
     document.getElementById('s3_tax').value       = cust.tax;
     document.getElementById('s3_phone').value     = cust.phone;
@@ -693,20 +685,8 @@ async function doStep2(){
     document.getElementById('s3_address').value   = cust.address;
 
 
-    if(data.customer_type == 1 && data.student){
-      document.getElementById('s3IndivFields').style.display  = '';
-      document.getElementById('s3IndivFields2').style.display = '';
-      document.getElementById('s3CorpField').style.display    = 'none';
-      document.getElementById('s3_firstname').value = data.student.firstname;
-      document.getElementById('s3_lastname').value  = data.student.lastname;
-      document.getElementById('s3_custname_hidden').value = data.student.firstname + ' ' + data.student.lastname;
-    } else {
-      document.getElementById('s3IndivFields').style.display  = 'none';
-      document.getElementById('s3IndivFields2').style.display = 'none';
-      document.getElementById('s3CorpField').style.display    = '';
-      document.getElementById('s3_custname_corp').value = cust.name;
-      document.getElementById('s3_custname_hidden').value = cust.name;
-    }
+    document.getElementById('s3_custname_corp').value = cust.name;
+    document.getElementById('s3_custname_hidden').value = cust.name;
 
     // Seller dropdown
     const selSel = document.getElementById('s3_seller');
@@ -892,16 +872,8 @@ async function doStep3(){
   const cust_type = parseInt(document.getElementById('s3_customer_type').value);
 
   // Build name
-  let rp_name_customer = '';
-  if(cust_type == 1){
-    const f = document.getElementById('s3_firstname').value;
-    const l = document.getElementById('s3_lastname').value;
-    if(!f || !l){ Swal.fire({title:'กรุณากรอกชื่อ-นามสกุล',icon:'warning'}); return; }
-    rp_name_customer = f + ' ' + l;
-  } else {
-    rp_name_customer = document.getElementById('s3_custname_corp').value;
-    if(!rp_name_customer){ Swal.fire({title:'กรุณากรอกชื่อลูกค้า',icon:'warning'}); return; }
-  }
+  const rp_name_customer = document.getElementById('s3_custname_corp').value.trim();
+  if(!rp_name_customer){ Swal.fire({title:'กรุณากรอกชื่อลูกค้า',icon:'warning'}); return; }
 
   const seller = document.getElementById('s3_seller').value;
   const contact = document.getElementById('s3_contact').value;
