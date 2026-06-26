@@ -3948,7 +3948,7 @@ def spa_sale_step3(request):
     rp_phone         = request.POST.get('rp_phone', '')
     rp_email         = request.POST.get('rp_email', '')
     vat              = request.POST.get('vat', '0')
-    stmda            = request.POST.get('stmdate')
+    stmda            = request.POST.get('stmdate') or None
     etc              = request.POST.get('stmetc')
     bills            = request.POST.getlist('selected_bills', [])
     rp_ref1          = request.POST.get('rp_ref1', '')
