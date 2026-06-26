@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print, project, desbill, notification, customer
 
 urlpatterns = [
     # Register
@@ -195,6 +195,14 @@ urlpatterns = [
     # Master Data
     path('locationthai/', master_data.get_locationThai),
     path('api/customer', register.get_customer_data),
+
+    # Customers CRUD
+    path('customers/',                           customer.customer_list),
+    path('api/customers/list/',                  customer.customer_api_list),
+    path('api/customers/create/',                customer.customer_api_create),
+    path('api/customers/<int:customer_id>/',     customer.customer_api_detail),
+    path('api/customers/<int:customer_id>/update/', customer.customer_api_update),
+    path('api/customers/delete/',                customer.customer_api_delete),
 
     # General
     path('login/', general.login),

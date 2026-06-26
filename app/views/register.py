@@ -115,6 +115,7 @@ def register_home(request):
         'success_count': success_count,
         'recent_payments': recent_payments,
         'today': today,
+        'listMenuPermission': objMenu,
     }
     return render(request, 'dashboard/index.html', context)
 

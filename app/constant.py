@@ -449,6 +449,13 @@ listMenu = [
         "group_label": "เปิดการขาย",
     },
 
+     {
+        "value": "customers",
+        "label": "ลูกค้า",
+        "group_value": "CR1111",
+        "group_label": "ลูกค้า",
+    },
+
     {
         "value": "https://forms.gle/FjMysUQ6i7iAUHLF6",
         "label": "แบบประเมินทดสอบการขับรถจริง",

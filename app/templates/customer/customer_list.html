@@ -1,0 +1,507 @@
+{% extends 'base.html' %}{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.ctype-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.ctype-1 { background: rgba(91,141,246,.15); color: #5b8df6; }
+.ctype-2 { background: rgba(168,85,247,.15);  color: #a855f7; }
+
+.cus-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cus-table th {
+  padding: 10px 14px; background: var(--card2); color: var(--t3);
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--bdr2); white-space: nowrap;
+}
+.cus-table td {
+  padding: 10px 14px; border-bottom: 1px solid var(--bdr);
+  color: var(--t1); vertical-align: middle;
+}
+.cus-table tr:last-child td { border-bottom: none; }
+.cus-table tr:hover td { background: var(--card2); }
+
+.page-card {
+  background: var(--card); border: 1px solid var(--bdr);
+  border-radius: var(--radius); overflow: hidden;
+}
+.page-card-head {
+  padding: 14px 18px; background: var(--card2);
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+}
+.search-wrap { position: relative; }
+.search-wrap input {
+  padding-left: 34px; border-radius: 8px;
+  border: 1px solid var(--bdr2); background: var(--card);
+  color: var(--t1); font-size: 13px; height: 36px; min-width: 220px;
+}
+.search-wrap .bi {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--t3); pointer-events: none;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 1050;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--card); border-radius: 14px;
+  width: min(640px, 96vw); max-height: 92vh;
+  overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  animation: modalIn .18s ease;
+}
+@keyframes modalIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 15px; font-weight: 700; color: var(--t1); }
+.modal-body { padding: 20px; }
+.modal-foot {
+  padding: 14px 20px; border-top: 1px solid var(--bdr);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+.form-label { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 4px; }
+.form-control, .form-select {
+  border: 1px solid var(--bdr2); background: var(--card2); color: var(--t1);
+  border-radius: 8px; font-size: 13px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,110,247,.15);
+  background: var(--card); color: var(--t1); outline: none;
+}
+
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--t3);
+}
+
+/* select2 dark compat */
+.select2-container--default .select2-selection--single {
+  background: var(--card2); border: 1px solid var(--bdr2);
+  border-radius: 8px; height: 38px; display: flex; align-items: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--t1); line-height: 38px; padding: 0 12px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px;
+}
+.select2-dropdown {
+  background: var(--card); border: 1px solid var(--bdr2); border-radius: 8px;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  background: var(--card2); color: var(--t1);
+  border: 1px solid var(--bdr2); border-radius: 6px;
+}
+.select2-container--default .select2-results__option--highlighted {
+  background: var(--blue) !important; color: #fff !important;
+}
+.select2-results__option { color: var(--t1); padding: 7px 12px; font-size: 13px; }
+</style>
+
+<!-- Page Header -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item active">ข้อมูลลูกค้า</li>
+      </ol>
+    </nav>
+    <h5 class="mb-0 fw-bold" style="color:var(--t1);">
+      <i class="bi bi-people-fill" style="color:var(--blue)"></i> ข้อมูลลูกค้า
+    </h5>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="openModal()">
+    <i class="bi bi-plus-lg"></i> เพิ่มลูกค้าใหม่
+  </button>
+</div>
+
+<!-- Table Card -->
+<div class="page-card">
+  <div class="page-card-head">
+    <div style="font-size:13px; font-weight:600; color:var(--t1);">
+      <i class="bi bi-list-ul" style="color:var(--blue)"></i>
+      รายชื่อลูกค้าทั้งหมด
+      <span id="totalCount" style="font-size:11px; color:var(--t3); font-weight:400;"></span>
+    </div>
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, รหัส, เบอร์โทร...">
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="cus-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>รหัส</th>
+          <th>ชื่อลูกค้า / บริษัท</th>
+          <th>ประเภท</th>
+          <th>เบอร์โทร</th>
+          <th>อีเมล</th>
+          <th>เลขผู้เสียภาษี</th>
+          <th>ที่อยู่</th>
+          <th style="text-align:center">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody id="cusTableBody">
+        <tr>
+          <td colspan="9" class="empty-state">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
+            กำลังโหลด...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── Modal ─── -->
+<div class="modal-overlay" id="cusModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modalTitle">
+        <i class="bi bi-person-plus-fill" style="color:var(--blue)"></i> เพิ่มลูกค้าใหม่
+      </span>
+      <button class="btn btn-sm btn-link text-secondary p-0" onclick="closeModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modalCustomerId">
+
+      <!-- ประเภทลูกค้า -->
+      <div class="mb-3">
+        <label class="form-label">ประเภทลูกค้า <span style="color:var(--red)">*</span></label>
+        <div class="d-flex gap-3">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="customer_type" id="ctype1" value="1" checked>
+            <label class="form-check-label" for="ctype1">
+              <i class="bi bi-person"></i> บุคคลธรรมดา
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="customer_type" id="ctype2" value="2">
+            <label class="form-check-label" for="ctype2">
+              <i class="bi bi-building"></i> นิติบุคคล / บริษัท
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- ชื่อ-นามสกุล (บุคคล) -->
+        <div id="fieldIndiv" class="col-12 row g-3">
+          <div class="col-md-6">
+            <label class="form-label">ชื่อ</label>
+            <input type="text" class="form-control" id="f_first" placeholder="ชื่อ">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">นามสกุล</label>
+            <input type="text" class="form-control" id="f_last" placeholder="นามสกุล">
+          </div>
+        </div>
+
+        <!-- ชื่อบริษัท -->
+        <div class="col-12">
+          <label class="form-label" id="nameLabel">ชื่อ-นามสกุล (เต็ม)</label>
+          <input type="text" class="form-control" id="f_name" placeholder="ชื่อ-นามสกุลเต็ม หรือ ชื่อบริษัท">
+        </div>
+
+        <!-- เลขผู้เสียภาษี -->
+        <div class="col-md-6">
+          <label class="form-label">เลขประจำตัวผู้เสียภาษี</label>
+          <input type="text" class="form-control" id="f_tax" placeholder="0000000000000">
+        </div>
+
+        <!-- เบอร์โทร -->
+        <div class="col-md-6">
+          <label class="form-label">เบอร์โทรศัพท์</label>
+          <input type="text" class="form-control" id="f_phone" placeholder="0XX-XXX-XXXX">
+        </div>
+
+        <!-- อีเมล -->
+        <div class="col-12">
+          <label class="form-label">อีเมล</label>
+          <input type="email" class="form-control" id="f_email" placeholder="example@email.com">
+        </div>
+
+        <!-- ที่อยู่ -->
+        <div class="col-12">
+          <label class="form-label">ที่อยู่</label>
+          <textarea class="form-control" id="f_address" rows="2" placeholder="บ้านเลขที่ ถนน ซอย..."></textarea>
+        </div>
+
+        <!-- ตำบล / อำเภอ / จังหวัด -->
+        <div class="col-12">
+          <label class="form-label">ตำบล / อำเภอ / จังหวัด</label>
+          <select id="f_location" style="width:100%">
+            <option value="">-- เลือกตำบล/อำเภอ/จังหวัด --</option>
+          </select>
+          <input type="hidden" id="f_location_id">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary btn-sm" id="saveBtn" onclick="saveCustomer()">
+        <i class="bi bi-check2-circle"></i> บันทึก
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script>
+const CSRF = '{{ csrf_token }}';
+let allData = [];
+let editId  = null;
+
+// ─── Load list ────────────────────────────────────────────────────────────────
+function loadList(q) {
+  const url = '/api/customers/list/' + (q ? '?q=' + encodeURIComponent(q) : '');
+  fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      allData = res.data || [];
+      renderTable(allData);
+      document.getElementById('totalCount').textContent = ` (${allData.length} รายการ)`;
+    });
+}
+
+function renderTable(rows) {
+  const tb = document.getElementById('cusTableBody');
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="9" class="empty-state">
+      <i class="bi bi-inbox" style="font-size:26px;display:block;margin-bottom:6px;"></i>
+      ไม่พบรายการ
+    </td></tr>`;
+    return;
+  }
+  tb.innerHTML = rows.map((c, i) => `
+    <tr>
+      <td style="color:var(--t3);font-size:12px;">${i+1}</td>
+      <td><span style="font-size:11px;color:var(--t3);">${c.customer_code}</span></td>
+      <td>
+        <div style="font-weight:600;">${c.customer_name}</div>
+        ${c.customer_fisrt ? `<div style="font-size:11px;color:var(--t3);">${c.customer_fisrt} ${c.customer_last}</div>` : ''}
+      </td>
+      <td>
+        <span class="ctype-badge ctype-${c.customer_type}">
+          <i class="bi bi-${c.customer_type==1?'person':'building'}"></i>
+          ${c.customer_type==1?'บุคคล':'นิติบุคคล'}
+        </span>
+      </td>
+      <td>${c.customer_phone || '<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-size:12px;">${c.customer_email || '<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-size:12px;">${c.customer_tax || '<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-size:11px;color:var(--t3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.full_address}">
+        ${c.full_address || '—'}
+      </td>
+      <td style="text-align:center;white-space:nowrap;">
+        <button class="btn btn-sm btn-outline-primary" style="padding:3px 9px;font-size:12px;" onclick="openEdit(${c.customer_id})">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" style="padding:3px 9px;font-size:12px;margin-left:4px;" onclick="deleteCustomer(${c.customer_id}, '${escHtml(c.customer_name)}')">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s) { return (s||'').replace(/'/g, "\\'"); }
+
+// ─── Search ────────────────────────────────────────────────────────────────────
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadList(this.value.trim()), 320);
+});
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  editId = id || null;
+  clearForm();
+  document.getElementById('modalTitle').innerHTML = id
+    ? '<i class="bi bi-pencil-square" style="color:var(--blue)"></i> แก้ไขข้อมูลลูกค้า'
+    : '<i class="bi bi-person-plus-fill" style="color:var(--blue)"></i> เพิ่มลูกค้าใหม่';
+  document.getElementById('cusModal').classList.add('active');
+  initSelect2();
+  if (id) loadEditData(id);
+}
+
+function closeModal() {
+  document.getElementById('cusModal').classList.remove('active');
+}
+
+function clearForm() {
+  ['f_first','f_last','f_name','f_tax','f_phone','f_email','f_address'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f_location_id').value = '';
+  document.getElementById('modalCustomerId').value = '';
+  document.querySelector('input[name="customer_type"][value="1"]').checked = true;
+  toggleTypeFields(1);
+  if (window.locSelect2) {
+    $('#f_location').val('').trigger('change');
+  }
+}
+
+function toggleTypeFields(ctype) {
+  const indiv = document.getElementById('fieldIndiv');
+  const label = document.getElementById('nameLabel');
+  if (ctype == 1) {
+    indiv.style.display = '';
+    label.textContent = 'ชื่อ-นามสกุล (เต็ม)';
+  } else {
+    indiv.style.display = 'none';
+    label.textContent = 'ชื่อบริษัท / ชื่อห้าง *';
+  }
+}
+
+document.querySelectorAll('input[name="customer_type"]').forEach(el => {
+  el.addEventListener('change', () => toggleTypeFields(+el.value));
+});
+
+// ─── Select2 location ─────────────────────────────────────────────────────────
+function initSelect2() {
+  if (window.locSelect2Inited) return;
+  window.locSelect2Inited = true;
+  $('#f_location').select2({
+    placeholder: '-- เลือกตำบล/อำเภอ/จังหวัด --',
+    allowClear: true,
+    ajax: {
+      url: '/locationthai/',
+      type: 'POST',
+      data: params => ({ searchTerm: params.term || '', csrfmiddlewaretoken: CSRF }),
+      processResults: data => ({ results: data }),
+    },
+    minimumInputLength: 1,
+  }).on('select2:select', e => {
+    document.getElementById('f_location_id').value = e.params.data.id;
+  }).on('select2:clear', () => {
+    document.getElementById('f_location_id').value = '';
+  });
+}
+
+// ─── Load edit data ───────────────────────────────────────────────────────────
+function loadEditData(id) {
+  fetch(`/api/customers/${id}/`)
+    .then(r => r.json())
+    .then(res => {
+      const c = res.data;
+      document.getElementById('f_first').value   = c.customer_fisrt;
+      document.getElementById('f_last').value    = c.customer_last;
+      document.getElementById('f_name').value    = c.customer_name;
+      document.getElementById('f_tax').value     = c.customer_tax;
+      document.getElementById('f_phone').value   = c.customer_phone;
+      document.getElementById('f_email').value   = c.customer_email;
+      document.getElementById('f_address').value = c.customer_address;
+      document.getElementById('f_location_id').value = c.location_id;
+      document.querySelector(`input[name="customer_type"][value="${c.customer_type}"]`).checked = true;
+      toggleTypeFields(c.customer_type);
+      // set select2 with existing location label
+      if (c.location_id && c.full_address) {
+        const short = c.full_address.split(' ').slice(1).join(' ') || c.full_address;
+        const opt = new Option(c.full_address, c.location_id, true, true);
+        $('#f_location').append(opt).trigger('change');
+      }
+    });
+}
+
+// ─── Open edit shortcut ───────────────────────────────────────────────────────
+function openEdit(id) { openModal(id); }
+
+// ─── Save ────────────────────────────────────────────────────────────────────
+function saveCustomer() {
+  const btn = document.getElementById('saveBtn');
+  const ctype = document.querySelector('input[name="customer_type"]:checked').value;
+  const name  = document.getElementById('f_name').value.trim();
+  const first = document.getElementById('f_first').value.trim();
+
+  if (!name && !first) {
+    Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อลูกค้า', timer: 1500, showConfirmButton: false });
+    return;
+  }
+
+  btn.disabled = true;
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', CSRF);
+  fd.append('customer_type',    ctype);
+  fd.append('customer_name',    name || `${first} ${document.getElementById('f_last').value}`.trim());
+  fd.append('customer_fisrt',   first);
+  fd.append('customer_last',    document.getElementById('f_last').value.trim());
+  fd.append('customer_tax',     document.getElementById('f_tax').value.trim());
+  fd.append('customer_phone',   document.getElementById('f_phone').value.trim());
+  fd.append('customer_email',   document.getElementById('f_email').value.trim());
+  fd.append('customer_address', document.getElementById('f_address').value.trim());
+  fd.append('location_id',      document.getElementById('f_location_id').value || '0');
+
+  const url = editId ? `/api/customers/${editId}/update/` : '/api/customers/create/';
+  fetch(url, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(res => {
+      btn.disabled = false;
+      if (res.status === 'ok') {
+        closeModal();
+        Swal.fire({
+          icon: 'success',
+          title: editId ? 'แก้ไขข้อมูลสำเร็จ' : 'เพิ่มลูกค้าสำเร็จ',
+          timer: 1400, showConfirmButton: false,
+        }).then(() => loadList(document.getElementById('searchInput').value));
+      } else {
+        Swal.fire({ icon: 'error', title: res.message || 'เกิดข้อผิดพลาด' });
+      }
+    })
+    .catch(() => { btn.disabled = false; });
+}
+
+// ─── Delete ───────────────────────────────────────────────────────────────────
+function deleteCustomer(id, name) {
+  Swal.fire({
+    icon: 'warning',
+    title: 'ลบลูกค้า?',
+    html: `<span style="color:var(--red);font-weight:600;">${name}</span><br>ข้อมูลจะถูกลบถาวร`,
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    confirmButtonText: 'ลบเลย',
+    cancelButtonText: 'ยกเลิก',
+  }).then(result => {
+    if (!result.isConfirmed) return;
+    const fd = new FormData();
+    fd.append('csrfmiddlewaretoken', CSRF);
+    fd.append('customer_id', id);
+    fetch('/api/customers/delete/', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === 'ok') {
+          Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1200, showConfirmButton: false })
+            .then(() => loadList(document.getElementById('searchInput').value));
+        } else {
+          Swal.fire({ icon: 'error', title: res.message || 'เกิดข้อผิดพลาด' });
+        }
+      });
+  });
+}
+
+// close modal on overlay click
+document.getElementById('cusModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadList();
+</script>
+
+{% endblock %}
