@@ -3662,11 +3662,11 @@ def get_customer_data(request):
 
 @login_required(login_url='/login')
 def spa_sale_step1(request):
-    """Step 1: สร้าง register -> คืน JSON"""
+    """Step 1: บันทึกข้อมูลลง session เท่านั้น (ยังไม่ insert DB) -> คืน JSON"""
     if request.method != 'POST':
         return JsonResponse({'status': 'error'}, status=405)
 
-    seller_id = request.user.id
+    seller_id     = request.user.id
     course_id     = request.POST.get('course_id')
     customer_type = request.POST.get('customer_type')
     pay_type      = request.POST.get('pay_type')
@@ -3679,33 +3679,18 @@ def spa_sale_step1(request):
     except user_group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'ไม่มีสิทธิ์'})
 
-    old_id = request.session.get('register_id')
-    if old_id:
-        try:
-            register_main.objects.filter(register_id=old_id, register_number='-').delete()
-        except Exception:
-            pass
-    for k in ('register_id', 'idcard_data'):
+    # ล้าง session เก่า (ไม่มี DB record ให้ลบแล้ว)
+    for k in ('spa_step1_data', 'spa_customer', 'idcard_data'):
         request.session.pop(k, None)
 
-    close_the_sale = 1 if int(pay_type) == 1 else 0
-    obj = register_main.objects.create(
-        register_number='-',
-        customer_type=customer_type,
-        customer_status=0,
-        pay_type=pay_type,
-        pay_status=1,
-        close_the_sale=close_the_sale,
-        crt_date=dateTimeNow(),
-        upd_date=dateTimeNow(),
-        seller_id=seller_id,
-        course_id=course_id,
-        user_update_id=seller_id,
-        is_event='N',
-        module=m.module,
-    )
-    obj.refresh_from_db()
-    request.session['register_id'] = str(obj.register_id)
+    # บันทึกข้อมูล step1 ลง session
+    request.session['spa_step1_data'] = {
+        'course_id':     course_id,
+        'customer_type': int(customer_type),
+        'pay_type':      int(pay_type),
+        'seller_id':     seller_id,
+        'module':        m.module,
+    }
 
     try:
         c = course.objects.get(course_id=course_id)
@@ -3715,11 +3700,10 @@ def spa_sale_step1(request):
 
     return JsonResponse({
         'status': 'ok',
-        'register_id': str(obj.register_id),
         'customer_type': int(customer_type),
-        'pay_type': int(pay_type),
-        'course_name': c_name,
-        'course_code': c_code,
+        'pay_type':      int(pay_type),
+        'course_name':   c_name,
+        'course_code':   c_code,
     })
 
 
@@ -3729,16 +3713,12 @@ def spa_sale_step2(request):
     if request.method != 'POST':
         return JsonResponse({'status': 'error'}, status=405)
 
-    register_id = request.session.get('register_id')
-    if not register_id:
-        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
+    # อ่านข้อมูล step1 จาก session แทน DB
+    step1 = request.session.get('spa_step1_data')
+    if not step1:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย (กรุณาเริ่มใหม่)'})
 
-    try:
-        content_regist = register_main.objects.get(register_id=register_id)
-    except register_main.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
-
-    ctype = content_regist.customer_type
+    ctype = step1['customer_type']
     dtype = request.POST.get('customerType', 'new')
 
     # เก็บข้อมูลลูกค้าใน session (ยังไม่เขียน DB)
@@ -3801,7 +3781,7 @@ def spa_sale_step2(request):
             display_addr = customer_session['customer_address']
 
     try:
-        co = course.objects.get(course_id=content_regist.course_id)
+        co = course.objects.get(course_id=step1['course_id'])
         c_name, c_code = co.course_name, co.course_code
     except Exception:
         c_name = c_code = ''
@@ -3813,32 +3793,27 @@ def spa_sale_step2(request):
     mgr_list = [{'user_id': s.user.id, 'name': s.user.first_name + ' ' + s.user.last_name}
                 for s in fact_signature.objects.select_related('user').all()]
 
-    uid_nd = str(register_id).replace('-', '')
-    addons_qs = add_on.objects.filter(register_id=uid_nd, status='Y')
-    addon_list = [{'addon_id': str(a.addon_id), 'course_code': a.course_code,
-                   'order_list': a.order_list, 'unit': a.unit, 'qty': float(a.qty),
-                   'rpi_price': float(a.rpi_price), 'rpi_price_discount': float(a.rpi_price_discount),
-                   'rpi_price_result': float(a.rpi_price_result)} for a in addons_qs]
-    total_addon = float(addons_qs.aggregate(Sum('rpi_price_result'))['rpi_price_result__sum'] or 0)
+    # ยังไม่มี register_id จริง → addon ว่างเปล่า
+    addon_list  = []
+    total_addon = 0.0
     cl = [{'course_id': c2.course_id, 'course_code': c2.course_code, 'course_name': c2.course_name}
           for c2 in course.objects.filter(is_show_order='Y', cancelled=1)]
 
     return JsonResponse({
         'status': 'ok',
-        'register_id': str(register_id),
         'customer': {
             'name':    display_name,
             'tax':     display_tax,
             'phone':   display_phone,
             'email':   display_email,
             'address': display_addr,
-            'cus_code':display_customer_code
+            'cus_code': display_customer_code,
         },
         'student': {'firstname': customer_session['firstname'], 'lastname': customer_session['lastname']} if ctype == 1 else None,
         'course_name':   c_name,
         'course_code':   c_code,
         'customer_type': ctype,
-        'pay_type':      content_regist.pay_type,
+        'pay_type':      step1['pay_type'],
         'list_user':  users,
         'des_bill':   des_list,
         'manage':     mgr_list,
@@ -3855,22 +3830,40 @@ def spa_sale_step3(request):
         return JsonResponse({'status': 'error'}, status=405)
 
     now = date.today()
-    user_id  = request.user.id
-    register_id = request.POST.get('register_id')
+    user_id = request.user.id
 
-    # ── ดึง session ลูกค้าจาก step 2 ──
+    # ── ดึง session จาก step 1 และ step 2 ──
+    step1 = request.session.get('spa_step1_data')
+    if not step1:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย (กรุณาเริ่มใหม่)'})
+
     cus_sess = request.session.get('spa_customer')
     if not cus_sess:
         return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลลูกค้าใน session'})
 
-    try:
-        content_main = register_main.objects.get(register_id=register_id)
-    except register_main.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
-
-    ctype    = content_main.customer_type
-    pay_type = content_main.pay_type
+    ctype    = step1['customer_type']
+    pay_type = step1['pay_type']
     active   = 1 if pay_type == 1 else 0
+
+    # ── สร้าง register_main (insert ครั้งเดียวที่ step 3) ──
+    close_the_sale = 1 if pay_type == 1 else 0
+    content_main = register_main.objects.create(
+        register_number='-',
+        customer_type=ctype,
+        customer_status=0,
+        pay_type=pay_type,
+        pay_status=1,
+        close_the_sale=close_the_sale,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        seller_id=step1['seller_id'],
+        course_id=step1['course_id'],
+        user_update_id=step1['seller_id'],
+        is_event='N',
+        module=step1['module'],
+    )
+    content_main.refresh_from_db()
+    register_id = str(content_main.register_id)
 
     mc, yc = now.month, now.year
     yc_f = str(yc + 543)
@@ -4019,7 +4012,7 @@ def spa_sale_step3(request):
             rp_id=rp_obj.rp_id).update(active=0)
 
     # ── 10. ล้าง session ──
-    for k in ('register_id', 'idcard_data', 'spa_customer'):
+    for k in ('spa_step1_data', 'spa_customer', 'idcard_data'):
         request.session.pop(k, None)
 
     return JsonResponse({

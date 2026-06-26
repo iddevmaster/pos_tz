@@ -302,7 +302,6 @@
           <span class="info-badge"><i class="bi bi-3-circle"></i> ขั้นตอน 3 / 3</span>
         </div>
         <div class="spa-card-body">
-          <input type="hidden" id="s3_register_id">
           <input type="hidden" id="s3_pay_type">
           <input type="hidden" id="s3_customer_type">
           <div class="row g-3">
@@ -658,13 +657,10 @@ async function doStep2(){
     if(data.status !== 'ok') throw new Error(data.message || 'เกิดข้อผิดพลาด');
 
     // store state
-    state.register_id  = data.register_id;
     state.course_list  = data.course_list;
 
-
     // populate step 3
-    document.getElementById('s3_register_id').value  = data.register_id;
-    document.getElementById('s3_pay_type').value     = data.pay_type;
+    document.getElementById('s3_pay_type').value      = data.pay_type;
     document.getElementById('s3_customer_type').value = data.customer_type;
     
 
@@ -908,7 +904,6 @@ async function doStep3(){
 
   const fd = new FormData();
   fd.append('csrfmiddlewaretoken', CSRF);
-  fd.append('register_id',       state.register_id);
   fd.append('rp_name_customer',  rp_name_customer);
   fd.append('rp_code_customer',  document.getElementById('s3_cust_code').value);
   fd.append('rp_tax',            document.getElementById('s3_tax').value);
