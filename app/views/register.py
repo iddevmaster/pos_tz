@@ -71,70 +71,51 @@ def register_home(request):
         objMenu.append(r)
 
 
-    try:
-        idcard_data = request.session['idcard_data']
-        Province = idcard_data['Province']
-        Amphur = idcard_data['Amphur']
-        Tumbol = idcard_data['Tumbol']
-        HomeNo = idcard_data['HomeNo']
-        Road = idcard_data['Road']
-        Moo = idcard_data['Moo']
-        Soi = idcard_data['Soi']
-        Trok = idcard_data['Trok']
-        address = str(HomeNo)
+    today      = date.today()
+    this_month = today.month
+    this_year  = today.year
 
-        if Moo != '':
-            address += " " + str(Moo)
-        if Road != '':
-            address += " ถ." + str(Road)
-        if Soi != '':
-            address += " ซ." + str(Soi)
+    # ยอดขายวันนี้
+    sale_today = register_payment_items.objects.filter(
+        rp__crt_date__date=today
+    ).aggregate(total=Sum('rpi_price_result'))['total'] or 0
 
-        if Trok != '':
-            address += " " + str(Trok)
+    # ยอดขายเดือนนี้
+    sale_month = register_payment_items.objects.filter(
+        rp__crt_date__month=this_month,
+        rp__crt_date__year=this_year,
+    ).aggregate(total=Sum('rpi_price_result'))['total'] or 0
 
-    except KeyError:
-        idcard_data = None
-        Province = None
-        Amphur = None
-        Tumbol = None
-        address = ""
-    if idcard_data is not None:
-        try:
-            _location = location_thai.objects.get(
-                province_name__icontains=Province, amphur_name__icontains=Amphur, district_name__icontains=Tumbol)
-        except location_thai.DoesNotExist:
-            _location = None
-    else:
-        _location = None
-    try:
-        register_id = request.session['register_id']
-      
-        content_regist = register_main.objects.get(register_id=register_id)
-    except KeyError:
-        content_regist = None
-    
-    _date = date.today()
-    hundredDaysLater = _date + timedelta(days=365)
-    obj = []
-    
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2026, 2, 1), until=hundredDaysLater):
-        
-        _newdate = str(dt).split(" ")[0]
-        yearstart = _newdate.split("-")[0]
-        monthstart = _newdate.split("-")[1]
-        label = month_fomat(monthstart) + " " + yearstart
-        status = ['W','I','S','Y']
-        # print(label)
-        result = course_event.objects.select_related("course").filter(status__in=status,
-            cancelled=1, active=1, ev_date_start__month=int(monthstart), ev_date_start__year=int(yearstart), module=m.module).order_by("ev_date_start")
-        content = {"label": label, "data": result}
-        obj.append(content)
-    # print(idcard_data)
-    getcustomer = customers.objects.filter()
-   
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu,'content_regist1': _newdate,'customers':getcustomer,
-               'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
+    # ยอดขายปีนี้
+    sale_year = register_payment_items.objects.filter(
+        rp__crt_date__year=this_year,
+    ).aggregate(total=Sum('rpi_price_result'))['total'] or 0
+
+    # นับออเดอร์วันนี้
+    orders_today = register_payment.objects.filter(
+        crt_date__date=today
+    ).count()
+
+    # รอยืนยัน (W) / สำเร็จ (Y)
+    pending_count  = register_main.objects.filter(status='W').count()
+    success_count  = register_main.objects.filter(status='Y').count()
+
+    # รายการล่าสุด 8 รายการ
+    recent_payments = register_payment.objects.select_related(
+        'register'
+    ).prefetch_related('items').order_by('-crt_date')[:8]
+
+    context = {
+        'title': title,
+        'sale_today':    sale_today,
+        'sale_month':    sale_month,
+        'sale_year':     sale_year,
+        'orders_today':  orders_today,
+        'pending_count': pending_count,
+        'success_count': success_count,
+        'recent_payments': recent_payments,
+        'today': today,
+    }
     return render(request, 'dashboard/index.html', context)
 
 @login_required(login_url='/login')

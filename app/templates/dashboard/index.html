@@ -1,309 +1,251 @@
 {% extends 'base.html' %} {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+{% load humanize %}
 
-
-
-   const existingRadio = document.getElementById('existing');
-        const newRadio = document.getElementById('new');
-        const existingOption = document.getElementById('existing-option');
-        const newOption = document.getElementById('new-option');
-        const existingForm = document.getElementById('existingCustomerForm');
-        const newForm = document.getElementById('newCustomerForm');
-        const customerSearch = document.getElementById('customerSearch');
-        const searchResults = document.getElementById('searchResults');
-        const form = document.getElementById('customerForm');
-
-    function selectCus(x) {
- showExistingForm(x);
-    }
-
-
-function validateForm() {
-
- 
-
-  const languageRadios = document.getElementsByName('customerType');
-
-            // 2. อ้างอิงถึง Element ที่จะใช้แสดงผลลัพธ์
-            const displayElement = document.getElementById('selectedLanguageDisplay');
- let selectedValue = null;
-            // 3. วนลูปผ่าน NodeList เพื่อเพิ่ม Event Listener ให้กับแต่ละ Radio button
-            for (let i = 0; i < languageRadios.length; i++) {
-                // เพิ่ม 'change' event listener
-                // 'change' event จะถูก fire เมื่อสถานะ checked ของ input เปลี่ยนไป
-  if (languageRadios[i].checked) {
-                    selectedValue = languageRadios[i].value;
-                    break; // เมื่อเจอตัวที่ถูกเลือกแล้ว ก็ออกจากลูปทันที
-                }
-            }
-
-
-
-if(selectedValue != null){
-  if(selectedValue == 'existing'){  
-   const customer_id = document.getElementById('customer_id').value;
-
-   
-
-    if(customer_id){
-
-      console.log('ไปกันต่อ');
-
-    return true
-   
-    }else {
-            Swal.fire({
-       title: 'เลือกลูกค้า',
-       text: 'Select Customer',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-    }
-
-  }
-
-   if(selectedValue == 'new'){ 
-
-    const student_firstname_th = document.getElementById('student_firstname_th').value;
-    const student_lastname_th = document.getElementById('student_lastname_th').value;
-    const customer_tax = document.getElementById('customer_tax').value;
-    const customer_phone = document.getElementById('customer_phone').value;
-    const customer_email = document.getElementById('customer_email').value;
-    const customer_address = document.getElementById('customer_address').value;
-    const location_id = document.getElementById('selLocations').value;
-
-    if((student_firstname_th) && (student_lastname_th) && (customer_phone) && (customer_address) && (location_id)){
-return true
-    }else {
-      if(!student_firstname_th){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'ชื่อ',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!student_lastname_th){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'นามสกุล',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!customer_phone){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'เบอร์โทร',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-            if(!customer_address){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'ที่อยู่เลขที่',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!location_id){
-        Swal.fire({
-       title: 'กรุณาเลือกที่อยู่',
-       text: 'ตำบล-อำเภอ-จังหวัด-ไปรษณีย์',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-      
-    }
-
-  }
-   return false; 
-}
-else {
-      Swal.fire({
-       title: 'เลือกข้อมูลลูกค้า',
-       text: 'Select Data Customer',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
+<style>
+/* ── Dashboard ── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
- 
- return false; 
-
- 
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow .2s, transform .2s;
+}
+.stat-card:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
+  transform: translateY(-2px);
 }
 
-
-
-    $(document).ready(function () {
-    // Initialize Select2
-
-
-            $(".select2").select2({
-              
-          placeholder: "เลือกข้อมูล",
-          allowClear: true,
-        });
-  });
-
-
-         function showExistingForm(x) {
-            const existingForm = document.getElementById('existingCustomerForm');
-            const newForm = document.getElementById('newCustomerForm');
-        
-       
-          if(x == 'new'){
-            existingForm.classList.remove('show');
-            existingForm.classList.add('hidden');
-    
-            newForm.classList.remove('hidden');
-            newForm.classList.add('show');
-   
-
-          }else {
-
-
-            existingForm.classList.add('show');
-            existingForm.classList.remove('hidden');
-
-
-             newForm.classList.remove('show');
-            newForm.classList.add('hidden');
-
-
-    
-
-          }
-
-
-        }
-        
-  function setBillName() {
-    let student_firstname_th = document.getElementById(
-      "student_firstname_th"
-    ).value;
-    let student_lastname_th = document.getElementById(
-      "student_lastname_th"
-    ).value;
-    document.getElementById("customer_name").value =
-      student_firstname_th + " " + student_lastname_th;
-  }
-
-
-
-
-  var myVar = null;
-
-  function start_read_test() {
-    myStopFunctionTest();
-    myVar = setInterval(load_dataTest, 1500);
-  }
-
-  function myStopFunctionTest() {
-    clearInterval(myVar);
-  }
-
-  async function load_dataTest() {
-    let myObject = await fetch("{{api_id_card}}");
-    let jsondata = await myObject.text();
-    var data = jsondata.substr(13, jsondata.length - 14);
-    //let jdata = JSON.parse(data);
-
-     document.getElementById("result_id_card").value= data;
-     document.getElementById("read_id_card").submit();
-  }
-
-
-  async function myFunction(selectElement) {
-  
-const selectedValue = selectElement.value;
-
-
-
-    let data = await fetch('/api/customer', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({'customer_id':selectedValue})
-      })
-      .then(response => response.json())
-      .then(data => {
-
-        document.getElementById("customer_address").value= data.customer_address;
-
-      })
-      
-  }
-
-</script>
-<style scoped>
-
-        .form-section {
-            margin-bottom: 25px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.8);
-           
-            transition: all 0.4s ease;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-       .form-section.hidden {
-            display: none;
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-
-        .form-section.show {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-        .select2-selection.select2-selection--single {
-    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+.stat-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
 }
+.icon-blue   { background: rgba(91,141,246,.15); color: #5b8df6; }
+.icon-green  { background: rgba(16,185,129,.15); color: #10b981; }
+.icon-orange { background: rgba(249,115,22,.15);  color: #f97316; }
+.icon-purple { background: rgba(168,85,247,.15);  color: #a855f7; }
+.icon-red    { background: rgba(239,68,68,.15);   color: #ef4444; }
+.icon-teal   { background: rgba(20,184,166,.15);  color: #14b8a6; }
+
+.stat-info { flex: 1; min-width: 0; }
+.stat-label {
+  font-size: 11px; font-weight: 600; color: var(--t3);
+  text-transform: uppercase; letter-spacing: .6px;
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-size: 22px; font-weight: 700; color: var(--t1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stat-sub {
+  font-size: 11px; color: var(--t3); margin-top: 2px;
+}
+
+/* ── Recent table card ── */
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.dash-card-head {
+  padding: 14px 18px;
+  background: var(--card2);
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dash-card-title {
+  font-size: 14px; font-weight: 700; color: var(--t1);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.recent-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.recent-table th {
+  padding: 10px 14px;
+  background: var(--card2); color: var(--t3);
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--bdr2); text-align: left;
+}
+.recent-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bdr);
+  color: var(--t1); vertical-align: middle;
+}
+.recent-table tr:last-child td { border-bottom: none; }
+.recent-table tr:hover td { background: var(--card2); }
+
+.badge-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-y  { background: rgba(16,185,129,.15); color: #10b981; }
+.badge-w  { background: rgba(249,115,22,.15);  color: #f97316; }
+.badge-default { background: var(--card2); color: var(--t3); }
+
+.amount-cell { text-align: right; font-weight: 600; color: var(--t1); }
 </style>
-<div class="row">
-  <div class="col-12 col-md-6 order-md-1 order-last">
-   
-   
-  </div>
-  <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
+
+<div class="row mb-2">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="/">หน้าหลัก</a>
-        </li>
-     
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
       </ol>
     </nav>
   </div>
 </div>
 
-<section class="section">
-  <div class="card">
-xxx
-                </div>
- 
+<!-- ── Stat Cards ── -->
+<div class="dash-grid">
+
+  <div class="stat-card">
+    <div class="stat-icon icon-blue">
+      <i class="bi bi-cash-stack"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ยอดขายวันนี้</div>
+      <div class="stat-value">฿{{ sale_today|floatformat:0|intcomma }}</div>
+      <div class="stat-sub">{{ today|date:"d M Y" }}</div>
     </div>
   </div>
-  
-</section>
+
+  <div class="stat-card">
+    <div class="stat-icon icon-green">
+      <i class="bi bi-graph-up-arrow"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ยอดขายเดือนนี้</div>
+      <div class="stat-value">฿{{ sale_month|floatformat:0|intcomma }}</div>
+      <div class="stat-sub">{{ today|date:"F Y" }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon icon-purple">
+      <i class="bi bi-bar-chart-fill"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ยอดขายปีนี้</div>
+      <div class="stat-value">฿{{ sale_year|floatformat:0|intcomma }}</div>
+      <div class="stat-sub">ปี {{ today|date:"Y" }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon icon-teal">
+      <i class="bi bi-receipt-cutoff"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ออเดอร์วันนี้</div>
+      <div class="stat-value">{{ orders_today }}</div>
+      <div class="stat-sub">รายการ</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon icon-green">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ซื้อขายสำเร็จ</div>
+      <div class="stat-value">{{ success_count }}</div>
+      <div class="stat-sub">รายการซื้อขายสำเร็จ</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon icon-orange">
+      <i class="bi bi-hourglass-split"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ใบเสนอราคา</div>
+      <div class="stat-value">{{ pending_count }}</div>
+      <div class="stat-sub">รายการรอยืนยัน</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Recent Payments ── -->
+<div class="dash-card">
+  <div class="dash-card-head">
+    <span class="dash-card-title">
+      <i class="bi bi-clock-history" style="color:var(--blue)"></i>
+      รายการล่าสุด
+    </span>
+    <a href="/salesnotevent/payment/history" class="btn btn-outline-primary btn-sm">
+      ดูทั้งหมด <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="recent-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>เลขที่บิล / ใบเสนอราคา</th>
+          <th>ชื่อลูกค้า</th>
+          <th>วันที่</th>
+          <th>ประเภท</th>
+          <th style="text-align:right">ยอดรวม</th>
+          <th>สถานะ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rp in recent_payments %}
+        <tr>
+          <td style="color:var(--t3); font-size:12px;">{{ forloop.counter }}</td>
+          <td>
+            <a href="/salesnotevent/payment/history/{{ rp.register_id }}"
+               style="font-weight:600; color:var(--blue); text-decoration:none;">
+              {{ rp.rp_doc_number|default:"—" }}
+            </a>
+          </td>
+          <td>{{ rp.rp_name_customer }}</td>
+          <td style="font-size:12px; color:var(--t3);">
+            {{ rp.crt_date|date:"d/m/Y H:i" }}
+          </td>
+          <td style="font-size:12px;">
+            {% if rp.register.pay_type == 1 %}
+              <span class="badge-status badge-y"><i class="bi bi-cash"></i> เงินสด</span>
+            {% else %}
+              <span class="badge-status badge-w"><i class="bi bi-credit-card"></i> เครดิต</span>
+            {% endif %}
+          </td>
+          <td class="amount-cell">
+            ฿{% with total=rp.items.all|first %}{{ total.rpi_price_result|floatformat:0|intcomma }}{% endwith %}
+          </td>
+          <td>
+            {% if rp.register.status == 'Y' %}
+              <span class="badge-status badge-y"><i class="bi bi-check2"></i> สำเร็จ</span>
+            {% elif rp.register.status == 'W' %}
+              <span class="badge-status badge-w"><i class="bi bi-hourglass"></i> รอยืนยัน</span>
+            {% else %}
+              <span class="badge-status badge-default">{{ rp.register.status }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center; color:var(--t3); padding:30px;">
+            <i class="bi bi-inbox" style="font-size:24px;"></i><br>ยังไม่มีรายการ
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
 {% endblock %}
