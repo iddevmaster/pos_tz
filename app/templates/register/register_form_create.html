@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %} {% load humanize %}
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>ผู้เข้าอบรมหลักสูตร : {{main_data.course.course_name}}</h3>
+    <h3>ผู้เข้าอบรมสินค้า : {{main_data.course.course_name}}</h3>
     <span>
       วันอบรม {{main_data.ev_date_start |date:"d/m/Y"}} ถึง
       {{main_data.ev_date_end|date:"d/m/Y"}} รุ่นที่ {{main_data.ev_generation}}

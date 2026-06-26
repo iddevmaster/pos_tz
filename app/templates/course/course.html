@@ -1,354 +1,332 @@
-{% extends 'base.html' %} {% block content %} {% load humanize %}
-<script>
-  function setValueUpdateModal(
-    course_id,
-    course_code,
-    course_name,
-    course_name_eng,
-    active,
-    crt_date,
-    upd_date
-  ) {
-    document.getElementById("course_id_update").value = course_id;
-    document.getElementById("course_code_update").value = course_code;
-    document.getElementById("course_name_update").value = course_name;
-    document.getElementById("course_name_eng_update").value = course_name_eng;
-    document.getElementById("active_update").value = active;
-    document.getElementById("datecrt").innerHTML =
-      "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
-  }
-  function setValueDeleteModal(course_id) {
-    document.getElementById("course_id_delete").value = course_id;
-  }
-</script>
-<div class="row">
-  <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>หลักสูตร</h3>
+{% extends 'base.html' %}{% block content %}{% load humanize %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.product-img-thumb{
+  width:44px; height:44px; border-radius:8px; object-fit:cover;
+  border:1px solid var(--bdr);
+}
+.product-img-placeholder{
+  width:44px; height:44px; border-radius:8px;
+  background:var(--card2); border:1px solid var(--bdr);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--t3); font-size:18px;
+}
+.img-upload-area{
+  border:2px dashed var(--bdr2);
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s;
+  background:var(--card2);
+  position:relative;
+}
+.img-upload-area:hover{ border-color:var(--blue); background:rgba(79,110,247,.04); }
+.img-upload-area input[type=file]{ display:none; }
+.img-preview{
+  width:80px; height:80px; border-radius:10px;
+  object-fit:cover; border:1px solid var(--bdr);
+  margin-bottom:8px;
+}
+.img-remove-btn{
+  position:absolute; top:8px; right:8px;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--red); color:#fff; border:none;
+  font-size:10px; cursor:pointer; display:none;
+  align-items:center; justify-content:center;
+}
+.status-badge{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:20px;
+  font-size:11px; font-weight:600;
+}
+.status-open{ background:rgba(5,150,105,.1); color:var(--green); }
+.status-close{ background:rgba(220,38,38,.1); color:var(--red); }
+</style>
+
+<!-- Header -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h5 class="mb-0 fw-bold" style="color:var(--t1);">
+      <i class="bi bi-box-seam-fill me-2" style="color:var(--blue);"></i>จัดการสินค้า
+    </h5>
+    <small style="color:var(--t3);">ทั้งหมด {{ data|length }} รายการ</small>
   </div>
-  <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="/">หน้าหลัก</a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">หลักสูตร</li>
-      </ol>
-    </nav>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">
+    <i class="bi bi-plus-lg me-1"></i> เพิ่มสินค้า
+  </button>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table mb-0" id="table1">
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th style="width:60px;">รูป</th>
+          <th>รหัสสินค้า</th>
+          <th>ชื่อสินค้า (ไทย)</th>
+          <th>ชื่อสินค้า (Eng)</th>
+          <th style="width:100px;">สถานะ</th>
+          <th style="width:120px; text-align:center;">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for res in data %}
+        <tr>
+          <td style="color:var(--t3);">{{ forloop.counter }}</td>
+          <td>
+            {% if res.image_cover %}
+            <img src="{{ res.image_cover.url }}" class="product-img-thumb" alt="img">
+            {% else %}
+            <div class="product-img-placeholder"><i class="bi bi-image"></i></div>
+            {% endif %}
+          </td>
+          <td style="font-weight:600; color:var(--t1);">{{ res.course_code }}</td>
+          <td>{{ res.course_name }}</td>
+          <td style="color:var(--t2);">{{ res.course_name_eng }}</td>
+          <td>
+            {% if res.active == 1 %}
+            <span class="status-badge status-open"><i class="bi bi-circle-fill" style="font-size:6px;"></i> เปิด</span>
+            {% else %}
+            <span class="status-badge status-close"><i class="bi bi-circle-fill" style="font-size:6px;"></i> ปิด</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex gap-1 justify-content-center">
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="openEdit(
+                  '{{ res.course_id }}',
+                  '{{ res.course_code }}',
+                  '{{ res.course_name|escapejs }}',
+                  '{{ res.course_name_eng|escapejs }}',
+                  '{{ res.active }}',
+                  '{% if res.image_cover %}{{ res.image_cover.url }}{% endif %}'
+                )">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger"
+                onclick="confirmDelete('{{ res.course_id }}', '{{ res.course_name|escapejs }}')">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center; padding:40px; color:var(--t3);">
+            <i class="bi bi-inbox" style="font-size:32px; display:block; margin-bottom:8px;"></i>
+            ยังไม่มีข้อมูลสินค้า
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
-<section class="section">
-  <div class="card">
-    <div class="card-header">
-      <div align="right">
-        <div class="btn-group mb-3" role="group" aria-label="Basic example">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#CreateClick"
-          >
-            <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
-          </button>
-        </div>
+
+<!-- ══ MODAL: สร้าง ══ -->
+<div class="modal fade" id="modalCreate" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle-fill me-2" style="color:var(--blue);"></i>เพิ่มสินค้าใหม่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-    </div>
-    <div class="card-body">
-      <table class="table table-striped" id="table1">
-        <thead>
-          <tr>
-            <th>ลำดับ</th>
-            <th>Item code(Sap)</th>
-            <th>ชื่อหลักสูตรภาษาไทย</th>
-            <th>ชื่อหลักสูตรภาษาอังกฤษ</th>
-            <th>พร้อมทำงาน</th>
-            <th>จัดการ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for res in data %}
-          <tr>
-            <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.course_code}}</td>
-            <td>{{res.course_name}}</td>
-            <td>{{res.course_name_eng}}</td>
+      <form action="{% url 'CreateCourse' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
 
-            <td align="center">
-              {% if res.active == 1 %}
-              <font style="color: blue">เปิด</font>
-              {% else %}
-              <font style="color: red">ปิด</font>
-              {% endif %}
-            </td>
-            <td>
-              <div align="center">
-                <button
-                  type="button"
-                  onclick="setValueUpdateModal('{{res.course_id}}',
-                  '{{res.course_code}}',
-                  '{{res.course_name}}',
-                  '{{res.course_name_eng}}',
-                  '{{res.active}}',
-                  '{{res.crt_date}}',
-                  '{{res.upd_date}}')"
-                  class="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#UpdateClick"
-                >
-                  <i class="icon dripicons-document-edit"></i> แก้ไข
-                </button>
-
-                <button
-                  type="button"
-                  onclick="setValueDeleteModal('{{res.course_id}}')"
-                  class="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#DeleteClick"
-                >
-                  <i class="icon dripicons-trash" aria-hidden="true"></i>
-                  ลบ
-                </button>
+            <!-- รูปภาพ -->
+            <div class="col-12">
+              <label class="form-label">รูปภาพสินค้า</label>
+              <div class="img-upload-area" id="uploadAreaC" onclick="document.getElementById('imgFileC').click()">
+                <button type="button" class="img-remove-btn" id="removeImgC" onclick.stop="removeImg('C')">×</button>
+                <div id="previewWrapC">
+                  <i class="bi bi-cloud-arrow-up-fill" style="font-size:28px; color:var(--t3); display:block; margin-bottom:6px;"></i>
+                  <span style="color:var(--t2); font-size:13px;">คลิกเพื่ออัปโหลดรูป</span><br>
+                  <span style="color:var(--t3); font-size:11px;">PNG, JPG, WEBP ขนาดไม่เกิน 5MB</span>
+                </div>
+                <input type="file" id="imgFileC" name="image_cover" accept="image/*" onchange="previewImg(this,'C')">
               </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+            </div>
 
-{% comment %} Create {% endcomment %}
-<div
-  class="modal fade text-left"
-  id="CreateClick"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="myModalLabel160"
-  aria-hidden="true"
->
-  <div
-    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-    role="document"
-  >
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title white" id="myModalLabel160">เพิ่มข้อมูล</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'CreateCourse' %}" method="post">
-        {% csrf_token %}
-        <div class="modal-body">
-          <div class="form-group">
-            <label>รหัสหลักสูตร</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_code"
-              name="course_code"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>ชื่อหลักสูตรภาษาไทย</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_name"
-              name="course_name"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>ชื่อหลักสูตรภาษาอังกฤษ</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_name_eng"
-              name="course_name_eng"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>เปิด-ปิด</label>
-            <select class="form-control" name="active" id="active" required>
-              <option value="0">ปิด</option>
-              <option value="1" selected>เปิด</option>
-            </select>
+            <div class="col-md-6">
+              <label class="form-label">รหัสสินค้า <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" name="course_code" required placeholder="เช่น WIN11-PRO">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">สถานะ</label>
+              <select class="form-select" name="active">
+                <option value="1" selected>เปิด</option>
+                <option value="0">ปิด</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">ชื่อสินค้า (ไทย) <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" name="course_name" required placeholder="ชื่อภาษาไทย">
+            </div>
+            <div class="col-12">
+              <label class="form-label">ชื่อสินค้า (English)</label>
+              <input type="text" class="form-control" name="course_name_eng" placeholder="Product name in English">
+            </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-light-secondary"
-            data-bs-dismiss="modal"
-          >
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">บันทึก</span>
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>บันทึก</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-{% comment %} Update {% endcomment %}
-<div
-  class="modal fade text-left"
-  id="UpdateClick"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="myModalLabel160"
-  aria-hidden="true"
->
-  <div
-    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-    role="document"
-  >
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title white" id="myModalLabel160">แก้ไขข้อมูล</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'UpdateCourse' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" id="course_id_update" name="course_id" required />
-        <div class="modal-body">
-          <div class="form-group">
-            <label>รหัสหลักสูตร</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_code_update"
-              name="course_code"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>ชื่อหลักสูตรภาษาไทย</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_name_update"
-              name="course_name"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label>ชื่อหลักสูตรภาษาอังกฤษ</label>
-            <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="course_name_eng_update"
-              name="course_name_eng"
-              required
-            />
-          </div>
 
-          <div class="form-group">
-            <label>เปิด-ปิด</label>
-            <select
-              class="form-control"
-              name="active"
-              id="active_update"
-              required
-            >
-              <option value="0">ปิด</option>
-              <option value="1">เปิด</option>
-            </select>
+<!-- ══ MODAL: แก้ไข ══ -->
+<div class="modal fade" id="modalEdit" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil-fill me-2" style="color:var(--orange);"></i>แก้ไขข้อมูลสินค้า</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{% url 'UpdateCourse' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="course_id" id="editCourseId">
+        <div class="modal-body">
+          <div class="row g-3">
+
+            <!-- รูปภาพ -->
+            <div class="col-12">
+              <label class="form-label">รูปภาพสินค้า</label>
+              <div class="img-upload-area" id="uploadAreaE" onclick="document.getElementById('imgFileE').click()">
+                <button type="button" class="img-remove-btn" id="removeImgE" onclick.stop="removeImg('E')">×</button>
+                <div id="previewWrapE">
+                  <i class="bi bi-cloud-arrow-up-fill" style="font-size:28px; color:var(--t3); display:block; margin-bottom:6px;"></i>
+                  <span style="color:var(--t2); font-size:13px;">คลิกเพื่อเปลี่ยนรูป</span>
+                </div>
+                <input type="file" id="imgFileE" name="image_cover" accept="image/*" onchange="previewImg(this,'E')">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">รหัสสินค้า <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" name="course_code" id="editCode" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">สถานะ</label>
+              <select class="form-select" name="active" id="editActive">
+                <option value="1">เปิด</option>
+                <option value="0">ปิด</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">ชื่อสินค้า (ไทย) <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" name="course_name" id="editName" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">ชื่อสินค้า (English)</label>
+              <input type="text" class="form-control" name="course_name_eng" id="editNameEng">
+            </div>
           </div>
-          <p id="datecrt"></p>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-light-secondary"
-            data-bs-dismiss="modal"
-          >
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">ยกเลิก</span>
-          </button>
-          <button type="submit" class="btn btn-primary ml-1">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">บันทึก</span>
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>บันทึก</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-{% comment %} Delete {% endcomment %}
-<div class="modal fade" id="DeleteClick">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header bg-danger">
-        <h5 class="modal-title white" id="myModalLabel19">ลบ</h5>
-        <button
-          type="button"
-          class="close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <form action="{% url 'DeleteCourse' %}" method="post">
-        <div class="modal-body">
-          {% csrf_token %}
-          <input
-            type="hidden"
-            name="course_id"
-            id="course_id_delete"
-            required
-          />
-          <div align="center">
-            <h4>ยืนยันการลบข้อมูล</h4>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-light-secondary"
-              data-bs-dismiss="modal"
-            >
-              <i class="bx bx-x d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยกเลิก</span>
-            </button>
-            <button type="submit" class="btn btn-primary ml-1">
-              <i class="bx bx-check d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">ยืนยันการลบ</span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+
+<!-- ══ MODAL: ลบ (hidden form) ══ -->
+<form id="deleteForm" action="{% url 'DeleteCourse' %}" method="post" style="display:none;">
+  {% csrf_token %}
+  <input type="hidden" name="course_id" id="deleteCourseId">
+</form>
+
+
+<script>
+/* ── Image preview ── */
+function previewImg(input, key){
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const wrap = document.getElementById('previewWrap' + key);
+    wrap.innerHTML = `<img src="${e.target.result}" class="img-preview">
+                      <div style="font-size:11px;color:var(--t2);">คลิกเพื่อเปลี่ยนรูป</div>`;
+    document.getElementById('removeImg' + key).style.display = 'flex';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removeImg(key){
+  event.stopPropagation();
+  document.getElementById('imgFile' + key).value = '';
+  const wrap = document.getElementById('previewWrap' + key);
+  document.getElementById('removeImg' + key).style.display = 'none';
+  if(key === 'C'){
+    wrap.innerHTML = `<i class="bi bi-cloud-arrow-up-fill" style="font-size:28px;color:var(--t3);display:block;margin-bottom:6px;"></i>
+                      <span style="color:var(--t2);font-size:13px;">คลิกเพื่ออัปโหลดรูป</span><br>
+                      <span style="color:var(--t3);font-size:11px;">PNG, JPG, WEBP ขนาดไม่เกิน 5MB</span>`;
+  } else {
+    wrap.innerHTML = `<i class="bi bi-cloud-arrow-up-fill" style="font-size:28px;color:var(--t3);display:block;margin-bottom:6px;"></i>
+                      <span style="color:var(--t2);font-size:13px;">คลิกเพื่อเปลี่ยนรูป</span>`;
+  }
+}
+
+/* ── Open edit modal ── */
+function openEdit(id, code, name, nameEng, active, imgUrl){
+  document.getElementById('editCourseId').value = id;
+  document.getElementById('editCode').value     = code;
+  document.getElementById('editName').value     = name;
+  document.getElementById('editNameEng').value  = nameEng;
+  document.getElementById('editActive').value   = active;
+
+  // set image preview
+  const wrap = document.getElementById('previewWrapE');
+  const rmBtn = document.getElementById('removeImgE');
+  if(imgUrl){
+    wrap.innerHTML = `<img src="${imgUrl}" class="img-preview">
+                      <div style="font-size:11px;color:var(--t2);">คลิกเพื่อเปลี่ยนรูป</div>`;
+    rmBtn.style.display = 'flex';
+  } else {
+    wrap.innerHTML = `<i class="bi bi-cloud-arrow-up-fill" style="font-size:28px;color:var(--t3);display:block;margin-bottom:6px;"></i>
+                      <span style="color:var(--t2);font-size:13px;">คลิกเพื่อเปลี่ยนรูป</span>`;
+    rmBtn.style.display = 'none';
+  }
+  document.getElementById('imgFileE').value = '';
+
+  new bootstrap.Modal(document.getElementById('modalEdit')).show();
+}
+
+/* ── Confirm delete ── */
+async function confirmDelete(id, name){
+  const result = await Swal.fire({
+    title: 'ยืนยันการลบ?',
+    html: `ลบสินค้า <b>${name}</b> ?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    confirmButtonText: 'ลบ',
+    cancelButtonText: 'ยกเลิก',
+  });
+  if(result.isConfirmed){
+    document.getElementById('deleteCourseId').value = id;
+    document.getElementById('deleteForm').submit();
+  }
+}
+
+/* ── Reset create modal on close ── */
+document.getElementById('modalCreate').addEventListener('hidden.bs.modal', () => {
+  removeImg('C');
+  document.getElementById('modalCreate').querySelector('form').reset();
+});
+</script>
 
 {% endblock %}

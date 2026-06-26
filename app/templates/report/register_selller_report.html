@@ -97,9 +97,9 @@
           </div>
 
           <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">หลักสูตร</label>
+            <label for="x" class="form-label">สินค้า</label>
             <select class="form-select select2" id="qcourse" name="qcourse">
-              <option value="0">-หลักสูตรทั้งหมด-</option>
+              <option value="0">-สินค้าทั้งหมด-</option>
               {% for res1 in course_list %}
               <option value="{{res1.course_id}}">
                 {{res1.course_code}} {{res1.course_name}}

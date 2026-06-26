@@ -58,6 +58,7 @@ class user_detail(models.Model):
     cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+@cleanup.select
 class  course(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_code = models.CharField(max_length=128, blank=True, default=None)
@@ -72,6 +73,8 @@ class  course(models.Model):
     is_show_order = models.CharField(max_length=12, blank=True, default=None)
     is_type_condition = models.CharField(max_length=12, blank=True, default=None)
     is_show_condition = models.CharField(max_length=12, blank=True, default=None)
+    image_cover = models.ImageField(
+        upload_to=generate_unique_name('images/course'), blank=True, null=True, default=None)
 
 # ev_vat  0  =ไม่รวม Vat,1 = รวม Vat
 
@@ -218,9 +221,9 @@ class customers(models.Model):
     customer_email = models.CharField(max_length=64, blank=True, default=None)
     customer_address = models.CharField(
         max_length=512, blank=True, default=None)
-    location = models.ForeignKey(
-        location_thai, on_delete=models.CASCADE)
-    register = models.ForeignKey(register_main, on_delete=models.CASCADE)
+    location_id = models.IntegerField(default=0, blank=True)
+    # 1=บุคคล, 2=บริษัท
+    customer_type = models.IntegerField(default=1, blank=True)
 
 class fact_customer(models.Model):
     fact_cus_id = models.AutoField(primary_key=True)
@@ -327,7 +330,7 @@ class billing_cycle_setting(models.Model):
     bcs_end_day  = models.IntegerField(default=0, blank=False)
     module = models.CharField(max_length=12, blank=True, default=defaultModule)
     
-# student_learning_status  0 = ยังไม่จบหลักสูตร , 1  = จบหลักสูตรแล้ว
+# student_learning_status  0 = ยังไม่จบสินค้า , 1  = จบสินค้าแล้ว
 class student(models.Model):
     student_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)

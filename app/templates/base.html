@@ -1,1606 +1,862 @@
 {% load static %} {% load ex_functions %}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>{{title}}</title>
-    <link
-      rel="shortcut icon"
-      type="image/png"
-      href="{% static 'images/logo.png' %}"
-    />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}" />
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{{title}}</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}"/>
 
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendors/dripicons/webfont.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/css/pages/dripicons.css' %}"
-    />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.css' %}"
-    />
+  <!-- Bootstrap + Plugins CSS -->
+  <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/css/app.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/bootstrap-icons/bootstrap-icons.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/dripicons/webfont.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/css/pages/dripicons.css' %}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/choices.js/choices.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/toastify/toastify.css' %}"/>
+  <link rel="stylesheet" href="{% static 'assets/vendors/simple-datatables/style.css' %}"/>
+  <link rel="stylesheet" href="{% static 'libs/fullcalendar_5.111.3/lib/main.css' %}"/>
+  <link rel="stylesheet" href="{% static 'libs/daterangepicker/daterangepicker.css' %}"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
 
-    <link rel="stylesheet" href="{% static 'assets/css/app.css' %}" />
+  <!-- jQuery -->
+  <script src="{% static 'libs/js/jquery_210.min.js' %}"></script>
+  <script src="{% static 'libs/daterangepicker/jquery/3.3.1/jquery.js' %}"></script>
+  <script src="{% static 'libs/daterangepicker/moment.js/2.22.1/moment.min.js' %}"></script>
+  <script src="{% static 'libs/daterangepicker/daterangepicker.js' %}"></script>
+  <script src="{% static 'libs/fullcalendar_5.111.3/lib/main.js' %}"></script>
+  <script src="{% static 'libs/fullcalendar_5.111.3/lib/locales-all.js' %}"></script>
 
-    <!-- Include Choices CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendors/choices.js/choices.min.css' %}"
-    />
+  <style>
+    /* ── DESIGN TOKENS (Light Theme) ── */
+    :root{
+      --bg:#f0f4f8; --panel:#ffffff; --card:#ffffff; --card2:#f8fafc;
+      --bdr:rgba(0,0,0,.08); --bdr2:rgba(0,0,0,.12);
+      --blue:#4f6ef7; --blue2:#3b5de8; --violet:#7c3aed;
+      --green:#059669; --orange:#d97706; --red:#dc2626; --cyan:#0891b2;
+      --t1:#1e293b; --t2:#64748b; --t3:#94a3b8;
+      --radius:10px; --sidebar-w:220px;
+    }
 
-    <!-- Include Toastify CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendors/toastify/toastify.css' %}"
-    />
-    <!-- Include Datable CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/vendors/simple-datatables/style.css' %}"
-    />
-    <script src="{% static 'libs/js/jquery_210.min.js' %}"></script>
-    {% comment %} date picker
-    https://onlymycode.blogspot.com/2020/05/datepickerth.html {% endcomment %}
+    /* ── RESET ── */
+    *{box-sizing:border-box;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+    ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
 
-    <link
-      href="{% static 'libs/fullcalendar_5.111.3/lib/main.css' %}"
-      rel="stylesheet"
-    />
-    <script src="{% static 'libs/fullcalendar_5.111.3/lib/main.js' %}"></script>
-    <script src="{% static 'libs/fullcalendar_5.111.3/lib/locales-all.js' %}"></script>
-    <!-- Select2 CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
-      rel="stylesheet"
-    />
+    /* ── BODY ── */
+    body{
+      font-family:'Sarabun',system-ui,sans-serif !important;
+      font-size:14px;
+      background:var(--bg) !important;
+      background-image:none !important;
+      color:var(--t1);
+    }
 
-    <link
-      rel="stylesheet"
-      type="text/css"
-      media="all"
-      href="{% static 'libs/daterangepicker/daterangepicker.css' %}"
-    />
+    /* ── MAZER SIDEBAR OVERRIDE ── */
+    #app { display:flex; min-height:100vh; }
 
-    <script
-      type="text/javascript"
-      src="{% static 'libs/daterangepicker/jquery/3.3.1/jquery.js' %}"
-    ></script>
+    /* Override Mazer's white sidebar */
+    .sidebar-wrapper {
+      background:var(--panel) !important;
+      width:var(--sidebar-w) !important;
+      border-right:1px solid var(--bdr) !important;
+      box-shadow:2px 0 12px rgba(0,0,0,.06) !important;
+    }
+    #sidebar:not(.active) .sidebar-wrapper { left:calc(-1 * var(--sidebar-w)) !important; }
+    #main {
+      margin-left:var(--sidebar-w) !important;
+      padding:0 !important;
+      background:var(--bg);
+      flex:1 !important;
+      min-width:0 !important;
+      width:calc(100% - var(--sidebar-w)) !important;
+      min-height:100vh;
+    }
+    #sidebar:not(.active) ~ #main {
+      margin-left:0 !important;
+      width:100% !important;
+    }
 
-    <script
-      type="text/javascript"
-      src="{% static 'libs/daterangepicker/moment.js/2.22.1/moment.min.js' %}"
-    ></script>
+    /* Sidebar header */
+    .sidebar-wrapper .sidebar-header {
+      padding:0 !important;
+      background:transparent !important;
+    }
 
-    <script
-      type="text/javascript"
-      src="{% static 'libs/daterangepicker/daterangepicker.js' %}"
-    ></script>
+    .sb-logo-area {
+      display:flex; align-items:center; gap:11px;
+      padding:18px 16px 16px;
+      border-bottom:1px solid var(--bdr);
+    }
 
-     <script>
+    .sb-logo-icon {
+      width:36px; height:36px; border-radius:9px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--blue),var(--violet));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:13px; color:#fff;
+      box-shadow:0 0 14px rgba(91,141,246,.3);
+    }
 
+    .sb-brand { font-size:13px; font-weight:700; color:var(--t1); line-height:1.2; }
+    .sb-user  { font-size:11px; color:var(--t3); margin-top:2px; }
 
-  
+    /* Menu section title */
+    .sidebar-wrapper .menu .sidebar-title {
+      font-size:9px !important; font-weight:700 !important;
+      letter-spacing:1px !important; text-transform:uppercase !important;
+      color:var(--t3) !important;
+      padding:14px 16px 5px !important; margin:0 !important;
+      list-style:none;
+    }
 
-      document.addEventListener('DOMContentLoaded', fetchNotifications);
+    /* Menu item wrapper */
+    .sidebar-wrapper .menu .sidebar-item {
+      margin:2px 8px !important;
+      border-radius:9px !important;
+      list-style:none !important;
+      position:relative !important;
+    }
 
+    /* Sidebar link */
+    .sidebar-wrapper .menu .sidebar-link {
+      display:flex !important; align-items:center !important; gap:10px !important;
+      padding:9px 12px !important;
+      border-radius:9px !important;
+      color:var(--t2) !important;
+      font-size:13px !important; font-weight:500 !important;
+      text-decoration:none !important;
+      transition:all .15s !important;
+      cursor:pointer;
+    }
 
-// หรือตั้งเวลาให้ดึงข้อมูลทุกๆ 1 นาที (Polling)
+    .sidebar-wrapper .menu .sidebar-link i,
+    .sidebar-wrapper .menu .sidebar-link svg,
+    .sidebar-wrapper .menu .sidebar-link .icon {
+      font-size:16px !important;
+      color:var(--t3) !important;
+      width:18px; text-align:center; flex-shrink:0;
+    }
+
+    .sidebar-wrapper .menu .sidebar-link span {
+      color:var(--t2) !important;
+      margin-left:0 !important;
+      font-size:13px;
+    }
+
+    .sidebar-wrapper .menu .sidebar-link:hover {
+      background:rgba(91,141,246,.1) !important;
+      color:var(--blue) !important;
+    }
+
+    .sidebar-wrapper .menu .sidebar-link:hover i,
+    .sidebar-wrapper .menu .sidebar-link:hover svg,
+    .sidebar-wrapper .menu .sidebar-link:hover span,
+    .sidebar-wrapper .menu .sidebar-link:hover .icon {
+      color:var(--blue) !important;
+    }
+
+    /* Active sidebar item */
+    .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link {
+      background:rgba(91,141,246,.15) !important;
+      color:var(--blue) !important;
+    }
+
+    .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link i,
+    .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link svg,
+    .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link span,
+    .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link .icon {
+      color:var(--blue) !important; fill:var(--blue) !important;
+    }
+
+    /* has-sub chevron */
+    .sidebar-wrapper .menu .sidebar-item.has-sub .sidebar-link:after {
+      content:'\f107' !important;
+      font-family:'Font Awesome 6 Free' !important; font-weight:900 !important;
+      color:var(--t3) !important; font-size:11px !important;
+      position:absolute !important; right:12px !important;
+      top:50% !important; transform:translateY(-50%) !important;
+      transition:transform .2s !important;
+    }
+
+    .sidebar-wrapper .menu .sidebar-item.has-sub.active .sidebar-link:after {
+      transform:translateY(-50%) rotate(180deg) !important;
+      color:var(--blue) !important;
+    }
+
+    /* Submenu */
+    .sidebar-wrapper .menu .submenu {
+      list-style:none !important;
+      padding:3px 0 3px 30px !important;
+      margin:0 !important;
+    }
+
+    .sidebar-wrapper .menu .submenu .submenu-item {
+      list-style:none; margin:1px 0; border-radius:7px;
+    }
+
+    .sidebar-wrapper .menu .submenu .submenu-item a {
+      display:block;
+      font-size:12px !important; font-weight:400 !important;
+      color:var(--t3) !important;
+      padding:6px 12px !important; border-radius:7px;
+      letter-spacing:0 !important;
+      transition:all .15s !important;
+    }
+
+    .sidebar-wrapper .menu .submenu .submenu-item a:hover {
+      background:rgba(91,141,246,.08) !important;
+      color:var(--t2) !important;
+      margin-left:0 !important;
+    }
+
+    .sidebar-wrapper .menu .submenu .submenu-item.active-menu > a,
+    .sidebar-wrapper .menu .submenu .submenu-item.active > a {
+      background:rgba(91,141,246,.12) !important;
+      color:var(--blue) !important; font-weight:600 !important;
+      border-left:2px solid var(--blue) !important;
+      padding-left:10px !important;
+    }
+
+    /* Sidebar bottom area */
+    .sidebar-wrapper .sidebar-toggler.x {
+      display:none !important;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      height:56px; padding:0 20px;
+      background:var(--panel);
+      border-bottom:1px solid var(--bdr);
+      box-shadow:0 1px 6px rgba(0,0,0,.06);
+      position:sticky; top:0; z-index:500;
+    }
+
+    .topbar-left { display:flex; align-items:center; gap:12px; }
+
+    .page-title-text {
+      font-size:15px; font-weight:700; color:var(--t1); white-space:nowrap;
+    }
+    .page-title-text b { color:var(--blue); }
+
+    .topbar-right { display:flex; align-items:center; gap:8px; }
+
+    /* Icon button (เหมือน .ib ใน pos.html) */
+    .ib{
+      width:34px; height:34px; border-radius:9px;
+      background:var(--card); border:1px solid var(--bdr);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--t2); font-size:15px;
+      transition:all .15s; flex-shrink:0;
+    }
+    .ib:hover{ border-color:var(--blue); color:var(--blue); }
+
+    /* Bell badge */
+    .ib.bell-wrap { position:relative; }
+    .ib.bell-wrap .badge2x{
+      position:absolute; top:-5px; right:-5px;
+      background:var(--red); color:#fff;
+      border-radius:50%; width:16px; height:16px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:9px; font-weight:700; border:2px solid var(--panel);
+    }
+
+    /* User avatar */
+    .av{
+      width:32px; height:32px; border-radius:50%;
+      background:linear-gradient(135deg,var(--blue),var(--violet));
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:#fff; cursor:pointer;
+      flex-shrink:0; title:attr(title);
+    }
+
+    /* Hamburger */
+    .hamburger-btn{
+      display:none; flex-direction:column; justify-content:center;
+      gap:5px; width:34px; height:34px;
+      background:var(--card); border:1px solid var(--bdr);
+      border-radius:9px; cursor:pointer; padding:8px;
+      transition:all .15s;
+    }
+    .hamburger-btn:hover{ border-color:var(--blue); }
+    .hamburger-btn span{
+      display:block; width:100%; height:2px;
+      background:var(--t2); border-radius:2px; transition:all .3s;
+    }
+    .hamburger-btn.is-active span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+    .hamburger-btn.is-active span:nth-child(2){ opacity:0; }
+    .hamburger-btn.is-active span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+    /* ── PAGE CONTENT ── */
+    .page-content-wrapper{
+      padding:20px;
+      min-height:calc(100vh - 56px);
+    }
+
+    /* ── CARDS ── */
+    .card{
+      background:var(--card) !important;
+      border:1px solid var(--bdr) !important;
+      border-radius:var(--radius) !important;
+      color:var(--t1) !important;
+      box-shadow:0 1px 4px rgba(0,0,0,.06) !important;
+    }
+    .card .card-header{
+      background:var(--card2) !important;
+      border-bottom:1px solid var(--bdr) !important;
+      border-radius:var(--radius) var(--radius) 0 0 !important;
+      color:var(--t1) !important; font-weight:600 !important;
+    }
+    .card .card-body { color:var(--t1); }
+    .card .card-title { color:var(--t1) !important; }
+
+    /* ── TABLES ── */
+    .table{
+      color:var(--t1) !important; font-size:13px;
+      border-color:var(--bdr) !important;
+    }
+    .table thead th{
+      background:var(--card2) !important;
+      color:var(--t2) !important; font-weight:600 !important;
+      font-size:11px !important; text-transform:uppercase !important;
+      letter-spacing:.5px !important;
+      border-bottom:1px solid var(--bdr2) !important;
+      white-space:nowrap;
+    }
+    .table td, .table th{
+      border-color:var(--bdr) !important;
+      vertical-align:middle !important;
+    }
+    .table tbody tr:hover{
+      background:rgba(91,141,246,.05) !important;
+    }
+    .table-striped > tbody > tr:nth-of-type(odd) > *{
+      background:rgba(0,0,0,.02) !important;
+      color:var(--t1) !important;
+    }
+
+    /* ── FORMS ── */
+    .form-control, .form-select{
+      background:var(--card2) !important;
+      border:1px solid var(--bdr2) !important;
+      color:var(--t1) !important; font-size:13px;
+      border-radius:8px !important;
+      font-family:'Sarabun',sans-serif;
+    }
+    .form-control::placeholder{ color:var(--t3) !important; }
+    .form-control:focus, .form-select:focus{
+      background:var(--card2) !important;
+      border-color:var(--blue) !important;
+      box-shadow:0 0 0 3px rgba(91,141,246,.15) !important;
+      color:var(--t1) !important;
+    }
+    .form-select option{ background:var(--card2); color:var(--t1); }
+    label{ color:var(--t2) !important; font-size:12px !important; font-weight:600 !important; }
+    .form-group label{ color:var(--t2) !important; }
+
+    /* Select2 dark */
+    .select2-container .select2-selection--single{
+      background:var(--card2) !important; border:1px solid var(--bdr2) !important;
+      height:38px !important; border-radius:8px !important;
+    }
+    .select2-selection__rendered{ color:var(--t1) !important; line-height:38px !important; }
+    .select2-selection__arrow{ height:38px !important; }
+    .select2-dropdown{
+      background:var(--card2) !important; border:1px solid var(--bdr2) !important;
+      border-radius:8px !important;
+    }
+    .select2-search__field{
+      background:var(--card) !important; color:var(--t1) !important;
+      border:1px solid var(--bdr2) !important;
+    }
+    .select2-results__option{ color:var(--t2) !important; }
+    .select2-results__option--highlighted{ background:rgba(91,141,246,.2) !important; color:var(--blue) !important; }
+
+    /* ── BUTTONS ── */
+    .btn{ font-family:'Sarabun',sans-serif !important; font-size:13px; }
+    .btn-primary{ background:var(--blue) !important; border-color:var(--blue) !important; }
+    .btn-primary:hover{ background:var(--blue2) !important; border-color:var(--blue2) !important; }
+    .btn-success{ background:var(--green) !important; border-color:var(--green) !important; }
+    .btn-danger{ background:var(--red) !important; border-color:var(--red) !important; }
+    .btn-secondary{
+      background:var(--card2) !important; border:1px solid var(--bdr2) !important;
+      color:var(--t2) !important;
+    }
+    .btn-secondary:hover{ color:var(--t1) !important; }
+    .btn-outline-primary{ border-color:var(--blue) !important; color:var(--blue) !important; }
+    .btn-outline-primary:hover{ background:rgba(91,141,246,.15) !important; }
+
+    /* ── MODALS ── */
+    .modal-content{
+      background:var(--panel) !important;
+      border:1px solid var(--bdr2) !important;
+      border-radius:16px !important; color:var(--t1) !important;
+    }
+    .modal-header{
+      border-bottom:1px solid var(--bdr) !important;
+      color:var(--t1) !important;
+    }
+    .modal-footer{ border-top:1px solid var(--bdr) !important; }
+    .modal-title{ color:var(--t1) !important; }
+    .btn-close{ filter:none; opacity:.6; }
+
+    /* ── NOTIFICATION MODAL ── */
+    .nmodal-overlay{
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.65); z-index:2000;
+      align-items:center; justify-content:center;
+    }
+    .nmodal-overlay.show{ display:flex; }
+
+    .nmodal-box{
+      background:var(--panel); border:1px solid var(--bdr2);
+      border-radius:16px; width:90%; max-width:420px;
+      max-height:80vh; overflow:hidden; display:flex;
+      flex-direction:column; position:relative;
+      animation:slideDown .25s ease;
+    }
+
+    @keyframes slideDown{
+      from{ transform:translateY(-16px); opacity:0; }
+      to{ transform:translateY(0); opacity:1; }
+    }
+
+    .nmodal-close{
+      position:absolute; top:12px; right:12px;
+      width:26px; height:26px; border-radius:50%;
+      background:var(--card2); border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; color:var(--t2); transition:all .2s;
+    }
+    .nmodal-close:hover{ background:var(--card); color:var(--t1); transform:rotate(90deg); }
+
+    .nmodal-head{
+      padding:14px 18px; border-bottom:1px solid var(--bdr);
+      display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
+    }
+    .nmodal-head h3{ margin:0; font-size:14px; font-weight:700; color:var(--t1); }
+    .mark-all-read{ font-size:11px; color:var(--blue); cursor:pointer; font-weight:500; }
+    .mark-all-read:hover{ text-decoration:underline; }
+
+    .ntabs{ display:flex; border-bottom:1px solid var(--bdr); flex-shrink:0; }
+    .ntab{
+      flex:1; padding:10px; text-align:center; cursor:pointer;
+      font-size:12px; font-weight:600; color:var(--t3);
+      border-bottom:2px solid transparent; transition:all .15s;
+    }
+    .ntab:hover{ color:var(--t2); }
+    .ntab.active{ color:var(--blue); border-bottom-color:var(--blue); }
+
+    .notification-list{ overflow-y:auto; flex:1; }
+
+    .notification-item{
+      display:flex; gap:10px; padding:11px 18px;
+      border-bottom:1px solid var(--bdr);
+      cursor:pointer; transition:background .15s;
+    }
+    .notification-item:hover{ background:rgba(0,0,0,.03); }
+    .notification-item.unread{ background:rgba(91,141,246,.07); }
+
+    .notification-icon{
+      width:34px; height:34px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .notification-icon.manager{ background:rgba(245,158,11,.12); }
+    .notification-icon.director{ background:rgba(6,182,212,.12); }
+    .notification-icon.sale{ background:rgba(16,185,129,.12); }
+    .notification-icon svg{ width:16px; height:16px; }
+
+    .notification-content{ flex:1; min-width:0; }
+    .notification-title{ font-size:12px; font-weight:700; color:var(--t1); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .notification-message{ font-size:11px; color:var(--t3); line-height:1.4; }
+    .notification-time{ font-size:10px; color:var(--t3); margin-top:3px; }
+    .unread-dot{ width:6px; height:6px; background:var(--blue); border-radius:50%; flex-shrink:0; margin-top:12px; }
+
+    /* ── MISC ── */
+    .page-heading{ margin:0 0 1.5rem; }
+    .cutword{ white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:200px; }
+    .modal-dialog{ position:relative; display:table; overflow-y:auto; overflow-x:auto; width:auto; min-width:600px; }
+    .error{ color:var(--red); }
+    .select2{ width:100% !important; }
+    #calendar{ max-width:1100px; margin:40px auto; padding:0 10px; }
+
+    /* Datatable */
+    .dataTable-wrapper{ color:var(--t1); }
+    .dataTable-input{
+      background:var(--card2) !important; border:1px solid var(--bdr2) !important;
+      color:var(--t1) !important; border-radius:8px !important;
+    }
+    .dataTable-selector{
+      background:var(--card2) !important; border:1px solid var(--bdr2) !important;
+      color:var(--t1) !important;
+    }
+    .dataTable-pagination a{ color:var(--t2) !important; }
+    .dataTable-pagination a:hover{ color:var(--blue) !important; }
+
+    /* Alert */
+    .alert{ border-radius:var(--radius) !important; }
+
+    /* Badge */
+    .badge{ font-size:10px; font-weight:600; }
+
+    /* Input group */
+    .input-group-text{
+      background:var(--card2) !important; border-color:var(--bdr2) !important;
+      color:var(--t2) !important;
+    }
+
+    /* Pagination */
+    .page-link{
+      background:var(--card2) !important; border-color:var(--bdr) !important;
+      color:var(--t2) !important;
+    }
+    .page-link:hover{ color:var(--blue) !important; }
+    .page-item.active .page-link{ background:var(--blue) !important; border-color:var(--blue) !important; color:#fff !important; }
+
+    /* ── RESPONSIVE ── */
+    @media screen and (max-width:1199px){
+      #main{ margin-left:0 !important; }
+      .hamburger-btn{ display:flex; }
+    }
+    @media screen and (min-width:1200px){
+      .hamburger-btn{ display:none; }
+    }
+    @media (max-width:768px){
+      .page-content-wrapper{ padding:14px; }
+      .topbar{ padding:0 14px; }
+      .topbar-user-name{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <div id="sidebar" class="active">
+    <div class="sidebar-wrapper active">
+
+      <!-- Logo / Brand -->
+      <div class="sidebar-header">
+        <div class="sb-logo-area">
+          <div class="sb-logo-icon">POS</div>
+          <div>
+            <div class="sb-brand">{{title}}</div>
+            <div class="sb-user">{{ user.first_name }} {{ user.last_name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu -->
+      <div class="sidebar-menu">
+        <ul class="menu">
+
+          <li class="sidebar-title">
+            <a href="#" class="sidebar-hide d-xl-none d-block" style="text-align:right; color:var(--t3); font-size:11px;">
+              <i class="bi bi-x-lg"></i> ซ่อน
+            </a>
+          </li>
+
+          <li class="sidebar-title">เมนูหลัก</li>
+
+          <li class="{% if request.path == '/' %}sidebar-item active{% else %}sidebar-item{% endif %}">
+            <a href="/" class="sidebar-link">
+              <i class="bi bi-grid-1x2-fill"></i>
+              <span>หน้าหลัก</span>
+            </a>
+          </li>
+
+          <li class="{% if request.path == '/salesnotevent' %}sidebar-item active{% else %}sidebar-item{% endif %}">
+            <a href="/salesnotevent" class="sidebar-link">
+              <i class="bi bi-bag-check-fill"></i>
+              <span>เปิดการขาย</span>
+            </a>
+          </li>
+
+          {% for rs in listMenuPermission %}
+          <li class="{% if request.path|contains_parent == rs.group_value %}sidebar-item active has-sub{% else %}sidebar-item has-sub{% endif %}">
+            <a href="#" class="sidebar-link">
+              <i class="bi bi-layers-fill"></i>
+              <span>{{rs.group_label}}</span>
+            </a>
+            <ul class="{% if request.path|contains_parent == rs.group_value %}submenu active{% else %}submenu{% endif %}">
+              {% for rsc in rs.children %}
+              <li class="{% if request.path|contains:rsc.page_route %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/{{rsc.page_route}}">{{rsc.page_label}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endfor %}
+
+          {% if user.is_staff == 1 %}
+          <li class="sidebar-title">ผู้ดูแลระบบ</li>
+
+          <li class="{% if request.path == '/user/category/list' %}sidebar-item active{% else %}sidebar-item{% endif %}">
+            <a href="/user/category/list" class="sidebar-link">
+              <i class="bi bi-people-fill"></i>
+              <span>กลุ่มผู้ใช้งาน</span>
+            </a>
+          </li>
+
+          <li class="sidebar-item has-sub">
+            <a href="#" class="sidebar-link">
+              <i class="bi bi-gear-fill"></i>
+              <span>ตั้งค่า</span>
+            </a>
+            <ul class="submenu">
+              <li class="submenu-item"><a href="/description/setting/form/create">ตั้งค่าการฝึกอบรม</a></li>
+              <li class="submenu-item"><a href="/tax/setting/form/create">ตั้งค่าภาษี</a></li>
+              <li class="submenu-item"><a href="/setting/form/bill/create">ตั้งค่าบิล</a></li>
+              <li class="submenu-item"><a href="/commissionstages/setting/form">ตั้งค่าคอม</a></li>
+            </ul>
+          </li>
+          {% endif %}
+
+          <li class="sidebar-title">บัญชี</li>
+
+          <li class="sidebar-item">
+            <a href="/logout" class="sidebar-link">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>ออกจากระบบ</span>
+            </a>
+          </li>
+
+        </ul>
+      </div>
+
+      <button class="sidebar-toggler btn x" style="display:none;"><i data-feather="x"></i></button>
+    </div>
+  </div>
+  <!-- ═══════════ END SIDEBAR ═══════════ -->
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <div id="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="page-title-text">POS<b>IDC</b></div>
+      </div>
+      <div class="topbar-right">
+        <div class="ib bell-wrap" id="bellIcon" title="การแจ้งเตือน">
+          <i class="bi bi-bell-fill"></i>
+          <span class="badge2x" id="badge2x">0</span>
+        </div>
+        <div class="av" title="{{ user.first_name }} {{ user.last_name }}">
+          {{user.first_name|slice:":1"}}{{user.last_name|slice:":1"}}
+        </div>
+        <span class="topbar-user-name" style="font-size:12px; color:var(--t2); white-space:nowrap;">
+          {{ user.first_name }} {{ user.last_name }}
+        </span>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="page-content-wrapper">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="nmodal-overlay" id="notificationModal">
+      <div class="nmodal-box">
+        <button class="nmodal-close" id="modalClose"><i class="bi bi-x"></i></button>
+        <div class="nmodal-head">
+          <h3><i class="bi bi-bell" style="color:var(--blue);margin-right:6px;"></i>การแจ้งเตือน</h3>
+          <a href="#" class="mark-all-read" id="markAllRead">อ่านทั้งหมด</a>
+        </div>
+        <div class="ntabs">
+          <div class="ntab active">ทั้งหมด (0)</div>
+          <div class="ntab">ยังไม่อ่าน (0)</div>
+        </div>
+        <div class="notification-list"></div>
+      </div>
+    </div>
+
+  </div>
+  <!-- ═══════════ END MAIN ═══════════ -->
+
+</div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendors/choices.js/choices.min.js' %}"></script>
+<script src="{% static 'assets/js/pages/form-element-select.js' %}"></script>
+<script src="{% static 'assets/vendors/toastify/toastify.js' %}"></script>
+<script src="{% static 'assets/vendors/simple-datatables/simple-datatables.js' %}"></script>
+<script src="{% static 'assets/js/mazer.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+<script>
+/* ── HAMBURGER ── */
+document.getElementById('hamburger-btn').addEventListener('click', function(){
+  this.classList.toggle('is-active');
+  document.getElementById('sidebar').classList.toggle('active');
+});
+
+/* ── NOTIFICATION SYSTEM ── */
+let allNotificationsData={total_count:0,unread_count:0,notifications:[]};
+let total=0, unread=0;
+
+document.addEventListener('DOMContentLoaded', fetchNotifications);
 setInterval(fetchNotifications, 100000);
 
-      async function fetchNotifications() {
-
-
-
-        try {
-        const response = await fetch('/api/notifications'); // แก้ URL ให้ตรงกับ urls.py
-        const data = await response.json();
-
-
-         allNotificationsData = {
-    "total_count": data.total,
-    "unread_count": data.unread,
-    "notifications": data.data
-};
-total = data.total
-unread = data.unread
-
-
-   const badgeElement = document.getElementById('badge2x');
-   badgeElement.innerText = data.unread; 
-        renderNotifications(data.data,total,unread)
-
-        initTabEvents();
-
-       
-
-        // // 1. อัปเดตตัวเลขที่ Badge
-        // const badge = document.querySelector('.badge');
-        // if (badge) {
-        //     badge.textContent = data.unread_count;
-        //     badge.style.display = data.unread_count > 0 ? 'flex' : 'none';
-        // }
-
-        // // 2. ล้างรายการเก่าและเพิ่มรายการใหม่
-        // const listContainer = document.querySelector('.notification-list');
-        // if (data.notifications.length === 0) {
-        //     listContainer.innerHTML = '<div class="empty-state">ไม่มีการแจ้งเตือนใหม่</div>';
-        //     return;
-        // }
-
-        // listContainer.innerHTML = ''; // ล้างรายการเดิม
-        // data.notifications.forEach(item => {
-        //     const html = `
-        //         <div class="notification-item unread" onclick="markAsRead(${item.id})">
-        //             <div class="notification-icon ${item.type.toLowerCase()}">
-        //                 <svg viewBox="0 0 24 24" fill="#856404"><path d="M12 2L1 21h22L12 2z"/></svg>
-        //             </div>
-        //             <div class="notification-content">
-        //                 <div class="notification-title">${item.title}</div>
-        //                 <div class="notification-message">${item.message}</div>
-        //                 <div class="notification-time">${item.time}</div>
-        //             </div>
-        //             <div class="unread-dot"></div>
-        //         </div>
-        //     `;
-        //     listContainer.insertAdjacentHTML('beforeend', html);
-        // });
-
-    } catch (error) {
-        console.error('Error fetching notifications:', error);
-    }
-      }
-        document.addEventListener('DOMContentLoaded', function() {
-
-          
-            const bellIcon = document.getElementById('bellIcon');
-            const modalOverlay = document.getElementById('notificationModal');
-            const modalClose = document.getElementById('modalClose');
-
-            // Open modal when bell is clicked
-            if (bellIcon) {
-                bellIcon.addEventListener('click', function() {
-                    modalOverlay.classList.add('active');
-                });
-            }
-
-            // Close modal when close button is clicked
-            if (modalClose) {
-                modalClose.addEventListener('click', function() {
-                    modalOverlay.classList.remove('active');
-                });
-            }
-
-            // Close modal when clicking outside
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) {
-                    modalOverlay.classList.remove('active');
-                }
-            });
-
-            // Close modal with Escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    modalOverlay.classList.remove('active');
-                }
-            });
-
-            // Mark all as read functionality
-            const markAllRead = document.getElementById('markAllRead');
-            if (markAllRead) {
-
-              ///check จำนวนไม่อ่านก่อน
-           
-
-                markAllRead.addEventListener('click', function(e) {
-                
-                  if(unread != 0){
-
-                               initTabEvents()
-                  const response = fetch('/api/notifications/read'); // แก้ URL ให้ตรงกับ urls.py
-                    e.preventDefault();
-                    const unreadItems = document.querySelectorAll('.notification-item.unread');
-                    unreadItems.forEach(item => {
-                        item.classList.remove('unread');
-                        const dot = item.querySelector('.unread-dot');
-                        if (dot) dot.remove();
-                    });
-
-                fetchNotifications()
-                  
-                    // Update badge count
-                    const badge = document.querySelector('.badge');
-                    if (badge) badge.textContent = '0';
-                    
-                    // Update tab counts
-                    const allTab = document.querySelectorAll('.tab')[0];
-                    const unreadTab = document.querySelectorAll('.tab')[1];
-                    if (allTab) allTab.textContent = 'ทั้งหมด '+ '(' +allNotificationsData.total_count + ')';
-                    if (unreadTab) unreadTab.textContent = 'ยังไม่อ่าน (0)';
-
-
-                  }
-       
-                    
-                });
-            }
-
-            // Tab switching functionality
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const notificationItems = document.querySelectorAll('.notification-item');
-                    if (this.textContent.includes('ยังไม่อ่าน')) {
-                        notificationItems.forEach(item => {
-                            if (!item.classList.contains('unread')) {
-                                item.style.display = 'none';
-                            } else {
-                                item.style.display = 'flex';
-                            }
-                        });
-                    } else {
-                        notificationItems.forEach(item => {
-                            item.style.display = 'flex';
-                        });
-                    }
-                });
-            });
-
-            // Click notification item to mark as read
-            const notificationItems = document.querySelectorAll('.notification-item');
-            notificationItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    if (this.classList.contains('unread')) {
-                        this.classList.remove('unread');
-                        const dot = this.querySelector('.unread-dot');
-                        if (dot) dot.remove();
-                        
-                        // Update badge count
-                        const badge = document.querySelector('.badge');
-                        if (badge) {
-                            const currentCount = parseInt(badge.textContent);
-                            if (currentCount > 0) {
-                                badge.textContent = currentCount - 1;
-                            }
-                        }
-                    }
-                });
-            });
-        });
-
-
-
-async function handleNotificationClick(id, actionUrl) {
-
-
-
-
-          try {
-        // ยิง API เพื่อ mark as read
-        await fetch(`/api/notifications/readone`, {
-            method: 'POST', // หรือ PUT ตามที่คุณตั้ง route
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({'id': id})
-
-        });
-
-         if (actionUrl) {
-            window.open(actionUrl, '_blank'); // ✅ แก้จาก url → actionUrl
-        }
-
-        
-
-        // redirect หลัง update สำเร็จ
-     
-
-    } catch (error) {
-        console.error('error:', error);
-
-        // fallback: ถึง error ก็ยังเปิด link ได้
-
-    }
-
-
-
+async function fetchNotifications(){
+  try{
+    const res=await fetch('/api/notifications');
+    const data=await res.json();
+    allNotificationsData={total_count:data.total,unread_count:data.unread,notifications:data.data};
+    total=data.total; unread=data.unread;
+    const badge=document.getElementById('badge2x');
+    if(badge) badge.innerText=data.unread;
+    renderNotifications(data.data,total,unread);
+    initTabEvents();
+  }catch(e){ console.error('Notification error:',e); }
 }
 
-function initTabEvents() {
+document.addEventListener('DOMContentLoaded',function(){
+  const bellIcon=document.getElementById('bellIcon');
+  const overlay=document.getElementById('notificationModal');
+  const closeBtn=document.getElementById('modalClose');
+  if(bellIcon) bellIcon.addEventListener('click',()=>overlay.classList.add('show'));
+  if(closeBtn) closeBtn.addEventListener('click',()=>overlay.classList.remove('show'));
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') overlay.classList.remove('show'); });
 
- 
-    document.querySelectorAll('.tab').forEach((tab, index) => {
-        tab.addEventListener('click', function() {
-            // สลับ Class Active
-          
-            document.querySelector('.tab.active').classList.remove('active');
-            this.classList.add('active');
-           
-            let filtered;
-            const total = allNotificationsData.notifications.length;
-            const unread = allNotificationsData.notifications.filter(n => n.is_read == 'false').length;
-
-            if (index === 1) { // Tab "ยังไม่อ่าน"
-                filtered = allNotificationsData.notifications.filter(n => n.is_read === 'false');
-            } else { // Tab "ทั้งหมด"
-                filtered = allNotificationsData.notifications;
-            }
-       
-           
-            // ส่งข้อมูลที่กรองแล้วไปวาดใหม่
-            renderNotifications(filtered,total,unread);
+  const markAll=document.getElementById('markAllRead');
+  if(markAll){
+    markAll.addEventListener('click',function(e){
+      e.preventDefault();
+      if(unread!=0){
+        fetch('/api/notifications/read');
+        document.querySelectorAll('.notification-item.unread').forEach(item=>{
+          item.classList.remove('unread');
+          const dot=item.querySelector('.unread-dot');
+          if(dot) dot.remove();
         });
+        fetchNotifications();
+      }
     });
-    
-}
+  }
+});
 
-
-
-
-        function renderNotifications(data,totalall,unread) {
-          
-          
-    const listContainer = document.querySelector('.notification-list');
-    const tabAll = document.querySelectorAll('.tab')[0];
-    const tabUnread = document.querySelectorAll('.tab')[1];
-
-    // 1. อัปเดตตัวเลขบน Tabs
-    if (tabAll) tabAll.textContent = `ทั้งหมด (${totalall})`;
-    if (tabUnread) tabUnread.textContent = `ยังไม่อ่าน (${unread})`;
-
-    // 2. ล้างรายการเดิมใน List
-    listContainer.innerHTML = '';
-
-    // 3. วนลูปสร้าง HTML รายการแจ้งเตือน
-
-    if (data.length === 0) {
-        listContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">ไม่มีการแจ้งเตือน</div>';
-        return;
-    }
-    data.forEach(item => {  
-        const isUnread = item.is_read === 'false';
-        const unreadClass = isUnread ? 'true' : '';
-        const unreadDot = isUnread ? '<div class="unread-dot"></div>' : '';
-      
-        console.log(item)
-        // เลือก Icon ตามประเภท (ตัวอย่าง)
-        let iconSvg = '';
-        if (item.notification_type === 'event') {
-            iconSvg = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>';
-        } else if (item.notification_type === 'approve') {
-            iconSvg = '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>';
-        } else {
-            iconSvg = '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>';
-        }
-
-        const itemHtml = `
-            <div class="notification-item ${unreadClass}" data-id="${item.id}" onclick="handleNotificationClick(${item.notifications_id}, '${item.action_url}')" >
-                <div class="notification-icon ${item.category_label}">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        ${iconSvg}
-                    </svg>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">
-                      
-                        ${item.title} 
-                    </div>
-                    <div class="notification-message">${item.message}</div>
-                    <div class="notification-time">${item.crt_date}</div>
-                </div>
-                ${unreadDot}
-            </div>
-        `;
-
-        listContainer.insertAdjacentHTML('beforeend', itemHtml);
+function initTabEvents(){
+  document.querySelectorAll('.ntab').forEach((tab,idx)=>{
+    tab.addEventListener('click',function(){
+      document.querySelector('.ntab.active').classList.remove('active');
+      this.classList.add('active');
+      const unreadCount=allNotificationsData.notifications.filter(n=>n.is_read=='false').length;
+      const filtered=idx===1
+        ? allNotificationsData.notifications.filter(n=>n.is_read==='false')
+        : allNotificationsData.notifications;
+      renderNotifications(filtered,allNotificationsData.total_count,unreadCount);
     });
-}
-    </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <style>
-
-/* Container หลัก */
-
-
-
-    * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        h2 {
-            color: #34495e;
-            margin: 30px 0 15px 0;
-            font-size: 22px;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        h3 {
-            color: #555;
-            margin: 20px 0 10px 0;
-            font-size: 18px;
-        }
-
-        /* Database Schema Styles */
-        .schema-section {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .table-schema {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .table-header {
-            background: #3498db;
-            color: white;
-            padding: 12px 15px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .table-content {
-            padding: 15px;
-        }
-
-        .field {
-            display: grid;
-            grid-template-columns: 200px 120px 1fr;
-            padding: 10px;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .field:last-child {
-            border-bottom: none;
-        }
-
-        .field-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .field-type {
-            color: #7f8c8d;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
-
-        .field-desc {
-            color: #555;
-            font-size: 14px;
-        }
-
-        /* UI Section Styles */
-        .ui-section {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* Notification Bell */
-        .notification-bell {
-             position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    z-index: 1000;
-        }
-
-        .bell-icon {
-            width: 50px;
-            height: 50px;
-            background: #3498db;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .bell-icon:hover {
-            background: #2980b9;
-            transform: scale(1.1);
-        }
-
-        .bell-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: white;
-        }
-
-        .badge2x {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            border: 2px solid white;
-        }
-
-        .submenu-item {
-    border-radius: 8px;
-    margin: 4px 8px;
-    transition: all 0.2s ease;
+  });
 }
 
-/* hover */
-.submenu-item:hover {
-    background-color: #f5f7ff;
-}
-
-/* 🔥 active */
-.submenu-item.active-menu {
-    background: linear-gradient(90deg, #696cff, #5f61e6);
-    color: #fff;
-    border-left: 4px solid #4f46e5;
-    box-shadow: 0 4px 10px rgba(105,108,255,0.2);
-}
-
-/* text ข้างใน */
-.submenu-item.active-menu a {
-    color: #fff !important;
-    font-weight: 600;
-}
-
-/* hover ตอน active */
-.submenu-item.active-menu:hover {
-    opacity: 0.95;
-}
-
-        /* Notification Dropdown */
-        .notification-dropdown {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            width: 400px;
-            margin-top: 20px;
-        }
-
-        .dropdown-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        
-
-        .dropdown-header h3 {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 18px;
-        }
-
-        .mark-all-read {
-            color: #3498db;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .mark-all-read:hover {
-            text-decoration: underline;
-        }
-
-        .notification-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f1f3f5;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            display: flex;
-            gap: 12px;
-        }
-
-        .notification-item:hover {
-            background: #f8f9fa;
-        }
-
-        .notification-item.unread {
-            background: #e3f2fd;
-        }
-
-        .notification-item.unread:hover {
-            background: #d6ebfa;
-        }
-
-        .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .notification-icon.manager {
-            background: #fff3cd;
-        }
-
-        .notification-icon.director {
-            background: #d1ecf1;
-        }
-
-        .notification-icon.sale {
-            background: #d4edda;
-        }
-
-        .notification-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .notification-content {
-            flex: 1;
-        }
-
-        .notification-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-            font-size: 14px;
-        }
-
-        .notification-message {
-            color: #6c757d;
-            font-size: 13px;
-            margin-bottom: 4px;
-            line-height: 1.4;
-        }
-
-        .notification-time {
-            color: #95a5a6;
-            font-size: 12px;
-        }
-
-        .unread-dot {
-            width: 8px;
-            height: 8px;
-            background: #3498db;
-            border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 16px;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            color: #6c757d;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tab:hover {
-            color: #3498db;
-        }
-
-        .tab.active {
-            color: #3498db;
-            border-bottom-color: #3498db;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #95a5a6;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 15px;
-            fill: #dee2e6;
-        }
-
-        /* Role Badge */
-        .role-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .role-badge.manager {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .role-badge.director {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .role-badge.sale {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            width: 90%;
-         
-            animation: slideDown 0.3s ease;
-            overflow: hidden;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f1f3f5;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .modal-close:hover {
-            background: #e9ecef;
-            transform: rotate(90deg);
-        }
-
-        .modal-close svg {
-            width: 18px;
-            height: 18px;
-            fill: #495057;
-        }
-
-        .bell-demo-section {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            margin-bottom: 30px;
-        }
-
-        .bell-demo-section h3 {
-            color: white;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .bell-demo-section p {
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .notification-dropdown {
-                width: 100%;
-            }
-
-            .modal-content {
-                width: 95%;
-                max-height: 90vh;
-            }
-
-            .field {
-                grid-template-columns: 1fr;
-                gap: 5px;
-            }
-        }
-
-        code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #e83e8c;
-        }
-
-        .note {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 12px 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-.bell { background-color: #f1c40f; } /* สีเหลืองทอง */
-.line { background-color: #00c300; }
-.messenger { background-color: #0084ff; }
-
-/* --- ส่วนของตัวเลขแจ้งเตือน (Badge) --- */
-.notification-badge {
-    position: absolute;
-    top: -5px;      /* ขยับขึ้นไปข้างบน */
-    right: -5px;     /* ขยับไปทางขวา */
-    background-color: #ff3b30; /* สีแดงแจ้งเตือน */
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    min-width: 20px;
-    height: 20px;
-    padding: 2px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid white; /* ตัดเส้นขอบให้ดูเด่นขึ้น */
-}
-
-/* สีเฉพาะของแต่ละแพลตฟอร์ม */
-.call { background-color: #ff3b30; }      /* สีแดง */
-.line { background-color: #00c300; }      /* สีเขียว Line */
-.messenger { background-color: #0084ff; } /* สีฟ้า Messenger */
-
-      
-
-.hamburger {
-            display: block;
-            width: 35px;
-            height: 30px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 100%;
-            height: 5px;
-            background-color: black;
-            position: absolute;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .hamburger span:nth-child(1) { top: 0; }
-        .hamburger span:nth-child(2) { top: 12px; }
-        .hamburger span:nth-child(3) { top: 24px; }
-
-        /* เมื่อเมนูถูกเปิด */
-        .hamburger.active span:nth-child(1) { transform: translateY(12px) rotate(45deg); }
-        .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: translateY(-12px) rotate(-45deg); }
-      body {
-        font-family: "Sarabun", sans-serif;
-        font-size: 16px;
-        background-image: url("{% static "images/rm218batch4-katie-20.jpg" %}");
-        background-size: cover;
-      }
-
-      .btn {
-        font-size: 16px;
-      }
-      .font-default {
-        font-size: 12px;
-      }
-      .form-control {
-        font-size: 16px;
-      }
-      .form-select {
-        font-size: 16px;
-      }
-
-      .select2-selection__rendered {
-        line-height: 45px !important;
-      }
-      .select2-container .select2-selection--single {
-        height: 45px !important;
-      }
-      .select2-selection__arrow {
-        height: 45px !important;
-      }
-
-      .cutword {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        -o-text-overflow: ellipsis;
-        -ms-text-overflow: ellipsis;
-        overflow: hidden;
-        width: 200px;
-      }
-      .modal-dialog {
-        position: relative;
-        display: table; /* This is important */
-        overflow-y: auto;
-        overflow-x: auto;
-        width: auto;
-        min-width: 600px;
-      }
-      #script-warning {
-        display: none;
-        background: #eee;
-        border-bottom: 1px solid #ddd;
-        padding: 0 10px;
-        line-height: 40px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 12px;
-        color: red;
-      }
-
-      #loading {
-        display: none;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-      }
-
-      #calendar {
-        max-width: 1100px;
-        margin: 40px auto;
-        padding: 0 10px;
-      }
-      .error {
-        color: red;
-      }
-      .select2 {
-        width: 100%;
-        height: 40px;
-      }
-      .user-welcome {
-        color: white;
-      }
-      .sidebar-wrapper {
-        background-image: linear-gradient(#03a1fc, yellow);
-        position: fixed;
-      }
-      .sidebar-header {
-        background-image: url("{% static "images/bg.jpg" %}");
-      }
-
-
-@media (max-width: 1000px) {
-  .font-default {
-        font-size: 14px;
-      }
-
-      body {
-        
-        font-size: 24px;
-       
-      }
- }
- 
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      <div id="sidebar" class="active">
-        <div class="sidebar-wrapper active">
-          <div class="sidebar-header">
-            <div class="justify-content-between">
-              <div class="logo" align="center">
-                <!-- <a href="index.html"
-                  ><img
-                    src="{% static 'assets/images/logo/logo.png' %}"
-                    alt="Logo"
-                    srcset=""
-                /></a> -->
-                <div>
-                  <a href="/">
-                    <img
-                      src="{% static 'assets/images/logo.png' %}"
-                      style="width: 65px; height: 65px"
-                    />
-                    <p class="user-welcome">{{title}}</p>
-                  </a>
-                </div>
-                <div class="user-welcome">
-                  {{ user.first_name }} {{ user.last_name }}
-                </div>
-              </div>
-
-         
-            </div>
-          </div>
-          <div class="sidebar-menu">
-            <ul class="menu">
-            
-              <li class="sidebar-title"> 
-                <a href="#" class="sidebar-hide d-xl-none d-block" style="text-align: right;"
-                  ><i class="bi bi-x bi-middle"> ซ่อน </i
-                ></a>
-              </li>
-              <li class="sidebar-title">เมนู</li>
-         
-              <li class="{% if request.path == "/" %} sidebar-item active {% else %} sidebar-item {% endif %}">
-                <a href="/" class="sidebar-link">
-                  <i class="icon dripicons-store"></i>
-                  <span class="font-default">หน้าหลัก</span>
-                </a>
-              </li>
-
-              <li class="{% if request.path == "/salesnotevent" %} sidebar-item active {% else %} sidebar-item {% endif %}">
-                <a href="/salesnotevent" class="sidebar-link">
-                  <i class="icon dripicons-store"></i>
-                  <span class="font-default">เปิดการขาย</span>
-                </a>
-              </li>
-              {% comment %}
-              <p>Current URL: {{ request.path }}</p>
-              {% endcomment %} {% for rs in listMenuPermission %}
-              <li
-                class="{% if request.path|contains_parent == rs.group_value %} sidebar-item active has-sub {% else %} sidebar-item has-sub {% endif %}"
-              >
-                <a href="#" class="sidebar-link">
-                  <i class="dripicons-pin"></i>
-                  <span class="font-default">{{rs.group_label}} </span>
-                </a>
-                <ul
-                  class="{% if request.path|contains_parent == rs.group_value %} submenu active {% else %} submenu {% endif %}"
-                >
-                  {% for rsc in rs.children %}
-                  
-                  <li
-                    class="{% if request.path|contains:rsc.page_route %} submenu-item active-menu {% else %} submenu-item {% endif %}"
-                  >
-
-
-                    <a href="/{{rsc.page_route}}">
-                      <span class="font-default"> {{rsc.page_label}} </span>
-                    </a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </li>
-              {% endfor %} {% comment %}
-
-              <li class="sidebar-item">
-                <a href="/course" class="sidebar-link">
-                  <i class="icon dripicons-clipboard"></i>
-                  <span class="font-default">หลักสูตร</span>
-                </a>
-              </li>
-
-              <li class="sidebar-item">
-                <a href="/teachers" class="sidebar-link">
-                  <i class="icon dripicons-user"></i>
-                  <span class="font-default">ครู - วิทยากร</span>
-                </a>
-              </li>
-
-              <li class="sidebar-item">
-                <a href="/course/event" class="sidebar-link">
-                  <i class="icon dripicons-information"></i>
-                  <span class="font-default"> กำหนดวันอบรมและราคาอบรม</span>
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a href="/register/report" class="sidebar-link">
-                  <i class="icon dripicons-graph-bar"></i>
-                  <span class="font-default">ดำเนินการ</span>
-                </a>
-              </li>
-
-              <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-preview"></i>
-                  <span class="font-default">อนุมัติเอกสาร</span>
-                </a>
-                <ul class="submenu">
-                  <li class="submenu-item">
-                    <a href="/approve/update/payment">
-                      <span class="font-default"
-                        >แก้ไขใบเสร็จ - ใบเสนอราคา</span
-                      >
-                    </a>
-                  </li>
-                </ul>
-              </li>
-
-              <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-gear"></i>
-                  <span class="font-default">การเงิน</span>
-                </a>
-                <ul class="submenu">
-                  <li class="submenu-item">
-                    <a href="/finance/billing/setting">
-                      <span class="font-default">กำหนดค่าตอบแทน</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a href="/finance/billing/result">
-                      <span class="font-default">สรุปยอดค่าตอบแทน</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a href="/billing/setting/form/create">
-                      <span class="font-default">ตั้งค่าตัดรอบจ่าย</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-
-              <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-export"></i>
-                  <span class="font-default">รายงาน</span>
-                </a>
-                <ul class="submenu">
-                  <li class="submenu-item">
-                    <a href="/register/export/seller">
-                      <span class="font-default">รายงานข้อมูลการขาย</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a href="/register/export/quotation" class="font-default">
-                      <span class="font-default">รายงานข้อมูลใบเสนอราคา</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a href="/register/export/bill" class="font-default">
-                      <span class="font-default">รายงานใบเสร็จ</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a
-                      href="/register/export/learning_status"
-                      class="font-default"
-                    >
-                      <span class="font-default">รายงานจบ/ไม่จบหลักสูตร</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a
-                      href="/register/export/approve_list"
-                      class="font-default"
-                    >
-                      <span class="font-default">รายงานอนุมัติเอกสาร</span>
-                    </a>
-                  </li>
-            <li class="submenu-item">
-                    <a
-                      href="/register/export/endevent"
-                      class="font-default"
-                    >
-                      <span class="font-default">รายงานส่งมอบงานทั้งหมด</span>
-                    </a>
-                  </li>
-
-
-                 <li class="submenu-item">
-                    <a
-                      href="/register/sale/credit"
-                      class="font-default"
-                    >
-                      <span class="font-default">รายงานใบเสนอราคารายบุคคล</span>
-                    </a>
-                  </li>
-
-                  
-                </ul>
-              </li>
-              {% endcomment %} {% if user.is_staff == 1 %}
-              <li class="{% if request.path == "/user/category/list" %} sidebar-item active {% else %} sidebar-item {% endif %}">
-                <a href="/user/category/list" class="sidebar-link">
-                  <i class="icon dripicons-bell"></i>
-                  <span class="font-default">กลุ่มผู้ใช้งาน</span>
-                </a>
-              </li>
-
-
-              <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-export"></i>
-                  <span class="font-default">ตั้งค่า</span>
-                </a>
-                <ul class="submenu">
-                  <li class="submenu-item">
-                    <a href="/description/setting/form/create">
-                      <span class="font-default">ตั้งค่าการฝึกอบรม</span>
-                    </a>
-                  </li>
-                  <li class="submenu-item">
-                    <a href="/tax/setting/form/create">
-                      <span class="font-default">ตั้งค่าภาษี</span>
-                    </a>
-                  </li>
-                   <li class="submenu-item">
-                    <a href="/setting/form/bill/create">
-                      <span class="font-default">ตั้งค่าบิล</span>
-                    </a>
-                  </li>
-                    <li class="submenu-item">
-                    <a href="/commissionstages/setting/form">
-                      <span class="font-default">ตั้งค่าคอม</span>
-                    </a>
-                  </li>
-                </ul>
-              
-              </li>
-              {% endif %}
-              {% comment %} <li class="{% if request.path == "/manual/idcard" %} sidebar-item active {% else %} sidebar-item {% endif %}">
-                <a href="/manual/idcard" class="sidebar-link">
-                  <i class="icon dripicons-document"></i>
-                  <span class="font-default">คู่มือติดตั้งเครื่องอ่านบัตร</span>
-                </a>
-              </li>
-                     <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-export"></i>
-                  <span class="font-default">ตั้งค่า</span>
-                </a>
-                <ul class="submenu">
-                   <li class="submenu-item">
-                    <a href="/setting/form/bill/create">
-                      <span class="font-default">ตั้งค่าบิล</span>
-                    </a>
-                  </li>
-                </ul>
-              
-              </li> {% endcomment %}
-
-
-               {% comment %} <li class="sidebar-item has-sub">
-                <a href="#" class="sidebar-link">
-                  <i class="icon dripicons-export"></i>
-                  <span class="font-default">แบบประเมินการทดสอบรถ</span>
-                </a>
-                <ul class="submenu">
-                   <li class="submenu-item">
-                    <a href="https://forms.gle/FjMysUQ6i7iAUHLF6" target="_blank">
-                      <span class="font-default">แบบประเมินทดสอบการขับรถจริง</span>
-                    </a>
-                  </li>
-                           <li class="submenu-item">
-                    <a href="https://forms.gle/7fMGAt5n4CG5okxc7" target="_blank">
-                      <span class="font-default">แบบประเมินทดสอบการขับรถ สพฉ.</span>
-                    </a>
-                  </li>
-                </ul>
-              
-              </li> {% endcomment %}
-
-              <li class="sidebar-item">
-                <a href="/logout" class="sidebar-link">
-                  <i class="icon dripicons-power" aria-hidden="true"></i>
-                  <span class="font-default">ออกจากระบบ</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <button class="sidebar-toggler btn x">
-            <i data-feather="x"></i>
-          </button>
+function renderNotifications(data,totalall,unreadCount){
+  const list=document.querySelector('.notification-list');
+  const tabAll=document.querySelectorAll('.ntab')[0];
+  const tabUnread=document.querySelectorAll('.ntab')[1];
+  if(tabAll) tabAll.textContent=`ทั้งหมด (${totalall})`;
+  if(tabUnread) tabUnread.textContent=`ยังไม่อ่าน (${unreadCount})`;
+  list.innerHTML='';
+  if(!data||!data.length){
+    list.innerHTML='<div style="padding:30px;text-align:center;color:var(--t3);font-size:13px;">ไม่มีการแจ้งเตือน</div>';
+    return;
+  }
+  data.forEach(item=>{
+    const isUnread=item.is_read==='false';
+    const dot=isUnread?'<div class="unread-dot"></div>':'';
+    let iconSvg='';
+    if(item.notification_type==='event') iconSvg='<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>';
+    else if(item.notification_type==='approve') iconSvg='<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>';
+    else iconSvg='<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>';
+    list.insertAdjacentHTML('beforeend',`
+      <div class="notification-item${isUnread?' unread':''}" data-id="${item.id}"
+        onclick="handleNotificationClick(${item.notifications_id},'${item.action_url}')">
+        <div class="notification-icon ${item.category_label}">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${isUnread?'#5b8df6':'#7c85a8'}">${iconSvg}</svg>
         </div>
-      </div>
-      <div id="main">
-        <header class="mb-3">
-          <a href="#" class="burger-btn d-block d-xl-none">
-            <i class="bi bi-justify fs-3"></i>
-          </a>
-        
-        
-
-          <div class="hamburger" id="hamburger-btn">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="notification-content">
+          <div class="notification-title">${item.title}</div>
+          <div class="notification-message">${item.message}</div>
+          <div class="notification-time">${item.crt_date}</div>
         </div>
-        </header>
+        ${dot}
+      </div>`);
+  });
+}
 
-        <div class="page-heading">
-          <div class="page-title">{% block content %} {% endblock %}</div>
+async function handleNotificationClick(id,actionUrl){
+  try{
+    await fetch('/api/notifications/readone',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:id})
+    });
+    if(actionUrl) window.open(actionUrl,'_blank');
+  }catch(e){ console.error('error:',e); }
+}
 
-          <!-- <footer>
-            <div class="footer clearfix mb-0 text-muted">
-            <div class="float-start">
-              <p>2021 &copy; Mazer</p>
-            </div>
-            <div class="float-end">
-              <p>
-                Crafted with
-                <span class="text-danger"><i class="bi bi-heart"></i></span> by
-                <a href="http://ahmadsaugi.com">A. Saugi</a>
-              </p>
-            </div>
-          </div>
-          </footer> -->
+/* ── SELECT2 & DATERANGE ── */
+$(document).ready(function(){
+  $('.select2').select2({placeholder:'เลือกข้อมูล',allowClear:true});
+  $('#selLocations').select2({
+    ajax:{
+      url:'/locationthai/',type:'post',dataType:'json',delay:250,
+      data:function(params){return{searchTerm:params.term,csrfmiddlewaretoken:'{{ csrf_token }}'};},
+      processResults:function(res){return{results:res};},
+      cache:true,
+    },
+  });
+});
 
-<div >
-             
-                <div class="notification-bell">
-                    <div class="bell-icon" id="bellIcon" style="cursor: pointer;">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
-                        </svg>
-                        <span class="badge2x" id='badge2x'></span>
-                    </div>
-                </div>
-            </div>
+$(function(){
+  const locale={
+    format:'DD/MM/YYYY',separator:' - ',applyLabel:'Apply',cancelLabel:'Cancel',weekLabel:'W',
+    daysOfWeek:['อา','จ','อ','พ','พฤ','ศ','ส'],
+    monthNames:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+    firstDay:1,
+  };
+  $('.daterangesingle').daterangepicker({singleDatePicker:true,startDate:moment(),locale});
+  $('.daterange').daterangepicker({opens:'left',locale});
+});
 
+/* ── DATATABLE ── */
+if(document.getElementById('table1')!=null){
+  new simpleDatatables.DataTable(document.querySelector('#table1'));
+}
+</script>
 
+<!-- Toast Messages -->
+{% for msg in messages %}
+<script>
+Toastify({
+  text:"{{msg}}",duration:3000,close:true,gravity:"top",position:"center",
+  backgroundColor:"{% if msg.tags == 'error' %}#fef2f2{% else %}#f0fdf4{% endif %}",
+  style:{
+    border:"1px solid {% if msg.tags == 'error' %}#fca5a5{% else %}#86efac{% endif %}",
+    color:"{% if msg.tags == 'error' %}#dc2626{% else %}#16a34a{% endif %}",
+    borderRadius:'10px',fontFamily:'Sarabun,sans-serif',fontSize:'13px',
+    boxShadow:'0 4px 12px rgba(0,0,0,.1)',
+  }
+}).showToast();
+</script>
+{% endfor %}
 
-
-
-            <div class="modal-overlay" id="notificationModal">
-    <div class="modal-content">
-             <div class="notification-dropdown" style="width: 100%; box-shadow: none; margin: 0;">
-                        <div class="dropdown-header">
-                            <h3>การแจ้งเตือน</h3>
-                            <a href="#" class="mark-all-read" id="markAllRead">ทำเครื่องหมายอ่านทั้งหมด</a>
-                        </div>
-
-                        <div class="tabs">
-                            <div class="tab active">ทั้งหมด (5)</div>
-                            <div class="tab">ยังไม่อ่าน (3)</div>
-                        </div>
-        <div class="notification-list">
-            </div>
-             </div>
-    </div>
-</div>
-        </div>
-      </div>
-    </div>
-
-    <script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
-    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
-
-    <!-- Include Choices JavaScript -->
-    <script src="{% static 'assets/vendors/choices.js/choices.min.js' %}"></script>
-    <script src="{% static 'assets/js/pages/form-element-select.js' %}"></script>
-
-    <!-- Include Toastify JavaScript -->
-    <script src="{% static 'assets/vendors/toastify/toastify.js' %}"></script>
-    <!-- Include Datatables JavaScript -->
-    <script src="{% static 'assets/vendors/simple-datatables/simple-datatables.js' %}"></script>
-
-    <script src="{% static 'assets/js/mazer.js' %}"></script>
-
-    <!-- Include select2 JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-
-    <script>
-      document.getElementById("hamburger-btn").addEventListener("click", function() {
-          document.getElementById("sidebar").classList.toggle("active");
-      });
-      </script>
-    <script>
-      // Simple Datatable
-
-      $(document).ready(function () {
-
-        
-        $(".select2").select2({
-          placeholder: "เลือกข้อมูล",
-          allowClear: true,
-        });
-
-        $("#selLocations").select2({
-          ajax: {
-            url: "/locationthai/",
-            type: "post",
-            dataType: "json",
-            delay: 250,
-            data: function (params) {
-              return {
-                searchTerm: params.term, // search term
-                csrfmiddlewaretoken: "{{ csrf_token }}",
-              };
-            },
-            processResults: function (response) {
-              return {
-                results: response,
-              };
-            },
-            cache: true,
-          },
-        });
-      });
-
-      $(function () {
-        $(".daterangesingle").daterangepicker({
-          singleDatePicker: true,
-          startDate: moment(),
-          locale: {
-            format: "DD/MM/YYYY",
-            separator: " - ",
-            applyLabel: "Apply",
-            cancelLabel: "Cancel",
-            fromLabel: "From",
-            toLabel: "To",
-            customRangeLabel: "Custom",
-            weekLabel: "W",
-            daysOfWeek: ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"],
-            monthNames: [
-              "ม.ค.",
-              "ก.พ.",
-              "มี.ค.",
-              "เม.ย.",
-              "พ.ค.",
-              "มิ.ย.",
-              "ก.ค.",
-              "ส.ค.",
-              "ก.ย.",
-              "ต.ค.",
-              "พ.ย.",
-              "ธ.ค.",
-            ],
-            firstDay: 1,
-          },
-        });
-
-        $(".daterange").daterangepicker({
-          opens: "left",
-          locale: {
-            format: "DD/MM/YYYY",
-            separator: " - ",
-            applyLabel: "Apply",
-            cancelLabel: "Cancel",
-            fromLabel: "From",
-            toLabel: "To",
-            customRangeLabel: "Custom",
-            weekLabel: "W",
-            daysOfWeek: ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"],
-            monthNames: [
-              "ม.ค.",
-              "ก.พ.",
-              "มี.ค.",
-              "เม.ย.",
-              "พ.ค.",
-              "มิ.ย.",
-              "ก.ค.",
-              "ส.ค.",
-              "ก.ย.",
-              "ต.ค.",
-              "พ.ย.",
-              "ธ.ค.",
-            ],
-            firstDay: 1,
-          },
-        });
-      });
-
-      if (document.getElementById("table1") != null) {
-        const table1 = document.querySelector("#table1");
-        new simpleDatatables.DataTable(table1);
-      }
-    </script>
-    {% for msg in messages %}
-    <div>
-      {% if msg.tags == 'error' %}
-      <script>
-        Toastify({
-          text: "{{msg}}",
-          duration: 3000,
-          close: true,
-          gravity: "top",
-          position: "center",
-          backgroundColor: "#FF0000",
-        }).showToast();
-      </script>
-      {% else %}
-      <script>
-        Toastify({
-          text: "{{msg}}",
-          duration: 3000,
-          close: true,
-          gravity: "top",
-          position: "center",
-          backgroundColor: "#4fbe87",
-        }).showToast();
-      </script>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </body>
+</body>
 </html>

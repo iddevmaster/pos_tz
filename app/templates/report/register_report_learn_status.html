@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>รายงานจบ/ไม่จบหลักสูตร</h3>
+    <h3>รายงานจบ/ไม่จบสินค้า</h3>
   </div>
   <div class="col-12 col-md-6 order-md-2 order-first">
     <nav
@@ -15,7 +15,7 @@
         </li>
 
         <li class="breadcrumb-item active" aria-current="page">
-          รายงานจบ/ไม่จบหลักสูตร
+          รายงานจบ/ไม่จบสินค้า
         </li>
       </ol>
     </nav>
@@ -52,15 +52,15 @@
                 id="qlearning_status"
               >
                 <option value="">-สถานะทั้งหมด-</option>
-                <option value="0">ไม่จบหลักสูตร</option>
-                <option value="1">จบหลักสูตร</option>
+                <option value="0">ไม่จบสินค้า</option>
+                <option value="1">จบสินค้า</option>
               </select>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6">
             <select class="form-select select2" id="qcourse" name="qcourse">
-              <option value="0">-หลักสูตรทั้งหมด-</option>
+              <option value="0">-สินค้าทั้งหมด-</option>
               {% for res1 in course_list %}
               <option value="{{res1.course_id}}">
                 {{res1.course_code}} {{res1.course_name}}

@@ -1,600 +1,1026 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}{% block content %}
+{% load humanize %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
 
-
-
-   const existingRadio = document.getElementById('existing');
-        const newRadio = document.getElementById('new');
-        const existingOption = document.getElementById('existing-option');
-        const newOption = document.getElementById('new-option');
-        const existingForm = document.getElementById('existingCustomerForm');
-        const newForm = document.getElementById('newCustomerForm');
-        const customerSearch = document.getElementById('customerSearch');
-        const searchResults = document.getElementById('searchResults');
-        const form = document.getElementById('customerForm');
-
-    function selectCus(x) {
- showExistingForm(x);
-    }
-
-
-function validateForm() {
-
- 
-
-  const languageRadios = document.getElementsByName('customerType');
-
-            // 2. อ้างอิงถึง Element ที่จะใช้แสดงผลลัพธ์
-            const displayElement = document.getElementById('selectedLanguageDisplay');
- let selectedValue = null;
-            // 3. วนลูปผ่าน NodeList เพื่อเพิ่ม Event Listener ให้กับแต่ละ Radio button
-            for (let i = 0; i < languageRadios.length; i++) {
-                // เพิ่ม 'change' event listener
-                // 'change' event จะถูก fire เมื่อสถานะ checked ของ input เปลี่ยนไป
-  if (languageRadios[i].checked) {
-                    selectedValue = languageRadios[i].value;
-                    break; // เมื่อเจอตัวที่ถูกเลือกแล้ว ก็ออกจากลูปทันที
-                }
-            }
-
-
-
-if(selectedValue != null){
-  if(selectedValue == 'existing'){  
-   const customer_id = document.getElementById('customer_id').value;
-
-   
-
-    if(customer_id){
-
-      console.log('ไปกันต่อ');
-
-    return true
-   
-    }else {
-            Swal.fire({
-       title: 'เลือกลูกค้า',
-       text: 'Select Customer',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-    }
-
-  }
-
-   if(selectedValue == 'new'){ 
-
-    const student_firstname_th = document.getElementById('student_firstname_th').value;
-    const student_lastname_th = document.getElementById('student_lastname_th').value;
-    const customer_tax = document.getElementById('customer_tax').value;
-    const customer_phone = document.getElementById('customer_phone').value;
-    const customer_email = document.getElementById('customer_email').value;
-    const customer_address = document.getElementById('customer_address').value;
-    const location_id = document.getElementById('selLocations').value;
-
-    if((student_firstname_th) && (student_lastname_th) && (customer_phone) && (customer_address) && (location_id)){
-return true
-    }else {
-      if(!student_firstname_th){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'ชื่อ',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!student_lastname_th){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'นามสกุล',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!customer_phone){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'เบอร์โทร',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-            if(!customer_address){
-        Swal.fire({
-       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'ที่อยู่เลขที่',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-
-      if(!location_id){
-        Swal.fire({
-       title: 'กรุณาเลือกที่อยู่',
-       text: 'ตำบล-อำเภอ-จังหวัด-ไปรษณีย์',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
-        return false;
-      }
-      
-    }
-
-  }
-   return false; 
+<style>
+/* ── Wizard Shell ── */
+.spa-shell{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:20px;
+  min-height:calc(100vh - 100px);
 }
-else {
-      Swal.fire({
-       title: 'เลือกข้อมูลลูกค้า',
-       text: 'Select Data Customer',
-       icon: 'error',
-     confirmButtonText: 'OK'
-    });
+/* Steps sidebar */
+.steps-panel{
+  background:var(--panel);
+  border:1px solid var(--bdr);
+  border-radius:var(--radius);
+  padding:20px 14px;
+  display:flex; flex-direction:column; gap:4px;
+  position:sticky; top:76px; height:fit-content;
+}
+.step-item{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:9px;
+  cursor:default; transition:all .2s;
+}
+.step-num{
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; flex-shrink:0;
+  background:var(--card2); color:var(--t3);
+  border:2px solid var(--bdr2);
+  transition:all .2s;
+}
+.step-label{ font-size:13px; font-weight:500; color:var(--t3); }
+
+.step-item.done .step-num{
+  background:rgba(16,185,129,.15); color:var(--green);
+  border-color:var(--green);
+}
+.step-item.done .step-label{ color:var(--t2); }
+.step-item.active .step-num{
+  background:rgba(91,141,246,.2); color:var(--blue);
+  border-color:var(--blue);
+}
+.step-item.active .step-label{ color:var(--t1); font-weight:700; }
+.step-divider{
+  width:2px; height:18px; background:var(--bdr2);
+  margin-left:25px;
 }
 
- 
- return false; 
+/* Content area */
+.spa-content{ display:flex; flex-direction:column; gap:16px; }
 
- 
+/* Step panels */
+.step-panel{ display:none; }
+.step-panel.active{ display:block; }
+
+/* Card */
+.spa-card{
+  background:var(--card);
+  border:1px solid var(--bdr);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.spa-card-head{
+  padding:14px 18px;
+  background:var(--card2);
+  border-bottom:1px solid var(--bdr);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.spa-card-title{
+  font-size:14px; font-weight:700; color:var(--t1);
+  display:flex; align-items:center; gap:8px;
+}
+.spa-card-body{ padding:20px; }
+
+/* Radio choice buttons */
+.ctype-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+.ctype-btn{
+  flex:1; min-width:120px;
+  padding:12px 16px;
+  border-radius:9px;
+  border:1px solid var(--bdr2);
+  background:var(--card2);
+  color:var(--t2); font-size:13px; font-weight:500;
+  cursor:pointer; text-align:center;
+  transition:all .15s;
+}
+.ctype-btn:hover{ border-color:var(--blue); color:var(--blue); }
+.ctype-btn.selected{
+  background:rgba(91,141,246,.15);
+  border-color:var(--blue); color:var(--blue); font-weight:700;
 }
 
+/* Summary badge */
+.info-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 10px; border-radius:20px;
+  background:rgba(91,141,246,.1); border:1px solid rgba(91,141,246,.2);
+  font-size:12px; font-weight:600; color:var(--blue);
+}
 
+/* Addon table */
+.addon-table{ width:100%; border-collapse:collapse; font-size:12px; }
+.addon-table th{
+  background:var(--card2); color:var(--t2);
+  padding:8px 10px; text-align:left;
+  font-size:11px; text-transform:uppercase; letter-spacing:.5px;
+  border-bottom:1px solid var(--bdr2);
+}
+.addon-table td{
+  padding:8px 10px; border-bottom:1px solid var(--bdr);
+  color:var(--t1);
+}
+.addon-table tr:last-child td{ border-bottom:none; }
 
-    $(document).ready(function () {
-    // Initialize Select2
+/* Summary box */
+.summary-box{
+  background:var(--card2);
+  border:1px solid var(--bdr2);
+  border-radius:var(--radius);
+  padding:16px;
+}
+.summary-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:5px 0;
+  font-size:13px; color:var(--t2);
+}
+.summary-row.total{
+  border-top:1px solid var(--bdr2); margin-top:8px; padding-top:12px;
+  font-size:15px; font-weight:700; color:var(--t1);
+}
+.summary-row .amt{ font-weight:600; color:var(--t1); }
+.summary-row.total .amt{ color:var(--blue); font-size:18px; }
 
+/* Spinner */
+.spinner{
+  display:inline-block; width:16px; height:16px;
+  border:2px solid rgba(91,141,246,.3);
+  border-top-color:var(--blue); border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
 
-            $(".select2").select2({
-              
-          placeholder: "เลือกข้อมูล",
-          allowClear: true,
-        });
-  });
-
-
-         function showExistingForm(x) {
-            const existingForm = document.getElementById('existingCustomerForm');
-            const newForm = document.getElementById('newCustomerForm');
-        
-       
-          if(x == 'new'){
-            existingForm.classList.remove('show');
-            existingForm.classList.add('hidden');
-    
-            newForm.classList.remove('hidden');
-            newForm.classList.add('show');
-   
-
-          }else {
-
-
-            existingForm.classList.add('show');
-            existingForm.classList.remove('hidden');
-
-
-             newForm.classList.remove('show');
-            newForm.classList.add('hidden');
-
-
-    
-
-          }
-
-
-        }
-        
-  function setBillName() {
-    let student_firstname_th = document.getElementById(
-      "student_firstname_th"
-    ).value;
-    let student_lastname_th = document.getElementById(
-      "student_lastname_th"
-    ).value;
-    document.getElementById("customer_name").value =
-      student_firstname_th + " " + student_lastname_th;
-  }
-
-
-
-
-  var myVar = null;
-
-  function start_read_test() {
-    myStopFunctionTest();
-    myVar = setInterval(load_dataTest, 1500);
-  }
-
-  function myStopFunctionTest() {
-    clearInterval(myVar);
-  }
-
-  async function load_dataTest() {
-    let myObject = await fetch("{{api_id_card}}");
-    let jsondata = await myObject.text();
-    var data = jsondata.substr(13, jsondata.length - 14);
-    //let jdata = JSON.parse(data);
-
-     document.getElementById("result_id_card").value= data;
-     document.getElementById("read_id_card").submit();
-  }
-
-
-  async function myFunction(selectElement) {
-  
-const selectedValue = selectElement.value;
-
-
-
-    let data = await fetch('/api/customer', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({'customer_id':selectedValue})
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data.customer_address)
-        document.getElementById("customer_address").value= data.customer_address;
-
-      })
-      
-  }
-
-</script>
-<style scoped>
-
-        .form-section {
-            margin-bottom: 25px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.8);
-           
-            transition: all 0.4s ease;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-       .form-section.hidden {
-            display: none;
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-
-        .form-section.show {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-        .select2-selection.select2-selection--single {
-    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
+@media(max-width:768px){
+  .spa-shell{ grid-template-columns:1fr; }
+  .steps-panel{ flex-direction:row; overflow-x:auto; position:static; }
+  .step-divider{ display:none; }
 }
 </style>
-<div class="row">
-  <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>เปิดการขาย</h3>
-   
-  </div>
-  <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="/">หน้าหลัก</a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">เปิดการขาย</li>
-      </ol>
-    </nav>
-  </div>
-</div>
 
-<section class="section">
-  <div class="card">
-    <div class="card-body">
-      <form method="post" action="{% url 'CreateRegisterNo' %}">
-        {% csrf_token %}
-       
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <div class="form-group">
-              <label>สินค้า  
-			  </label> <label style="color: red">*</label>
-              <select
-                class="select2"
-                id="course_id"
-                name="course_id"
-                required
-              >
-                <option value="">-เลือกหลักสูตรและวันที่อบรม-</option>
+<div class="spa-shell">
+
+  <!-- ── Steps sidebar ── -->
+  <div class="steps-panel">
+    <div class="step-item active" id="si1">
+      <div class="step-num" id="sn1">1</div>
+      <div class="step-label">เลือกสินค้า</div>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item" id="si2">
+      <div class="step-num" id="sn2">2</div>
+      <div class="step-label">ข้อมูลลูกค้า</div>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item" id="si3">
+      <div class="step-num" id="sn3">3</div>
+      <div class="step-label">ชำระเงิน</div>
+    </div>
+
+    <div style="margin-top:auto; padding-top:20px;">
+      <button type="button" class="btn btn-secondary w-100" id="btnReset"
+              style="font-size:12px;">
+        <i class="bi bi-arrow-counterclockwise"></i> เริ่มใหม่
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Content area ── -->
+  <div class="spa-content">
+
+    <!-- ══ STEP 1: เลือกสินค้า ══ -->
+    <div class="step-panel active" id="panel1">
+      <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title">
+            <i class="bi bi-box-seam-fill" style="color:var(--blue)"></i>
+            เปิดการขาย
+          </span>
+          <span class="info-badge"><i class="bi bi-1-circle"></i> ขั้นตอน 1 / 3</span>
+        </div>
+        <div class="spa-card-body">
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label class="form-label">สินค้า <span style="color:var(--red)">*</span></label>
+              <select class="form-select select2" id="course_id" required>
+                <option value="">— เลือกสินค้า —</option>
                 {% for res in data %}
-                <option value="{{res.course_id}}" {% if content_regist.course_id == res.course_id %} selected {% endif %}>
-                  {{res.course_code}} {{res.course_name}}  
-                </option>
+                <option value="{{res.course_id}}">{{res.course_code}} {{res.course_name}}</option>
                 {% endfor %}
               </select>
             </div>
-          </div>
-          <div class="col-md-3 mb-4">
-            <div class="form-group">
-              <label>ประเภทลูกค้า</label> <label style="color: red">*</label>
-              <select
-                class="form-select"
-                name="customer_type"
-                id="customer_type"
-                required
-              >
-                <option value="">-เลือกประเภทลูกค้า-</option>
-                <option value="1" {% if content_regist.customer_type == 1 %} selected {% endif %}>บุคคล</option>
-                <option value="2" {% if content_regist.customer_type == 2 %} selected {% endif %}>บริษัท</option>
-              </select>
+            <div class="col-md-6">
+              <label class="form-label">ประเภทลูกค้า <span style="color:var(--red)">*</span></label>
+              <div class="ctype-btns" id="ctypeBtns">
+                <div class="ctype-btn" data-val="1" onclick="selectCtype(1)">
+                  <i class="bi bi-person-fill"></i> บุคคล
+                </div>
+                <div class="ctype-btn" data-val="2" onclick="selectCtype(2)">
+                  <i class="bi bi-building"></i> บริษัท
+                </div>
+              </div>
+              <input type="hidden" id="customer_type" value="">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">ประเภทการชำระ <span style="color:var(--red)">*</span></label>
+              <div class="ctype-btns" id="ptypeBtns">
+                <div class="ctype-btn" data-val="1" onclick="selectPtype(1)">
+                  <i class="bi bi-cash-stack"></i> เงินสด
+                </div>
+                <div class="ctype-btn" data-val="2" onclick="selectPtype(2)">
+                  <i class="bi bi-credit-card"></i> เครดิต
+                </div>
+              </div>
+              <input type="hidden" id="pay_type" value="">
             </div>
           </div>
-          <div class="col-md-3 mb-4">
-            <div class="form-group">
-              <label>ประเภทการชำระเงิน</label>
-              <label style="color: red">*</label>
-              <select
-                class="form-select"
-                required
-                name="pay_type"
-                id="pay_type"
-              >
-                <option value="">-เลือกประเภทการชำระเงิน-</option>
-                <option value="1" {% if content_regist.pay_type == 1 %} selected {% endif %}>เงินสด</option>
-                <option value="2" {% if content_regist.pay_type == 2 %} selected {% endif %}>เครดิต</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="form-group" align="center">
-        
-          {% if content_regist.register_id == None %}
-          <button type="submit" class="btn btn-primary rounded-pill">
-            ขั้นตอนถัดไป
-          </button>
-          {% else %}
-          <button type="button" class="btn btn-danger rounded-pill"
-           onclick="window.location.href='/register/reset'">
-            ทำรายการใหม่
-          </button>
-          {% endif %}
-        
-        </div>
-      </form>
-    </div>
-  </div>
-  {% if content_regist.register_id != None %}
-  <div class="card">
-    <div class="card-body">
-      
-      <div class="row">
-        <div class="col-lg-6 col-md-6">
-          <div class="form-grop">
-           ข้อมูลลูกค้า
-          </div>
-        </div>
-
-  
-        <div class="col-lg-6 col-md-6">
-
-          {% if content_regist.customer_type == 1 %}
-          <div class="form-grop" align="right">
-            <button type="button" onclick="load_dataTest();" class="btn btn-info rounded-pill">
-             ข้อมูลจากบัตรประชาชน
+          <div class="mt-4 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary px-4" id="btnStep1" onclick="doStep1()">
+              ถัดไป <i class="bi bi-arrow-right"></i>
             </button>
           </div>
-          {% endif %}
-          
         </div>
       </div>
-      <form action="/register/customer/read_idcard/" method="post" id="read_id_card">
-        {% csrf_token %}
-        <input type="hidden" name="data" id="result_id_card">
-      </form>
+    </div><!-- /panel1 -->
 
-
-      <form method="post"  onsubmit="return validateForm();"  action="{% url 'CreateCustomerNo' %}">
-        {% csrf_token %}
-
-           <div class="row">
-  
-           <div class="col-lg-12 col-md-12">
-           <div class="form-check form-check-inline"  id="new-option">
-                <input class="form-check-input" type="radio" id="new" name="customerType" value="new" onclick="selectCus('new')">
-                <label class="form-check-label" for="new">ลูกค้าใหม่</label>
-            </div>
-            <div class="form-check form-check-inline"  id="existing-option" >
-                <input class="form-check-input" type="radio"  id="existing" name="customerType" value="existing" onclick="selectCus('existing')">
-                <label class="form-check-label" for="same">ลูกค้าเก่า</label>
-            </div>
-        </div>
-       
-      <div id="newCustomerForm" class="form-section hidden">
- <div class="row">
-
-
-        {% if content_regist.customer_type == 1 %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ชื่อ</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="student_firstname_th"
-              name="student_firstname_th"
-              onkeypress="setBillName();"
-              onkeyup="setBillName();"
-              value="{{idcard_data.FirstNameTh}}"
-            />
+    <!-- ══ STEP 2: ข้อมูลลูกค้า ══ -->
+    <div class="step-panel" id="panel2">
+      <!-- Info bar -->
+      <div class="spa-card" id="step2InfoBar">
+        <div class="spa-card-body" style="padding:12px 18px;">
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="info-badge" id="s2CourseBadge"><i class="bi bi-box-seam"></i> —</span>
+            <span class="info-badge" id="s2CtypeBadge"><i class="bi bi-person"></i> —</span>
+            <span class="info-badge" id="s2PtypeBadge"><i class="bi bi-cash"></i> —</span>
           </div>
         </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>นามสกุล</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="student_lastname_th"
-              name="student_lastname_th"
-              onkeypress="setBillName();"
-              onkeyup="setBillName();"
-              value="{{idcard_data.LastNameTh}}"
-            />  
-            <input
-            type="hidden"
-            name="customer_name"
-            id="customer_name"
-            
-            value="{{idcard_data.FirstNameTh}} {{idcard_data.LastNameTh}}"
-          />
-          </div>
+      </div>
+
+      <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title">
+            <i class="bi bi-person-vcard-fill" style="color:var(--blue)"></i>
+            ข้อมูลลูกค้า
+          </span>
+          <span class="info-badge"><i class="bi bi-2-circle"></i> ขั้นตอน 2 / 3</span>
         </div>
-        {% else %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ชื่อ</label>  <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_name"
-              id="customer_name"
-              
-            />
-          </div>
-        </div>
-        {% endif %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>TAX ID / เลขประจำตัวประชาชน</label> 
-            <input
-              type="text"
-              class="form-control"
-              name="customer_tax"
-              id="customer_tax"
-              value="{{idcard_data.CitizenNo}}"
-            />
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>Tel.</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_phone"
-              id="customer_phone"
-              
-            />
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>Email</label> 
-            <input
-              type="text"
-              class="form-control"
-              name="customer_email"
-              id="customer_email"
-            />
-          </div>
-        </div>
+        <div class="spa-card-body">
+          <input type="hidden" id="customerType" value="existing">
 
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ที่อยู่เลขที่</label>  <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_address"
-              id="customer_address"
-              
-              value="{{address}}"
-            />
-          </div>
-        </div>
-
-        <div class="col-lg-12 col-md-12">
-          <div class="form-group">
-            <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์</label> <label style="color: red">*</label>
-            <select
-              class="form-select"
-              
-              name="location_id"
-              id="selLocations"
-            >
-            
-            {% if location != None %}
-            <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
-            {% endif %}
-
-              <option value="">-เลือกข้อมูล-</option>
-            </select>
-          </div>
-        </div>
-
-
- 
-        
-      </div> 
-      
-
- </div>
-
-
-        <div  id="existingCustomerForm"  class="form-section hidden">
-     <div class="row">
-                <div class="col-lg-12 col-md-12">
-         <div class="form-group">
-            <label>ลูกค้า  
-      </label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              id="customer_id"
-              name="customer_id"
-              
-              onchange="myFunction(this)" 
-              
-            >
-              <option value="">-เลือกลูกค้า-</option>
+          <!-- ฟอร์มลูกค้าเก่า -->
+          <div id="formExist">
+            <label class="form-label">เลือกลูกค้า <span style="color:var(--red)">*</span></label>
+            <select class="form-select select2" id="customer_id_sel">
+              <option value="">— เลือกลูกค้า —</option>
               {% for res in customers %}
-              <option value="{{res.customer_id}}">
-                {{res.customer_name}}  - {{res.customer_code}}  
-              </option>
+              <option value="{{res.customer_id}}">{{res.customer_name}} — {{res.customer_code}}</option>
               {% endfor %}
             </select>
           </div>
 
+          <div class="mt-4 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" onclick="goStep(1)">
+              <i class="bi bi-arrow-left"></i> ย้อนกลับ
+            </button>
+            <button type="button" class="btn btn-primary px-4" id="btnStep2" onclick="doStep2()">
+              ถัดไป 2 <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
         </div>
-        
-      </div> 
-
-
-        
-      </div> 
-
-      <div class="form-group" align="center">
-        <button type="submit" class="btn btn-success rounded-pill">
-          บันทึกข้อมูล
-        </button>
       </div>
-    </form>
+    </div><!-- /panel2 -->
 
+    <!-- ══ STEP 3: ชำระเงิน ══ -->
+    <div class="step-panel" id="panel3">
+      <!-- Info bar -->
+      <div class="spa-card">
+        <div class="spa-card-body" style="padding:12px 18px;">
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="info-badge" id="s3CourseBadge"><i class="bi bi-box-seam"></i> —</span>
+            <span class="info-badge" id="s3DocBadge"><i class="bi bi-receipt"></i> —</span>
+            <span class="info-badge" id="s3PtypeBadge"><i class="bi bi-cash"></i> —</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ข้อมูลลูกค้า (บิล) -->
+      <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title"><i class="bi bi-person-lines-fill" style="color:var(--blue)"></i> ข้อมูลในบิล</span>
+          <span class="info-badge"><i class="bi bi-3-circle"></i> ขั้นตอน 3 / 3</span>
+        </div>
+        <div class="spa-card-body">
+          <input type="hidden" id="s3_register_id">
+          <input type="hidden" id="s3_pay_type">
+          <input type="hidden" id="s3_customer_type">
+          <div class="row g-3">
+            <div class="col-md-4" id="s3IndivFields">
+              <label class="form-label">ชื่อ <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_firstname">
+            </div>
+            <div class="col-md-4" id="s3IndivFields2">
+              <label class="form-label">นามสกุล <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_lastname" oninput="s3AutoName()">
+            </div>
+            <div class="col-md-4" id="s3CorpField" style="display:none;">
+              <label class="form-label">ชื่อลูกค้า <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_custname_corp">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">รหัสลูกค้า <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_cust_code" readonly>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">TAX ID</label>
+              <input type="text" class="form-control" id="s3_tax">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ผู้เสนอโครงการ <span style="color:var(--red)">*</span></label>
+              <select class="form-select" id="s3_seller"></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ชื่อผู้ติดต่อ <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_contact">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ฝ่าย / สาขา <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-control" id="s3_branch" value="00018">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tel.</label>
+              <input type="text" class="form-control" id="s3_phone">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="s3_email">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Ref 1</label>
+              <input type="text" class="form-control" id="s3_ref1">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Ref 2</label>
+              <input type="text" class="form-control" id="s3_ref2">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">STM โอน</label>
+              <input type="datetime-local" class="form-control" id="s3_stmdate">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">หมายเหตุ</label>
+              <input type="text" class="form-control" id="s3_etc">
+            </div>
+            <!-- Credit fields -->
+            <div class="col-md-4 s3CreditOnly" style="display:none;">
+              <label class="form-label">ยืนยันราคาภายในวัน</label>
+              <input type="text" class="form-control daterangesingle" id="s3_confirm_date">
+            </div>
+            <div class="col-md-4 s3CreditOnly" style="display:none;">
+              <label class="form-label">วันที่ส่งของ</label>
+              <input type="text" class="form-control daterangesingle" id="s3_deliver_date">
+            </div>
+            <div class="col-md-4 s3CreditOnly" style="display:none;">
+              <label class="form-label">เลือกผู้จัดการ</label>
+              <select class="form-select" id="s3_manager"></select>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">ที่อยู่ <span style="color:var(--red)">*</span></label>
+              <textarea class="form-control" rows="2" id="s3_address"></textarea>
+            </div>
+          </div>
+          <input type="hidden" id="s3_custname_hidden">
+        </div>
+      </div>
+
+      <!-- รายละเอียดการอบรม -->
+      {% comment %} <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title"><i class="bi bi-list-check" style="color:var(--green)"></i> รายละเอียดการอบรม</span>
+          <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#desModal">
+            <i class="bi bi-pencil-square"></i> เลือก
+          </button>
+        </div>
+        <div class="spa-card-body" id="s3DesSelected">
+          <span style="color:var(--t3); font-size:12px;">— ยังไม่ได้เลือก —</span>
+        </div>
+      </div> {% endcomment %}
+
+      <!-- Addon -->
+      {% comment %} <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title"><i class="bi bi-plus-square-fill" style="color:var(--orange)"></i> รายการเพิ่มเติม (Add-on)</span>
+          <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addonModal">
+            <i class="bi bi-plus"></i> เพิ่ม
+          </button>
+        </div>
+        <div class="spa-card-body" style="padding:0;">
+          <table class="addon-table" id="addonTable">
+            <thead>
+              <tr>
+                <th>#</th><th>รหัส</th><th>รายการ</th><th>หน่วย</th>
+                <th>จำนวน</th><th>ราคา/หน่วย</th><th>ส่วนลด</th><th>รวม</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="addonTbody"></tbody>
+          </table>
+        </div>
+      </div> {% endcomment %}
+
+      <!-- ชำระเงิน -->
+      <div class="spa-card">
+        <div class="spa-card-head">
+          <span class="spa-card-title"><i class="bi bi-cash-coin" style="color:var(--green)"></i> ข้อมูลชำระเงิน</span>
+        </div>
+        <div class="spa-card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">รหัสสินค้า</label>
+              <input type="text" class="form-control" id="s3_rpi_code" readonly>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ราคานี้รวม VAT</label>
+              <select class="form-select" id="s3_vat" onchange="calcVat()">
+                <option value="0">ไม่รวม VAT</option>
+                <option value="1">รวม VAT</option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">รายการสินค้า</label>
+              <textarea class="form-control" rows="2" id="s3_rpi_name"></textarea>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">จำนวน</label>
+              <input type="number" class="form-control" id="s3_qty" value="1" min="1" oninput="calcVat()">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">หน่วย</label>
+              <input type="text" class="form-control" id="s3_unit" value="Course">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">ราคาต่อหน่วย <span style="color:var(--red)">*</span></label>
+              <input type="number" class="form-control" id="s3_price" value="0" oninput="calcVat()">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">ส่วนลด</label>
+              <input type="number" class="form-control" id="s3_discount" value="0" oninput="calcVat()">
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="summary-box mt-4">
+            <div class="summary-row">
+              <span>รวมสินค้าหลัก</span>
+              <span class="amt" id="sumMain">0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>Add-on รวม</span>
+              <span class="amt" id="sumAddon">0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>ก่อน VAT</span>
+              <span class="amt" id="sumBeforeVat">0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>VAT 7%</span>
+              <span class="amt" id="sumVat">0.00</span>
+            </div>
+            <div class="summary-row total">
+              <span>ยอดรวมทั้งสิ้น</span>
+              <span class="amt" id="sumTotal">0.00</span>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" onclick="goStep(2)">
+              <i class="bi bi-arrow-left"></i> ย้อนกลับ
+            </button>
+            <button type="button" class="btn btn-success px-5" id="btnStep3" onclick="doStep3()">
+              <i class="bi bi-check-circle-fill"></i>
+              <span id="btnStep3Text">ยืนยันการขาย</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel3 -->
+
+  </div><!-- /spa-content -->
+</div><!-- /spa-shell -->
+
+
+<!-- ══ MODAL: รายละเอียดการอบรม ══ -->
+<div class="modal fade" id="desModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">รายละเอียดการอบรม</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="desModalBody">
+        <p style="color:var(--t3); font-size:13px;">โหลดข้อมูล...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add-on ══ -->
+<div class="modal fade" id="addonModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">เพิ่มรายการ Add-on</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">สินค้า</label>
+          <select class="form-select" id="addon_course_id"></select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">จำนวน</label>
+          <input type="number" class="form-control" id="addon_qty" value="1" min="1" oninput="calcAddonTotal()">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">ราคาต่อหน่วย</label>
+          <input type="number" class="form-control" id="addon_price" value="0" oninput="calcAddonTotal()">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">ยอดรวม</label>
+          <input type="number" class="form-control" id="addon_total_m" readonly>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+        <button type="button" class="btn btn-primary" onclick="saveAddon()">บันทึก</button>
+      </div>
     </div>
   </div>
 </div>
 
 
-  </div>
-  {% endif %}
-</section>
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const CSRF = '{{ csrf_token }}';
+let state = {
+  step: 1,
+  register_id: null,
+  customer_type: null,
+  pay_type: null,
+  course_name: '',
+  course_code: '',
+  addon: [],
+  total_addon: 0,
+  course_list: [],
+  des_bill: [],
+  selected_bills: [],
+};
+
+// ── Step navigation ────────────────────────────────────────────────────────
+function goStep(n){
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel' + n).classList.add('active');
+  ['si1','si2','si3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if(i + 1 < n) el.classList.add('done');
+    else if(i + 1 === n) el.classList.add('active');
+  });
+  const icons = [document.getElementById('sn1'), document.getElementById('sn2'), document.getElementById('sn3')];
+  icons.forEach((el, i) => {
+    if(i + 1 < n) el.innerHTML = '<i class="bi bi-check2"></i>';
+    else el.textContent = i + 1;
+  });
+  state.step = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Step 1 ─────────────────────────────────────────────────────────────────
+function selectCtype(v){
+  document.querySelectorAll('#ctypeBtns .ctype-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`#ctypeBtns [data-val="${v}"]`).classList.add('selected');
+  document.getElementById('customer_type').value = v;
+}
+function selectPtype(v){
+  document.querySelectorAll('#ptypeBtns .ctype-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`#ptypeBtns [data-val="${v}"]`).classList.add('selected');
+  document.getElementById('pay_type').value = v;
+}
+
+async function doStep1(){
+  const course_id = document.getElementById('course_id').value;
+  const customer_type = document.getElementById('customer_type').value;
+  const pay_type = document.getElementById('pay_type').value;
+  if(!course_id || !customer_type || !pay_type){
+    Swal.fire({ title:'กรุณาเลือกข้อมูลให้ครบ', icon:'warning', confirmButtonText:'ตกลง' });
+    return;
+  }
+  const btn = document.getElementById('btnStep1');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', CSRF);
+  fd.append('course_id', course_id);
+  fd.append('customer_type', customer_type);
+  fd.append('pay_type', pay_type);
+
+  try {
+    const res = await fetch('/api/spa/sale/step1/', { method:'POST', body:fd });
+    const data = await res.json();
+    if(data.status !== 'ok') throw new Error(data.message || 'เกิดข้อผิดพลาด');
+
+    state.register_id  = data.register_id;
+    state.customer_type = data.customer_type;
+    state.pay_type      = data.pay_type;
+    state.course_name   = data.course_name;
+    state.course_code   = data.course_code;
+
+    // update info badges step 2
+    document.getElementById('s2CourseBadge').innerHTML = '<i class="bi bi-box-seam"></i> ' + data.course_code + ' ' + data.course_name;
+    document.getElementById('s2CtypeBadge').innerHTML  = '<i class="bi bi-person"></i> ' + (data.customer_type == 1 ? 'บุคคล':'บริษัท');
+    document.getElementById('s2PtypeBadge').innerHTML  = '<i class="bi bi-cash"></i> ' + (data.pay_type == 1 ? 'เงินสด':'เครดิต');
+
+    goStep(2);
+  } catch(e){
+    Swal.fire({ title:'เกิดข้อผิดพลาด', text: e.message, icon:'error', confirmButtonText:'ตกลง' });
+  } finally {
+    btn.innerHTML = 'ถัดไป <i class="bi bi-arrow-right"></i>';
+    btn.disabled = false;
+  }
+}
+
+// ── Step 2 ─────────────────────────────────────────────────────────────────
+async function doStep2(){
+  const btn = document.getElementById('btnStep2');
+
+  if(!document.getElementById('customer_id_sel').value){
+    Swal.fire({title:'กรุณาเลือกลูกค้า',icon:'warning',confirmButtonText:'ตกลง'}); return;
+  }
+  
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', CSRF);
+  fd.append('customerType', 'existing');
+  fd.append('customer_id', document.getElementById('customer_id_sel').value);
+
+  try {
+    const res = await fetch('/api/spa/sale/step2/', { method:'POST', body:fd });
+    const data = await res.json();
+    console.log(data);
+    if(data.status !== 'ok') throw new Error(data.message || 'เกิดข้อผิดพลาด');
+
+    // store state
+    state.register_id  = data.register_id;
+    state.course_list  = data.course_list;
+
+
+    // populate step 3
+    document.getElementById('s3_register_id').value  = data.register_id;
+    document.getElementById('s3_pay_type').value     = data.pay_type;
+    document.getElementById('s3_customer_type').value = data.customer_type;
+    
+
+    
+    
+    // info badges
+    document.getElementById('s3CourseBadge').innerHTML = '<i class="bi bi-box-seam"></i> ' + data.course_code + ' ' + data.course_name;
+    document.getElementById('s3DocBadge').innerHTML    = '<i class="bi bi-receipt"></i> ' + data.register_number;
+    document.getElementById('s3PtypeBadge').innerHTML  = '<i class="bi bi-cash"></i> ' + (data.pay_type == 1 ? 'เงินสด':'เครดิต');
+
+    // customer fields
+    const cust = data.customer;
+    console.log(cust)
+    document.getElementById('s3_cust_code').value = cust.cus_code;
+    document.getElementById('s3_tax').value       = cust.tax;
+    document.getElementById('s3_phone').value     = cust.phone;
+    document.getElementById('s3_email').value     = cust.email;
+    document.getElementById('s3_address').value   = cust.address;
+
+
+    if(data.customer_type == 1 && data.student){
+      document.getElementById('s3IndivFields').style.display  = '';
+      document.getElementById('s3IndivFields2').style.display = '';
+      document.getElementById('s3CorpField').style.display    = 'none';
+      document.getElementById('s3_firstname').value = data.student.firstname;
+      document.getElementById('s3_lastname').value  = data.student.lastname;
+      document.getElementById('s3_custname_hidden').value = data.student.firstname + ' ' + data.student.lastname;
+    } else {
+      document.getElementById('s3IndivFields').style.display  = 'none';
+      document.getElementById('s3IndivFields2').style.display = 'none';
+      document.getElementById('s3CorpField').style.display    = '';
+      document.getElementById('s3_custname_corp').value = cust.name;
+      document.getElementById('s3_custname_hidden').value = cust.name;
+    }
+
+    // Seller dropdown
+    const selSel = document.getElementById('s3_seller');
+    selSel.innerHTML = '<option value="">— ผู้เสนอโครงการ —</option>';
+    data.list_user.forEach(u => {
+      selSel.insertAdjacentHTML('beforeend', `<option value="${u.id}">${u.name}</option>`);
+    });
+
+    // Manager dropdown (credit only)
+    const mgr = document.getElementById('s3_manager');
+    mgr.innerHTML = '<option value="">— เลือกผู้จัดการ —</option>';
+    data.manage.forEach(m => {
+      mgr.insertAdjacentHTML('beforeend', `<option value="${m.user_id}">${m.name}</option>`);
+    });
+    document.querySelectorAll('.s3CreditOnly').forEach(el => {
+      el.style.display = (data.pay_type == 2) ? '' : 'none';
+    });
+
+    {% comment %} // des_bill modal
+    buildDesModal(data.des_bill);
+
+    // addon table
+    buildAddonTable(data.addon);
+    state.total_addon = data.total_addon;
+    document.getElementById('sumAddon').textContent = fmtNum(data.total_addon); {% endcomment %}
+
+    // course list for addon modal
+    const addCourse = document.getElementById('addon_course_id');
+    addCourse.innerHTML = '<option value="">— เลือกสินค้า —</option>';
+    data.course_list.forEach(c => {
+      addCourse.insertAdjacentHTML('beforeend', `<option value="${c.course_id}">${c.course_code} ${c.course_name}</option>`);
+    });
+
+    // product code / name
+    document.getElementById('s3_rpi_code').value = data.course_code;
+    document.getElementById('s3_rpi_name').value = data.course_name;
+
+    calcVat();
+    goStep(3);
+  } catch(e){
+    Swal.fire({ title:'เกิดข้อผิดพลาด', text: e.message, icon:'error', confirmButtonText:'ตกลง' });
+  } finally {
+    btn.innerHTML = 'ถัดไป <i class="bi bi-arrow-right"></i>';
+    btn.disabled = false;
+  }
+}
+
+// ── Step 3: des_bill, addon, calc, submit ─────────────────────────────────
+function buildDesModal(desList){
+  const body = document.getElementById('desModalBody');
+  body.innerHTML = '';
+  desList.forEach(d => {
+    body.insertAdjacentHTML('beforeend', `
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" name="selected_bills" value="${d.id}" id="des${d.id}">
+        <label class="form-check-label" for="des${d.id}" style="color:var(--t1);">${d.name}</label>
+      </div>`);
+  });
+
+  // sync selected
+  document.getElementById('desModal').addEventListener('hidden.bs.modal', () => {
+    state.selected_bills = [];
+    const selected_names = [];
+    document.querySelectorAll('#desModalBody input[type=checkbox]:checked').forEach(cb => {
+      state.selected_bills.push(cb.value);
+      const label = document.querySelector(`label[for="${cb.id}"]`);
+      if(label) selected_names.push(label.textContent.trim());
+    });
+    const area = document.getElementById('s3DesSelected');
+    area.innerHTML = selected_names.length > 0
+      ? selected_names.map(n => `<span class="info-badge" style="margin:2px;">${n}</span>`).join('')
+      : '<span style="color:var(--t3); font-size:12px;">— ยังไม่ได้เลือก —</span>';
+  }, { once: false });
+}
+
+function buildAddonTable(addons){
+  const tbody = document.getElementById('addonTbody');
+  tbody.innerHTML = '';
+  addons.forEach((a, i) => {
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td>${i+1}</td><td>${a.course_code}</td><td>${a.order_list}</td><td>${a.unit}</td>
+        <td>${a.qty}</td><td>${fmtNum(a.rpi_price)}</td><td>${fmtNum(a.rpi_price_discount)}</td>
+        <td>${fmtNum(a.rpi_price_result)}</td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteAddon('${a.addon_id}')">ลบ</button></td>
+      </tr>`);
+  });
+}
+
+function calcAddonTotal(){
+  const qty = parseFloat(document.getElementById('addon_qty').value) || 0;
+  const price = parseFloat(document.getElementById('addon_price').value) || 0;
+  document.getElementById('addon_total_m').value = (qty * price).toFixed(2);
+}
+
+async function saveAddon(){
+  const course_id = document.getElementById('addon_course_id').value;
+  const qty       = document.getElementById('addon_qty').value;
+  const price     = document.getElementById('addon_price').value;
+  const total_res = document.getElementById('addon_total_m').value;
+  const reg_id    = state.register_id;
+  if(!course_id || !qty || !price){ Swal.fire({title:'กรอกข้อมูลให้ครบ',icon:'warning'}); return; }
+
+  const res = await fetch('/api/saveaddon', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ course_id, qty, rpi_price: price, register_id: reg_id, addon_price_result: total_res })
+  });
+  const data = await res.json();
+  state.addon = data.data.map(a => ({
+    addon_id: String(a.addon_id), course_code: a.course_code, order_list: a.order_list,
+    unit: a.unit, qty: parseFloat(a.qty), rpi_price: parseFloat(a.rpi_price),
+    rpi_price_discount: parseFloat(a.rpi_price_discount), rpi_price_result: parseFloat(a.rpi_price_result)
+  }));
+  state.total_addon = parseFloat(data.total_price_add_on) || 0;
+  buildAddonTable(state.addon);
+  document.getElementById('sumAddon').textContent = fmtNum(state.total_addon);
+  calcVat();
+  bootstrap.Modal.getInstance(document.getElementById('addonModal')).hide();
+  document.getElementById('addon_qty').value = 1;
+  document.getElementById('addon_price').value = 0;
+  document.getElementById('addon_total_m').value = 0;
+}
+
+async function deleteAddon(addon_id){
+  const reg_id = state.register_id;
+  const res = await fetch('/api/deleteaddon', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ addon_id, register_id: reg_id })
+  });
+  const data = await res.json();
+  state.addon = data.data.map(a => ({
+    addon_id: String(a.addon_id), course_code: a.course_code, order_list: a.order_list,
+    unit: a.unit, qty: parseFloat(a.qty), rpi_price: parseFloat(a.rpi_price),
+    rpi_price_discount: parseFloat(a.rpi_price_discount), rpi_price_result: parseFloat(a.rpi_price_result)
+  }));
+  state.total_addon = parseFloat(data.total_price_add_on) || 0;
+  buildAddonTable(state.addon);
+  document.getElementById('sumAddon').textContent = fmtNum(state.total_addon);
+  calcVat();
+}
+
+function s3AutoName(){
+  const f = document.getElementById('s3_firstname').value;
+  const l = document.getElementById('s3_lastname').value;
+  document.getElementById('s3_custname_hidden').value = f + ' ' + l;
+}
+
+function calcVat(){
+  const qty = parseFloat(document.getElementById('s3_qty').value) || 0;
+  const price = parseFloat(document.getElementById('s3_price').value) || 0;
+  const discount = parseFloat(document.getElementById('s3_discount').value) || 0;
+  const vat = document.getElementById('s3_vat').value;
+  const addon = state.total_addon || 0;
+
+  const mainTotal = (qty * price) - discount;
+  const grandTotal = mainTotal + addon;
+
+  let beforeVat, vatAmt, result;
+  if(vat == '1'){
+    beforeVat = grandTotal * 100 / 107;
+    vatAmt    = grandTotal - beforeVat;
+    result    = grandTotal;
+  } else {
+    beforeVat = grandTotal;
+    vatAmt    = grandTotal * 7 / 100;
+    result    = grandTotal + vatAmt;
+  }
+
+  document.getElementById('sumMain').textContent     = fmtNum(mainTotal);
+  document.getElementById('sumAddon').textContent    = fmtNum(addon);
+  document.getElementById('sumBeforeVat').textContent = fmtNum(beforeVat);
+  document.getElementById('sumVat').textContent      = fmtNum(vatAmt);
+  document.getElementById('sumTotal').textContent    = fmtNum(result);
+}
+
+function fmtNum(n){ return parseFloat(n || 0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+async function doStep3(){
+  const btn = document.getElementById('btnStep3');
+  const pay_type = parseInt(document.getElementById('s3_pay_type').value);
+  const cust_type = parseInt(document.getElementById('s3_customer_type').value);
+
+  // Build name
+  let rp_name_customer = '';
+  if(cust_type == 1){
+    const f = document.getElementById('s3_firstname').value;
+    const l = document.getElementById('s3_lastname').value;
+    if(!f || !l){ Swal.fire({title:'กรุณากรอกชื่อ-นามสกุล',icon:'warning'}); return; }
+    rp_name_customer = f + ' ' + l;
+  } else {
+    rp_name_customer = document.getElementById('s3_custname_corp').value;
+    if(!rp_name_customer){ Swal.fire({title:'กรุณากรอกชื่อลูกค้า',icon:'warning'}); return; }
+  }
+
+  const seller = document.getElementById('s3_seller').value;
+  const contact = document.getElementById('s3_contact').value;
+  const address = document.getElementById('s3_address').value;
+  if(!seller){ Swal.fire({title:'กรุณาเลือกผู้เสนอโครงการ',icon:'warning'}); return; }
+  if(!contact){ Swal.fire({title:'กรุณากรอกชื่อผู้ติดต่อ',icon:'warning'}); return; }
+  if(!address){ Swal.fire({title:'กรุณากรอกที่อยู่',icon:'warning'}); return; }
+
+  // Calc final values
+  const qty = parseFloat(document.getElementById('s3_qty').value) || 0;
+  const price = parseFloat(document.getElementById('s3_price').value) || 0;
+  const discount = parseFloat(document.getElementById('s3_discount').value) || 0;
+  const vat = document.getElementById('s3_vat').value;
+  const addon = state.total_addon || 0;
+
+  const mainTotal = (qty * price) - discount;
+  const grandTotal = mainTotal + addon;
+
+  let beforeVat, vatAmt, result;
+  if(vat == '1'){
+    beforeVat = (grandTotal * 100 / 107).toFixed(2);
+    vatAmt    = (grandTotal - parseFloat(beforeVat)).toFixed(2);
+    result    = grandTotal.toFixed(2);
+  } else {
+    beforeVat = grandTotal.toFixed(2);
+    vatAmt    = (grandTotal * 7 / 100).toFixed(2);
+    result    = (grandTotal + parseFloat(vatAmt)).toFixed(2);
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...';
+  btn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', CSRF);
+  fd.append('register_id',       state.register_id);
+  fd.append('rp_name_customer',  rp_name_customer);
+  fd.append('rp_code_customer',  document.getElementById('s3_cust_code').value);
+  fd.append('rp_tax',            document.getElementById('s3_tax').value);
+  fd.append('rp_name_seller',    seller);
+  fd.append('rp_name_contact',   contact);
+  fd.append('rp_branch',         document.getElementById('s3_branch').value);
+  fd.append('rp_address',        address);
+  fd.append('rp_phone',          document.getElementById('s3_phone').value);
+  fd.append('rp_email',          document.getElementById('s3_email').value);
+  fd.append('rp_ref1',           document.getElementById('s3_ref1').value);
+  fd.append('rp_ref2',           document.getElementById('s3_ref2').value);
+  fd.append('stmdate',           document.getElementById('s3_stmdate').value);
+  fd.append('stmetc',            document.getElementById('s3_etc').value);
+  fd.append('vat',               vat);
+  fd.append('rpi_code',          document.getElementById('s3_rpi_code').value);
+  fd.append('rpi_name',          document.getElementById('s3_rpi_name').value);
+  fd.append('rpi_quantity',      qty);
+  fd.append('rpi_unit',          document.getElementById('s3_unit').value);
+  fd.append('rpi_price',         price);
+  fd.append('rpi_price_discount', discount);
+  fd.append('rpi_price_total',   grandTotal.toFixed(2));
+  fd.append('rpi_price_vat',     vatAmt);
+  fd.append('before_price_vat',  beforeVat);
+  fd.append('rpi_price_result',  result);
+  fd.append('addon_total',       addon);
+
+  if(pay_type == 2){
+    fd.append('rp_confirm_date_price', document.getElementById('s3_confirm_date').value);
+    fd.append('rp_date_delivery',      document.getElementById('s3_deliver_date').value);
+    fd.append('user_manage',           document.getElementById('s3_manager').value);
+  }
+
+  state.selected_bills.forEach(b => fd.append('selected_bills', b));
+
+  try {
+    const res = await fetch('/api/spa/sale/step3/', { method:'POST', body:fd });
+    const data = await res.json();
+    if(data.status !== 'ok') throw new Error(data.message || 'เกิดข้อผิดพลาด');
+
+    await Swal.fire({ title:'บันทึกสำเร็จ!', icon:'success', confirmButtonText:'ดูรายการ', timer:2000 });
+    window.location.href = data.redirect;
+  } catch(e){
+    Swal.fire({ title:'เกิดข้อผิดพลาด', text: e.message, icon:'error', confirmButtonText:'ตกลง' });
+    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> ยืนยันการขาย';
+    btn.disabled = false;
+  }
+}
+
+// ── Reset ──────────────────────────────────────────────────────────────────
+document.getElementById('btnReset').addEventListener('click', async () => {
+  const conf = await Swal.fire({
+    title:'เริ่มใหม่?', text:'ข้อมูลที่กรอกไว้จะหายทั้งหมด',
+    icon:'question', showCancelButton:true,
+    confirmButtonText:'เริ่มใหม่', cancelButtonText:'ยกเลิก',
+  });
+  if(!conf.isConfirmed) return;
+  // reset session on server
+  await fetch('/salesnotevent/reset');
+  state = { step:1, register_id:null, customer_type:null, pay_type:null,
+            course_name:'', course_code:'', addon:[], total_addon:0, course_list:[], des_bill:[], selected_bills:[] };
+  goStep(1);
+  // clear fields
+  document.getElementById('course_id').value = '';
+  document.getElementById('customer_type').value = '';
+  document.getElementById('pay_type').value = '';
+  document.getElementById('customer_id_sel').value = '';
+  if($('#course_id').hasClass('select2-hidden-accessible')) $('#course_id').val('').trigger('change');
+});
+
+$(document).ready(function(){
+  $('.select2').select2({ placeholder:'เลือกข้อมูล', allowClear:true });
+  $(function(){
+    var locale = {
+      format:'DD/MM/YYYY', separator:' - ', applyLabel:'Apply', cancelLabel:'Cancel',
+      daysOfWeek:['อา','จ','อ','พ','พฤ','ศ','ส'],
+      monthNames:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+      firstDay:1,
+    };
+    $(document).on('focus','.daterangesingle', function(){
+      if(!$(this).data('daterangepicker'))
+        $(this).daterangepicker({ singleDatePicker:true, startDate:moment(), locale });
+    });
+  });
+});
+</script>
 
 {% endblock %}
-

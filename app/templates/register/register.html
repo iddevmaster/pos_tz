@@ -305,7 +305,7 @@ const selectedValue = selectElement.value;
         <div class="row">
           <div class="col-md-6 mb-4">
             <div class="form-group">
-              <label>หลักสูตร  
+              <label>สินค้า  
 			  </label> <label style="color: red">*</label>
               <select
                 class="select2"
@@ -313,7 +313,7 @@ const selectedValue = selectElement.value;
                 name="ev_id"
                 required
               >
-                <option value="">-เลือกหลักสูตรและวันที่อบรม-</option>
+                <option value="">-เลือกสินค้าและวันที่อบรม-</option>
                 {% for res in data %}
                 <optgroup label="{{res.label}}">
                   {% for r in res.data %}

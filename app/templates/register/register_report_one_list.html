@@ -251,7 +251,7 @@ fileInput.value = ''; // Clear the selected file
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>ผู้เข้าอบรมหลักสูตร : {{main_data.course.course_name}}</h3>
+    <h3>ผู้เข้าอบรมสินค้า : {{main_data.course.course_name}}</h3>
     <span>
       วันอบรม {{main_data.ev_date_start |date:"d/m/Y"}} ถึง
       {{main_data.ev_date_end|date:"d/m/Y"}} รุ่นที่ {{main_data.ev_generation}}
@@ -361,7 +361,7 @@ fileInput.value = ''; // Clear the selected file
               type="submit"
               class="btn btn-light-secondary"
               form="create_form_idcard"
-              onclick="exportTableToExcel('myTable', 'รายชื่อผู้เข้าอบรมหลักสูตร')"
+              onclick="exportTableToExcel('myTable', 'รายชื่อผู้เข้าอบรมสินค้า')"
             >
              
               Export to Excel
@@ -401,8 +401,8 @@ fileInput.value = ''; // Clear the selected file
             <th hidden>รหัสบัตร ปชช./ Passport</th>
             <th hidden>ชื่อ - นามสกุล ภาษาไทย</th>
             <th hidden>ชื่อ - นามสกุล ภาษาอังกฤษ</th>
-            <th hidden>รหัสหลักสูตร</th>
-            <th hidden>ชื่อหลักสูตร</th>
+            <th hidden>รหัสสินค้า</th>
+            <th hidden>ชื่อสินค้า</th>
             <th hidden>วันที่เริ่มต้น</th>
             <th hidden>วันที่สิ้นสุด</th>
             <th hidden>ลายเซ็น</th>
@@ -536,7 +536,7 @@ fileInput.value = ''; // Clear the selected file
     <div class="modal-content">
       <div class="modal-header bg-danger">
         <h5 class="modal-title white" id="myModalLabel19">
-          ยืนยันการจบหลักสูตร
+          ยืนยันการจบสินค้า
         </h5>
         <button
           type="button"
@@ -558,10 +558,10 @@ fileInput.value = ''; // Clear the selected file
           />
           <div align="center">
             <h4>
-              ยืนยันการเรียนจบหลักสูตร {{detail.course.course_name}} ทั้งหมด
+              ยืนยันการเรียนจบสินค้า {{detail.course.course_name}} ทั้งหมด
             </h4>
             <span style="color: red; font-size: 16px"
-              >หมายเหตุ : เมื่อจบหลักสูตรแล้ว จะไม่สามารถแก้ไขข้อมูลได้
+              >หมายเหตุ : เมื่อจบสินค้าแล้ว จะไม่สามารถแก้ไขข้อมูลได้
             </span>
           </div>
           <div class="modal-footer">

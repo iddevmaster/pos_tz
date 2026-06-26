@@ -361,7 +361,6 @@ def customer_create(request):
             customer_email=customer_email,
             customer_address=customer_address,
             location_id=location_id,
-            register_id=register_id,
             customer_fisrt=request.POST['student_firstname_th'],
             customer_last=request.POST['student_lastname_th'])
         else:
@@ -380,7 +379,6 @@ def customer_create(request):
             customer_email=customer_email,
             customer_address=customer_address,
             location_id=location_id,
-            register_id=register_id,
             customer_fisrt='-',
             customer_last='-')
     # 
@@ -482,7 +480,6 @@ def customer_createno(request):
             customer_email=customer_email,
             customer_address=customer_address,
             location_id=location_id,
-            register_id=register_id,
             customer_fisrt=request.POST['student_firstname_th'],
             customer_last=request.POST['student_lastname_th'])
         else:
@@ -501,7 +498,6 @@ def customer_createno(request):
             customer_email=customer_email,
             customer_address=customer_address,
             location_id=location_id,
-            register_id=register_id,
             customer_fisrt='-',
             customer_last='-')
     # 
@@ -3680,3 +3676,373 @@ def get_customer_data(request):
     r = {'customer_address':dat.customer_address,'customer_phone':dat.customer_phone,'customer_code':dat.customer_code,'customer_name':dat.customer_name}
     obj.append(r)
     return JsonResponse(r, status=200,safe=False)
+
+# ─── SPA API: เปิดการขาย ───────────────────────────────────────────────────
+
+@login_required(login_url='/login')
+def spa_sale_step1(request):
+    """Step 1: สร้าง register -> คืน JSON"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error'}, status=405)
+
+    seller_id = request.user.id
+    course_id     = request.POST.get('course_id')
+    customer_type = request.POST.get('customer_type')
+    pay_type      = request.POST.get('pay_type')
+
+    if not all([course_id, customer_type, pay_type]):
+        return JsonResponse({'status': 'error', 'message': 'ข้อมูลไม่ครบ'})
+
+    try:
+        m = user_group.objects.get(user=seller_id)
+    except user_group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'ไม่มีสิทธิ์'})
+
+    old_id = request.session.get('register_id')
+    if old_id:
+        try:
+            register_main.objects.filter(register_id=old_id, register_number='-').delete()
+        except Exception:
+            pass
+    for k in ('register_id', 'idcard_data'):
+        request.session.pop(k, None)
+
+    close_the_sale = 1 if int(pay_type) == 1 else 0
+    obj = register_main.objects.create(
+        register_number='-',
+        customer_type=customer_type,
+        customer_status=0,
+        pay_type=pay_type,
+        pay_status=1,
+        close_the_sale=close_the_sale,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        seller_id=seller_id,
+        course_id=course_id,
+        user_update_id=seller_id,
+        is_event='N',
+        module=m.module,
+    )
+    obj.refresh_from_db()
+    request.session['register_id'] = str(obj.register_id)
+
+    try:
+        c = course.objects.get(course_id=course_id)
+        c_name, c_code = c.course_name, c.course_code
+    except Exception:
+        c_name = c_code = ''
+
+    return JsonResponse({
+        'status': 'ok',
+        'register_id': str(obj.register_id),
+        'customer_type': int(customer_type),
+        'pay_type': int(pay_type),
+        'course_name': c_name,
+        'course_code': c_code,
+    })
+
+
+@login_required(login_url='/login')
+def spa_sale_step2(request):
+    """Step 2: เก็บข้อมูลลูกค้าใน session -> คืน JSON สำหรับ step 3 (ยังไม่บันทึก DB)"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error'}, status=405)
+
+    register_id = request.session.get('register_id')
+    if not register_id:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
+
+    try:
+        content_regist = register_main.objects.get(register_id=register_id)
+    except register_main.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
+
+    ctype = content_regist.customer_type
+    dtype = request.POST.get('customerType', 'new')
+
+    # เก็บข้อมูลลูกค้าใน session (ยังไม่เขียน DB)
+    customer_session = {
+        'customerType': dtype,
+        'customer_id':  request.POST.get('customer_id', ''),
+        'firstname':    request.POST.get('student_firstname_th', '-'),
+        'lastname':     request.POST.get('student_lastname_th', '-'),
+        'customer_name': request.POST.get('customer_name', ''),
+        'customer_tax':  request.POST.get('customer_tax', ''),
+        'customer_phone': request.POST.get('customer_phone', ''),
+        'customer_email': request.POST.get('customer_email', ''),
+        'customer_address': request.POST.get('customer_address', ''),
+        'location_id':  request.POST.get('location_id') or '0',
+    }
+    request.session['spa_customer'] = customer_session
+    request.session.pop('idcard_data', None)
+
+    # สร้างข้อมูลสำหรับแสดงใน step 3 (ไม่ต้องสร้างจาก DB)
+    if dtype == 'existing':
+        try:
+            cus_obj = customers.objects.get(customer_id=customer_session['customer_id'])
+            display_name  = cus_obj.customer_name
+            display_tax   = cus_obj.customer_tax
+            display_phone = cus_obj.customer_phone
+            display_email = cus_obj.customer_email
+            display_customer_code = cus_obj.customer_code
+            try:
+                loc = location_thai.objects.get(location_id=cus_obj.location_id)
+                display_addr = (str(cus_obj.customer_address) + ' ตำบล/แขวง ' + str(loc.district_name) +
+                                ' อำเภอ/เขต ' + str(loc.amphur_name) +
+                                ' จังหวัด ' + str(loc.province_name) + ' ' + str(loc.zipcode))
+            except Exception:
+                display_addr = cus_obj.customer_address or ''
+            customer_session['firstname'] = cus_obj.customer_fisrt or ''
+            customer_session['lastname']  = cus_obj.customer_last or ''
+            customer_session['customer_name']    = cus_obj.customer_name
+            customer_session['customer_tax']     = cus_obj.customer_tax
+            customer_session['customer_phone']   = cus_obj.customer_phone
+            customer_session['customer_email']   = cus_obj.customer_email
+            customer_session['customer_address'] = cus_obj.customer_address or ''
+            customer_session['location_id']      = str(cus_obj.location_id)
+            request.session['spa_customer'] = customer_session
+        except customers.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลลูกค้า'})
+    else:
+        fname = customer_session['firstname']
+        lname = customer_session['lastname']
+        display_name  = customer_session['customer_name'] or (fname + ' ' + lname)
+        display_tax   = customer_session['customer_tax']
+        display_phone = customer_session['customer_phone']
+        display_email = customer_session['customer_email']
+        loc_id = int(customer_session['location_id'] or 0)
+        try:
+            loc = location_thai.objects.get(location_id=loc_id)
+            display_addr = (str(customer_session['customer_address']) + ' ตำบล/แขวง ' + str(loc.district_name) +
+                            ' อำเภอ/เขต ' + str(loc.amphur_name) +
+                            ' จังหวัด ' + str(loc.province_name) + ' ' + str(loc.zipcode))
+        except Exception:
+            display_addr = customer_session['customer_address']
+
+    try:
+        co = course.objects.get(course_id=content_regist.course_id)
+        c_name, c_code = co.course_name, co.course_code
+    except Exception:
+        c_name = c_code = ''
+
+    users = [{'id': u.id, 'name': u.first_name + ' ' + u.last_name}
+             for u in User.objects.filter(is_staff=0, is_active=1)]
+    des_list = [{'id': d.des_id, 'name': d.name}
+                for d in desciption_bill.objects.all().order_by('seq')]
+    mgr_list = [{'user_id': s.user.id, 'name': s.user.first_name + ' ' + s.user.last_name}
+                for s in fact_signature.objects.select_related('user').all()]
+
+    uid_nd = str(register_id).replace('-', '')
+    addons_qs = add_on.objects.filter(register_id=uid_nd, status='Y')
+    addon_list = [{'addon_id': str(a.addon_id), 'course_code': a.course_code,
+                   'order_list': a.order_list, 'unit': a.unit, 'qty': float(a.qty),
+                   'rpi_price': float(a.rpi_price), 'rpi_price_discount': float(a.rpi_price_discount),
+                   'rpi_price_result': float(a.rpi_price_result)} for a in addons_qs]
+    total_addon = float(addons_qs.aggregate(Sum('rpi_price_result'))['rpi_price_result__sum'] or 0)
+    cl = [{'course_id': c2.course_id, 'course_code': c2.course_code, 'course_name': c2.course_name}
+          for c2 in course.objects.filter(is_show_order='Y', cancelled=1)]
+
+    return JsonResponse({
+        'status': 'ok',
+        'register_id': str(register_id),
+        'customer': {
+            'name':    display_name,
+            'tax':     display_tax,
+            'phone':   display_phone,
+            'email':   display_email,
+            'address': display_addr,
+            'cus_code':display_customer_code
+        },
+        'student': {'firstname': customer_session['firstname'], 'lastname': customer_session['lastname']} if ctype == 1 else None,
+        'course_name':   c_name,
+        'course_code':   c_code,
+        'customer_type': ctype,
+        'pay_type':      content_regist.pay_type,
+        'list_user':  users,
+        'des_bill':   des_list,
+        'manage':     mgr_list,
+        'addon':      addon_list,
+        'total_addon': total_addon,
+        'course_list': cl,
+    })
+
+
+@login_required(login_url='/login')
+def spa_sale_step3(request):
+    """Step 3: บันทึกทุกอย่างลง DB ครั้งเดียว -> คืน JSON"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error'}, status=405)
+
+    now = date.today()
+    user_id  = request.user.id
+    register_id = request.POST.get('register_id')
+
+    # ── ดึง session ลูกค้าจาก step 2 ──
+    cus_sess = request.session.get('spa_customer')
+    if not cus_sess:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลลูกค้าใน session'})
+
+    try:
+        content_main = register_main.objects.get(register_id=register_id)
+    except register_main.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลการขาย'})
+
+    ctype    = content_main.customer_type
+    pay_type = content_main.pay_type
+    active   = 1 if pay_type == 1 else 0
+
+    mc, yc = now.month, now.year
+    yc_f = str(yc + 543)
+
+    # ── 1. สร้าง / ดึงลูกค้า ──
+    dtype = cus_sess.get('customerType', 'new')
+    if dtype == 'existing':
+        cus = customers.objects.get(customer_id=cus_sess['customer_id'])
+    else:
+        fname = cus_sess.get('firstname', '-')
+        lname = cus_sess.get('lastname', '-')
+        cname = cus_sess.get('customer_name') or (fname + ' ' + lname)
+        cus = customers.objects.create(
+            customer_code='C' + str(dateTimeIntNow()),
+            customer_name=cname,
+            customer_tax=cus_sess.get('customer_tax', ''),
+            customer_phone=cus_sess.get('customer_phone', ''),
+            customer_email=cus_sess.get('customer_email', ''),
+            customer_address=cus_sess.get('customer_address', ''),
+            location_id=int(cus_sess.get('location_id') or 0),
+            customer_fisrt=fname,
+            customer_last=lname,
+        )
+
+    # ── 2. fact_customer ──
+    if fact_customer.objects.filter(register_id=register_id).count() == 0:
+        fact_customer.objects.create(customer_id=cus.customer_id, register_id=register_id)
+
+    # ── 3. student (กรณีบุคคล) ──
+    if ctype == 1:
+        total_s = student.objects.filter(crt_date__month=mc, crt_date__year=yc).count()
+        stu_code = 'IDC' + twoDigit(mc) + treeDigit(total_s + 1) + '/' + str(yc)
+        student.objects.create(
+            student_identification_number=cus.customer_tax,
+            student_prefix_th='', student_firstname_th=cus.customer_fisrt,
+            student_lastname_th=cus.customer_last,
+            student_prefix_eng='', student_firstname_eng='', student_lastname_eng='',
+            student_code=stu_code,
+            crt_date=dateTimeNow(), upd_date=dateTimeNow(),
+            register_id=register_id,
+        )
+
+    # ── 4. register_number ──
+    total_r = register_main.objects.filter(
+        crt_date__month=mc, crt_date__year=yc).exclude(register_number='-').count()
+    reg_no = 'R' + yc_f[2:4] + '/' + twoDigit(mc) + '/' + treeDigit(total_r + 1)
+
+    # ── 5. payment data จาก POST ──
+    rp_code_customer = request.POST.get('rp_code_customer', '')
+    rp_name_customer = request.POST.get('rp_name_customer', '')
+    rp_tax           = request.POST.get('rp_tax', '')
+    rp_name_seller   = request.POST.get('rp_name_seller', '')
+    rp_name_contact  = request.POST.get('rp_name_contact', '')
+    rp_branch        = request.POST.get('rp_branch', '')
+    rp_address       = request.POST.get('rp_address', '')
+    rp_phone         = request.POST.get('rp_phone', '')
+    rp_email         = request.POST.get('rp_email', '')
+    vat              = request.POST.get('vat', '0')
+    stmda            = request.POST.get('stmdate')
+    etc              = request.POST.get('stmetc')
+    bills            = request.POST.getlist('selected_bills', [])
+    rp_ref1          = request.POST.get('rp_ref1', '')
+    rp_ref2          = request.POST.get('rp_ref2', '')
+    user_man         = request.POST.get('user_manage') or 0
+
+    rp_confirm_date_price = dmytoymd(request.POST.get('rp_confirm_date_price', now.strftime('%d/%m/%Y')))
+    rp_date_delivery      = dmytoymd(request.POST.get('rp_date_delivery', now.strftime('%d/%m/%Y')))
+
+    rpi_code           = request.POST.get('rpi_code', '')
+    rpi_name           = request.POST.get('rpi_name', '')
+    rpi_quantity       = request.POST.get('rpi_quantity', '1')
+    rpi_unit           = request.POST.get('rpi_unit', 'Course')
+    rpi_price          = request.POST.get('rpi_price', '0')
+    rpi_price_discount = request.POST.get('rpi_price_discount', '0')
+    rpi_price_total    = request.POST.get('rpi_price_total', '0')
+    rpi_price_vat      = request.POST.get('rpi_price_vat', '0')
+    rpi_price_result   = request.POST.get('rpi_price_result', '0')
+
+    total_rp = register_payment.objects.filter(crt_date__month=mc, crt_date__year=yc).count()
+    rp_doc_number = 'IDC' + yc_f[2:4] + '/' + twoDigit(mc) + '/' + treeDigit(total_rp + 1)
+
+    try:
+        u = User.objects.get(id=rp_name_seller)
+        seller_name = u.first_name + ' ' + u.last_name
+    except Exception:
+        seller_name = str(rp_name_seller)
+
+    # ── 6. อัปเดต register_main ──
+    content_main.register_number = reg_no
+    content_main.status = 'Y'
+    content_main.orderstatus = 'FullPayment'
+    content_main.seller_id = rp_name_seller
+    content_main.save()
+
+    # ── 7. register_payment ──
+    rp_obj = register_payment.objects.create(
+        rp_doc_number=rp_doc_number,
+        rp_code_customer=rp_code_customer,
+        rp_name_customer=rp_name_customer,
+        rp_tax=rp_tax,
+        rp_name_seller=seller_name,
+        rp_name_contact=rp_name_contact,
+        rp_branch=rp_branch,
+        rp_address=rp_address,
+        rp_phone=rp_phone,
+        rp_email=rp_email,
+        rp_confirm_date_price=rp_confirm_date_price,
+        rp_date_delivery=rp_date_delivery,
+        rp_quota=0,
+        rp_ref1=rp_ref1,
+        rp_ref2=rp_ref2,
+        active=active,
+        crt_date=dateTimeNow(),
+        upd_date=dateTimeNow(),
+        register_id=register_id,
+        user_create=user_id,
+        user_manage=user_man,
+        status_bill='Y',
+        commit_head=0,
+    )
+    rp_obj.refresh_from_db()
+
+    # ── 8. register_payment_items ──
+    new_total = float(rpi_price_total) - float(rpi_price_vat) if vat != '0' else float(rpi_price_total)
+    register_payment_items.objects.create(
+        rpi_code=rpi_code, rpi_name=rpi_name,
+        rpi_quantity=rpi_quantity, rpi_unit=rpi_unit,
+        rpi_price=rpi_price, rpi_price_discount=rpi_price_discount,
+        rpi_price_total=new_total,
+        rpi_price_vat=rpi_price_vat,
+        rpi_price_result=rpi_price_result,
+        rpi_pay=rpi_price_result,
+        rp_id=rp_obj.rp_id,
+        register_id=register_id,
+        vat=vat, stmdate=stmda, stmetc=etc,
+        type_payment='FullPayment',
+    )
+
+    # ── 9. factbilldes ──
+    uid_nd = str(register_id).replace('-', '')
+    for bill in bills:
+        factbilldes.objects.create(register_id=uid_nd, des_id=bill)
+
+    if pay_type == 2:
+        register_payment.objects.filter(register_id=register_id).exclude(
+            rp_id=rp_obj.rp_id).update(active=0)
+
+    # ── 10. ล้าง session ──
+    for k in ('register_id', 'idcard_data', 'spa_customer'):
+        request.session.pop(k, None)
+
+    return JsonResponse({
+        'status': 'ok',
+        'redirect': '/salesnotevent/payment/history/' + str(register_id),
+    })
+

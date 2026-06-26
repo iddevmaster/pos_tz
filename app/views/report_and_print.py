@@ -510,7 +510,7 @@ def register_excel_seller(request):
             close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
         elif close_the_sale == 2:
             close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
+    course_param = "ทุกสินค้า"
     if course_id != 0:
         content = content.filter(register__ev__course_id=course_id)
         c = course.objects.get(course_id=course_id)
@@ -855,7 +855,7 @@ def register_excel_quotation(request):
             close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
         elif close_the_sale == 2:
             close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
+    course_param = "ทุกสินค้า"
     if course_id != 0:
         content = content.filter(register__ev__course_id=course_id)
         c = course.objects.get(course_id=course_id)
@@ -960,7 +960,7 @@ def register_excel_quotation_byuser(request):
             close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
         elif close_the_sale == 2:
             close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
+    course_param = "ทุกสินค้า"
     if course_id != 0:
         content = content.filter(register__ev__course_id=course_id)
         c = course.objects.get(course_id=course_id)
@@ -3561,7 +3561,7 @@ def register_excel_bill(request):
     #         close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
     #     elif close_the_sale == 2:
     #         close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
+    course_param = "ทุกสินค้า"
     if course_id != 0:
         content = content.filter(register__ev__course_id=course_id)
         c = course.objects.get(course_id=course_id)
@@ -3676,7 +3676,7 @@ def register_excel_billtoday(request):
     #         close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
     #     elif close_the_sale == 2:
     #         close_the_sale_param = "ปิดการขาย - ขายไม่สำเร็จ"
-    course_param = "ทุกหลักสูตร"
+    course_param = "ทุกสินค้า"
     if course_id != 0:
         content = content.filter(register__ev__course_id=course_id)
         c = course.objects.get(course_id=course_id)
@@ -3796,7 +3796,7 @@ def register_excel_billtoday_summarize(request):
 
     # close_the_sale_param = "ปิดการขาย - ขายสำเร็จ"
 
-    # course_param = "ทุกหลักสูตร"
+    # course_param = "ทุกสินค้า"
     # if course_id != 0:
     #     content = content.filter(register__ev__course_id=course_id)
     #     c = course.objects.get(course_id=course_id)

@@ -59,8 +59,9 @@ def course_create(request):
         return render(request, '404.html')
     course_code = request.POST['course_code']
     course_name = request.POST['course_name']
-    course_name_eng = request.POST['course_name_eng']
+    course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
+    image_cover = request.FILES.get('image_cover')
     content = course(
         course_code=course_code,
         course_name=course_name,
@@ -69,6 +70,8 @@ def course_create(request):
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         module=m.module)
+    if image_cover:
+        content.image_cover = image_cover
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course")
@@ -79,14 +82,17 @@ def course_update(request):
     course_id = request.POST['course_id']
     course_code = request.POST['course_code']
     course_name = request.POST['course_name']
-    course_name_eng = request.POST['course_name_eng']
+    course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
+    image_cover = request.FILES.get('image_cover')
     content = course.objects.get(pk=course_id)
     content.course_code = course_code
     content.course_name = course_name
     content.course_name_eng = course_name_eng
     content.active = active
     content.upd_date = dateTimeNow()
+    if image_cover:
+        content.image_cover = image_cover
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course")
