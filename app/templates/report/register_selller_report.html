@@ -1,201 +1,150 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}{% block content %}
 
-<div class="row">
-  <div class="col-12 col-md-6 order-md-1 order-last">
-    <h3>รายงานข้อมูลการขาย</h3>
-  </div>
-  <div class="col-12 col-md-6 order-md-2 order-first">
-    <nav
-      aria-label="breadcrumb"
-      class="breadcrumb-header float-start float-lg-end"
-    >
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="/">หน้าหลัก</a>
-        </li>
+<style>
+.filter-card {
+  background: var(--card); border: 1px solid var(--bdr);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 20px;
+}
+.filter-card-head {
+  padding: 12px 18px; background: var(--card2);
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--t1);
+}
+.filter-card-body { padding: 18px 20px; }
+.filter-card-foot {
+  padding: 12px 20px; background: var(--card2);
+  border-top: 1px solid var(--bdr);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.form-label { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 4px; }
+.form-control, .form-select {
+  border: 1px solid var(--bdr2); background: var(--card2); color: var(--t1);
+  border-radius: 8px; font-size: 13px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,110,247,.15);
+  background: var(--card); color: var(--t1); outline: none;
+}
 
-        <li class="breadcrumb-item active" aria-current="page">
-          รายงานข้อมูลการขาย
-        </li>
+.report-frame {
+  background: var(--card); border: 1px solid var(--bdr);
+  border-radius: var(--radius); overflow: hidden;
+}
+.report-frame-head {
+  padding: 10px 18px; background: var(--card2);
+  border-bottom: 1px solid var(--bdr);
+  font-size: 13px; font-weight: 600; color: var(--t2);
+  display: flex; align-items: center; gap: 8px;
+}
+</style>
+
+<!-- Breadcrumb + Header -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item active">รายงานข้อมูลการขาย</li>
       </ol>
     </nav>
+    <h5 class="mb-0 fw-bold" style="color:var(--t1);">
+      <i class="bi bi-bar-chart-line-fill" style="color:var(--blue)"></i>
+      รายงานข้อมูลการขาย
+    </h5>
   </div>
 </div>
 
-<section class="section">
-  <div class="card">
-    <div class="card-body">
-      <form
-        method="post"
-        action="/register/excel/seller"
-        autocomplete="off"
-        target="iframe_target"
-      >
-        {% csrf_token %}
-        <div class="row">
-          
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">ช่วงวันที่</label>
-            <input
-              type="text"
-              class="form-control daterange"
-              id="date_range"
-              name="date_range"
-              required
-              value="{{daterange}}"
-            />
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">จังหวัด</label>
-            <select class="form-select select2" id="qprovince" name="qprovince">
-              <option value="0">-ทุกจังหวัด-</option>
-              {% for res in province_list %}
-              <option value="{{res.province_code}}">
-                {{res.province_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-3 mb-4">
-              <label for="x" class="form-label">กลุ่มลูกค้า</label>
-            <div class="form-group">
-              <select
-                class="form-select"
-                name="qcustomer_type"
-                id="qcustomer_type"
-              >
-                <option value="0">-ประเภทลูกค้าทั้งหมด-</option>
-                <option value="1">บุคคล</option>
-                <option value="2">บริษัท</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="col-md-3 mb-4">
-            <label for="x" class="form-label">ประเภทการจ่าย</label>
-            <div class="form-group">
-              <select class="form-select" name="qpay_type" id="qpay_type">
-                <option value="0">-ประเภทการชำระเงินทั้งหมด-</option>
-                <option value="1">เงินสด</option>
-                <option value="2">เครดิต</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="col-md-3 mb-4">
-            <label for="x" class="form-label">สถานะ</label>
-            <select
-              class="form-control"
-              name="qclose_the_sale"
-              id="qclose_the_sale"
-            >
-              <option value="-1">-สถานะปิดการขายทั้งหมด-</option>
-              <option value="0">กำลังขาย</option>
-              <option value="1">ปิดการขาย - ขายสำเร็จ</option>
-              <option value="2">ปิดการขาย - ไม่ขายสำเร็จ</option>
-            </select>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">สินค้า</label>
-            <select class="form-select select2" id="qcourse" name="qcourse">
-              <option value="0">-สินค้าทั้งหมด-</option>
-              {% for res1 in course_list %}
-              <option value="{{res1.course_id}}">
-                {{res1.course_code}} {{res1.course_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">รุ่น</label>
-            <input
-              type="text"
-              id="qgeneration"
-              name="qgeneration"
-              class="form-control"
-              pattern="[0-9]+"
-              placeholder="รุ่น"
-            />
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">ผู้เสนอโครงการ</label>
-            <select class="form-select select2" id="qseller" name="qseller">
-              <option value="0">-ผู้ขายทั้งหมด-</option>
-              {% for res2 in list_user %}
-              <option value="{{res2.id}}">
-                {{res2.first_name}} {{res2.last_name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-md-3 mb-4">
-            <label for="x" class="form-label">Event</label>
-            <select
-              class="form-control"
-              name="event"
-              id="event"
-            >
-              <option value="0">ทั้งหมด</option>
-              <option value="1">มี Event</option>
-              <option value="2">ไม่มี Event</option>
-  
-            </select>
-          </div>
-
-                    <div class="col-md-3 mb-4">
-            <label for="x" class="form-label">ประเภทบิล</label>
-            <select
-              class="form-control"
-              name="type_payment"
-              id="type_payment"
-            >
-              <option value="FullPayment">จ่ายครบ</option>
-              <option value="Deposit">ค้างชำระ</option>
-         
-  
-            </select>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <label for="x" class="form-label">ชื่อลูกค้า</label>
-            <input
-              type="text"
-              class="form-control"
-              id="qcustomer_name"
-              name="qcustomer_name"
-              placeholder="ค้นหาชื่อลูกค้า"
-            />
-          </div>
-        </div>
-        <div class="form-goup" align="center" style="padding-top: 25px">
-          <button type="submit" class="btn btn-success">
-            <i class="icon dripicons-experiment"></i>
-            กรอง
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-warning"
-            onclick="window.location.href='/report/register/export/seller'"
-          >
-            <i class="icon dripicons-clockwise"></i>
-            รีเซ็ต
-          </button>
-        </div>
-      </form>
-    </div>
+<!-- Filter Form -->
+<div class="filter-card">
+  <div class="filter-card-head">
+    <i class="bi bi-funnel-fill" style="color:var(--blue)"></i>
+    ตัวกรองข้อมูล
   </div>
+  <form method="post" action="/register/excel/seller" autocomplete="off" target="iframe_target">
+    {% csrf_token %}
+    <div class="filter-card-body">
+      <div class="row g-3">
 
-  <iframe
-    id="iframe_target"
-    name="iframe_target"
-    src="/register/excel/seller"
-    style="height: 500px; width: 100%; border: thin; background-color: #fff"
-  ></iframe>
-</section>
+        <!-- ช่วงวันที่ -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-calendar-range"></i> ช่วงวันที่</label>
+          <input type="text" class="form-control daterange" id="date_range" name="date_range"
+                 value="{{ daterange }}" required>
+        </div>
+
+        <!-- สินค้า -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-box-seam"></i> สินค้า</label>
+          <select class="form-select select2" name="qcourse">
+            <option value="0">— ทุกสินค้า —</option>
+            {% for c in course_list %}
+            <option value="{{ c.course_id }}">{{ c.course_code }} {{ c.course_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- ประเภทการชำระ -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-credit-card"></i> ประเภทการชำระ</label>
+          <select class="form-select" name="qpay_type">
+            <option value="0">— ทุกประเภท —</option>
+            <option value="1">เงินสด</option>
+            <option value="2">เครดิต</option>
+          </select>
+        </div>
+
+        <!-- กลุ่มลูกค้า -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-people"></i> กลุ่มลูกค้า</label>
+          <select class="form-select" name="qcustomer_type">
+            <option value="0">— ทุกประเภท —</option>
+            <option value="1">บุคคลธรรมดา</option>
+            <option value="2">นิติบุคคล / บริษัท</option>
+          </select>
+        </div>
+
+        <!-- สถานะบิล (Y/W/N) -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-receipt"></i> สถานะบิล</label>
+          <select class="form-select" name="qstatus">
+            <option value="">— ทุกสถานะ —</option>
+            <option value="Y">เงินสด / สำเร็จ (Y)</option>
+            <option value="W">เครดิต / รอยืนยัน (W)</option>
+           
+          </select>
+        </div>
+
+        <!-- ชื่อลูกค้า -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label"><i class="bi bi-search"></i> ชื่อลูกค้า</label>
+          <input type="text" class="form-control" name="qcustomer_name" placeholder="ค้นหาชื่อลูกค้า">
+        </div>
+
+      </div>
+    </div>
+    <div class="filter-card-foot">
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="bi bi-funnel"></i> กรองข้อมูล
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm"
+              onclick="window.location.href='/report/register/export/seller'">
+        <i class="bi bi-arrow-counterclockwise"></i> รีเซ็ต
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Report Frame -->
+<div class="report-frame">
+  <div class="report-frame-head">
+    <i class="bi bi-table" style="color:var(--blue)"></i>
+    ผลลัพธ์รายงาน — กด <strong>กรองข้อมูล</strong> เพื่ออัปเดต
+  </div>
+  <iframe id="iframe_target" name="iframe_target"
+          src="/register/excel/seller"
+          style="height:600px; width:100%; border:none; background:#f5f6fa;">
+  </iframe>
+</div>
 
 {% endblock %}

@@ -1,199 +1,211 @@
-{% load humanize %} {% comment %}
-https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel-using-JavaScript/
-{% endcomment %}
-<script
-  src="https://code.jquery.com/jquery-latest.min.js"
-  type="text/javascript"
-></script>
+{% load humanize %}
+<script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-  var tableToExcel = (function () {
-    // Define your style class template.
-    var style = "<style>.green { background-color: green; }</style>";
-    var uri = "data:application/vnd.ms-excel;base64,",
-      template =
-        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
-        style +
-        "</head><body><table>{table}</table></body></html>",
-      base64 = function (s) {
-        return window.btoa(unescape(encodeURIComponent(s)));
-      },
-      format = function (s, c) {
-        return s.replace(/{(\w+)}/g, function (m, p) {
-          return c[p];
-        });
-      };
-    return function (table, name) {
-      if (!table.nodeType) table = document.getElementById(table);
-      var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
-      window.location.href = uri + base64(format(template, ctx));
-    };
-  })();
+var tableToExcel = (function () {
+  var style = "<style>body{font-family:'Sarabun',sans-serif;font-size:13px;} table{border-collapse:collapse;} td,th{border:1px solid #ccc;padding:4px 8px;}</style>";
+  var uri = "data:application/vnd.ms-excel;base64,",
+    template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' + style + "</head><body><table>{table}</table></body></html>",
+    base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))); },
+    format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }); };
+  return function (table, name) {
+    if (!table.nodeType) table = document.getElementById(table);
+    var ctx = { worksheet: name || "Worksheet", table: table.innerHTML };
+    window.location.href = uri + base64(format(template, ctx));
+  };
+})();
 </script>
-<link
-  href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
-  rel="stylesheet"
-/>
 
-<style type="text/css">
-  body {
-    font-family: "Sarabun", sans-serif;
-    font-size: 16px;
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Sarabun', sans-serif; font-size: 13px; background: #f5f6fa; margin: 0; padding: 12px; }
+
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
   }
-  table {
-    font-size: 16px;
+  .toolbar-info { font-size: 13px; color: #475569; }
+  .toolbar-info strong { color: #1e293b; }
+  .btn-excel {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #16a34a; color: #fff; border: none; border-radius: 7px;
+    padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
   }
-  .green {
-    background-color: green;
+  .btn-excel:hover { background: #15803d; }
+
+  .params-bar {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 8px 14px; margin-bottom: 10px; font-size: 12px; color: #475569;
+    display: flex; flex-wrap: wrap; gap: 10px;
   }
+  .params-bar span { display: inline-flex; align-items: center; gap: 4px; }
+  .params-bar b { color: #334155; }
+
+  .data-table {
+    width: 100%; border-collapse: collapse; background: #fff;
+    border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
+    font-size: 12.5px;
+  }
+  .data-table thead tr { background: #1e3a5f; color: #fff; }
+  .data-table thead th {
+    padding: 9px 10px; text-align: left; font-weight: 600;
+    font-size: 11.5px; letter-spacing: .3px; white-space: nowrap;
+  }
+  .data-table tbody tr:nth-child(even) { background: #f8fafc; }
+  .data-table tbody tr:hover { background: #eff6ff; }
+  .data-table tbody td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  .data-table tfoot td {
+    padding: 9px 10px; background: #1e3a5f; color: #fff;
+    font-weight: 700; border-top: 2px solid #1e40af;
+  }
+
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .badge-cash    { background: #dcfce7; color: #16a34a; }
+  .badge-credit  { background: #ede9fe; color: #7c3aed; }
+  .badge-y       { background: #dcfce7; color: #16a34a; }
+  .badge-w       { background: #fef3c7; color: #d97706; }
+  .badge-person  { background: #dbeafe; color: #1d4ed8; }
+  .badge-company { background: #f3e8ff; color: #7c3aed; }
+  .badge-full    { background: #dcfce7; color: #15803d; }
+  .badge-deposit { background: #fef9c3; color: #a16207; }
+  .badge-event   { background: #e0f2fe; color: #0369a1; }
+  .badge-noevent { background: #f1f5f9; color: #64748b; }
+
+  .num-col { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: #94a3b8; }
+  .total-label { text-align: right; }
+  .total-val { text-align: right; font-size: 14px; }
 </style>
 
-<div style="padding-bottom: 65px">
-  <div style="float: left">
-    ทั้งหมด <strong>{{param.total_data}} </strong>รายการ
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-info">
+    ทั้งหมด <strong>{{ param.total_data }}</strong> รายการ
+    &nbsp;|&nbsp; ยอดรวม <strong>฿{{ total_sum|floatformat:2|intcomma }}</strong>
   </div>
-  <div style="float: right">
-    <input
-      type="button"
-      onclick="tableToExcel('testTable', 'รายงานการขาย')"
-      value="Export to Excel"
-      style="height: 35px"
-    />
-  </div>
+  <button class="btn-excel" onclick="tableToExcel('reportTable','รายงานข้อมูลการขาย')">
+    &#x1F4E5; Export Excel
+  </button>
 </div>
-{% comment %} rules="groups" frame="hsides" border="2" {% endcomment %}
-<table
-  id="testTable"
-  summary="Code page support in different versions of MS Windows."
-  style="width: 100%; border-collapse: collapse"
-  border="1"
->
-  <tbody>
-    <tr style="font-weight: bold">
-      <td colspan="2">{{param.range_param}}</td>
-      <td>จังหวัด : {{param.province_name}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="font-weight: bold">
-      <td>ประเภทการชำระเงิน : {{param.pay_type_param}}</td>
-      <td>สถานะการขาย : {{param.close_the_sale_param}}</td>
-      <td>สินค้า : {{param.course_param}}</td>
-      <td>รุ่น : {{param.generation_param}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr style="font-weight: bold">
-      <td>ชื่อผู้ขาย : {{param.seller_param}}</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
 
-    <tr style="font-weight: bold">
-      <td>ชื่อลูกค้า</td>
-      <td>Tax ID</td>
-      <td>เบอร์โทร</td>
-      <td>ที่อยู่</td>
-      <td>สินค้า</td>
-       <td>เลขรายการ</td>
-      <td>ประเภทลูกค้า</td>
-      <td>ประเภทชำระเงิน</td>
-      <td>สถานะการขาย</td>
-      <td>ชื่อผู้ขาย</td>
-      <td>ราคาที่ปิดการขาย</td>
-      <td>วันที่เปิดการขาย</td>
-      <td>เลขที่บิล</td>
-      <td>ประเภท</td>
-    </tr>
-    {% for res in data %}
+<!-- Params bar -->
+<div class="params-bar">
+  <span>📅 <b>ช่วงวันที่:</b> {{ param.range_param }}</span>
+  <span>💳 <b>ประเภทชำระ:</b> {{ param.pay_type_param }}</span>
+  <span>👤 <b>ประเภทลูกค้า:</b> {{ param.customer_type_param }}</span>
+  <span>📦 <b>สินค้า:</b> {{ param.course_param }}</span>
+</div>
+
+<!-- Table -->
+<table id="reportTable" class="data-table">
+  <thead>
     <tr>
-      <td>{{res.customer_list.customer.customer_name}}</td>
-      <td>{{res.customer_list.customer.customer_tax}}</td>
-      <td>{{res.customer_list.customer.customer_phone}}</td>
-      <td>
-        {{res.customer_list.customer.customer_address}} ตำแบล/แขวง
-        {{res.customer_list.location.district_name}} อำเภอ/เขต
-        {{res.customer_list.location.amphur_name}} จังหวัด
-        {{res.customer_list.location.province_name}}
-        {{res.customer_list.location.zipcode}}
-      </td>
-       <td>
-  
-        {% if res.payment_list.register.is_event == 'Y' %}
-     {{res.course_list.course.course_name}}
-        {% else %}
-     {{res.course_list.course_name}}
-        {% endif %}
-       </td>
-         <td> {{res.customer_list.register.register_number}}</td>
-      <td align="center">
-        {% if res.customer_list.register.customer_type == 1 %}
-        <span>บุคคล</span>
-        {% else %}
-        <span>บริษัท</span>
-        {% endif %}
-      </td>
-      <td align="center">
-        {% if res.customer_list.register.pay_type == 1 %}
-        <span>เงินสด / {{res.customer_list.register.orderstatus}}</span>
-        {% else %}
-        <span>เครดิต</span>
-        {% endif %}
-      </td>
-      <td align="center">
-        {% if res.customer_list.register.close_the_sale == 1 %}
-        <span>ปิดการขาย - ขายสำเร็จ</span>
-        {% elif res.customer_list.register.close_the_sale == 2 %}
-        <span>ปิดการขาย - ขายไม่สำเร็จ</span>
-        {% else %}
-        <span>กำลังขาย</span>
-        {% endif %}
-      </td>
-      <td>{{res.payment_list.rp.rp_name_seller}}</td>
-      <td align="right">
-        {{res.payment_list.rpi_price_result|floatformat:2|intcomma }}
-      </td>
-      <td>{{res.payment_list.rp.crt_date|date:"d/m/Y H:i"}}</td>
-      <td>{{res.payment_list.rp.rp_doc_number}}</td>
-      <td>
-        {% if res.customer_list.register.ev_id %}
-        <span>มี Event</span>
-        {% else %}
-        <span>ไม่มี Event</span>
-        {% endif %}
-      </td>
-      {% endfor %}
+      <th>#</th>
+      <th>เลขที่บิล / ใบเสนอราคา</th>
+      <th>เลขรายการ</th>
+      <th>ชื่อลูกค้า</th>
+      <th>เลขผู้เสียภาษี</th>
+      <th>เบอร์โทร</th>
+      <th>ที่อยู่</th>
+      <th>สินค้า</th>
+      <th>ประเภทลูกค้า</th>
+      <th>ประเภทชำระ</th>
+      <th>สถานะบิล</th>
+      <th>วันที่บิล</th>
+      <th class="num-col">ราคา (บาท)</th>
     </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
     <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>รวม</td>
-      <td align="right">{{total_sum|floatformat:2|intcomma}}</td>
-      <td></td>
-      <td></td>
+      <td class="muted" style="font-size:11px;">{{ forloop.counter }}</td>
+
+      <td>
+        <strong style="color:#1d4ed8;">{{ item.rp.rp_doc_number|default:"—" }}</strong>
+      </td>
+
+      <td style="font-size:11px; color:#64748b;">
+        {{ item.register.register_number|default:"—" }}
+      </td>
+
+      <td>
+        <div style="font-weight:600;">{{ item.rp.rp_name_customer|default:"—" }}</div>
+        {% if item.rp.rp_code_customer %}
+          <div style="font-size:11px; color:#94a3b8;">{{ item.rp.rp_code_customer }}</div>
+        {% endif %}
+      </td>
+
+      <td style="font-size:11.5px;">{{ item.rp.rp_tax|default:"—" }}</td>
+
+      <td style="font-size:11.5px;">{{ item.rp.rp_phone|default:"—" }}</td>
+
+      <td style="font-size:11px; color:#475569; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+          title="{{ item.rp.rp_address }}">
+        {{ item.rp.rp_address|default:"—" }}
+      </td>
+
+      <td>
+        {% if item.register.is_event == 'Y' %}
+          {{ item.register.ev.course.course_name|default:"—" }}
+          {% if item.register.ev.ev_generation %}
+            <div style="font-size:11px; color:#94a3b8;">รุ่น {{ item.register.ev.ev_generation }}</div>
+          {% endif %}
+        {% else %}
+          {{ item.register.course.course_name|default:"—" }}
+        {% endif %}
+      </td>
+
+      <td>
+        {% if item.register.customer_type == 1 %}
+          <span class="badge badge-person">บุคคล</span>
+        {% else %}
+          <span class="badge badge-company">นิติบุคคล</span>
+        {% endif %}
+      </td>
+
+      <td>
+        {% if item.register.pay_type == 1 %}
+          <span class="badge badge-cash">เงินสด</span>
+        {% else %}
+          <span class="badge badge-credit">เครดิต</span>
+        {% endif %}
+      </td>
+
+      <td>
+        {% if item.register.status == 'Y' %}
+          <span class="badge badge-y">สำเร็จ</span>
+        {% elif item.register.status == 'W' %}
+          <span class="badge badge-w">รอยืนยัน</span>
+        {% else %}
+          <span class="badge muted">{{ item.register.status|default:"—" }}</span>
+        {% endif %}
+      </td>
+
+      <td style="font-size:11.5px; white-space:nowrap;">
+        {{ item.rp.crt_date|date:"d/m/Y H:i" }}
+      </td>
+
+      <td class="num-col" style="font-weight:600; color:#1e293b;">
+        {{ item.rpi_price_result|floatformat:2|intcomma }}
+      </td>
     </tr>
+    {% empty %}
+    <tr>
+      <td colspan="13" style="text-align:center; padding:40px; color:#94a3b8;">
+        ไม่พบรายการในช่วงที่เลือก
+      </td>
+    </tr>
+    {% endfor %}
   </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="12" class="total-label">รวมยอดทั้งหมด ({{ param.total_data }} รายการ)</td>
+      <td class="total-val num-col">฿{{ total_sum|floatformat:2|intcomma }}</td>
+    </tr>
+  </tfoot>
 </table>
