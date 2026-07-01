@@ -1,0 +1,72 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  .com-wrap{ --paper:#F6F1E6; --paper-raised:#FBF8F1; --ink:#1E2A38; --ink-soft:#5B6677; --navy:#16233A;
+    --brass:#A8762E; --sage:#4C7A63; --sage-bg:#E4EFE8; --violet-bg:#EDE7F6; --violet:#5B3FA0;
+    --terracotta-bg:#F6E4DE; --terracotta:#B5533C; --hairline:#D9CFB8; --radius:6px;
+    background:var(--paper); padding:20px; border-radius:8px; }
+  .com-nav{ display:flex; gap:8px; margin-bottom:18px; }
+  .com-nav a{ padding:8px 14px; border-radius:20px; font-size:13px; text-decoration:none; border:1px solid var(--hairline); color:var(--ink-soft); }
+  .com-nav a.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  .com-card{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius); padding:16px 20px; margin-bottom:20px; }
+  .ptype{ font-size:11px; padding:3px 8px; border-radius:3px; }
+  .ptype.STAFF{ background:var(--violet-bg); color:var(--violet); }
+  .ptype.DEPARTMENT{ background:var(--sage-bg); color:var(--sage); }
+  .ptype.EXTERNAL_ORG{ background:var(--terracotta-bg); color:var(--terracotta); }
+  .prow{ display:grid; grid-template-columns:140px 1fr 90px; gap:14px; align-items:center; padding:10px 4px; border-bottom:1px solid var(--hairline); font-size:13.5px; }
+</style>
+
+<div class="com-wrap">
+  <div class="com-nav">
+    <a href="/commission/rules">01 ตั้งค่าตามสินค้า</a>
+    <a href="/commission/payees" class="active">02 ผู้รับเงิน</a>
+    <a href="/commission/bills">03 บิลขาย · กำหนดค่าคอม</a>
+  </div>
+
+  <div class="com-card">
+    <h4 style="margin-top:0;">เพิ่มผู้รับเงิน</h4>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <select id="payeeType" class="form-select" style="width:160px;">
+        <option value="STAFF">บุคคล</option>
+        <option value="DEPARTMENT">ฝ่ายภายใน</option>
+        <option value="EXTERNAL_ORG">หน่วยงานภายนอก</option>
+      </select>
+      <input type="text" id="payeeName" class="form-control" placeholder="ชื่อผู้รับเงิน" style="width:260px;">
+      <input type="text" id="bankName" class="form-control" placeholder="ธนาคาร (ถ้ามี)" style="width:180px;">
+      <input type="text" id="bankAccount" class="form-control" placeholder="เลขบัญชี (ถ้ามี)" style="width:180px;">
+      <button class="btn btn-primary btn-sm" onclick="addPayee()">+ เพิ่มผู้รับเงิน</button>
+    </div>
+  </div>
+
+  <div class="com-card">
+    <div id="payeeRows">
+      {% for p in payees %}
+      <div class="prow" id="payee-{{ p.payee_id }}">
+        <span class="ptype {{ p.payee_type }}">
+          {% if p.payee_type == 'STAFF' %}บุคคล{% elif p.payee_type == 'DEPARTMENT' %}ฝ่ายภายใน{% else %}หน่วยงานภายนอก{% endif %}
+        </span>
+        <span>{{ p.payee_name }}{% if p.bank_name %} — {{ p.bank_name }} {{ p.bank_account }}{% endif %}</span>
+        <button class="btn btn-outline-danger btn-sm" onclick="rmPayee({{ p.payee_id }})">ลบ</button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+async function addPayee(){
+  const payload = {
+    payee_type: document.getElementById('payeeType').value,
+    payee_name: document.getElementById('payeeName').value.trim(),
+    bank_name: document.getElementById('bankName').value.trim(),
+    bank_account: document.getElementById('bankAccount').value.trim(),
+  };
+  if(!payload.payee_name) return;
+  await fetch('/api/commission/payee/create', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  location.reload();
+}
+async function rmPayee(id){
+  await fetch('/api/commission/payee/delete', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({payee_id:id})});
+  document.getElementById('payee-'+id).remove();
+}
+</script>
+{% endblock %}

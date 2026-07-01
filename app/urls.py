@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print, project, desbill, notification, customer
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print, project, desbill, notification, customer, commission
 
 urlpatterns = [
     # Register
@@ -400,6 +400,25 @@ urlpatterns = [
 
      path('api/notifications/readone', notification.fetch_notification_read_one),
   
+
+    # Commission
+    path('commission/rules', commission.rules_page),
+    path('commission/payees', commission.payees_page),
+    path('commission/bills', commission.bills_page),
+    path('api/commission/rules/list', commission.api_rules_list),
+    path('api/commission/rules/save', commission.api_rules_save),
+    path('api/commission/rules/allocation/add', commission.api_rules_allocation_add),
+    path('api/commission/rules/allocation/delete', commission.api_rules_allocation_delete),
+    path('api/commission/payee/create', commission.api_payee_create),
+    path('api/commission/payee/delete', commission.api_payee_delete),
+    path('api/commission/plan/open', commission.api_plan_open),
+    path('api/commission/plan/detail', commission.api_plan_detail),
+    path('api/commission/plan/line/save', commission.api_plan_line_save),
+    path('api/commission/plan/allocation/add', commission.api_plan_allocation_add),
+    path('api/commission/plan/allocation/delete', commission.api_plan_allocation_delete),
+    path('api/commission/plan/lock', commission.api_plan_lock),
+    path('api/commission/plan/unlock', commission.api_plan_unlock),
+    path('api/commission/payout/status', commission.api_payout_status),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

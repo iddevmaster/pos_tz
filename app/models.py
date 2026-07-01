@@ -577,4 +577,142 @@ class notifications(models.Model):
     cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    
+
+# ============================================================================
+# Commission engine (นโยบายค่าคอมมิชชั่น 4 นโยบายหลัก + เงื่อนไขย่อย)
+# แทนที่ com_head / commissionstages / fact_commission เดิมด้วยโครงสร้างที่รองรับ
+# การแบ่งสัดส่วนผู้รับหลายคนต่อเงื่อนไข และแผนค่าคอมเฉพาะบิลที่แก้ไขได้อิสระ
+# จากอัตรากลาง แต่กำหนด/ล็อกได้ก็ต่อเมื่อบิลนั้น "ปิดการขาย - ขายสำเร็จ" แล้วเท่านั้น
+# ============================================================================
+
+# calc_type  PRORATA = แบ่งสัดส่วนตามยอด , LUMPSUM = จ่ายก้อนเดียว , FIXED = จำนวนคงที่
+class commission_policy(models.Model):
+    policy_id = models.AutoField(primary_key=True)
+    policy_code = models.CharField(max_length=8, blank=True, default=None)
+    policy_name = models.CharField(max_length=255, blank=True, default=None)
+    seq = models.IntegerField(default=0, blank=False)
+    active = models.IntegerField(default=1, blank=False)
+
+    def __str__(self):
+        return str(self.policy_code) + " " + str(self.policy_name)
+
+
+class commission_condition(models.Model):
+    condition_id = models.AutoField(primary_key=True)
+    policy = models.ForeignKey(
+        commission_policy, on_delete=models.CASCADE, related_name="conditions")
+    condition_code = models.CharField(max_length=8, blank=True, default=None)
+    condition_name = models.CharField(max_length=255, blank=True, default=None)
+    calc_type = models.CharField(max_length=16, blank=True, default="PRORATA")
+    seq = models.IntegerField(default=0, blank=False)
+    active = models.IntegerField(default=1, blank=False)
+
+    def __str__(self):
+        return str(self.condition_code) + " " + str(self.condition_name)
+
+
+# payee_type  STAFF = บุคคล(พนักงาน/ที่ปรึกษา) , DEPARTMENT = ฝ่ายงานภายใน , EXTERNAL_ORG = หน่วยงานภายนอก
+class commission_payee(models.Model):
+    payee_id = models.AutoField(primary_key=True)
+    payee_type = models.CharField(max_length=16, blank=True, default=None)
+    payee_name = models.CharField(max_length=255, blank=True, default=None)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="commission_payee_user")
+    teacher = models.ForeignKey(
+        teacher, on_delete=models.CASCADE, null=True, blank=True, related_name="commission_payee_teacher")
+    bank_name = models.CharField(max_length=128, blank=True, default=None)
+    bank_account = models.CharField(max_length=64, blank=True, default=None)
+    active = models.IntegerField(default=1, blank=False)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.payee_name)
+
+
+# อัตรา "ค่าเริ่มต้น" ต่อสินค้า(course) x เงื่อนไข ปรับได้อิสระตลอดเวลา ไม่ผูกกับบิลใด ๆ
+class commission_rule(models.Model):
+    rule_id = models.AutoField(primary_key=True)
+    course = models.ForeignKey(
+        course, on_delete=models.CASCADE, related_name="commission_rules")
+    condition = models.ForeignKey(commission_condition, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, blank=False)
+    active = models.IntegerField(default=0, blank=False)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ("course", "condition")
+
+
+# สัดส่วนผู้รับ "ค่าเริ่มต้น" ของ rule ใช้เป็น template ตอนเปิดแผนค่าคอมของบิล
+class commission_rule_allocation(models.Model):
+    alloc_id = models.AutoField(primary_key=True)
+    rule = models.ForeignKey(
+        commission_rule, on_delete=models.CASCADE, related_name="allocations")
+    payee = models.ForeignKey(commission_payee, on_delete=models.CASCADE)
+    percent = models.FloatField(default=0, blank=False)
+
+
+# หัวแผนค่าคอมของ "บิล" หนึ่งใบ (1 รายการขาย = 1 register_payment_items)
+# สร้างได้ก็ต่อเมื่อบิลนั้นปิดการขาย-ขายสำเร็จแล้วเท่านั้น (ดูเงื่อนไขที่ view เป็นผู้ตรวจสอบ)
+class commission_plan(models.Model):
+    plan_id = models.AutoField(primary_key=True)
+    rpi = models.OneToOneField(
+        register_payment_items, on_delete=models.CASCADE, related_name="commission_plan")
+    register = models.ForeignKey(
+        register_main, on_delete=models.CASCADE, related_name="commission_plans")
+    is_locked = models.IntegerField(default=0, blank=False)
+    locked_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="commission_plan_locked_by")
+    locked_at = models.DateTimeField(blank=True, null=True)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+
+
+# source  DEFAULT = ดึงจาก commission_rule ของสินค้า ณ วันที่เปิดแผน , CUSTOM = ผู้ใช้แก้ไขเฉพาะบิลนี้
+class commission_plan_line(models.Model):
+    line_id = models.AutoField(primary_key=True)
+    plan = models.ForeignKey(
+        commission_plan, on_delete=models.CASCADE, related_name="lines")
+    condition = models.ForeignKey(commission_condition, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, blank=False)
+    active = models.IntegerField(default=0, blank=False)
+    source = models.CharField(max_length=16, blank=True, default="DEFAULT")
+
+    class Meta:
+        unique_together = ("plan", "condition")
+
+
+class commission_plan_allocation(models.Model):
+    alloc_id = models.AutoField(primary_key=True)
+    line = models.ForeignKey(
+        commission_plan_line, on_delete=models.CASCADE, related_name="allocations")
+    payee = models.ForeignKey(commission_payee, on_delete=models.CASCADE)
+    percent = models.FloatField(default=0, blank=False)
+
+
+# ยอดค่าคอมที่ต้องจ่ายจริง เกิดขึ้นตอน "ล็อกแผน" เท่านั้น (snapshot อัตรา/ยอดฐาน ณ เวลาล็อก)
+# status  PENDING = รอดำเนินการ , APPROVED = อนุมัติแล้ว , PAID = จ่ายแล้ว
+class commission_payout(models.Model):
+    payout_id = models.AutoField(primary_key=True)
+    plan = models.ForeignKey(
+        commission_plan, on_delete=models.CASCADE, related_name="payouts")
+    condition = models.ForeignKey(commission_condition, on_delete=models.CASCADE)
+    payee = models.ForeignKey(
+        commission_payee, on_delete=models.CASCADE, null=True, blank=True)
+    rate = models.FloatField(default=0, blank=False)
+    base_amount = models.FloatField(default=0, blank=False)
+    payee_percent = models.FloatField(null=True, blank=True)
+    payout_amount = models.FloatField(default=0, blank=False)
+    status = models.CharField(max_length=16, blank=True, default="PENDING")
+    approved_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="commission_payout_approved_by")
+    approved_at = models.DateTimeField(blank=True, null=True)
+    paid_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="commission_payout_paid_by")
+    paid_at = models.DateTimeField(blank=True, null=True)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+
+

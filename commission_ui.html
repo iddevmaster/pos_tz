@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทะเบียนค่าคอม — Commission Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E6;
+    --paper-raised:#FBF8F1;
+    --ink:#1E2A38;
+    --ink-soft:#5B6677;
+    --navy:#16233A;
+    --navy-soft:#23344F;
+    --brass:#A8762E;
+    --brass-light:#E9D9B8;
+    --sage:#4C7A63;
+    --sage-bg:#E4EFE8;
+    --terracotta:#B5533C;
+    --terracotta-bg:#F6E4DE;
+    --hairline:#D9CFB8;
+    --radius:6px;
+    --serif:'Noto Serif Thai', serif;
+    --sans:'IBM Plex Sans Thai','IBM Plex Sans', sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); -webkit-font-smoothing:antialiased;
+  }
+  .app{ display:flex; min-height:100vh; }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:240px; flex:0 0 240px; background:var(--navy); color:#EDE7D6;
+    padding:28px 18px; display:flex; flex-direction:column; gap:28px;
+  }
+  .brand{ padding:0 6px; }
+  .brand .mark{
+    font-family:var(--serif); font-weight:700; font-size:20px; letter-spacing:.02em;
+  }
+  .brand .sub{
+    font-family:var(--mono); font-size:11px; color:#9DA9C0; letter-spacing:.12em; text-transform:uppercase; margin-top:4px;
+  }
+  .nav{ display:flex; flex-direction:column; gap:2px; }
+  .nav button{
+    all:unset; cursor:pointer; padding:11px 12px; border-radius:4px; font-size:14px;
+    color:#C7CEDB; border-left:3px solid transparent; display:flex; align-items:center; gap:10px;
+  }
+  .nav button .n{ font-family:var(--mono); font-size:11px; color:#7E8AA3; }
+  .nav button:hover{ background:var(--navy-soft); color:#fff; }
+  .nav button.active{ background:var(--navy-soft); color:#fff; border-left-color:var(--brass); }
+  .nav button.active .n{ color:var(--brass); }
+  .sidebar-foot{ margin-top:auto; font-size:11px; color:#7E8AA3; line-height:1.6; border-top:1px solid rgba(255,255,255,.1); padding-top:14px; }
+
+  /* ---------- main ---------- */
+  .main{ flex:1; padding:32px 40px 60px; max-width:980px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+  .topbar h1{ font-family:var(--serif); font-weight:600; font-size:24px; margin:0; }
+  .topbar .desc{ font-size:13px; color:var(--ink-soft); margin-top:4px; }
+
+  select, input[type=text], input[type=number]{
+    font-family:var(--sans); font-size:14px; color:var(--ink);
+    background:var(--paper-raised); border:1px solid var(--hairline); border-radius:4px;
+    padding:8px 10px;
+  }
+  input[type=number].mono, .num-input{ font-family:var(--mono); }
+  button.btn{
+    all:unset; cursor:pointer; font-family:var(--sans); font-size:13px; font-weight:500;
+    padding:9px 14px; border-radius:4px; border:1px solid var(--navy);
+    background:var(--navy); color:#fff;
+  }
+  button.btn:hover{ background:var(--navy-soft); }
+  button.btn.ghost{ background:transparent; color:var(--navy); border:1px solid var(--hairline); }
+  button.btn.ghost:hover{ background:var(--paper-raised); }
+  button.btn.small{ padding:5px 10px; font-size:12px; }
+
+  /* ---------- product header card ---------- */
+  .product-card{
+    background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius);
+    padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:26px;
+  }
+  .product-card .code{ font-family:var(--mono); font-size:13px; color:var(--brass); letter-spacing:.04em; }
+  .product-card .name{ font-family:var(--serif); font-size:20px; font-weight:600; margin-top:2px; }
+  .pill{
+    font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; cursor:pointer; border:1px solid transparent;
+  }
+  .pill.on{ background:var(--sage-bg); color:var(--sage); }
+  .pill.off{ background:var(--terracotta-bg); color:var(--terracotta); }
+  .grand-total{ text-align:right; }
+  .grand-total .label{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.08em; }
+  .grand-total .value{ font-family:var(--mono); font-size:26px; font-weight:600; color:var(--ink); }
+
+  /* ---------- policy ledger section ---------- */
+  .policy{ margin-bottom:30px; }
+  .policy-head{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .num-badge{
+    width:30px; height:30px; border-radius:50%; border:1.5px solid var(--brass); color:var(--brass);
+    font-family:var(--serif); font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; flex:0 0 30px;
+  }
+  .policy-head h2{ font-family:var(--serif); font-size:16px; font-weight:600; margin:0; flex:1; }
+  .policy-subtotal{ font-family:var(--mono); font-size:13px; color:var(--brass); }
+
+  .cond-table{ border-top:1px solid var(--hairline); }
+  .cond-row{
+    border-bottom:1px solid var(--hairline); padding:12px 4px; display:grid;
+    grid-template-columns:52px 1fr 110px 130px 70px 28px; gap:12px; align-items:center;
+  }
+  .cond-row .code{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+  .cond-row .cname{ font-size:13.5px; line-height:1.5; }
+  .stamp{
+    font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase;
+    border:1px dashed var(--brass); color:var(--brass); padding:3px 6px; border-radius:3px;
+    transform:rotate(-2deg); text-align:center; white-space:nowrap;
+  }
+  .rate-input-wrap{ display:flex; align-items:center; gap:4px; }
+  .rate-input-wrap input{ width:70px; text-align:right; }
+  .rate-input-wrap .pct{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+
+  .switch{ position:relative; width:34px; height:18px; flex:0 0 34px; }
+  .switch input{ opacity:0; width:100%; height:100%; margin:0; position:absolute; cursor:pointer; }
+  .switch .track{ position:absolute; inset:0; background:var(--hairline); border-radius:10px; transition:.15s; pointer-events:none; }
+  .switch .knob{ position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:.15s; pointer-events:none; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked + .track{ background:var(--sage); }
+  .switch input:checked ~ .knob{ transform:translateX(16px); }
+
+  .expand-btn{ all:unset; cursor:pointer; color:var(--ink-soft); font-size:13px; text-align:center; }
+  .expand-btn:hover{ color:var(--ink); }
+
+  .alloc-panel{ grid-column:1/-1; background:var(--paper); border:1px dashed var(--hairline); border-radius:4px; padding:12px 14px; margin-top:6px; }
+  .alloc-panel .arow{ display:flex; align-items:center; gap:10px; font-size:13px; padding:5px 0; border-bottom:1px solid var(--hairline); }
+  .alloc-panel .arow:last-of-type{ border-bottom:none; }
+  .alloc-panel .arow .aname{ flex:1; }
+  .alloc-panel .arow .apct{ font-family:var(--mono); color:var(--brass); }
+  .alloc-panel .arow button{ all:unset; cursor:pointer; color:var(--terracotta); font-size:12px; }
+  .alloc-add{ display:flex; gap:8px; margin-top:10px; align-items:center; }
+  .alloc-add select{ flex:1; }
+  .alloc-add input{ width:80px; }
+  .empty-note{ font-size:12px; color:var(--ink-soft); font-style:italic; }
+
+  /* ---------- payees view ---------- */
+  .payee-row{ display:grid; grid-template-columns:140px 1fr 90px; gap:14px; align-items:center; padding:11px 4px; border-bottom:1px solid var(--hairline); font-size:13.5px; }
+  .ptype{ font-family:var(--mono); font-size:11px; letter-spacing:.04em; padding:3px 8px; border-radius:3px; width:fit-content; }
+  .ptype.STAFF{ background:#EDE7F6; color:#5B3FA0; }
+  .ptype.DEPARTMENT{ background:var(--sage-bg); color:var(--sage); }
+  .ptype.EXTERNAL_ORG{ background:var(--terracotta-bg); color:var(--terracotta); }
+  .add-form{ display:flex; gap:10px; margin:18px 0; flex-wrap:wrap; align-items:center; background:var(--paper-raised); border:1px solid var(--hairline); padding:14px; border-radius:var(--radius); }
+
+  /* ---------- bills view ---------- */
+  .bill-card{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+  .bill-row{
+    display:grid; grid-template-columns:120px 1fr 130px 110px 110px 28px; gap:12px; align-items:center;
+    padding:14px 18px; cursor:pointer;
+  }
+  .bill-row .bno{ font-family:var(--mono); font-size:13px; color:var(--brass); }
+  .bill-row .bprod{ font-size:13.5px; }
+  .bill-row .bprod .pname{ color:var(--ink-soft); font-size:12px; }
+  .bill-row .bamt{ font-family:var(--mono); text-align:right; }
+  .bill-row .bdate{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+  .bstatus{ font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; padding:4px 9px; border-radius:20px; width:fit-content; }
+  .bstatus.OPEN{ background:var(--brass-light); color:var(--brass); }
+  .bstatus.SOLD{ background:var(--sage-bg); color:var(--sage); }
+  .bstatus.CANCELLED{ background:var(--terracotta-bg); color:var(--terracotta); text-decoration:line-through; }
+  .bill-detail{ border-top:1px dashed var(--hairline); padding:18px 22px; background:var(--paper); }
+  .bill-actions{ display:flex; gap:10px; padding:0 18px 16px; }
+  .payout-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px dotted var(--hairline); font-size:13.5px; }
+  .payout-row .pname2{ flex:1; }
+  .payout-row .pwho{ color:var(--ink-soft); font-size:12px; }
+  .payout-row .pamt{ font-family:var(--mono); }
+  .pstatus{ font-family:var(--mono); font-size:10px; text-transform:uppercase; padding:3px 8px; border-radius:20px; cursor:pointer; border:1px solid transparent; }
+  .pstatus.PENDING{ background:var(--brass-light); color:var(--brass); }
+  .pstatus.APPROVED{ background:#DCE6F2; color:#2C5282; }
+  .pstatus.PAID{ background:var(--sage-bg); color:var(--sage); }
+  .lock-note{ font-size:11.5px; color:var(--ink-soft); margin-top:10px; font-style:italic; }
+
+  /* ---------- calculator view ---------- */
+  .calc-controls{ display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:var(--paper-raised); border:1px solid var(--hairline); padding:16px; border-radius:var(--radius); margin-bottom:24px; }
+  .calc-controls .field label{ display:block; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+  .receipt{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius); padding:22px 26px; }
+  .receipt h3{ font-family:var(--serif); font-size:15px; margin:18px 0 8px; }
+  .receipt h3:first-child{ margin-top:0; }
+  .rline{ display:flex; justify-content:space-between; font-size:13.5px; padding:6px 0; border-bottom:1px dotted var(--hairline); }
+  .rline .amt{ font-family:var(--mono); }
+  .rline.sub{ padding-left:14px; color:var(--ink-soft); font-size:12.5px; }
+  .rtotal{ display:flex; justify-content:space-between; padding-top:14px; margin-top:6px; border-top:2px solid var(--ink); font-family:var(--serif); font-weight:600; font-size:18px; }
+  .rtotal .amt{ font-family:var(--mono); }
+
+  @media (max-width: 760px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:100%; flex:0 0 auto; flex-direction:row; overflow-x:auto; align-items:center; }
+    .nav{ flex-direction:row; }
+    .main{ padding:22px 18px 40px; }
+    .cond-row{ grid-template-columns:1fr; gap:6px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">ทะเบียนค่าคอม</div>
+      <div class="sub">Commission Ledger</div>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-view="rules" class="active"><span class="n">01</span> ตั้งค่าตามสินค้า</button>
+      <button data-view="payees"><span class="n">02</span> ผู้รับเงิน</button>
+      <button data-view="bills"><span class="n">03</span> บิลขาย</button>
+    </nav>
+    <div class="sidebar-foot">เงื่อนไขทั้ง 4 นโยบายเป็นข้อมูลกลาง<br>ปรับได้เฉพาะอัตราต่อสินค้า</div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+/* ---------------- master data (fixed, mirrors commission_policy / commission_condition) ---------------- */
+const POLICIES = [
+  { code:'1', name:'ค่า Commission IDC 3%', conditions:[
+    { code:'1.1', name:'ค่าคอมการขาย 3% แบบแบ่งสัดส่วน', calc:'PRORATA' },
+    { code:'1.2', name:'ค่าคอมการขาย 3% แบบก้อนเดียว', calc:'LUMPSUM' },
+  ]},
+  { code:'2', name:'จ่ายบุคคลภายนอก', conditions:[
+    { code:'2.1', name:'ค่าการตลาด (ภายนอก: NT, สมาคม, ชมรม, ศูนย์, สำนัก, อื่นๆ)', calc:'PRORATA' },
+    { code:'2.2', name:'ค่าที่ปรึกษา หรือ นายหน้า: แนะนำ/นำไปสู่การปิดการขาย', calc:'PRORATA' },
+  ]},
+  { code:'3', name:'จ่ายค่าตอบแทนผู้ปฏิบัติงาน', conditions:[
+    { code:'3.1', name:'การจัดหากองทุน', calc:'PRORATA' },
+    { code:'3.2', name:'การจัดเชิงกลยุทธ์: เป้าหมายลูกค้า ออกแบบสื่อการสอน สื่อการตลาด', calc:'PRORATA' },
+    { code:'3.3', name:'การพัฒนาโปรแกรม และผลิตผลิตภัณฑ์ A', calc:'PRORATA' },
+    { code:'3.4', name:'การพัฒนาโปรแกรม และผลิตผลิตภัณฑ์ B', calc:'PRORATA' },
+    { code:'3.5', name:'การติดตั้งและงานที่เกี่ยวข้อง: บันทึกข้อมูลตั้งต้น', calc:'PRORATA' },
+    { code:'3.6', name:'SUPPORT TEAM: อบรม/ ให้ข้อมูลเชิงลึก/ บริการก่อน-หลังขาย', calc:'PRORATA' },
+    { code:'3.7', name:'การบริหารจัดการภายในฝ่ายที่เกี่ยวข้อง A', calc:'PRORATA' },
+    { code:'3.8', name:'การบริหารจัดการภายในฝ่ายที่เกี่ยวข้อง B', calc:'PRORATA' },
+    { code:'3.9', name:'BACK OFFICE: ทีมงานสำนักงานที่เกี่ยวข้องการขาย/บริการ', calc:'PRORATA' },
+  ]},
+  { code:'4', name:'ค่า Commission IDC', conditions:[
+    { code:'4.1', name:'PRE SALE: การเปิดการขาย/ ให้บริการ/ นำไปสู่การปิดการขาย', calc:'PRORATA' },
+    { code:'4.2', name:'CORE TEAM: ทีมงานที่เกี่ยวข้องให้การขาย/บริการสำเร็จ', calc:'PRORATA' },
+    { code:'4.3', name:'การบริหารจัดการภายในฝ่าย: A', calc:'PRORATA' },
+    { code:'4.4', name:'การบริหารจัดการภายในฝ่าย: B', calc:'PRORATA' },
+    { code:'4.5', name:'BACK OFFICE: ทีมงานสำนักงานที่เกี่ยวข้องการขาย/บริการ', calc:'PRORATA' },
+  ]},
+];
+const CALC_LABEL = { PRORATA:'แบ่งสัดส่วน', LUMPSUM:'ก้อนเดียว', FIXED:'คงที่' };
+
+/* ---------------- in-memory state (mirrors commission_rule / payee / product) ---------------- */
+const state = {
+  payees: [
+    { id:1, type:'DEPARTMENT', name:'ฝ่ายขายตรง' },
+    { id:2, type:'DEPARTMENT', name:'ฝ่ายพัฒนาโปรแกรม' },
+    { id:3, type:'EXTERNAL_ORG', name:'สมาคมบริษัทจัดการลงทุน' },
+    { id:4, type:'STAFF', name:'คุณสมชาย ใจดี (ที่ปรึกษา)' },
+  ],
+  products: [
+    { id:1, code:'MASubmission1.2', name:'MA Submission 1.2', active:true,
+      rules:{ '1.2': { rate:5.5, active:true, allocations:[] } } },
+  ],
+  bills: [],
+  selectedProductId: 1,
+  view: 'rules',
+  expanded: new Set(),
+  expandedBill: null,
+  expandedPlanCond: new Set(),
+};
+let nextPayeeId = 5, nextProductId = 2, nextBillId = 1, nextPayoutId = 1;
+
+function getProduct(){ return state.products.find(p => p.id === state.selectedProductId); }
+function ruleFor(p, code){ if(!p.rules[code]) p.rules[code] = { rate:null, active:false, allocations:[] }; return p.rules[code]; }
+function fmtPct(n){ return (Math.round(n*1000)/1000).toString(); }
+function fmtBaht(n){ return n.toLocaleString('th-TH',{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+/* ---------------- render: nav ---------------- */
+document.getElementById('nav').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-view]');
+  if(!btn) return;
+  state.view = btn.dataset.view;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active', b===btn));
+  render();
+});
+
+/* ---------------- render: rules view ---------------- */
+function renderRules(){
+  const p = getProduct();
+  const productOptions = state.products.map(pr =>
+    `<option value="${pr.id}" ${pr.id===p.id?'selected':''}>${pr.code} — ${pr.name}</option>`).join('');
+
+  const grandTotal = Object.values(p.rules).reduce((s,r)=> s + (r.active && r.rate ? r.rate : 0), 0);
+
+  const policyBlocks = POLICIES.map(policy=>{
+    const subtotal = policy.conditions.reduce((s,c)=>{
+      const r = p.rules[c.code]; return s + (r && r.active && r.rate ? r.rate : 0);
+    },0);
+
+    const rows = policy.conditions.map(c=>{
+      const r = ruleFor(p, c.code);
+      const expanded = state.expanded.has(c.code);
+      const allocRows = r.allocations.map((a,i)=>{
+        const payee = state.payees.find(x=>x.id===a.payeeId);
+        return `<div class="arow"><span class="aname">${payee? payee.name : 'ไม่พบผู้รับ'}</span>
+          <span class="apct">${fmtPct(a.percent)}%</span>
+          <button data-act="rmalloc" data-code="${c.code}" data-i="${i}">ลบ</button></div>`;
+      }).join('') || `<div class="empty-note">ยังไม่กำหนดผู้รับสำหรับเงื่อนไขนี้ — ค่าคอมทั้งหมดจะรอผูกผู้รับภายหลัง</div>`;
+
+      const payeeOptions = state.payees.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+
+      return `
+      <div class="cond-row">
+        <span class="code">${c.code}</span>
+        <span class="cname">${c.name}</span>
+        <span class="stamp">${CALC_LABEL[c.calc]}</span>
+        <span class="rate-input-wrap">
+          <input class="num-input" type="number" step="0.001" min="0" placeholder="—"
+            value="${r.rate===null||r.rate===undefined?'':r.rate}"
+            data-act="setrate" data-code="${c.code}">
+          <span class="pct">%</span>
+        </span>
+        <label class="switch">
+          <input type="checkbox" ${r.active?'checked':''} data-act="toggleactive" data-code="${c.code}">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+        <button class="expand-btn" data-act="expand" data-code="${c.code}">${expanded? '▾' : '▸'}</button>
+        ${expanded? `
+        <div class="alloc-panel">
+          ${allocRows}
+          <div class="alloc-add">
+            <select data-role="payeesel" data-code="${c.code}">${payeeOptions}</select>
+            <input type="number" min="0" max="100" step="0.1" placeholder="%" data-role="pctinput" data-code="${c.code}">
+            <button class="btn small ghost" data-act="addalloc" data-code="${c.code}">+ เพิ่มผู้รับ</button>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+
+    return `
+    <section class="policy">
+      <div class="policy-head">
+        <span class="num-badge">${policy.code}</span>
+        <h2>${policy.name}</h2>
+        <span class="policy-subtotal">รวม ${fmtPct(subtotal)}%</span>
+      </div>
+      <div class="cond-table">${rows}</div>
+    </section>`;
+  }).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>ตั้งค่าค่าคอมตามสินค้า</h1>
+        <div class="desc">เลือกสินค้าเพื่อกำหนดอัตราในแต่ละเงื่อนไข — โครงสร้างนโยบายคงที่ ปรับได้เฉพาะอัตราและผู้รับ</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <select id="productSelect">${productOptions}</select>
+        <button class="btn ghost" id="btnAddProduct">+ เพิ่มสินค้า</button>
+      </div>
+    </div>
+
+    <div id="addProductForm" class="add-form" style="display:none;">
+      <input type="text" id="newProdCode" placeholder="รหัสสินค้า เช่น MASubmission2.1">
+      <input type="text" id="newProdName" placeholder="ชื่อสินค้า">
+      <button class="btn small" id="btnSaveProduct">บันทึกสินค้า</button>
+    </div>
+
+    <div class="product-card">
+      <div>
+        <div class="code">${p.code}</div>
+        <div class="name">${p.name}</div>
+      </div>
+      <span class="pill ${p.active?'on':'off'}" id="statusPill">${p.active?'ใช้งาน':'ปิดใช้งาน'}</span>
+      <div class="grand-total">
+        <div class="label">รวมอัตราทั้งหมด</div>
+        <div class="value">${fmtPct(grandTotal)}%</div>
+      </div>
+    </div>
+
+    ${policyBlocks}
+  `;
+
+  document.getElementById('productSelect').onchange = e=>{
+    state.selectedProductId = Number(e.target.value); state.expanded.clear(); render();
+  };
+  document.getElementById('statusPill').onclick = ()=>{ p.active = !p.active; render(); };
+  document.getElementById('btnAddProduct').onclick = ()=>{
+    const f = document.getElementById('addProductForm'); f.style.display = f.style.display==='none' ? 'flex' : 'none';
+  };
+  document.getElementById('btnSaveProduct').onclick = ()=>{
+    const code = document.getElementById('newProdCode').value.trim();
+    const name = document.getElementById('newProdName').value.trim();
+    if(!code || !name) return;
+    const np = { id:nextProductId++, code, name, active:true, rules:{} };
+    state.products.push(np); state.selectedProductId = np.id; render();
+  };
+
+  document.getElementById('main').addEventListener('change', rulesDelegatedChange);
+  document.getElementById('main').addEventListener('click', rulesDelegatedClick);
+}
+
+function rulesDelegatedChange(e){
+  const t = e.target;
+  if(t.dataset.act === 'setrate'){
+    const p = getProduct(); const r = ruleFor(p, t.dataset.code);
+    r.rate = t.value === '' ? null : Number(t.value);
+    render();
+  }
+  if(t.dataset.act === 'toggleactive'){
+    const p = getProduct(); const r = ruleFor(p, t.dataset.code);
+    r.active = t.checked; render();
+  }
+}
+function rulesDelegatedClick(e){
+  const btn = e.target.closest('[data-act]');
+  if(!btn) return;
+  const p = getProduct();
+  if(btn.dataset.act === 'expand'){
+    const code = btn.dataset.code;
+    state.expanded.has(code) ? state.expanded.delete(code) : state.expanded.add(code);
+    render();
+  }
+  if(btn.dataset.act === 'addalloc'){
+    const code = btn.dataset.code;
+    const sel = document.querySelector(`[data-role="payeesel"][data-code="${code}"]`);
+    const inp = document.querySelector(`[data-role="pctinput"][data-code="${code}"]`);
+    const payeeId = Number(sel.value); const percent = Number(inp.value);
+    if(!payeeId || !percent) return;
+    const r = ruleFor(p, code); r.allocations.push({ payeeId, percent });
+    render();
+  }
+  if(btn.dataset.act === 'rmalloc'){
+    const code = btn.dataset.code; const i = Number(btn.dataset.i);
+    const r = ruleFor(p, code); r.allocations.splice(i,1); render();
+  }
+}
+
+/* ---------------- render: payees view ---------------- */
+function renderPayees(){
+  const rows = state.payees.map(x=>`
+    <div class="payee-row">
+      <span class="ptype ${x.type}">${x.type==='STAFF'?'บุคคล':x.type==='DEPARTMENT'?'ฝ่ายภายใน':'หน่วยงานภายนอก'}</span>
+      <span>${x.name}</span>
+      <button class="btn small ghost" data-id="${x.id}" id="rm-${x.id}">ลบ</button>
+    </div>`).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>ผู้รับเงิน</h1>
+        <div class="desc">รายชื่อบุคคล ฝ่ายงานภายใน และหน่วยงานภายนอกที่สามารถผูกกับเงื่อนไขค่าคอม</div>
+      </div>
+    </div>
+    <div class="add-form">
+      <select id="newPayeeType">
+        <option value="STAFF">บุคคล</option>
+        <option value="DEPARTMENT">ฝ่ายภายใน</option>
+        <option value="EXTERNAL_ORG">หน่วยงานภายนอก</option>
+      </select>
+      <input type="text" id="newPayeeName" placeholder="ชื่อผู้รับเงิน">
+      <button class="btn small" id="btnAddPayee">+ เพิ่มผู้รับเงิน</button>
+    </div>
+    <div>${rows}</div>
+  `;
+  document.getElementById('btnAddPayee').onclick = ()=>{
+    const type = document.getElementById('newPayeeType').value;
+    const name = document.getElementById('newPayeeName').value.trim();
+    if(!name) return;
+    state.payees.push({ id:nextPayeeId++, type, name }); render();
+  };
+  state.payees.forEach(x=>{
+    const b = document.getElementById('rm-'+x.id);
+    if(b) b.onclick = ()=>{ state.payees = state.payees.filter(y=>y.id!==x.id); render(); };
+  });
+}
+
+/* ---------------- bills: helpers ---------------- */
+function findProduct(id){ return state.products.find(x=>x.id===id); }
+function findPayee(id){ return state.payees.find(x=>x.id===id); }
+
+// แผนค่าคอมของบิล (bill.plan) แยกอิสระจาก commission_rule ของสินค้า ตั้งแต่ตอนขายสำเร็จ
+function planRuleFor(bill, code){
+  if(!bill.plan[code]) bill.plan[code] = { rate:null, active:false, allocations:[] };
+  return bill.plan[code];
+}
+function planKey(billId, code){ return billId + ':' + code; }
+
+// ล็อกแผนค่าคอมของบิล -> สร้าง commission_payout จากแผนที่กำหนดเอง (ไม่ใช่จากอัตรากลางของสินค้าอีกต่อไป)
+function lockBillPlan(bill){
+  const payouts = [];
+  POLICIES.forEach(policy=>{
+    policy.conditions.forEach(c=>{
+      const r = bill.plan[c.code];
+      if(!r || !r.active || !r.rate) return;
+      const baseAmount = bill.amount;
+      const amt = baseAmount * r.rate / 100;
+      if(r.allocations.length){
+        r.allocations.forEach(a=>{
+          payouts.push({
+            id:nextPayoutId++, conditionCode:c.code, conditionName:c.name, policyCode:policy.code,
+            rate:r.rate, baseAmount, payoutAmount: amt * a.percent / 100,
+            payeeId:a.payeeId, payeePercent:a.percent, status:'PENDING',
+          });
+        });
+      } else {
+        payouts.push({
+          id:nextPayoutId++, conditionCode:c.code, conditionName:c.name, policyCode:policy.code,
+          rate:r.rate, baseAmount, payoutAmount: amt,
+          payeeId:null, payeePercent:null, status:'PENDING',
+        });
+      }
+    });
+  });
+  bill.payouts = payouts;
+  bill.planLocked = true;
+}
+
+/* ---------------- bills: plan editor (กำหนดแผนค่าคอมต่อบิล) ---------------- */
+function renderPlanEditor(bill){
+  const policyBlocks = POLICIES.map(policy=>{
+    const subtotal = policy.conditions.reduce((s,c)=>{
+      const r = bill.plan[c.code]; return s + (r && r.active && r.rate ? r.rate : 0);
+    },0);
+    const rows = policy.conditions.map(c=>{
+      const r = planRuleFor(bill, c.code);
+      const key = planKey(bill.id, c.code);
+      const expanded = state.expandedPlanCond.has(key);
+      const payeeOptions = state.payees.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+      const allocRows = r.allocations.map((a,i)=>{
+        const payee = findPayee(a.payeeId);
+        return `<div class="arow"><span class="aname">${payee? payee.name : 'ไม่พบผู้รับ'}</span>
+          <span class="apct">${fmtPct(a.percent)}%</span>
+          <button data-act="planrmalloc" data-bill="${bill.id}" data-code="${c.code}" data-i="${i}">ลบ</button></div>`;
+      }).join('') || `<div class="empty-note">ยังไม่กำหนดผู้รับสำหรับเงื่อนไขนี้</div>`;
+
+      return `
+      <div class="cond-row">
+        <span class="code">${c.code}</span>
+        <span class="cname">${c.name}</span>
+        <span class="stamp">${CALC_LABEL[c.calc]}</span>
+        <span class="rate-input-wrap">
+          <input class="num-input" type="number" step="0.001" min="0" placeholder="—"
+            value="${r.rate===null||r.rate===undefined?'':r.rate}"
+            data-act="planrate" data-bill="${bill.id}" data-code="${c.code}">
+          <span class="pct">%</span>
+        </span>
+        <label class="switch">
+          <input type="checkbox" ${r.active?'checked':''} data-act="planactive" data-bill="${bill.id}" data-code="${c.code}">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+        <button class="expand-btn" data-act="planexpand" data-bill="${bill.id}" data-code="${c.code}">${expanded? '▾' : '▸'}</button>
+        ${expanded? `
+        <div class="alloc-panel">
+          ${allocRows}
+          <div class="alloc-add">
+            <select data-role="planpayeesel" data-bill="${bill.id}" data-code="${c.code}">${payeeOptions}</select>
+            <input type="number" min="0" max="100" step="0.1" placeholder="%" data-role="planpctinput" data-bill="${bill.id}" data-code="${c.code}">
+            <button class="btn small ghost" data-act="planaddalloc" data-bill="${bill.id}" data-code="${c.code}">+ เพิ่มผู้รับ</button>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+    return `
+    <section class="policy">
+      <div class="policy-head">
+        <span class="num-badge">${policy.code}</span>
+        <h2>${policy.name}</h2>
+        <span class="policy-subtotal">รวม ${fmtPct(subtotal)}%</span>
+      </div>
+      <div class="cond-table">${rows}</div>
+    </section>`;
+  }).join('');
+
+  const grandTotal = Object.values(bill.plan).reduce((s,r)=> s + (r.active && r.rate ? r.rate : 0), 0);
+
+  return `<div class="bill-detail">
+    <div class="lock-note" style="margin:0 0 14px;">กำหนดแผนค่าคอมเฉพาะบิลนี้ — เริ่มจากอัตรากลางของสินค้า แต่แก้ไขที่นี่จะไม่กระทบอัตรากลาง</div>
+    ${policyBlocks}
+    <div class="rtotal" style="margin-bottom:14px;"><span>รวมอัตราของแผนนี้</span><span class="amt">${fmtPct(grandTotal)}%</span></div>
+  </div>
+  <div class="bill-actions">
+    <button class="btn small" data-act="lockplan" data-bill="${bill.id}">ยืนยันและล็อกแผนค่าคอม</button>
+  </div>`;
+}
+
+/* ---------------- render: bills view ---------------- */
+function renderBills(){
+  const productOptions = state.products.map(p=>`<option value="${p.id}">${p.code} — ${p.name}</option>`).join('');
+
+  const rows = state.bills.slice().reverse().map(b=>{
+    const p = findProduct(b.productId);
+    const open = state.expandedBill === b.id;
+    let detail = '';
+    if(open){
+      if(b.status === 'SOLD' && b.planLocked){
+        const total = b.payouts.reduce((s,po)=>s+po.payoutAmount,0);
+        const lines = b.payouts.map(po=>{
+          const payee = po.payeeId ? findPayee(po.payeeId) : null;
+          return `<div class="payout-row">
+            <span class="pname2">${po.policyCode}.${po.conditionCode} ${po.conditionName} — ${fmtPct(po.rate)}%
+              <div class="pwho">${payee ? payee.name + (po.payeePercent? ' ('+fmtPct(po.payeePercent)+'%)' : '') : 'รอกำหนดผู้รับ'}</div>
+            </span>
+            <span class="pamt">${fmtBaht(po.payoutAmount)}</span>
+            <span class="pstatus ${po.status}" data-act="cyclepayout" data-bill="${b.id}" data-po="${po.id}">${po.status}</span>
+          </div>`;
+        }).join('') || `<div class="empty-note">แผนนี้ไม่มีเงื่อนไขที่เปิดใช้งาน</div>`;
+        detail = `<div class="bill-detail">
+          ${lines}
+          <div class="rtotal" style="margin-top:10px;"><span>รวมค่าคอม (ล็อกแล้ว)</span><span class="amt">฿ ${fmtBaht(total)}</span></div>
+          <div class="lock-note">แผนค่าคอมของบิลนี้ถูกล็อกไว้แล้ว แก้ไขอัตรากลางของสินค้าในภายหลังจะไม่กระทบบิลนี้</div>
+        </div>
+        <div class="bill-actions">
+          <button class="btn small ghost" data-act="unlockplan" data-bill="${b.id}">แก้ไขแผนค่าคอม</button>
+        </div>`;
+      } else if(b.status === 'SOLD' && !b.planLocked){
+        detail = renderPlanEditor(b);
+      } else if(b.status === 'OPEN'){
+        detail = `<div class="bill-detail"><div class="empty-note">บิลนี้ยังเปิดอยู่ — กำหนดแผนค่าคอมได้หลังยืนยัน "ขายสำเร็จ"</div></div>
+        <div class="bill-actions">
+          <button class="btn small" data-act="sold" data-bill="${b.id}">ยืนยันขายสำเร็จ</button>
+          <button class="btn small ghost" data-act="cancelbill" data-bill="${b.id}">ยกเลิกบิล</button>
+        </div>`;
+      } else {
+        detail = `<div class="bill-detail"><div class="empty-note">บิลนี้ถูกยกเลิก ไม่มีการกำหนดค่าคอม</div></div>`;
+      }
+    }
+    const statusLabel = b.status==='OPEN' ? 'เปิดบิล' : b.status==='SOLD' ? (b.planLocked ? 'ขายสำเร็จ · ล็อกแผนแล้ว' : 'ขายสำเร็จ · รอกำหนดแผน') : 'ยกเลิก';
+    return `<div class="bill-card">
+      <div class="bill-row" data-act="togglebill" data-bill="${b.id}">
+        <span class="bno">${b.billNo}</span>
+        <span class="bprod">${p? p.code : '—'}<div class="pname">${b.customer || '—'}</div></span>
+        <span class="bamt">฿ ${fmtBaht(b.amount)}</span>
+        <span class="bdate">${b.date}</span>
+        <span class="bstatus ${b.status}">${statusLabel}</span>
+        <span class="expand-btn">${open?'▾':'▸'}</span>
+      </div>
+      ${detail}
+    </div>`;
+  }).join('') || `<div class="empty-note">ยังไม่มีบิล — เปิดบิลใหม่ด้านบนเพื่อเริ่มต้น</div>`;
+
+  document.getElementById('main').innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>บิลขาย</h1>
+        <div class="desc">เปิดบิลขาย ยืนยัน "ขายสำเร็จ" แล้วจึงกำหนดแผนค่าคอมเฉพาะบิลนั้นก่อนล็อก</div>
+      </div>
+    </div>
+    <div class="add-form">
+      <input type="text" id="billNo" placeholder="เลขที่บิล" value="BILL-${String(nextBillId).padStart(4,'0')}">
+      <select id="billProduct">${productOptions}</select>
+      <input type="text" id="billCustomer" placeholder="ชื่อลูกค้า">
+      <input type="number" id="billAmount" class="num-input" placeholder="มูลค่าบิล (บาท)" value="1000000" min="0">
+      <input type="date" id="billDate" value="${new Date().toISOString().slice(0,10)}">
+      <button class="btn small" id="btnAddBill">+ เปิดบิล</button>
+    </div>
+    <div id="billList">${rows}</div>
+  `;
+
+  document.getElementById('btnAddBill').onclick = ()=>{
+    const billNo = document.getElementById('billNo').value.trim();
+    const productId = Number(document.getElementById('billProduct').value);
+    const customer = document.getElementById('billCustomer').value.trim();
+    const amount = Number(document.getElementById('billAmount').value) || 0;
+    const date = document.getElementById('billDate').value;
+    if(!billNo || !amount) return;
+    state.bills.push({ id:nextBillId++, billNo, productId, customer, amount, date, status:'OPEN', plan:{}, planLocked:false, payouts:[] });
+    render();
+  };
+
+  document.getElementById('billList').addEventListener('change', e=>{
+    const t = e.target;
+    if(t.dataset.act === 'planrate' || t.dataset.act === 'planactive'){
+      const bill = state.bills.find(x=>x.id===Number(t.dataset.bill));
+      const r = planRuleFor(bill, t.dataset.code);
+      if(t.dataset.act === 'planrate') r.rate = t.value === '' ? null : Number(t.value);
+      else r.active = t.checked;
+      render();
+    }
+  });
+
+  document.getElementById('billList').addEventListener('click', e=>{
+    const el = e.target.closest('[data-act]');
+    if(!el) return;
+    const billId = Number(el.dataset.bill);
+    const bill = state.bills.find(x=>x.id===billId);
+    if(el.dataset.act === 'togglebill'){
+      state.expandedBill = state.expandedBill === billId ? null : billId; render();
+    }
+    if(el.dataset.act === 'sold'){
+      const p = findProduct(bill.productId);
+      bill.status = 'SOLD';
+      bill.plan = JSON.parse(JSON.stringify(p.rules)); // เริ่มแผนจากอัตรากลางของสินค้า ณ ขณะนั้น แก้ไขต่อได้อิสระ
+      bill.planLocked = false; bill.payouts = [];
+      render();
+    }
+    if(el.dataset.act === 'cancelbill'){
+      bill.status = 'CANCELLED'; render();
+    }
+    if(el.dataset.act === 'lockplan'){
+      lockBillPlan(bill); render();
+    }
+    if(el.dataset.act === 'unlockplan'){
+      bill.planLocked = false; render();
+    }
+    if(el.dataset.act === 'planexpand'){
+      const key = planKey(billId, el.dataset.code);
+      state.expandedPlanCond.has(key) ? state.expandedPlanCond.delete(key) : state.expandedPlanCond.add(key);
+      render();
+    }
+    if(el.dataset.act === 'planaddalloc'){
+      const code = el.dataset.code;
+      const sel = document.querySelector(`[data-role="planpayeesel"][data-bill="${billId}"][data-code="${code}"]`);
+      const inp = document.querySelector(`[data-role="planpctinput"][data-bill="${billId}"][data-code="${code}"]`);
+      const payeeId = Number(sel.value); const percent = Number(inp.value);
+      if(!payeeId || !percent) return;
+      const r = planRuleFor(bill, code); r.allocations.push({ payeeId, percent });
+      render();
+    }
+    if(el.dataset.act === 'planrmalloc'){
+      const code = el.dataset.code; const i = Number(el.dataset.i);
+      const r = planRuleFor(bill, code); r.allocations.splice(i,1); render();
+    }
+    if(el.dataset.act === 'cyclepayout'){
+      const po = bill.payouts.find(x=>x.id===Number(el.dataset.po));
+      const order = ['PENDING','APPROVED','PAID'];
+      po.status = order[(order.indexOf(po.status)+1) % order.length];
+      render();
+    }
+  });
+}
+
+/* ---------------- root render ---------------- */
+function render(){
+  if(state.view === 'rules') renderRules();
+  else if(state.view === 'payees') renderPayees();
+  else renderBills();
+}
+/* ---------------- seed one sample bill: sold, plan customized & locked ---------------- */
+(function seedSample(){
+  const p = findProduct(1);
+  const b = { id:nextBillId++, billNo:'BILL-0001', productId:1, customer:'บลจ. ตัวอย่าง จำกัด',
+    amount:1000000, date:new Date().toISOString().slice(0,10), status:'SOLD',
+    plan: JSON.parse(JSON.stringify(p.rules)), planLocked:false, payouts:[] };
+  lockBillPlan(b);
+  state.bills.push(b);
+})();
+
+render();
+</script>
+</body>
+</html>

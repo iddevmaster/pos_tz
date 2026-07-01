@@ -57,10 +57,10 @@ def register_home(request):
         cm_id = u.cm
     except user_detail.DoesNotExist:
         cm_id = 0
-    
+    print(cm_id)
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
         "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
-    
+    print(listMenuPermission)
     objMenu = []
     for rs in list(listMenuPermission):
         

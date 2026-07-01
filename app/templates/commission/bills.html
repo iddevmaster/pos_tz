@@ -1,0 +1,212 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  .com-wrap{ --paper:#F6F1E6; --paper-raised:#FBF8F1; --ink:#1E2A38; --ink-soft:#5B6677; --navy:#16233A;
+    --brass:#A8762E; --brass-light:#E9D9B8; --sage:#4C7A63; --sage-bg:#E4EFE8; --hairline:#D9CFB8; --radius:6px;
+    --terracotta:#B5533C; --terracotta-bg:#F6E4DE;
+    background:var(--paper); padding:20px; border-radius:8px; }
+  .com-nav{ display:flex; gap:8px; margin-bottom:18px; }
+  .com-nav a{ padding:8px 14px; border-radius:20px; font-size:13px; text-decoration:none; border:1px solid var(--hairline); color:var(--ink-soft); }
+  .com-nav a.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  .bill-card{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; }
+  .bill-row{ display:grid; grid-template-columns:140px 1fr 130px 140px 28px; gap:12px; align-items:center; padding:12px 16px; cursor:pointer; }
+  .bill-amt{ text-align:right; font-family:monospace; }
+  .bstatus{ font-size:10.5px; text-transform:uppercase; padding:4px 9px; border-radius:20px; width:fit-content; }
+  .bstatus.locked{ background:var(--sage-bg); color:var(--sage); }
+  .bstatus.open{ background:var(--brass-light); color:var(--brass); }
+  .bill-detail{ border-top:1px dashed var(--hairline); padding:16px 20px; background:var(--paper); }
+  .com-policy{ margin-bottom:18px; }
+  .com-policy-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .com-num{ width:26px; height:26px; border-radius:50%; border:1.5px solid var(--brass); color:var(--brass);
+    font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex:0 0 26px; }
+  .com-policy-head h5{ margin:0; font-size:14px; flex:1; }
+  .com-subtotal{ color:var(--brass); font-size:12px; }
+  .com-row{ border-top:1px solid var(--hairline); padding:8px 4px; display:grid;
+    grid-template-columns:52px 1fr 100px 130px 70px 28px; gap:10px; align-items:center; font-size:13px; }
+  .com-stamp{ font-size:10px; border:1px dashed var(--brass); color:var(--brass); padding:2px 6px; border-radius:3px; text-align:center; }
+  .com-alloc{ grid-column:1/-1; background:var(--paper); border:1px dashed var(--hairline); border-radius:4px; padding:10px 12px; margin-top:6px; }
+  .com-alloc .arow{ display:flex; gap:10px; align-items:center; padding:4px 0; border-bottom:1px solid var(--hairline); font-size:13px; }
+  .com-alloc .arow .aname{ flex:1; }
+  .com-empty{ font-size:12px; color:var(--ink-soft); font-style:italic; }
+  .payout-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dotted var(--hairline); font-size:13.5px; }
+  .payout-row .pwho{ color:var(--ink-soft); font-size:12px; }
+  .pstatus{ font-size:10px; text-transform:uppercase; padding:3px 8px; border-radius:20px; cursor:pointer; border:none; }
+  .pstatus.PENDING{ background:var(--brass-light); color:var(--brass); }
+  .pstatus.APPROVED{ background:#DCE6F2; color:#2C5282; }
+  .pstatus.PAID{ background:var(--sage-bg); color:var(--sage); }
+  .com-btn{ border:1px solid var(--navy); background:var(--navy); color:#fff; border-radius:4px; padding:6px 12px; font-size:12.5px; cursor:pointer; }
+  .com-btn.ghost{ background:transparent; color:var(--navy); }
+</style>
+
+<div class="com-wrap">
+  <div class="com-nav">
+    <a href="/commission/rules">01 ตั้งค่าตามสินค้า</a>
+    <a href="/commission/payees">02 ผู้รับเงิน</a>
+    <a href="/commission/bills" class="active">03 บิลขาย · กำหนดค่าคอม</a>
+  </div>
+  <p style="font-size:12.5px; color:#5B6677;">
+    แสดงเฉพาะบิลที่ "ปิดการขาย - ขายสำเร็จ" แล้วเท่านั้น — กำหนดแผนค่าคอมได้หลังจากนี้ ก่อนหน้านี้บิลยังแก้ไขได้อยู่จึงยังกำหนดค่าคอมไม่ได้
+  </p>
+
+  {% for row in rows %}
+  <div class="bill-card" id="bill-{{ row.rpi_id }}">
+    <div class="bill-row" onclick="toggleBill({{ row.rpi_id }})">
+      <span class="mono">{{ row.rp_doc_number }}</span>
+      <span>{{ row.register_number }} <div style="font-size:12px; color:#5B6677;">{{ row.course_name }}</div></span>
+      <span class="bill-amt">฿ {{ row.amount|floatformat:2 }}</span>
+      <span class="bstatus {% if row.is_locked %}locked{% else %}open{% endif %}">
+        {% if row.is_locked %}ล็อกแผนแล้ว{% elif row.plan_id %}รอกำหนดแผน{% else %}ยังไม่เปิดแผน{% endif %}
+      </span>
+      <span>▸</span>
+    </div>
+    <div class="bill-detail" id="detail-{{ row.rpi_id }}" style="display:none;"></div>
+  </div>
+  {% empty %}
+  <p class="com-empty" style="color:#5B6677;">ยังไม่มีบิลที่ปิดการขายสำเร็จ</p>
+  {% endfor %}
+</div>
+
+<script>
+const post = (url, body) => fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}).then(r=>r.json());
+function fmtPct(n){ return (Math.round((n||0)*1000)/1000).toString(); }
+function fmtBaht(n){ return (n||0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+const openBills = new Set();
+
+async function toggleBill(rpiId){
+  const detail = document.getElementById('detail-'+rpiId);
+  if(openBills.has(rpiId)){
+    openBills.delete(rpiId); detail.style.display = 'none'; return;
+  }
+  openBills.add(rpiId); detail.style.display = 'block';
+  await loadBill(rpiId, detail);
+}
+
+async function loadBill(rpiId, detail){
+  detail.innerHTML = '<div class="com-empty">กำลังโหลด...</div>';
+  const opened = await post('/api/commission/plan/open', {rpi_id: rpiId});
+  if(opened.status !== 200){
+    detail.innerHTML = `<div class="com-empty">${opened.message}</div>`; return;
+  }
+  const data = await post('/api/commission/plan/detail', {plan_id: opened.plan_id});
+  renderPlanDetail(detail, data);
+}
+
+function renderPlanDetail(detail, data){
+  detail.dataset.planId = data.plan_id;
+  if(data.is_locked){
+    const total = data.payouts.reduce((s,p)=>s+p.payout_amount,0);
+    const lines = data.payouts.map(po => `
+      <div class="payout-row">
+        <span>${po.condition_code} ${po.condition_name} — ${fmtPct(po.rate)}%
+          <div class="pwho">${po.payee_name ? po.payee_name + (po.payee_percent? ' ('+fmtPct(po.payee_percent)+'%)':'') : 'รอกำหนดผู้รับ'}</div>
+        </span>
+        <span class="mono">${fmtBaht(po.payout_amount)}</span>
+        <button class="pstatus ${po.status}" onclick="cyclePayout(${po.payout_id}, '${po.status}', this)">${po.status}</button>
+      </div>`).join('') || '<div class="com-empty">แผนนี้ไม่มีเงื่อนไขที่เปิดใช้งาน</div>';
+    detail.innerHTML = `
+      ${lines}
+      <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:8px; border-top:2px solid #1E2A38; font-weight:600;">
+        <span>รวมค่าคอม (ล็อกแล้ว)</span><span class="mono">฿ ${fmtBaht(total)}</span>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="com-btn ghost" onclick="unlockPlan(${data.plan_id})">แก้ไขแผนค่าคอม</button>
+      </div>`;
+    return;
+  }
+
+  const policyBlocks = data.policies.map(p => {
+    const subtotal = p.conditions.reduce((s,c)=> s + (c.active && c.rate ? c.rate : 0), 0);
+    const rows = p.conditions.map(c => {
+      const allocRows = (c.allocations||[]).map(a => `
+        <div class="arow"><span class="aname">${a.payee_name}</span><span style="color:#A8762E;">${fmtPct(a.percent)}%</span>
+        <button class="com-btn ghost" onclick="rmPlanAllocation(${a.alloc_id}, ${data.plan_id}, ${c.condition_id})">ลบ</button></div>`).join('')
+        || '<div class="com-empty">ยังไม่กำหนดผู้รับ</div>';
+      return `
+      <div class="com-row">
+        <span class="mono">${c.condition_code}</span>
+        <span>${c.condition_name}</span>
+        <span class="com-stamp mono">${c.calc_type}</span>
+        <span>
+          <input type="number" class="form-control form-control-sm mono" style="width:80px; display:inline-block;" step="0.001" min="0"
+            value="${c.rate ?? ''}" onchange="savePlanLine(${data.plan_id}, ${c.condition_id}, this.value, null)"> %
+        </span>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" ${c.active?'checked':''}
+            onchange="savePlanLine(${data.plan_id}, ${c.condition_id}, null, this.checked)">
+        </div>
+        <button style="border:none;background:none;color:#5B6677;" onclick="this.closest('.com-row').querySelector('.com-alloc').classList.toggle('d-none')">▸</button>
+        <div class="com-alloc d-none">
+          ${allocRows}
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <select class="form-select form-select-sm plan-payee-select">
+              <option value="">-- เลือกผู้รับ --</option>
+              {% for p in payees_all %}<option value="{{ p.payee_id }}">{{ p.payee_name }}</option>{% endfor %}
+            </select>
+            <input type="number" class="form-control form-control-sm plan-pct-input" style="width:90px;" placeholder="%">
+            <button class="com-btn" onclick="addPlanAllocation(this, ${c.line_id||'null'}, ${data.plan_id}, ${c.condition_id})">+ เพิ่มผู้รับ</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="com-policy">
+      <div class="com-policy-head"><span class="com-num">${p.policy_code}</span><h5>${p.policy_name}</h5>
+      <span class="com-subtotal mono">รวม ${fmtPct(subtotal)}%</span></div>
+      ${rows}</div>`;
+  }).join('');
+
+  detail.innerHTML = `
+    ${policyBlocks}
+    <div style="margin-top:10px;">
+      <button class="com-btn" onclick="lockPlan(${data.plan_id})">ยืนยันและล็อกแผนค่าคอม</button>
+    </div>`;
+}
+
+async function savePlanLine(planId, conditionId, rate, active){
+  const body = {plan_id: planId, condition_id: conditionId};
+  if(rate !== null) body.rate = rate === '' ? null : Number(rate);
+  if(active !== null) body.active = active;
+  await post('/api/commission/plan/line/save', body);
+  reloadPlan(planId);
+}
+async function addPlanAllocation(btn, lineId, planId, conditionId){
+  if(!lineId){
+    await post('/api/commission/plan/line/save', {plan_id: planId, condition_id: conditionId});
+    const d = await post('/api/commission/plan/detail', {plan_id: planId});
+    const c = d.policies.flatMap(p=>p.conditions).find(x=>x.condition_id===conditionId);
+    lineId = c.line_id;
+  }
+  const panel = btn.closest('.com-alloc');
+  const payeeId = panel.querySelector('.plan-payee-select').value;
+  const percent = panel.querySelector('.plan-pct-input').value;
+  if(!payeeId || !percent) return;
+  await post('/api/commission/plan/allocation/add', {line_id: lineId, payee_id: payeeId, percent: Number(percent)});
+  reloadPlan(planId);
+}
+async function rmPlanAllocation(allocId, planId){
+  await post('/api/commission/plan/allocation/delete', {alloc_id: allocId});
+  reloadPlan(planId);
+}
+async function lockPlan(planId){
+  const res = await post('/api/commission/plan/lock', {plan_id: planId});
+  if(res.status !== 200){ alert(res.message); return; }
+  reloadPlan(planId);
+}
+async function unlockPlan(planId){
+  const res = await post('/api/commission/plan/unlock', {plan_id: planId});
+  if(res.status !== 200){ alert(res.message); return; }
+  reloadPlan(planId);
+}
+async function cyclePayout(payoutId, status, btn){
+  const order = ['PENDING','APPROVED','PAID'];
+  const next = order[(order.indexOf(status)+1) % order.length];
+  await post('/api/commission/payout/status', {payout_id: payoutId, status: next});
+  const detail = btn.closest('.bill-detail');
+  await reloadPlan(Number(detail.dataset.planId));
+}
+async function reloadPlan(planId){
+  const detail = [...document.querySelectorAll('.bill-detail')].find(d => Number(d.dataset.planId) === Number(planId));
+  const data = await post('/api/commission/plan/detail', {plan_id: planId});
+  renderPlanDetail(detail, data);
+}
+</script>
+{% endblock %}

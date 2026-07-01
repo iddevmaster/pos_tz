@@ -7,20 +7,22 @@ import random
 import string
 from datetime import datetime as dts, timedelta
 from dateutil.relativedelta import relativedelta
+from django.utils.deconstruct import deconstructible
 
 
+# @deconstructible ทำให้ Django migrations serialize ค่านี้ได้ (เดิมเป็น closure ธรรมดา
+# ซึ่ง makemigrations ไม่สามารถ serialize ได้ ต้องแก้ migration ที่ generate มาด้วยมือทุกครั้ง)
+@deconstructible
+class generate_unique_name:
+    def __init__(self, path):
+        self.path = path
 
-def generate_unique_name(path):
-    def wrapper(instance, filename):
+    def __call__(self, instance, filename):
         extension = "." + filename.split('.')[-1]
         filename = str(random.randint(10, 99)) + str(random.randint(10, 99)) + \
             str(random.randint(10, 99)) + \
             str(random.randint(10, 99)) + extension
-        return os.path.join(path, filename)
-    return wrapper
-
-# def generate_unique_name(path):
-#     return path
+        return os.path.join(self.path, filename)
 
 
 def dateTimeNow():
