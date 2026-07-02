@@ -3500,9 +3500,9 @@ def approve_internal_doc_print(request,doc_id):
     total_credit = 0
     for r in content_regist:  
        
-         
-         payment = register_payment.objects.get(register_id=r.register_id)
-         item = register_payment_items.objects.get(register_id=r.register_id)
+         # บิลมัดจำ
+         payment = register_payment.objects.filter(register_id=r.register_id).first()
+         item = register_payment_items.objects.filter(register_id=r.register_id).first()
          factcusto = fact_customer.objects.get(register_id=r.register_id)
          custo = customers.objects.get(customer_id=factcusto.customer_id)
       
