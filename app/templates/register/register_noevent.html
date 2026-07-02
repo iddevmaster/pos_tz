@@ -182,6 +182,22 @@
 
     <!-- ══ STEP 1: เลือกสินค้า ══ -->
     <div class="step-panel active" id="panel1">
+
+      <!-- Mode selector -->
+      <div class="spa-card mb-3">
+        <div class="spa-card-body" style="padding:16px 20px;">
+          <div class="ctype-btns" id="modeBtns">
+            <div class="ctype-btn selected" id="modeNoEvent" data-val="noevent" onclick="selectMode('noevent')">
+              <i class="bi bi-box-seam"></i> ไม่มี Event
+            </div>
+            <div class="ctype-btn" id="modeEvent" data-val="event" onclick="selectMode('event')">
+              <i class="bi bi-calendar-event-fill"></i> มี Event
+            </div>
+          </div>
+          <input type="hidden" id="sale_mode" value="noevent">
+        </div>
+      </div>
+
       <div class="spa-card">
         <div class="spa-card-head">
           <span class="spa-card-title">
@@ -192,15 +208,37 @@
         </div>
         <div class="spa-card-body">
           <div class="row g-3">
-            <div class="col-md-12">
+
+            <!-- ไม่มี Event: เลือก course -->
+            <div class="col-md-12" id="blockCourse">
               <label class="form-label">สินค้า <span style="color:var(--red)">*</span></label>
-              <select class="form-select select2" id="course_id" required>
+              <select class="form-select select2" id="course_id">
                 <option value="">— เลือกสินค้า —</option>
                 {% for res in data %}
                 <option value="{{res.course_id}}">{{res.course_code}} {{res.course_name}}</option>
                 {% endfor %}
               </select>
             </div>
+
+            <!-- มี Event: เลือก course_event -->
+            <div class="col-md-12" id="blockEvent" style="display:none;">
+              <label class="form-label">Event <span style="color:var(--red)">*</span></label>
+              <select class="form-select select2" id="ev_id">
+                <option value="">— เลือก Event —</option>
+                {% for ev in course_events %}
+                <option value="{{ev.ev_id}}" data-evusername="{{ev.ev_user_name|default:''}}">
+                  [{{ev.ev_date_start|date:"d/m/Y"}}–{{ev.ev_date_end|date:"d/m/Y"}}]
+                  {{ev.course.course_code}} {{ev.course.course_name}}
+                </option>
+                {% endfor %}
+              </select>
+              <!-- แสดงผู้รับผิดชอบ -->
+              <div id="evUserBadge" style="display:none; margin-top:6px;">
+                <span style="font-size:12px; color:var(--t3);"><i class="bi bi-person-fill me-1"></i>ผู้จัดการโครงการ:</span>
+                <span id="evUserName" style="font-size:13px; font-weight:600; color:var(--t1);"></span>
+              </div>
+            </div>
+
             <div class="col-md-6">
               <label class="form-label">ประเภทลูกค้า <span style="color:var(--red)">*</span></label>
               <div class="ctype-btns" id="ctypeBtns">
@@ -579,7 +617,28 @@ function goStep(n){
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ── ev_id change → แสดงชื่อผู้รับผิดชอบ ──────────────────────────────────
+$('#ev_id').on('change', function(){
+  const sel = this.options[this.selectedIndex];
+  const name = sel ? (sel.getAttribute('data-evusername') || '') : '';
+  const badge = document.getElementById('evUserBadge');
+  if(name && name.trim()){
+    document.getElementById('evUserName').textContent = name.trim();
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+});
+
 // ── Step 1 ─────────────────────────────────────────────────────────────────
+function selectMode(mode){
+  document.getElementById('sale_mode').value = mode;
+  document.querySelectorAll('#modeBtns .ctype-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`#modeBtns [data-val="${mode}"]`).classList.add('selected');
+  document.getElementById('blockCourse').style.display = mode === 'noevent' ? '' : 'none';
+  document.getElementById('blockEvent').style.display  = mode === 'event'   ? '' : 'none';
+  document.getElementById('evUserBadge').style.display = 'none';
+}
 function selectCtype(v){
   document.querySelectorAll('#ctypeBtns .ctype-btn').forEach(b => b.classList.remove('selected'));
   document.querySelector(`#ctypeBtns [data-val="${v}"]`).classList.add('selected');
@@ -592,12 +651,20 @@ function selectPtype(v){
 }
 
 async function doStep1(){
-  const course_id = document.getElementById('course_id').value;
+  const sale_mode     = document.getElementById('sale_mode').value;
+  const course_id     = document.getElementById('course_id').value;
+  const ev_id         = document.getElementById('ev_id').value;
   const customer_type = document.getElementById('customer_type').value;
-  const pay_type = document.getElementById('pay_type').value;
-  if(!course_id || !customer_type || !pay_type){
-    Swal.fire({ title:'กรุณาเลือกข้อมูลให้ครบ', icon:'warning', confirmButtonText:'ตกลง' });
-    return;
+  const pay_type      = document.getElementById('pay_type').value;
+
+  if(sale_mode === 'noevent' && !course_id){
+    Swal.fire({ title:'กรุณาเลือกสินค้า', icon:'warning', confirmButtonText:'ตกลง' }); return;
+  }
+  if(sale_mode === 'event' && !ev_id){
+    Swal.fire({ title:'กรุณาเลือก Event', icon:'warning', confirmButtonText:'ตกลง' }); return;
+  }
+  if(!customer_type || !pay_type){
+    Swal.fire({ title:'กรุณาเลือกข้อมูลให้ครบ', icon:'warning', confirmButtonText:'ตกลง' }); return;
   }
   const btn = document.getElementById('btnStep1');
   btn.innerHTML = '<span class="spinner"></span>';
@@ -605,7 +672,9 @@ async function doStep1(){
 
   const fd = new FormData();
   fd.append('csrfmiddlewaretoken', CSRF);
+  fd.append('sale_mode', sale_mode);
   fd.append('course_id', course_id);
+  fd.append('ev_id', ev_id);
   fd.append('customer_type', customer_type);
   fd.append('pay_type', pay_type);
 
@@ -619,9 +688,17 @@ async function doStep1(){
     state.pay_type      = data.pay_type;
     state.course_name   = data.course_name;
     state.course_code   = data.course_code;
+    state.sale_mode     = data.sale_mode;
 
     // update info badges step 2
-    document.getElementById('s2CourseBadge').innerHTML = '<i class="bi bi-box-seam"></i> ' + data.course_code + ' ' + data.course_name;
+    let courseBadgeText;
+    if(data.sale_mode === 'event' && data.ev_date_start){
+      const dateRange = data.ev_date_start + (data.ev_date_end && data.ev_date_end !== data.ev_date_start ? ' – ' + data.ev_date_end : '');
+      courseBadgeText = '<i class="bi bi-calendar-event"></i> ' + dateRange + ' | ' + data.course_name;
+    } else {
+      courseBadgeText = '<i class="bi bi-box-seam"></i> ' + data.course_code + ' ' + data.course_name;
+    }
+    document.getElementById('s2CourseBadge').innerHTML = courseBadgeText;
     document.getElementById('s2CtypeBadge').innerHTML  = '<i class="bi bi-person"></i> ' + (data.customer_type == 1 ? 'บุคคล':'บริษัท');
     document.getElementById('s2PtypeBadge').innerHTML  = '<i class="bi bi-cash"></i> ' + (data.pay_type == 1 ? 'เงินสด':'เครดิต');
 
@@ -958,7 +1035,7 @@ document.getElementById('btnReset').addEventListener('click', async () => {
   // reset session on server
   await fetch('/salesnotevent/reset');
   state = { step:1, register_id:null, customer_type:null, pay_type:null,
-            course_name:'', course_code:'', addon:[], total_addon:0, course_list:[], des_bill:[], selected_bills:[] };
+            course_name:'', course_code:'', sale_mode:'noevent', addon:[], total_addon:0, course_list:[], des_bill:[], selected_bills:[] };
   goStep(1);
   // clear fields
   document.getElementById('course_id').value = '';
@@ -966,6 +1043,8 @@ document.getElementById('btnReset').addEventListener('click', async () => {
   document.getElementById('pay_type').value = '';
   document.getElementById('customer_id_sel').value = '';
   if($('#course_id').hasClass('select2-hidden-accessible')) $('#course_id').val('').trigger('change');
+  if($('#ev_id').hasClass('select2-hidden-accessible')) $('#ev_id').val('').trigger('change');
+  selectMode('noevent');
 });
 
 $(document).ready(function(){

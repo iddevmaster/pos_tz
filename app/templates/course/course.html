@@ -43,6 +43,9 @@
 }
 .status-open{ background:rgba(5,150,105,.1); color:var(--green); }
 .status-close{ background:rgba(220,38,38,.1); color:var(--red); }
+.smode-all    { background:rgba(79,110,247,.1); color:var(--blue); }
+.smode-event  { background:rgba(5,150,105,.1);  color:var(--green); }
+.smode-noevent{ background:rgba(234,88,12,.1);  color:var(--orange); }
 </style>
 
 <!-- Header -->
@@ -69,6 +72,7 @@
           <th>รหัสสินค้า</th>
           <th>ชื่อสินค้า (ไทย)</th>
           <th>ชื่อสินค้า (Eng)</th>
+          <th style="width:110px;">รูปแบบการขาย</th>
           <th style="width:100px;">สถานะ</th>
           <th style="width:120px; text-align:center;">จัดการ</th>
         </tr>
@@ -88,6 +92,15 @@
           <td>{{ res.course_name }}</td>
           <td style="color:var(--t2);">{{ res.course_name_eng }}</td>
           <td>
+            {% if res.sale_mode == 'event' %}
+            <span class="status-badge smode-event"><i class="bi bi-calendar-event-fill" style="font-size:9px;"></i> มี Event</span>
+            {% elif res.sale_mode == 'noevent' %}
+            <span class="status-badge smode-noevent"><i class="bi bi-box-seam" style="font-size:9px;"></i> ไม่มี Event</span>
+            {% else %}
+            <span class="status-badge smode-all"><i class="bi bi-grid-fill" style="font-size:9px;"></i> ทั้งหมด</span>
+            {% endif %}
+          </td>
+          <td>
             {% if res.active == 1 %}
             <span class="status-badge status-open"><i class="bi bi-circle-fill" style="font-size:6px;"></i> เปิด</span>
             {% else %}
@@ -103,6 +116,7 @@
                   '{{ res.course_name|escapejs }}',
                   '{{ res.course_name_eng|escapejs }}',
                   '{{ res.active }}',
+                  '{{ res.sale_mode }}',
                   '{% if res.image_cover %}{{ res.image_cover.url }}{% endif %}'
                 )">
                 <i class="bi bi-pencil-fill"></i>
@@ -174,6 +188,14 @@
               <label class="form-label">ชื่อสินค้า (English)</label>
               <input type="text" class="form-control" name="course_name_eng" placeholder="Product name in English">
             </div>
+            <div class="col-12">
+              <label class="form-label">รูปแบบการขาย</label>
+              <select class="form-select" name="sale_mode">
+                <option value="all" selected>ทั้งหมด (Event และไม่มี Event)</option>
+                <option value="event">มี Event เท่านั้น</option>
+                <option value="noevent">ไม่มี Event เท่านั้น</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -232,6 +254,14 @@
               <label class="form-label">ชื่อสินค้า (English)</label>
               <input type="text" class="form-control" name="course_name_eng" id="editNameEng">
             </div>
+            <div class="col-12">
+              <label class="form-label">รูปแบบการขาย</label>
+              <select class="form-select" name="sale_mode" id="editSaleMode">
+                <option value="all">ทั้งหมด (Event และไม่มี Event)</option>
+                <option value="event">มี Event เท่านั้น</option>
+                <option value="noevent">ไม่มี Event เท่านั้น</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -281,12 +311,13 @@ function removeImg(key){
 }
 
 /* ── Open edit modal ── */
-function openEdit(id, code, name, nameEng, active, imgUrl){
-  document.getElementById('editCourseId').value = id;
-  document.getElementById('editCode').value     = code;
-  document.getElementById('editName').value     = name;
-  document.getElementById('editNameEng').value  = nameEng;
-  document.getElementById('editActive').value   = active;
+function openEdit(id, code, name, nameEng, active, saleMode, imgUrl){
+  document.getElementById('editCourseId').value  = id;
+  document.getElementById('editCode').value      = code;
+  document.getElementById('editName').value      = name;
+  document.getElementById('editNameEng').value   = nameEng;
+  document.getElementById('editActive').value    = active;
+  document.getElementById('editSaleMode').value  = saleMode || 'all';
 
   // set image preview
   const wrap = document.getElementById('previewWrapE');

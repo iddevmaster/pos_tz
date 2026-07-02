@@ -12,20 +12,15 @@
 
         @page {
             size: A4;
-            margin: 20mm;
+            margin: 0;
         }
 
 @media print {
-    @page {
-        size: A4;
-        margin: 15mm;
-    }
-
     body {
         margin: 0;
         padding: 0;
         background: #fff;
-        font-size: 14pt;
+        font-size: 12pt;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -42,6 +37,13 @@
         width: 100%;
         text-align: right;
         font-size: 10pt;
+    }
+
+    .page-container {
+        width: 100%;
+        padding: 15mm 15mm;
+        margin: 0;
+        box-shadow: none;
     }
 }
 
@@ -63,22 +65,10 @@
             .page-container {
                 width: 210mm;
                 min-height: 297mm;
-                padding: 20mm;
+                padding: 15mm 15mm;
                 margin: 0 auto;
                 background: #ffffff;
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }
-        }
-
-        @media print {
-            body {
-                background-color: #ffffff;
-            }
-            .page-container {
-                width: 100%;
-                padding: 0;
-                margin: 0;
-                box-shadow: none;
             }
         }
 

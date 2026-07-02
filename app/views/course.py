@@ -6,6 +6,7 @@ from datetime import date, timedelta
 
 from django.db.models import Count, Sum, Value, F
 from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training,register_payment_items,notifications
+from django.contrib.auth.models import User
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd,checkpermi
 from django.views.decorators.csrf import csrf_exempt
@@ -61,12 +62,14 @@ def course_create(request):
     course_name = request.POST['course_name']
     course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
+    sale_mode = request.POST.get('sale_mode', 'all')
     image_cover = request.FILES.get('image_cover')
     content = course(
         course_code=course_code,
         course_name=course_name,
         course_name_eng=course_name_eng,
         active=active,
+        sale_mode=sale_mode,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         module=m.module)
@@ -84,12 +87,14 @@ def course_update(request):
     course_name = request.POST['course_name']
     course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
+    sale_mode = request.POST.get('sale_mode', 'all')
     image_cover = request.FILES.get('image_cover')
     content = course.objects.get(pk=course_id)
     content.course_code = course_code
     content.course_name = course_name
     content.course_name_eng = course_name_eng
     content.active = active
+    content.sale_mode = sale_mode
     content.upd_date = dateTimeNow()
     if image_cover:
         content.image_cover = image_cover
@@ -145,7 +150,7 @@ def course_event_list(request):
     Amphur = None
     Tumbol = None   
     course_list = course.objects.filter(
-            cancelled=1, active=1).order_by("-course_id")
+            cancelled=1, active=1, sale_mode__in=['event', 'all']).order_by("-course_id")
     project_list = project_code.objects.filter(
             status=1)      
     
@@ -160,12 +165,31 @@ def course_event_list(request):
     else:
         _location = None 
         
-    result = course_event.objects.select_related("course").filter(
-            cancelled=1, ev_date_start__month=month_current, ev_date_start__year=year_current, module=m.module).order_by("-ev_id")
-    
-    addall = location_thai.objects.all()
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': result, 'course_list': course_list,'location': _location,'project_list':project_list,'addall':addall}
-    
+    from django.db.models import Subquery, OuterRef, CharField, Value
+    from django.db.models.functions import Concat
+    loc_subq = location_thai.objects.filter(location_id=OuterRef('location_id')).values(
+        loc=Concat('district_name', Value(' - '), 'amphur_name', Value(' - '), 'province_name', output_field=CharField())
+    )[:1]
+    result = course_event.objects.select_related('course').filter(
+        cancelled=1, ev_date_start__month=month_current,
+        ev_date_start__year=year_current, module=m.module
+    ).annotate(loc_display=Subquery(loc_subq)).order_by('-ev_id')
+
+    user_list = User.objects.filter(is_active=1).order_by('first_name', 'last_name')
+    months_list = [
+        {'val': 1,'label':'มกราคม'}, {'val': 2,'label':'กุมภาพันธ์'},
+        {'val': 3,'label':'มีนาคม'}, {'val': 4,'label':'เมษายน'},
+        {'val': 5,'label':'พฤษภาคม'}, {'val': 6,'label':'มิถุนายน'},
+        {'val': 7,'label':'กรกฎาคม'}, {'val': 8,'label':'สิงหาคม'},
+        {'val': 9,'label':'กันยายน'}, {'val':10,'label':'ตุลาคม'},
+        {'val':11,'label':'พฤศจิกายน'}, {'val':12,'label':'ธันวาคม'},
+    ]
+    context = {
+        'title': defaultTitle, 'listMenuPermission': objMenu,
+        'data': result, 'course_list': course_list,
+        'user_list': user_list, 'months_list': months_list,
+        'month_current': int(month_current), 'year_current': int(year_current),
+    }
     return render(request, 'course/course_event_list.html', context)
 
 
@@ -175,168 +199,63 @@ def course_event_create(request):
     try:
         m = user_group.objects.get(user=user_id)
     except user_group.DoesNotExist:
-        m = None
         return render(request, '404.html')
-    course_id = request.POST['course_id']
-    project_id = request.POST['project_id']
-    ev_date_start = dmytoymd(request.POST['ev_date_start'])
-    ev_date_end = dmytoymd(request.POST['ev_date_end'])
-    ev_generation = request.POST['ev_generation']
-    ev_remark = request.POST['ev_remark']
-    ev_price = request.POST['ev_price']
-    ev_vat = request.POST['ev_vat']
-    ev_expired_cer_quantity = request.POST['ev_expired_cer_quantity']
-    ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
-    active = request.POST['active']
-    ev_hour = request.POST['ev_hour']
-    ev_hour_two = request.POST['ev_hour_two']
-    # ev_hour_three = request.POST['ev_hour_three']
-    ev_people = request.POST['ev_people']
-    ev_people_two = request.POST['ev_people_two']
-    # ev_people_three = request.POST['ev_people_three']
-    limitprice = request.POST['limit_price']
-    limit_price_workhelp = request.POST['limit_price_workhelp']
-    ev_training = request.POST['ev_training']
-    checkevent = request.POST['checkevent']
-    local = request.POST['location_id']
-    address = request.POST['address']
-    details = request.POST['details']
-    status = ''
-    now = datetime.datetime.now()
-    time_string = now.strftime("%H%M%S")
-    number_code = 'EV'+ ev_date_end + time_string + course_id
-    
-    if checkevent == '0':
-        status = 'N'
- 
-    try:
-        ev_logo = request.FILES['ev_logo']
-       
-    except KeyError:
-
-        ev_logo = None
-    content = course_event(
-        ev_date_start=ev_date_start,
-        ev_date_end=ev_date_end,
-        ev_generation=ev_generation,
-        ev_remark=ev_remark,
-        ev_price=ev_price,
-        ev_vat=ev_vat,
-        ev_expired_cer_quantity=ev_expired_cer_quantity,
-        ev_expired_cer_date=ev_expired_cer_date,
-        ev_logo=ev_logo,
-        active=active,
-        course_id=course_id,
-        project_id=project_id,
-        is_show=1,
-        crt_date=dateTimeNow(),
-        upd_date=dateTimeNow(),
-        ev_hour=ev_hour,
-        ev_hour_two=ev_hour_two,
-        ev_hour_three=0,
-        ev_people=ev_people,
-        ev_people_two=ev_people_two,
-        ev_people_three=10,
-        limit_price=limitprice,
-        limit_price_workhelp=limit_price_workhelp,
-        status=status,
-        number_code=number_code,
-        location_id=local,
-        address=address,
-        ev_training=ev_training,
-        checkevent=checkevent,
-        details=details,
-        module=m.module,
-     )
-    content.save()
-
-    
-
-    conu = course.objects.get(pk=course_id)
-    api_url = "http://127.0.0.1:8000/api/data"
-
-    # Optional: Add headers or parameters
-    headers = {
-        "Content-Type": "application/json",
-        }
-
-    start = str(content.crt_date)
-  
-    params = {
-        "item_code": conu.course_code,
-        "course_id": course_id,
-        "course_name": conu.course_name,
-        "course_name_eng": conu.course_name_eng,
-        "ev_generation": ev_generation,
-        "create_at": start,
-        "cancelled":1
-      }
-   
-
-
+    course_id     = request.POST['course_id']
+    ev_date_start = request.POST['ev_date_start']
+    ev_date_end   = request.POST['ev_date_end']
+    ev_remark     = request.POST.get('ev_remark', '')
+    active        = request.POST.get('active', 1)
+    local         = request.POST.get('location_id', 0) or 0
+    address       = request.POST.get('address', '')
+    details       = request.POST.get('details', '')
+    ev_user       = int(request.POST.get('ev_user', 0) or 0)
+    ev_logo       = request.FILES.get('ev_logo')
+    now           = datetime.datetime.now()
+    number_code   = 'EV' + str(ev_date_end) + now.strftime('%H%M%S') + str(course_id)
+    content_obj   = course_event(
+        ev_date_start=ev_date_start, ev_date_end=ev_date_end,
+        ev_generation=0, ev_remark=ev_remark,
+        ev_price=0, ev_vat=0, ev_expired_cer_quantity=0,
+        ev_expired_cer_date=ev_date_start, ev_logo=ev_logo,
+        active=active, course_id=course_id, project_id=1,
+        is_show=1, crt_date=dateTimeNow(), upd_date=dateTimeNow(),
+        ev_hour=0, ev_hour_two=0, ev_hour_three=0,
+        ev_people=0, ev_people_two=0, ev_people_three=10,
+        limit_price=0, limit_price_workhelp=0,
+        status='Y', number_code=number_code,
+        location_id=local, address=address, ev_training=0,
+        checkevent=1, details=details, module=m.module, ev_user=ev_user,
+    )
+    content_obj.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
 
 
-
-
-
-
-
 @login_required(login_url='/login')
 def course_event_update(request):
-    
-    ev_id = request.POST['ev_id']
-    limitprice = request.POST['limit_price']
-    limit_price_workhelp = request.POST['limit_price_workhelp']
-    project_id = request.POST['project_id']
-    ev_date_start = dmytoymd(request.POST['ev_date_start'])
-    ev_date_end = dmytoymd(request.POST['ev_date_end'])
-    ev_generation = request.POST['ev_generation']
-    ev_remark = request.POST['ev_remark']
-    ev_price = request.POST['ev_price']
-    ev_vat = request.POST['ev_vat']
-    ev_expired_cer_quantity = request.POST['ev_expired_cer_quantity']
-    ev_expired_cer_date = addYear(ev_date_start, int(ev_expired_cer_quantity))
-    active = request.POST['active']
-    ev_hour = request.POST['ev_hour']
-    ev_hour_two = request.POST['ev_hour_two']
-    ev_hour_three = 0
-    ev_people = request.POST['ev_people_update']
-    ev_people_two = request.POST['ev_people_two_update']
-    ev_people_three = 10
-    ev_training = request.POST['ev_training']
-    local = request.POST['location_id']
-    address = request.POST['address']
-    try:
-        ev_logo = request.FILES['ev_logo']
-    except KeyError:
-        ev_logo = None
-    content = course_event.objects.get(pk=ev_id)
-    content.ev_date_start = ev_date_start
-    content.ev_date_end = ev_date_end
-    content.ev_generation = ev_generation
-    content.ev_remark = ev_remark
-    content.ev_price = ev_price
-    content.ev_vat = ev_vat
-    content.ev_expired_cer_quantity = ev_expired_cer_quantity
-    content.ev_expired_cer_date = ev_expired_cer_date
-    content.ev_logo = ev_logo
-    content.active = active
-    content.ev_hour = ev_hour
-    content.ev_hour_two = ev_hour_two
-    content.ev_hour_three = ev_hour_three
-    content.ev_people = ev_people
-    content.ev_people_two = ev_people_two
-    content.ev_people_three = ev_people_three
-    content.upd_date = dateTimeNow()
-    content.project_id = project_id
-    content.limit_price = limitprice
-    content.limit_price_workhelp = limit_price_workhelp
-    content.ev_training = ev_training
-    content.location_id = local
-    content.address = address
-    content.save()
+    ev_id         = request.POST['ev_id']
+    ev_date_start = request.POST['ev_date_start']
+    ev_date_end   = request.POST['ev_date_end']
+    ev_remark     = request.POST.get('ev_remark', '')
+    active        = request.POST.get('active', 1)
+    local         = request.POST.get('location_id', 0) or 0
+    address       = request.POST.get('address', '')
+    details       = request.POST.get('details', '')
+    ev_user       = int(request.POST.get('ev_user', 0) or 0)
+    ev_logo       = request.FILES.get('ev_logo')
+    obj           = course_event.objects.get(pk=ev_id)
+    obj.ev_date_start = ev_date_start
+    obj.ev_date_end   = ev_date_end
+    obj.ev_remark     = ev_remark
+    obj.active        = active
+    obj.location_id   = local
+    obj.address       = address
+    obj.details       = details
+    obj.ev_user       = ev_user
+    obj.upd_date      = dateTimeNow()
+    if ev_logo:
+        obj.ev_logo = ev_logo
+    obj.save()
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/course/event")
 

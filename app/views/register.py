@@ -192,12 +192,18 @@ def register_homenotevent(request):
 
   
     courses = course.objects.filter(cancelled=1, active=1,is_show_order='Y')
-    obj = []
-    
     getcustomer = customers.objects.filter()
-    # print(idcard_data)
+    from django.db.models import Subquery, OuterRef, CharField, Value
+    from django.db.models.functions import Concat
+    _user_subq = User.objects.filter(id=OuterRef('ev_user')).values(
+        n=Concat('first_name', Value(' '), 'last_name', output_field=CharField())
+    )[:1]
+    course_events = course_event.objects.select_related('course').filter(
+        cancelled=1, active=1, module=m.module
+    ).annotate(ev_user_name=Subquery(_user_subq)).order_by('-ev_date_start')[:100]
     context = {'title': title,  'data': courses, 'listMenuPermission': objMenu,'customers':getcustomer,
-               'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location, 'address': address, 'api_id_card': api_id_card}
+               'content_regist': content_regist, 'idcard_data': idcard_data, 'location': _location,
+               'address': address, 'api_id_card': api_id_card, 'course_events': course_events}
     return render(request, 'register/register_noevent.html', context)
 
 
@@ -3668,24 +3674,52 @@ def spa_sale_step1(request):
         return JsonResponse({'status': 'error'}, status=405)
 
     seller_id     = request.user.id
-    course_id     = request.POST.get('course_id')
+    sale_mode     = request.POST.get('sale_mode', 'noevent')  # 'event' | 'noevent'
     customer_type = request.POST.get('customer_type')
     pay_type      = request.POST.get('pay_type')
-
-    if not all([course_id, customer_type, pay_type]):
-        return JsonResponse({'status': 'error', 'message': 'ข้อมูลไม่ครบ'})
 
     try:
         m = user_group.objects.get(user=seller_id)
     except user_group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'ไม่มีสิทธิ์'})
 
-    # ล้าง session เก่า (ไม่มี DB record ให้ลบแล้ว)
+    ev_id_int = None
+    ev_date_start = ev_date_end = None
+    if sale_mode == 'event':
+        ev_id = request.POST.get('ev_id')
+        if not ev_id:
+            return JsonResponse({'status': 'error', 'message': 'กรุณาเลือก Event'})
+        try:
+            ev_obj = course_event.objects.select_related('course').get(ev_id=ev_id)
+            course_id = str(ev_obj.course_id)
+            c_name = ev_obj.course.course_name
+            c_code = ev_obj.course.course_code
+            ev_id_int = int(ev_id)
+            ev_date_start = ev_obj.ev_date_start.strftime('%d/%m/%Y') if ev_obj.ev_date_start else None
+            ev_date_end   = ev_obj.ev_date_end.strftime('%d/%m/%Y')   if ev_obj.ev_date_end   else None
+        except course_event.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'ไม่พบ Event'})
+    else:
+        sale_mode = 'noevent'
+        course_id = request.POST.get('course_id')
+        if not course_id:
+            return JsonResponse({'status': 'error', 'message': 'กรุณาเลือกสินค้า'})
+        try:
+            c = course.objects.get(course_id=course_id)
+            c_name, c_code = c.course_name, c.course_code
+        except Exception:
+            c_name = c_code = ''
+
+    if not all([customer_type, pay_type]):
+        return JsonResponse({'status': 'error', 'message': 'ข้อมูลไม่ครบ'})
+
+    # ล้าง session เก่า
     for k in ('spa_step1_data', 'spa_customer', 'idcard_data'):
         request.session.pop(k, None)
 
-    # บันทึกข้อมูล step1 ลง session
     request.session['spa_step1_data'] = {
+        'sale_mode':     sale_mode,
+        'ev_id':         ev_id_int,
         'course_id':     course_id,
         'customer_type': int(customer_type),
         'pay_type':      int(pay_type),
@@ -3693,18 +3727,15 @@ def spa_sale_step1(request):
         'module':        m.module,
     }
 
-    try:
-        c = course.objects.get(course_id=course_id)
-        c_name, c_code = c.course_name, c.course_code
-    except Exception:
-        c_name = c_code = ''
-
     return JsonResponse({
-        'status': 'ok',
+        'status':        'ok',
+        'sale_mode':     sale_mode,
         'customer_type': int(customer_type),
         'pay_type':      int(pay_type),
         'course_name':   c_name,
         'course_code':   c_code,
+        'ev_date_start': ev_date_start,
+        'ev_date_end':   ev_date_end,
     })
 
 
@@ -3842,13 +3873,15 @@ def spa_sale_step3(request):
     if not cus_sess:
         return JsonResponse({'status': 'error', 'message': 'ไม่พบข้อมูลลูกค้าใน session'})
 
-    ctype    = step1['customer_type']
-    pay_type = step1['pay_type']
-    active   = 1 if pay_type == 1 else 0
+    ctype     = step1['customer_type']
+    pay_type  = step1['pay_type']
+    active    = 1 if pay_type == 1 else 0
+    sale_mode = step1.get('sale_mode', 'noevent')
+    ev_id_val = step1.get('ev_id')   # int or None
 
     # ── สร้าง register_main (insert ครั้งเดียวที่ step 3) ──
     close_the_sale = 1 if pay_type == 1 else 0
-    content_main = register_main.objects.create(
+    create_kwargs = dict(
         register_number='-',
         customer_type=ctype,
         customer_status=0,
@@ -3860,11 +3893,25 @@ def spa_sale_step3(request):
         seller_id=step1['seller_id'],
         course_id=step1['course_id'],
         user_update_id=step1['seller_id'],
-        is_event='N',
         module=step1['module'],
     )
+    if sale_mode == 'event' and ev_id_val:
+        create_kwargs['ev_id'] = ev_id_val
+        create_kwargs['is_event'] = 'Y'
+    else:
+        create_kwargs['is_event'] = 'N'
+
+    content_main = register_main.objects.create(**create_kwargs)
     content_main.refresh_from_db()
     register_id = str(content_main.register_id)
+
+    # ── สร้าง event_register ถ้าเป็น event mode ──
+    if sale_mode == 'event' and ev_id_val:
+        event_register.objects.create(
+            ev_id=ev_id_val,
+            register_id=register_id,
+            status='Y',
+        )
 
     mc, yc = now.month, now.year
     yc_f = str(yc + 543)

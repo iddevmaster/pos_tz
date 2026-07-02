@@ -73,6 +73,7 @@ class  course(models.Model):
     is_show_order = models.CharField(max_length=12, blank=True, default=None)
     is_type_condition = models.CharField(max_length=12, blank=True, default=None)
     is_show_condition = models.CharField(max_length=12, blank=True, default=None)
+    sale_mode = models.CharField(max_length=10, blank=True, default='all', choices=[('all','ทั้งหมด'),('event','มี Event เท่านั้น'),('noevent','ไม่มี Event เท่านั้น')])
     image_cover = models.ImageField(
         upload_to=generate_unique_name('images/course'), blank=True, null=True, default=None)
 
@@ -117,6 +118,7 @@ class course_event(models.Model):
     condition_id = models.IntegerField(default=0, blank=False)
     condition_type = models.IntegerField(default=0, blank=False)
     number_code = models.CharField(max_length=256, blank=True, default=None)
+    ev_user = models.IntegerField(default=0, blank=True, null=True)
    
     
 # customer_type  1  = บุคคล ,2 = บริษัท
