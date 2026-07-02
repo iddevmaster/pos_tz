@@ -4012,7 +4012,37 @@ def spa_sale_step3(request):
         register_payment.objects.filter(register_id=register_id).exclude(
             rp_id=rp_obj.rp_id).update(active=0)
 
-    # ── 10. ล้าง session ──
+    # ── 10. add_on + fact_addon ──
+    try:
+        addons_data = json.loads(request.POST.get('addons', '[]'))
+    except Exception:
+        addons_data = []
+    for a in addons_data:
+        try:
+            c_obj = course.objects.get(course_id=a.get('course_id'))
+            c_code = c_obj.course_code
+            c_name = c_obj.course_name
+        except Exception:
+            c_code = str(a.get('course_code', ''))[:20]
+            c_name = str(a.get('order_list', ''))[:20]
+        try:
+            ao = add_on.objects.create(
+                course_code=c_code,
+                order_list=c_name,
+                qty=int(float(a.get('qty', 0))),
+                register_id=uid_nd,
+                unit='ท่าน',
+                rpi_price=float(a.get('rpi_price', 0)),
+                rpi_price_discount=float(a.get('rpi_price_discount', 0)),
+                rpi_price_result=float(a.get('rpi_price_result', 0)),
+                status='Y',
+                rp_id=rp_obj.rp_id,
+            )
+            fact_addon.objects.create(rp_id=rp_obj.rp_id, addon_id=ao.addon_id)
+        except Exception:
+            pass
+
+    # ── 11. ล้าง session ──
     for k in ('spa_step1_data', 'spa_customer', 'idcard_data'):
         request.session.pop(k, None)
 

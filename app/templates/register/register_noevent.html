@@ -389,7 +389,7 @@
       </div> {% endcomment %}
 
       <!-- Addon -->
-      {% comment %} <div class="spa-card">
+      <div class="spa-card">
         <div class="spa-card-head">
           <span class="spa-card-title"><i class="bi bi-plus-square-fill" style="color:var(--orange)"></i> รายการเพิ่มเติม (Add-on)</span>
           <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addonModal">
@@ -407,7 +407,7 @@
             <tbody id="addonTbody"></tbody>
           </table>
         </div>
-      </div> {% endcomment %}
+      </div>
 
       <!-- ชำระเงิน -->
       <div class="spa-card">
@@ -713,7 +713,7 @@ async function doStep2(){
     const addCourse = document.getElementById('addon_course_id');
     addCourse.innerHTML = '<option value="">— เลือกสินค้า —</option>';
     data.course_list.forEach(c => {
-      addCourse.insertAdjacentHTML('beforeend', `<option value="${c.course_id}">${c.course_code} ${c.course_name}</option>`);
+      addCourse.insertAdjacentHTML('beforeend', `<option value="${c.course_id}" data-code="${c.course_code}" data-name="${c.course_name}">${c.course_code} ${c.course_name}</option>`);
     });
 
     // product code / name
@@ -767,7 +767,7 @@ function buildAddonTable(addons){
         <td>${i+1}</td><td>${a.course_code}</td><td>${a.order_list}</td><td>${a.unit}</td>
         <td>${a.qty}</td><td>${fmtNum(a.rpi_price)}</td><td>${fmtNum(a.rpi_price_discount)}</td>
         <td>${fmtNum(a.rpi_price_result)}</td>
-        <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteAddon('${a.addon_id}')">ลบ</button></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteAddon('${a._tmpId}')">ลบ</button></td>
       </tr>`);
   });
 }
@@ -778,49 +778,43 @@ function calcAddonTotal(){
   document.getElementById('addon_total_m').value = (qty * price).toFixed(2);
 }
 
-async function saveAddon(){
-  const course_id = document.getElementById('addon_course_id').value;
-  const qty       = document.getElementById('addon_qty').value;
-  const price     = document.getElementById('addon_price').value;
-  const total_res = document.getElementById('addon_total_m').value;
-  const reg_id    = state.register_id;
-  if(!course_id || !qty || !price){ Swal.fire({title:'กรอกข้อมูลให้ครบ',icon:'warning'}); return; }
+function saveAddon(){
+  const sel   = document.getElementById('addon_course_id');
+  const qty   = parseFloat(document.getElementById('addon_qty').value) || 0;
+  const price = parseFloat(document.getElementById('addon_price').value) || 0;
+  if(!sel.value || !qty || !price){
+    Swal.fire({title:'กรอกข้อมูลให้ครบ', icon:'warning'}); return;
+  }
+  const course_code  = sel.options[sel.selectedIndex]?.dataset.code || '';
+  const order_list   = sel.options[sel.selectedIndex]?.dataset.name || '';
+  const rpi_price_result = qty * price;
 
-  const res = await fetch('/api/saveaddon', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ course_id, qty, rpi_price: price, register_id: reg_id, addon_price_result: total_res })
+  // เก็บใน state ล้วนๆ — ไม่ call backend
+  state.addon.push({
+    _tmpId: Date.now(),        // key สำหรับ delete ฝั่ง JS
+    course_id:           sel.value,
+    course_code:         course_code,
+    order_list:          order_list,
+    unit:                'ท่าน',
+    qty:                 qty,
+    rpi_price:           price,
+    rpi_price_discount:  0,
+    rpi_price_result:    rpi_price_result,
   });
-  const data = await res.json();
-  state.addon = data.data.map(a => ({
-    addon_id: String(a.addon_id), course_code: a.course_code, order_list: a.order_list,
-    unit: a.unit, qty: parseFloat(a.qty), rpi_price: parseFloat(a.rpi_price),
-    rpi_price_discount: parseFloat(a.rpi_price_discount), rpi_price_result: parseFloat(a.rpi_price_result)
-  }));
-  state.total_addon = parseFloat(data.total_price_add_on) || 0;
+  state.total_addon = state.addon.reduce((s, a) => s + a.rpi_price_result, 0);
+
   buildAddonTable(state.addon);
   document.getElementById('sumAddon').textContent = fmtNum(state.total_addon);
   calcVat();
   bootstrap.Modal.getInstance(document.getElementById('addonModal')).hide();
-  document.getElementById('addon_qty').value = 1;
+  document.getElementById('addon_qty').value   = 1;
   document.getElementById('addon_price').value = 0;
   document.getElementById('addon_total_m').value = 0;
 }
 
-async function deleteAddon(addon_id){
-  const reg_id = state.register_id;
-  const res = await fetch('/api/deleteaddon', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ addon_id, register_id: reg_id })
-  });
-  const data = await res.json();
-  state.addon = data.data.map(a => ({
-    addon_id: String(a.addon_id), course_code: a.course_code, order_list: a.order_list,
-    unit: a.unit, qty: parseFloat(a.qty), rpi_price: parseFloat(a.rpi_price),
-    rpi_price_discount: parseFloat(a.rpi_price_discount), rpi_price_result: parseFloat(a.rpi_price_result)
-  }));
-  state.total_addon = parseFloat(data.total_price_add_on) || 0;
+function deleteAddon(tmpId){
+  state.addon = state.addon.filter(a => String(a._tmpId) !== String(tmpId));
+  state.total_addon = state.addon.reduce((s, a) => s + a.rpi_price_result, 0);
   buildAddonTable(state.addon);
   document.getElementById('sumAddon').textContent = fmtNum(state.total_addon);
   calcVat();
@@ -929,6 +923,7 @@ async function doStep3(){
   fd.append('before_price_vat',  beforeVat);
   fd.append('rpi_price_result',  result);
   fd.append('addon_total',       addon);
+  fd.append('addons',            JSON.stringify(state.addon));
 
   if(pay_type == 2){
     fd.append('rp_confirm_date_price', document.getElementById('s3_confirm_date').value);
