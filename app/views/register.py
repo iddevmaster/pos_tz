@@ -3580,7 +3580,7 @@ def addon_create(request):
         order_list=courses.course_name,
         qty=qty,
         register_id=uuid_without_dashes,
-        unit='ท่าน',
+        unit='ปี',
         rpi_price=rpi_price,
         rpi_price_discount=0,
         rpi_price_result=result,
