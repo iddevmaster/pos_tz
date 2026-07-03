@@ -1,0 +1,307 @@
+{% extends 'base.html' %}{% block content %}{% load humanize %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .ecom{ --paper:#ffffff; --paper-raised:#f8fafc; --ink:#1E2A38; --ink-soft:#5B6677;
+    --navy:#16233A; --navy-soft:#23344F; --brass:#A8762E; --brass-light:#E9D9B8;
+    --sage:#4C7A63; --sage-bg:#E4EFE8; --terra:#B5533C; --terra-bg:#F6E4DE;
+    --hairline:#e2e8f0; --radius:6px;
+    background:transparent; padding:4px 0; min-height:80vh; }
+  .ecom .serif{ font-family:'Noto Serif Thai', serif; }
+  .ecom .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  /* breadcrumb nav */
+  .ecom-nav{ display:flex; gap:6px; align-items:center; margin-bottom:16px; font-size:13px; color:var(--ink-soft); }
+  .ecom-nav a{ color:var(--brass); text-decoration:none; }
+  .ecom-nav a:hover{ text-decoration:underline; }
+  .ecom-nav .sep{ color:var(--hairline); }
+
+  /* event header card */
+  .ev-card{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:8px;
+    padding:16px 20px; margin-bottom:20px; display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .ev-card .ev-main{ flex:1; min-width:260px; }
+  .ev-card .ev-code{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--brass); letter-spacing:.04em; margin-bottom:3px; }
+  .ev-card .ev-name{ font-family:'Noto Serif Thai',serif; font-size:19px; font-weight:700; color:var(--ink); }
+  .ev-card .ev-meta{ display:flex; gap:14px; margin-top:8px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); }
+  .ev-card .ev-meta span{ display:flex; align-items:center; gap:4px; }
+  .ev-revenue{ text-align:right; }
+  .ev-revenue .label{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.08em; }
+  .ev-revenue .val{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:var(--ink); }
+
+  /* policy block */
+  .ep-block{ margin-bottom:26px; }
+  .ep-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .ep-num{ width:28px; height:28px; border-radius:50%; border:1.5px solid var(--brass); color:var(--brass);
+    font-weight:700; font-size:13px; font-family:'Noto Serif Thai',serif; display:flex; align-items:center; justify-content:center; flex:0 0 28px; }
+  .ep-head h4{ margin:0; font-size:15px; font-family:'Noto Serif Thai',serif; flex:1; }
+  .ep-subtotal{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--brass); }
+
+  /* condition rows */
+  .ep-table{ border-top:1px solid var(--hairline); }
+  .ep-row{ border-bottom:1px solid var(--hairline); padding:10px 4px;
+    display:grid; grid-template-columns:52px 1fr 90px 130px 56px 26px; gap:10px; align-items:center; font-size:13px; }
+  .ep-row .code{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .ep-stamp{ font-size:10px; border:1px dashed var(--brass); color:var(--brass);
+    padding:2px 6px; border-radius:3px; text-align:center; white-space:nowrap; font-family:'IBM Plex Mono',monospace; }
+  .ep-rate{ display:flex; align-items:center; gap:4px; }
+  .ep-rate input{ width:72px; text-align:right; font-family:'IBM Plex Mono',monospace;
+    border:1px solid var(--hairline); background:var(--paper-raised); border-radius:4px; padding:5px 7px; font-size:13px; }
+  .ep-rate input:focus{ outline:none; border-color:var(--brass); }
+  .ep-rate .pct{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .ep-expand{ background:none; border:none; cursor:pointer; color:var(--ink-soft); font-size:13px; padding:2px 4px; }
+  .ep-expand:hover{ color:var(--ink); }
+
+  /* allocation panel */
+  .ep-alloc{ grid-column:1/-1; background:#f8fafc; border:1px dashed var(--hairline);
+    border-radius:4px; padding:10px 12px; margin-top:6px; }
+  .ep-alloc .arow{ display:flex; gap:10px; align-items:center; padding:5px 0;
+    border-bottom:1px solid var(--hairline); font-size:13px; }
+  .ep-alloc .arow:last-of-type{ border-bottom:none; }
+  .ep-alloc .aname{ flex:1; }
+  .ep-alloc .apct{ font-family:'IBM Plex Mono',monospace; color:var(--brass); white-space:nowrap; }
+  .ep-alloc .aamt{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+  .ep-empty{ font-size:12px; color:var(--ink-soft); font-style:italic; padding:4px 0; }
+
+  /* status badge */
+  .ps{ font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.04em;
+    padding:3px 8px; border-radius:20px; cursor:pointer; border:1px solid transparent; white-space:nowrap; }
+  .ps.PENDING{ background:var(--brass-light); color:var(--brass); }
+  .ps.APPROVED{ background:#DCE6F2; color:#2C5282; }
+  .ps.PAID{ background:var(--sage-bg); color:var(--sage); }
+
+  /* alloc add row */
+  .ep-alloc-add{ display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap; }
+  .ep-alloc-add select{ flex:1; min-width:180px; font-size:13px;
+    border:1px solid var(--hairline); background:var(--paper-raised); border-radius:4px; padding:6px 8px; }
+  .ep-alloc-add input{ width:80px; font-family:'IBM Plex Mono',monospace; font-size:13px;
+    border:1px solid var(--hairline); background:var(--paper-raised); border-radius:4px; padding:6px 8px; text-align:right; }
+  .ep-btn{ border:1px solid var(--navy); background:var(--navy); color:#fff; border-radius:4px;
+    padding:6px 12px; font-size:12.5px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+  .ep-btn:hover{ background:var(--navy-soft); }
+  .ep-btn.ghost{ background:transparent; color:var(--navy); }
+  .ep-btn.ghost:hover{ background:var(--paper-raised); }
+  .ep-btn.danger{ background:transparent; color:var(--terra); border-color:var(--terra); }
+
+  @media(max-width:700px){
+    .ep-row{ grid-template-columns:1fr; gap:6px; }
+    .ev-card{ flex-direction:column; }
+    .ev-revenue{ text-align:left; }
+  }
+</style>
+
+<div class="ecom">
+
+  <!-- breadcrumb -->
+  <div class="ecom-nav">
+    <a href="/course/event">← รายการ Event</a>
+    <span class="sep">›</span>
+    <span>{{ ev.course.course_name|default:ev.ev_id }}</span>
+    <span class="sep">›</span>
+    <span>ค่าตอบแทนผู้ปฏิบัติงาน</span>
+  </div>
+
+  <!-- event header -->
+  <div class="ev-card">
+    <div class="ev-main">
+      <div class="ev-code">{{ ev.number_code|default:"—" }}</div>
+      <div class="ev-name">{{ ev.course.course_name|default:"—" }}</div>
+      <div class="ev-meta">
+        <span><i class="bi bi-calendar2-range"></i>
+          {{ ev.ev_date_start|date:"d/m/Y" }} — {{ ev.ev_date_end|date:"d/m/Y" }}
+        </span>
+        <span><i class="bi bi-hash"></i> EV-{{ ev.ev_id }}</span>
+        {% if ev_user_name %}
+        <span><i class="bi bi-person-fill"></i> {{ ev_user_name }}</span>
+        {% endif %}
+        <span><i class="bi bi-receipt"></i> {{ bill_count }} bill</span>
+        {% if ev.ev_remark %}
+        <span><i class="bi bi-chat-left-text"></i> {{ ev.ev_remark }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="ev-revenue">
+      <div class="label">ยอดรวม Event</div>
+      <div class="val">฿{{ total_revenue|floatformat:2|intcomma }}</div>
+    </div>
+  </div>
+
+  <!-- policy blocks (rendered by JS) -->
+  <div id="policyTree"></div>
+
+</div>
+
+<script>
+const EV_ID = {{ ev.ev_id }};
+const TOTAL_REVENUE = {{ total_revenue }};
+const POLICIES = {{ policy_data_json|safe }};
+const USERS = {{ users_json|safe }};
+const PAYEES = {{ payees_json|safe }};
+
+const CALC_LABEL = { PRORATA:'แบ่งสัดส่วน', LUMPSUM:'ก้อนเดียว', FIXED:'คงที่' };
+const STATUS_LABEL = { PENDING:'รอดำเนินการ', APPROVED:'อนุมัติแล้ว', PAID:'จ่ายแล้ว' };
+const STATUS_NEXT = { PENDING:'APPROVED', APPROVED:'PAID', PAID:'PENDING' };
+
+function fmtPct(n){ return (Math.round((n||0)*1000)/1000).toString(); }
+function fmtBaht(n){ return (n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+const api = (url, body) => fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}).then(r=>r.json());
+
+let expanded = new Set();   // condition_id ที่ expand alloc panel
+
+function render(){
+  const html = POLICIES.map(p => {
+    const subtotal = p.conditions.reduce((s,c)=> s + (c.active && c.rate ? c.rate : 0), 0);
+    const amtSubtotal = TOTAL_REVENUE * subtotal / 100;
+    const rows = p.conditions.map(c => {
+      const isExpanded = expanded.has(c.condition_id);
+      const baseAmt = TOTAL_REVENUE * (c.rate||0) / 100;
+
+      const allocRows = (c.allocations||[]).map(a => {
+        const aAmt = baseAmt * (a.percent||0) / 100;
+        return `<div class="arow">
+          <span class="aname">${a.payee_name}</span>
+          <span class="apct">${fmtPct(a.percent)}%</span>
+          <span class="aamt">฿${fmtBaht(aAmt)}</span>
+          <span class="ps ${a.status}" data-ev-alloc="${a.ev_alloc_id}" onclick="cycleStatus(this)">${STATUS_LABEL[a.status]||a.status} ${a.status}</span>
+          <button class="ep-btn danger" onclick="rmAlloc(${a.ev_alloc_id})">ลบ</button>
+        </div>`;
+      }).join('') || '<div class="ep-empty">ยังไม่กำหนดผู้รับ</div>';
+
+      return `
+      <div class="ep-row" data-cond="${c.condition_id}" data-rule="${c.ev_rule_id||''}">
+        <span class="code">${c.condition_code}</span>
+        <span>${c.condition_name}</span>
+        <span class="ep-stamp">${CALC_LABEL[c.calc_type]||c.calc_type}</span>
+        <span class="ep-rate">
+          <input type="number" step="0.001" min="0" placeholder="—"
+            value="${c.rate||''}"
+            onchange="saveRate(${c.condition_id}, this.value, this.closest('.ep-row'))">
+          <span class="pct">%</span>
+          <span class="mono" style="font-size:11px; color:var(--ink-soft);">฿${fmtBaht(baseAmt)}</span>
+        </span>
+        <div class="form-check form-switch mb-0" style="padding-left:2rem;">
+          <input class="form-check-input" type="checkbox" ${c.active?'checked':''}
+            onchange="saveActive(${c.condition_id}, this.checked)">
+        </div>
+        <button class="ep-expand" onclick="toggleAlloc(this, ${c.condition_id})">${isExpanded?'▾':'▸'}</button>
+        ${isExpanded ? `
+        <div class="ep-alloc">
+          ${allocRows}
+          <div class="ep-alloc-add">
+            <select class="user-sel" data-cond="${c.condition_id}" style="width:100%;">
+              <option value=""></option>
+            </select>
+            <input type="number" class="pct-in" min="0" max="100" step="0.1" placeholder="%">
+            <button class="ep-btn" onclick="addAlloc(this, ${c.condition_id})">+ เพิ่มผู้รับ</button>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="ep-block">
+      <div class="ep-table">${rows}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('policyTree').innerHTML = html;
+  // init Select2 บน .user-sel ทุกตัวที่เพิ่งสร้าง
+  $('.user-sel').select2({
+    placeholder: '— เลือกผู้ปฏิบัติงาน —',
+    allowClear: true,
+    width: '100%',
+    data: USERS.map(u => ({ id: u.id, text: u.name })),
+  });
+}
+
+function toggleAlloc(btn, condId){
+  if(expanded.has(condId)) expanded.delete(condId);
+  else expanded.add(condId);
+  render();
+}
+
+async function saveRate(condId, val, rowEl){
+  const res = await api('/api/commission/event/rule/save', {
+    ev_id: EV_ID, condition_id: condId, rate: val===''?0:Number(val)});
+  // อัปเดต POLICIES state
+  for(const p of POLICIES) for(const c of p.conditions){
+    if(c.condition_id === condId){
+      c.rate = val===''?0:Number(val);
+      c.ev_rule_id = res.ev_rule_id;
+    }
+  }
+  rowEl.dataset.rule = res.ev_rule_id;
+  render();
+}
+
+async function saveActive(condId, checked){
+  const res = await api('/api/commission/event/rule/save', {
+    ev_id: EV_ID, condition_id: condId, active: checked});
+  for(const p of POLICIES) for(const c of p.conditions){
+    if(c.condition_id === condId){ c.active = checked; c.ev_rule_id = res.ev_rule_id; }
+  }
+  render();
+}
+
+async function addAlloc(btn, condId){
+  const panel = btn.closest('.ep-alloc');
+  const rowEl = btn.closest('.ep-row');
+  let ruleId = rowEl.dataset.rule;
+
+  if(!ruleId){
+    // สร้าง rule ก่อนถ้ายังไม่มี
+    const res = await api('/api/commission/event/rule/save', {
+      ev_id: EV_ID, condition_id: condId, rate: 0, active: 0});
+    ruleId = res.ev_rule_id;
+    for(const p of POLICIES) for(const c of p.conditions){
+      if(c.condition_id === condId) c.ev_rule_id = ruleId;
+    }
+    rowEl.dataset.rule = ruleId;
+  }
+
+  const userSel = panel.querySelector('.user-sel');
+  const userId = $(userSel).val();
+  const pct = panel.querySelector('.pct-in').value;
+  if(!userId || !pct){ alert('กรุณาเลือกผู้รับและกรอก %'); return; }
+
+  const res = await api('/api/commission/event/allocation/add', {
+    ev_rule_id: Number(ruleId), user_id: Number(userId), percent: Number(pct)});
+
+  for(const p of POLICIES) for(const c of p.conditions){
+    if(c.condition_id === condId){
+      if(!c.allocations) c.allocations = [];
+      c.allocations.push({
+        ev_alloc_id: res.ev_alloc_id,
+        payee_name: res.payee_name,
+        percent: Number(pct),
+        amount: res.amount,
+        status: 'PENDING',
+      });
+    }
+  }
+  render();
+}
+
+async function rmAlloc(evAllocId){
+  if(!confirm('ลบผู้รับนี้?')) return;
+  await api('/api/commission/event/allocation/delete', {ev_alloc_id: evAllocId});
+  for(const p of POLICIES) for(const c of p.conditions){
+    c.allocations = (c.allocations||[]).filter(a => a.ev_alloc_id !== evAllocId);
+  }
+  render();
+}
+
+async function cycleStatus(el){
+  const evAllocId = Number(el.dataset.evAlloc);
+  const cur = el.dataset.status || el.className.match(/PENDING|APPROVED|PAID/)?.[0] || 'PENDING';
+  const next = STATUS_NEXT[cur] || 'PENDING';
+  await api('/api/commission/event/allocation/status', {ev_alloc_id: evAllocId, status: next});
+  for(const p of POLICIES) for(const c of p.conditions){
+    for(const a of (c.allocations||[])){
+      if(a.ev_alloc_id === evAllocId) a.status = next;
+    }
+  }
+  render();
+}
+
+// init
+render();
+</script>
+{% endblock %}

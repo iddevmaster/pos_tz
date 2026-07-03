@@ -419,6 +419,11 @@ urlpatterns = [
     path('api/commission/plan/lock', commission.api_plan_lock),
     path('api/commission/plan/unlock', commission.api_plan_unlock),
     path('api/commission/payout/status', commission.api_payout_status),
+    path('course/event/<int:ev_id>/commission/', commission.event_commission_page),
+    path('api/commission/event/rule/save', commission.api_ev_rule_save),
+    path('api/commission/event/allocation/add', commission.api_ev_alloc_add),
+    path('api/commission/event/allocation/delete', commission.api_ev_alloc_delete),
+    path('api/commission/event/allocation/status', commission.api_ev_alloc_status),
 
     #     API
     path('api/student/<str:date>', api.studentReport.as_view()),

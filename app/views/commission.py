@@ -9,12 +9,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ..constant import defaultTitle
 from ..functions import dateTimeNow, checkpermi
+from django.db.models import Sum
+
 from ..models import (
     User,
     category_program_permission,
     user_detail,
     course,
     teacher,
+    course_event,
     register_main,
     register_payment,
     register_payment_items,
@@ -27,6 +30,8 @@ from ..models import (
     commission_plan_line,
     commission_plan_allocation,
     commission_payout,
+    commission_event_rule,
+    commission_event_allocation,
 )
 
 
@@ -397,4 +402,176 @@ def api_payout_status(request):
     payout.upd_date = dateTimeNow()
     payout.save()
 
+    return JsonResponse({'status': 200})
+
+
+# =====================================================================
+# หน้า: ค่าตอบแทนผู้ปฏิบัติงาน ต่อ course_event (ev_id)
+# =====================================================================
+
+@login_required(login_url='/login')
+def event_commission_page(request, ev_id):
+    cm_id, objMenu = _menu_context(request)
+    ev = course_event.objects.select_related('course').get(ev_id=ev_id)
+
+    ev_user_name = ''
+    if ev.ev_user:
+        try:
+            u = User.objects.get(id=ev.ev_user)
+            ev_user_name = f'{u.first_name} {u.last_name}'.strip()
+        except User.DoesNotExist:
+            pass
+
+    bills_qs = register_payment_items.objects.filter(register__ev=ev)
+    bill_count = bills_qs.count()
+    total_revenue = bills_qs.aggregate(s=Sum('rpi_price_result'))['s'] or 0
+
+    policies = commission_policy.objects.filter(active=1, policy_code='3').order_by('seq').prefetch_related(
+        'conditions')
+    rules_by_cond = {
+        r.condition_id: r
+        for r in commission_event_rule.objects.filter(event=ev).prefetch_related('allocations__payee')
+    }
+    payees = commission_payee.objects.filter(active=1).order_by('payee_type', 'payee_name')
+
+    policy_data = []
+    for p in policies:
+        conds = []
+        for c in p.conditions.filter(active=1).order_by('seq'):
+            rule = rules_by_cond.get(c.condition_id)
+            allocs = []
+            if rule:
+                for a in rule.allocations.all():
+                    allocs.append({
+                        'ev_alloc_id': a.ev_alloc_id,
+                        'payee_id': a.payee_id,
+                        'payee_name': a.payee.payee_name,
+                        'percent': a.percent,
+                        'amount': a.amount,
+                        'status': a.status,
+                    })
+            conds.append({
+                'condition_id': c.condition_id,
+                'condition_code': c.condition_code,
+                'condition_name': c.condition_name,
+                'calc_type': c.calc_type,
+                'ev_rule_id': rule.ev_rule_id if rule else None,
+                'rate': rule.rate if rule else 0,
+                'active': bool(rule.active) if rule else False,
+                'allocations': allocs,
+            })
+        policy_data.append({
+            'policy_id': p.policy_id,
+            'policy_code': p.policy_code,
+            'policy_name': p.policy_name,
+            'conditions': conds,
+        })
+
+    users = User.objects.filter(is_active=1).order_by('first_name', 'last_name')
+
+    import json as _json
+    context = {
+        'title': defaultTitle,
+        'listMenuPermission': objMenu,
+        'ev': ev,
+        'ev_user_name': ev_user_name,
+        'bill_count': bill_count,
+        'total_revenue': total_revenue,
+        'policy_data_json': _json.dumps(policy_data, ensure_ascii=False),
+        'users_json': _json.dumps(
+            [{'id': u.id, 'name': f'{u.first_name} {u.last_name}'.strip() or u.username}
+             for u in users],
+            ensure_ascii=False),
+        'payees_json': _json.dumps(
+            [{'payee_id': px.payee_id, 'payee_name': px.payee_name, 'payee_type': px.payee_type}
+             for px in payees],
+            ensure_ascii=False),
+    }
+    return render(request, 'commission/event_commission.html', context)
+
+
+@csrf_exempt
+def api_ev_rule_save(request):
+    data = json.loads(request.body)
+    ev_id = data.get('ev_id')
+    condition_id = data.get('condition_id')
+    rate = data.get('rate')
+    active = data.get('active')
+
+    rule, _created = commission_event_rule.objects.get_or_create(
+        event_id=ev_id, condition_id=condition_id,
+        defaults={'rate': rate or 0, 'active': 1 if active else 0,
+                  'crt_date': dateTimeNow(), 'upd_date': dateTimeNow()})
+    if not _created:
+        if rate is not None:
+            rule.rate = rate
+        if active is not None:
+            rule.active = 1 if active else 0
+        rule.upd_date = dateTimeNow()
+        rule.save()
+
+    return JsonResponse({'status': 200, 'ev_rule_id': rule.ev_rule_id})
+
+
+@csrf_exempt
+def api_ev_alloc_add(request):
+    data = json.loads(request.body)
+    ev_rule_id = data.get('ev_rule_id')
+    user_id = data.get('user_id')
+    percent = float(data.get('percent') or 0)
+
+    # auto get_or_create commission_payee จาก auth_user
+    user = User.objects.get(id=user_id)
+    full_name = f'{user.first_name} {user.last_name}'.strip() or user.username
+    payee, _ = commission_payee.objects.get_or_create(
+        user_id=user_id,
+        defaults={'payee_type': 'STAFF', 'payee_name': full_name,
+                  'bank_name': '', 'bank_account': '',
+                  'active': 1, 'crt_date': dateTimeNow(), 'upd_date': dateTimeNow()})
+
+    rule = commission_event_rule.objects.get(ev_rule_id=ev_rule_id)
+    total_revenue = (
+        register_payment_items.objects
+        .filter(register__ev=rule.event)
+        .aggregate(s=Sum('rpi_price_result'))['s'] or 0
+    )
+    base = total_revenue * rule.rate / 100
+    amount = base * percent / 100
+
+    alloc = commission_event_allocation.objects.create(
+        ev_rule=rule, payee=payee, percent=percent,
+        amount=round(amount, 2), status='PENDING',
+        crt_date=dateTimeNow(), upd_date=dateTimeNow())
+
+    return JsonResponse({
+        'status': 200,
+        'ev_alloc_id': alloc.ev_alloc_id,
+        'amount': alloc.amount,
+        'payee_name': payee.payee_name,
+    })
+
+
+@csrf_exempt
+def api_ev_alloc_delete(request):
+    data = json.loads(request.body)
+    commission_event_allocation.objects.filter(ev_alloc_id=data.get('ev_alloc_id')).delete()
+    return JsonResponse({'status': 200})
+
+
+@csrf_exempt
+def api_ev_alloc_status(request):
+    data = json.loads(request.body)
+    alloc = commission_event_allocation.objects.get(ev_alloc_id=data.get('ev_alloc_id'))
+    next_status = data.get('status')
+    if next_status not in ('PENDING', 'APPROVED', 'PAID'):
+        return JsonResponse({'status': 400, 'message': 'สถานะไม่ถูกต้อง'}, status=400)
+    alloc.status = next_status
+    if next_status == 'APPROVED':
+        alloc.approved_by = request.user if request.user.is_authenticated else None
+        alloc.approved_at = dateTimeNow()
+    if next_status == 'PAID':
+        alloc.paid_by = request.user if request.user.is_authenticated else None
+        alloc.paid_at = dateTimeNow()
+    alloc.upd_date = dateTimeNow()
+    alloc.save()
     return JsonResponse({'status': 200})

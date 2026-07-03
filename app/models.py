@@ -718,3 +718,40 @@ class commission_payout(models.Model):
     upd_date = models.DateTimeField(blank=True, null=True)
 
 
+# ============================================================================
+# Commission per course_event — ค่าตอบแทนผู้ปฏิบัติงานต่อ ev_id
+# ============================================================================
+
+class commission_event_rule(models.Model):
+    """อัตราค่าตอบแทนต่อ course_event x condition"""
+    ev_rule_id = models.AutoField(primary_key=True)
+    event = models.ForeignKey(
+        course_event, on_delete=models.CASCADE, related_name="commission_ev_rules")
+    condition = models.ForeignKey(commission_condition, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0)
+    active = models.IntegerField(default=0)
+    remark = models.CharField(max_length=255, blank=True, null=True)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ("event", "condition")
+
+
+class commission_event_allocation(models.Model):
+    """สัดส่วนผู้รับค่าตอบแทนต่อ ev_rule — status PENDING/APPROVED/PAID"""
+    ev_alloc_id = models.AutoField(primary_key=True)
+    ev_rule = models.ForeignKey(
+        commission_event_rule, on_delete=models.CASCADE, related_name="allocations")
+    payee = models.ForeignKey(commission_payee, on_delete=models.CASCADE)
+    percent = models.FloatField(default=100)
+    amount = models.FloatField(default=0)
+    status = models.CharField(max_length=16, default='PENDING')
+    approved_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="ev_alloc_approved")
+    approved_at = models.DateTimeField(null=True, blank=True)
+    paid_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="ev_alloc_paid")
+    paid_at = models.DateTimeField(null=True, blank=True)
+    crt_date = models.DateTimeField(blank=True, null=True)
+    upd_date = models.DateTimeField(blank=True, null=True)
