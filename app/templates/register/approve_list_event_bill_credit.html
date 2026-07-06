@@ -202,6 +202,10 @@
             <td>
 
 
+              <a href="/salesnotevent/payment/history/{{res.register_id}}" class="btn btn-info btn-sm" title="ดูใบเสร็จ" target="_blank">
+                <i class="bi bi-eye-fill"></i>
+              </a>
+
               {% if res.status == 'Y' %}
               -
               {% else %}
@@ -219,10 +223,8 @@
                     ยกเลิก
                   </button>
 
-
                 </div>
               </div>
-
 
               {% endif %}
 

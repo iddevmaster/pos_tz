@@ -2358,10 +2358,8 @@ def delete_close_the_event(request):
 
 
 def approve_list_invoice_com(request):
-
     title = defaultTitle
     user_id = request.user.id
-    # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
@@ -2373,30 +2371,42 @@ def approve_list_invoice_com(request):
     for rs in list(listMenuPermission):
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
-        r = {'group_label': rs['group_label'],
-             'group_value': rs['group_value'], 'children': children}
-        objMenu.append(r)
-    try:
-        obj = []
-        st = [0,1]
-        # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:200]
-        # billpa = event_register.objects.filter(status='Y')
-        for r in billpa:  
-            
-            erv = event_register.objects.get(register=r.register.register_id)
-            evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            getsale = salesorder.objects.get(er_id=erv.er_id)
-            money = register_payment_items.objects.get(register_id=r.register.register_id)
-           
-            res = {'rpi_price_result':money.rpi_price_result,'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
-            
-            obj.append(res)    
-           
-    except:
-        content = None
-        
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+        objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
+
+    registers = register_main.objects.select_related(
+        'ev__course'
+    ).filter(
+        pay_type=2,
+        status='Y',
+    ).order_by('-crt_date')[:200]
+
+    obj = []
+    for r in registers:
+        ev = r.ev
+        payment = register_payment.objects.filter(register=r).first()
+        sale = salesorder.objects.filter(register=r).first()
+        money = register_payment_items.objects.filter(rp__register=r).first()
+
+        obj.append({
+            'register_id': r.register_id,
+            'register_number': r.register_number,
+            'rp_doc_number': payment.rp_doc_number if payment else '',
+            'custom': payment.rp_name_customer if payment else '',
+            'rpi_price_result': money.rpi_price_result if money else 0,
+            'po': sale.po if sale else '',
+            'sq': sale.sq if sale else '',
+            'so': sale.so if sale else '',
+            'invoice': sale.invoice if sale else '',
+            'rv': sale.rv if sale else '',
+            'status': sale.status if sale else '',
+            'sale_id': sale.sale_id if sale else None,
+            'course_name': ev.course.course_name if ev and ev.course else '',
+            'start': ev.ev_date_start if ev else None,
+            'end': ev.ev_date_end if ev else None,
+            'ev_generation': ev.ev_generation if ev else '',
+        })
+
+    context = {'title': title, 'data': obj, 'listMenuPermission': objMenu}
 
     return render(request, 'register/approve_list_event_bill_credit.html',context)
 
