@@ -402,7 +402,7 @@ class event_register(models.Model):
 
 class salesorder(models.Model):
     sale_id = models.AutoField(primary_key=True)
-    er = models.ForeignKey(event_register, on_delete=models.CASCADE ,related_name="ref_er")
+    register = models.ForeignKey(register_main, on_delete=models.SET_NULL, null=True, blank=True, related_name="salesorders")
     type_sa = models.CharField(max_length=128, default=None , blank=True)
     po = models.CharField(max_length=64, blank=True, default=None)
     sq = models.CharField(max_length=64, blank=True, default=None)

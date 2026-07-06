@@ -2265,48 +2265,23 @@ def update_close_the_event(request):
 
     
    
-    payment = register_payment.objects.get(register_id=register_id)
-    payment.active = 1
-    payment.save()
-
-    content = register_main.objects.get(pk=register_id)
-    content.status = 'Y'
-    content.close_the_sale = 0
-    content.orderstatus = 'FullPayment'
-    content.save()
-
-
-
 
     contentfact = fact_customer.objects.get(register_id=register_id)
     contentfact.status_bill = 'Y'
     contentfact.save()
 
-    contentev = event_register.objects.get(register_id=register_id)
-    contentev.status = 'Y'
-    contentev.save()
+
+    main = register_main.objects.get(register_id=register_id)
+    main.status = 'Y'
+    main.save()
+
+
     uuid_without_dashes = str(register_id).replace('-', '')
 
-    # com = commissionstages.objects.all()
-    # for coms in com:
-    #     dtaf = fact_commission.objects.create( 
-    #     stage_id=coms.stage_id,
-    #     register_id=uuid_without_dashes,
-    #     rpi_id=payment.rp_id,
-    #     status='N'
-    # )   
-
-    dtaf = fact_commission.objects.create( 
-        stage_id=5,
-        register_id=uuid_without_dashes,
-        rpi_id=payment.rp_id,
-        com_head_id=2,
-        user_id=content.seller.id,
-        status='W')
        
-    print(contentev.er_id)
+  
     savesal = salesorder.objects.create( 
-        er_id=contentev.er_id,
+        register_id=uuid_without_dashes,
         type_sa=accept_terms,
         po=pos,
         sq=sqs,
@@ -2318,14 +2293,14 @@ def update_close_the_event(request):
 
 
 
-    checkev = event_register.objects.filter(ev_id=ev_id)
-    all_passed = all(record.status == 'Y' for record in checkev)
-    if all_passed:
-            # เช็ค ก่อนว่า Event มีการเปิดรึยัง
-            content = course_event.objects.get(ev_id=ev_id)
-            if content.status == 'N':
-                content.status = 'Y'
-                content.save()
+    # checkev = event_register.objects.filter(ev_id=ev_id)
+    # all_passed = all(record.status == 'Y' for record in checkev)
+    # if all_passed:
+    #         # เช็ค ก่อนว่า Event มีการเปิดรึยัง
+    #         content = course_event.objects.get(ev_id=ev_id)
+    #         if content.status == 'N':
+    #             content.status = 'Y'
+    #             content.save()
 
         
 
@@ -2427,10 +2402,8 @@ def approve_list_invoice_com(request):
 
 
 def approve_list_invoice_inv(request):
-
     title = defaultTitle
     user_id = request.user.id
-    # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
@@ -2442,34 +2415,42 @@ def approve_list_invoice_inv(request):
     for rs in list(listMenuPermission):
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
-        r = {'group_label': rs['group_label'],
-             'group_value': rs['group_value'], 'children': children}
-        objMenu.append(r)
-    try:
-        obj = []
-        st = [0,1]
-        # salesorder
-        billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y').order_by("-crt_date")[:60]
-        
-        for r in billpa:    
-            
-            erv = event_register.objects.get(register=r.register.register_id)
-            
-            evcourse = course_event.objects.get(ev_id=erv.ev.ev_id)
-            
-            getsale = salesorder.objects.get(er_id=erv.er_id)
-            
+        objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
 
-            res = {'rp_doc_number':r.rp_doc_number,'register_number':r.register.register_number,'po':getsale.po,'sq':getsale.sq,'so':getsale.so,'register_id':r.register.register_id,'sale_id':getsale.sale_id,'invoice':getsale.invoice,'rv':getsale.rv,'status':getsale.status,'custom':r.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
-            
-            obj.append(res)    
-           
-    except:
-        content = None
-        
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+    sale_orders = salesorder.objects.select_related(
+        'register__ev__course'
+    ).filter(
+        register__pay_type=2,
+        register__status='Y',
+        register__close_the_sale__in=[0, 1],
+    ).order_by('-crt_date')[:60]
 
-    return render(request, 'register/approve_list_event_bill_credit_inv.html',context)    
+    obj = []
+    for s in sale_orders:
+        reg = s.register
+        ev = reg.ev
+        payment = register_payment.objects.filter(register=reg).first()
+
+        obj.append({
+            'sale_id': s.sale_id,
+            'po': s.po,
+            'sq': s.sq,
+            'so': s.so,
+            'invoice': s.invoice,
+            'rv': s.rv,
+            'status': s.status,
+            'register_id': reg.register_id,
+            'register_number': reg.register_number,
+            'rp_doc_number': payment.rp_doc_number if payment else '',
+            'custom': payment.rp_name_customer if payment else '',
+            'course_name': ev.course.course_name if ev and ev.course else '',
+            'start': ev.ev_date_start if ev else None,
+            'end': ev.ev_date_end if ev else None,
+            'ev_generation': ev.ev_generation if ev else '',
+        })
+
+    context = {'title': title, 'data': obj, 'listMenuPermission': objMenu}
+    return render(request, 'register/approve_list_event_bill_credit_inv.html', context)
 
 
 
