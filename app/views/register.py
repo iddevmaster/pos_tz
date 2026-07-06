@@ -2120,7 +2120,6 @@ def register_management(request):
 def approve_lis_event(request):
     title = defaultTitle
     user_id = request.user.id
-    # Menu
     try:
         u = user_detail.objects.get(user_id=user_id)
         cm_id = u.cm
@@ -2132,43 +2131,29 @@ def approve_lis_event(request):
     for rs in list(listMenuPermission):
         children = category_program_permission.objects.filter(
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
-        r = {'group_label': rs['group_label'],
-             'group_value': rs['group_value'], 'children': children}
-        objMenu.append(r)
-    # month_current = date.today().month
-    # year_current = date.today().year
-    month_current = request.GET.get('qmonths', date.today().month)
-    year_current = request.GET.get('qyear', date.today().year)
+        objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
 
-   
-    content = event_register.objects.select_related('ev','register').filter(status='D',register__pay_type=2).order_by('-er_id')[:30]
-    
+    registers = register_main.objects.select_related(
+        'ev__course', 'seller'
+    ).filter(status='W').order_by('-crt_date')[:50]
+
     obj = []
-    if content:
-     for r in content:
-      
-        cus = fact_customer.objects.select_related('register').filter(
-            register_id=r.register_id).first()
-        
-        customer_list = customers.objects.filter(
-            customer_id=cus.customer_id).first()
-        total_payment = register_payment.objects.filter(
-            register_id=r.register_id).count()
-        
-        payment_item = register_payment.objects.filter(
-            register_id=r.register_id).first()
-     
-        reg = register_main.objects.filter(
-            register_id=r.register_id).first()
-    
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.ev_id).first()
-        res = {'customer_list': customer_list,'register_id':r.register_id,
-               'course_list': course_list, 'total_payment': total_payment,'payment_item':payment_item,'register':reg}
-    
-        obj.append(res)
-    context = {'title': title,  'data': obj,'listMenuPermission': objMenu} 
+    for r in registers:
+        cus = fact_customer.objects.filter(register_id=r.register_id).first()
+        customer_list = customers.objects.filter(customer_id=cus.customer_id).first() if cus else None
+        payments = register_payment.objects.filter(register=r)
 
+        obj.append({
+            'register': r,
+            'register_id': r.register_id,
+            'course_list': r.ev,
+            'customer_list': customer_list,
+            'payment_item': payments.first(),
+            'payments': payments,
+            'total_payment': payments.count(),
+        })
+
+    context = {'title': title, 'data': obj, 'listMenuPermission': objMenu}
     return render(request, 'register/approve_list_event.html', context)
 def approve_lis_event_end(request):
     title = defaultTitle
@@ -2193,7 +2178,7 @@ def approve_lis_event_end(request):
     month_current = request.GET.get('qmonths', date.today().month)
     year_current = request.GET.get('qyear', date.today().year)
 
-    content = course_event.objects.select_related('course').filter(status='I')
+    content = course_event.objects.select_related('course').filter(status='W')
 
     # obj = []
     # if content:
