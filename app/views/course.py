@@ -63,6 +63,9 @@ def course_create(request):
     course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
     sale_mode = request.POST.get('sale_mode', 'all')
+    is_commission = 1 if request.POST.get('is_commission') else 0
+    is_operation = 1 if request.POST.get('is_operation') else 0
+    is_consultant = 1 if request.POST.get('is_consultant') else 0
     image_cover = request.FILES.get('image_cover')
     content = course(
         course_code=course_code,
@@ -70,6 +73,9 @@ def course_create(request):
         course_name_eng=course_name_eng,
         active=active,
         sale_mode=sale_mode,
+        is_commission=is_commission,
+        is_operation=is_operation,
+        is_consultant=is_consultant,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         module=m.module)
@@ -88,6 +94,9 @@ def course_update(request):
     course_name_eng = request.POST.get('course_name_eng', '')
     active = request.POST['active']
     sale_mode = request.POST.get('sale_mode', 'all')
+    is_commission = 1 if request.POST.get('is_commission') else 0
+    is_operation = 1 if request.POST.get('is_operation') else 0
+    is_consultant = 1 if request.POST.get('is_consultant') else 0
     image_cover = request.FILES.get('image_cover')
     content = course.objects.get(pk=course_id)
     content.course_code = course_code
@@ -95,6 +104,9 @@ def course_update(request):
     content.course_name_eng = course_name_eng
     content.active = active
     content.sale_mode = sale_mode
+    content.is_commission = is_commission
+    content.is_operation = is_operation
+    content.is_consultant = is_consultant
     content.upd_date = dateTimeNow()
     if image_cover:
         content.image_cover = image_cover

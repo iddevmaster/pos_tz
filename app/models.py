@@ -76,6 +76,10 @@ class  course(models.Model):
     sale_mode = models.CharField(max_length=10, blank=True, default='all', choices=[('all','ทั้งหมด'),('event','มี Event เท่านั้น'),('noevent','ไม่มี Event เท่านั้น')])
     image_cover = models.ImageField(
         upload_to=generate_unique_name('images/course'), blank=True, null=True, default=None)
+    # is_commission A = ค่าคอมมิชั่น , is_operation B = ค่าปฎิบัติงาน , is_consultant C = ค่าที่ปรึกษา
+    is_commission = models.IntegerField(default=0, blank=False)
+    is_operation = models.IntegerField(default=0, blank=False)
+    is_consultant = models.IntegerField(default=0, blank=False)
 
 # ev_vat  0  =ไม่รวม Vat,1 = รวม Vat
 

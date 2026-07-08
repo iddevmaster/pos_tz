@@ -46,6 +46,13 @@
 .smode-all    { background:rgba(79,110,247,.1); color:var(--blue); }
 .smode-event  { background:rgba(5,150,105,.1);  color:var(--green); }
 .smode-noevent{ background:rgba(234,88,12,.1);  color:var(--orange); }
+.flag-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:20px; height:20px; border-radius:5px; font-size:10.5px; font-weight:700;
+  background:var(--card2); color:var(--t3); border:1px solid var(--bdr);
+}
+.flag-badge.on{ background:rgba(79,110,247,.12); color:var(--blue); border-color:transparent; }
+.flag-group{ display:flex; gap:4px; }
 </style>
 
 <!-- Header -->
@@ -73,6 +80,7 @@
           <th>ชื่อสินค้า (ไทย)</th>
           <th>ชื่อสินค้า (Eng)</th>
           <th style="width:110px;">รูปแบบการขาย</th>
+          <th style="width:90px;" title="A=ค่าคอมมิชั่น B=ค่าปฎิบัติงาน C=ค่าที่ปรึกษา">A/B/C</th>
           <th style="width:100px;">สถานะ</th>
           <th style="width:120px; text-align:center;">จัดการ</th>
         </tr>
@@ -101,6 +109,13 @@
             {% endif %}
           </td>
           <td>
+            <div class="flag-group">
+              <span class="flag-badge {% if res.is_commission %}on{% endif %}" title="ค่าคอมมิชั่น">A</span>
+              <span class="flag-badge {% if res.is_operation %}on{% endif %}" title="ค่าปฎิบัติงาน">B</span>
+              <span class="flag-badge {% if res.is_consultant %}on{% endif %}" title="ค่าที่ปรึกษา">C</span>
+            </div>
+          </td>
+          <td>
             {% if res.active == 1 %}
             <span class="status-badge status-open"><i class="bi bi-circle-fill" style="font-size:6px;"></i> เปิด</span>
             {% else %}
@@ -117,7 +132,10 @@
                   '{{ res.course_name_eng|escapejs }}',
                   '{{ res.active }}',
                   '{{ res.sale_mode }}',
-                  '{% if res.image_cover %}{{ res.image_cover.url }}{% endif %}'
+                  '{% if res.image_cover %}{{ res.image_cover.url }}{% endif %}',
+                  {{ res.is_commission }},
+                  {{ res.is_operation }},
+                  {{ res.is_consultant }}
                 )">
                 <i class="bi bi-pencil-fill"></i>
               </button>
@@ -130,7 +148,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="7" style="text-align:center; padding:40px; color:var(--t3);">
+          <td colspan="9" style="text-align:center; padding:40px; color:var(--t3);">
             <i class="bi bi-inbox" style="font-size:32px; display:block; margin-bottom:8px;"></i>
             ยังไม่มีข้อมูลสินค้า
           </td>
@@ -195,6 +213,26 @@
                 <option value="event">มี Event เท่านั้น</option>
                 <option value="noevent">ไม่มี Event เท่านั้น</option>
               </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">ประเภทค่าใช้จ่ายที่เกี่ยวข้อง</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_commission" value="1" id="createIsCommission">
+                  <label class="form-check-label" for="createIsCommission">A: ค่าคอมมิชั่น</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_operation" value="1" id="createIsOperation">
+                  <label class="form-check-label" for="createIsOperation">B: ค่าปฎิบัติงาน</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_consultant" value="1" id="createIsConsultant">
+                  <label class="form-check-label" for="createIsConsultant">C: ค่าที่ปรึกษา</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <small style="color:var(--red);">* หมายเหตุ: หากไม่เลือกประเภทไหนเลย จะถูกจัดอยู่ในรูปแบบ Core Team</small>
             </div>
           </div>
         </div>
@@ -262,6 +300,26 @@
                 <option value="noevent">ไม่มี Event เท่านั้น</option>
               </select>
             </div>
+            <div class="col-12">
+              <label class="form-label">ประเภทค่าใช้จ่ายที่เกี่ยวข้อง</label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_commission" value="1" id="editIsCommission">
+                  <label class="form-check-label" for="editIsCommission">A: ค่าคอมมิชั่น</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_operation" value="1" id="editIsOperation">
+                  <label class="form-check-label" for="editIsOperation">B: ค่าปฎิบัติงาน</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_consultant" value="1" id="editIsConsultant">
+                  <label class="form-check-label" for="editIsConsultant">C: ค่าที่ปรึกษา</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <small style="color:var(--red);">* หมายเหตุ: หากไม่เลือกประเภทไหนเลย จะถูกจัดอยู่ในรูปแบบ Core Team</small>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -311,13 +369,16 @@ function removeImg(key){
 }
 
 /* ── Open edit modal ── */
-function openEdit(id, code, name, nameEng, active, saleMode, imgUrl){
+function openEdit(id, code, name, nameEng, active, saleMode, imgUrl, isCommission, isOperation, isConsultant){
   document.getElementById('editCourseId').value  = id;
   document.getElementById('editCode').value      = code;
   document.getElementById('editName').value      = name;
   document.getElementById('editNameEng').value   = nameEng;
   document.getElementById('editActive').value    = active;
   document.getElementById('editSaleMode').value  = saleMode || 'all';
+  document.getElementById('editIsCommission').checked = !!isCommission;
+  document.getElementById('editIsOperation').checked  = !!isOperation;
+  document.getElementById('editIsConsultant').checked = !!isConsultant;
 
   // set image preview
   const wrap = document.getElementById('previewWrapE');
