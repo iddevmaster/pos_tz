@@ -455,6 +455,18 @@ listMenu = [
         "group_value": "CR1111",
         "group_label": "ลูกค้า",
     },
+     {
+        "value": "commission/rules",
+        "label": "ค่าคอม",
+        "group_value": "CC001",
+        "group_label": "กำหนดแผน",
+    },
+     {
+        "value": "rules",
+        "label": "ค่าคอม2",
+        "group_value": "CC001",
+        "group_label": "กำหนดแผน",
+    },
 
     {
         "value": "https://forms.gle/FjMysUQ6i7iAUHLF6",
