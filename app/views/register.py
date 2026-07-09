@@ -2263,38 +2263,27 @@ def update_close_the_event(request):
    
     
     register_id = request.POST['register_id']
-    ev_id = request.POST['ev_id']
+   
+    uuid_without_dashes = str(register_id).replace('-', '')
 
     pos = request.POST['po']
-    sqs= request.POST['sq']
+    sqs = request.POST['sq']
     sos = request.POST['so']
     accept_terms = request.POST.get('flexCheckDefault')
 
- 
     try:
         ev_logo = request.FILES['ev_logo']
-        
     except KeyError:
         ev_logo = None
 
-    
-   
-
-    contentfact = fact_customer.objects.get(register_id=register_id)
-    contentfact.status_bill = 'Y'
-    contentfact.save()
-
+    fact_customer.objects.filter(register_id=uuid_without_dashes).update(status_bill='Y')
 
     main = register_main.objects.get(register_id=register_id)
     main.status = 'Y'
+    main.close_the_sale = 1
     main.save()
 
-
-    uuid_without_dashes = str(register_id).replace('-', '')
-
-       
-  
-    savesal = salesorder.objects.create( 
+    salesorder.objects.create(
         register_id=uuid_without_dashes,
         type_sa=accept_terms,
         po=pos,
