@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
   .com-wrap{ --paper:#F6F1E6; --paper-raised:#FBF8F1; --ink:#1E2A38; --ink-soft:#5B6677; --navy:#16233A;
     --brass:#A8762E; --brass-light:#E9D9B8; --sage:#4C7A63; --sage-bg:#E4EFE8; --hairline:#D9CFB8; --radius:6px;
@@ -119,10 +120,15 @@ function renderPlanDetail(detail, data){
   const policyBlocks = data.policies.map(p => {
     const subtotal = p.conditions.reduce((s,c)=> s + (c.active && c.rate ? c.rate : 0), 0);
     const rows = p.conditions.map(c => {
-      const allocRows = (c.allocations||[]).map(a => `
-        <div class="arow"><span class="aname">${a.payee_name}</span><span style="color:#A8762E;">${fmtPct(a.percent)}%</span>
-        <button class="com-btn ghost" onclick="rmPlanAllocation(${a.alloc_id}, ${data.plan_id}, ${c.condition_id})">ลบ</button></div>`).join('')
-        || '<div class="com-empty">ยังไม่กำหนดผู้รับ</div>';
+      const allocRows = (c.allocations||[]).map(a => {
+        const baht = data.amount * (c.rate||0) / 100 * a.percent / 100;
+        return `<div class="arow" data-percent="${a.percent}">
+          <span class="aname">${a.payee_name}</span>
+          <span style="color:#A8762E;">${fmtPct(a.percent)}%</span>
+          <span class="mono" style="color:#4C7A63;min-width:90px;text-align:right;">฿ ${fmtBaht(baht)}</span>
+          <button class="com-btn ghost" onclick="rmPlanAllocation(${a.alloc_id}, ${data.plan_id}, ${c.condition_id})">ลบ</button>
+        </div>`;
+      }).join('') || '<div class="com-empty">ยังไม่กำหนดผู้รับ</div>';
       return `
       <div class="com-row">
         <span class="mono">${c.condition_code}</span>
@@ -180,9 +186,22 @@ async function addPlanAllocation(btn, lineId, planId, conditionId){
   }
   const panel = btn.closest('.com-alloc');
   const userId = $(panel.querySelector('.plan-payee-select')).val();
-  const percent = panel.querySelector('.plan-pct-input').value;
+  const percent = Number(panel.querySelector('.plan-pct-input').value);
   if(!userId || !percent) return;
-  await post('/api/commission/plan/allocation/add', {line_id: lineId, user_id: userId, percent: Number(percent)});
+
+  const usedPct = [...panel.querySelectorAll('.arow[data-percent]')]
+    .reduce((s, el) => s + Number(el.dataset.percent), 0);
+  if(usedPct + percent > 100){
+    Swal.fire({
+      icon: 'warning',
+      title: 'เกิน 100%',
+      html: `ที่กำหนดแล้ว <b>${fmtPct(usedPct)}%</b> + ใหม่ <b>${fmtPct(percent)}%</b> = <b>${fmtPct(usedPct+percent)}%</b><br>ไม่สามารถเพิ่มผู้รับได้`,
+      confirmButtonText: 'ตกลง',
+    });
+    return;
+  }
+
+  await post('/api/commission/plan/allocation/add', {line_id: lineId, user_id: userId, percent});
   reloadPlan(planId);
 }
 async function rmPlanAllocation(allocId, planId){

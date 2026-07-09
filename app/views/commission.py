@@ -365,10 +365,13 @@ def api_plan_detail(request):
             'status': po.status,
         })
 
+    bill_amount = plan.rpi.rpi_price_result if plan.rpi else 0
+
     return JsonResponse({
         'status': 200,
         'plan_id': plan.plan_id,
         'is_locked': bool(plan.is_locked),
+        'amount': bill_amount,
         'policies': _policy_tree(rows_by_condition, course_obj),
         'payouts': payouts,
     }, safe=False)
