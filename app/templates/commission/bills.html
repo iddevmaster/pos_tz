@@ -42,6 +42,7 @@
     <a href="/commission/rules">01 ตั้งค่าตามสินค้า</a>
     <a href="/commission/payees">02 ผู้รับเงิน</a>
     <a href="/commission/bills" class="active">03 บิลขาย · กำหนดค่าคอม</a>
+    <a href="/commission/listall">04 บิลทั้งหมด</a>
   </div>
   <p style="font-size:12.5px; color:#5B6677;">
     แสดงเฉพาะบิลที่ "ปิดการขาย - ขายสำเร็จ" แล้วเท่านั้น — กำหนดแผนค่าคอมได้หลังจากนี้ ก่อนหน้านี้บิลยังแก้ไขได้อยู่จึงยังกำหนดค่าคอมไม่ได้
@@ -67,6 +68,7 @@
 
 <script>
 const post = (url, body) => fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}).then(r=>r.json());
+const USERS = {{ users_json|safe }};
 function fmtPct(n){ return (Math.round((n||0)*1000)/1000).toString(); }
 function fmtBaht(n){ return (n||0).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
@@ -138,10 +140,7 @@ function renderPlanDetail(detail, data){
         <div class="com-alloc d-none">
           ${allocRows}
           <div style="display:flex; gap:8px; margin-top:8px;">
-            <select class="form-select form-select-sm plan-payee-select">
-              <option value="">-- เลือกผู้รับ --</option>
-              {% for p in payees_all %}<option value="{{ p.payee_id }}">{{ p.payee_name }}</option>{% endfor %}
-            </select>
+            <select class="plan-payee-select" style="flex:1;"><option value=""></option></select>
             <input type="number" class="form-control form-control-sm plan-pct-input" style="width:90px;" placeholder="%">
             <button class="com-btn" onclick="addPlanAllocation(this, ${c.line_id||'null'}, ${data.plan_id}, ${c.condition_id})">+ เพิ่มผู้รับ</button>
           </div>
@@ -159,6 +158,10 @@ function renderPlanDetail(detail, data){
     <div style="margin-top:10px;">
       <button class="com-btn" onclick="lockPlan(${data.plan_id})">ยืนยันและล็อกแผนค่าคอม</button>
     </div>`;
+  $(detail).find('.plan-payee-select').select2({
+    placeholder: '-- เลือกผู้รับ --', allowClear: true, width: '100%',
+    data: USERS.map(u => ({ id: u.id, text: u.name })),
+  });
 }
 
 async function savePlanLine(planId, conditionId, rate, active){
@@ -176,10 +179,10 @@ async function addPlanAllocation(btn, lineId, planId, conditionId){
     lineId = c.line_id;
   }
   const panel = btn.closest('.com-alloc');
-  const payeeId = panel.querySelector('.plan-payee-select').value;
+  const userId = $(panel.querySelector('.plan-payee-select')).val();
   const percent = panel.querySelector('.plan-pct-input').value;
-  if(!payeeId || !percent) return;
-  await post('/api/commission/plan/allocation/add', {line_id: lineId, payee_id: payeeId, percent: Number(percent)});
+  if(!userId || !percent) return;
+  await post('/api/commission/plan/allocation/add', {line_id: lineId, user_id: userId, percent: Number(percent)});
   reloadPlan(planId);
 }
 async function rmPlanAllocation(allocId, planId){

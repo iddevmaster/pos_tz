@@ -462,8 +462,8 @@ listMenu = [
         "group_label": "กำหนดแผน",
     },
      {
-        "value": "rules",
-        "label": "ค่าคอม2",
+        "value": "commission/listall",
+        "label": "บิลทั้งหมด",
         "group_value": "CC001",
         "group_label": "กำหนดแผน",
     },

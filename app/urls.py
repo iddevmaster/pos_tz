@@ -405,6 +405,7 @@ urlpatterns = [
     path('commission/rules', commission.rules_page),
     path('commission/payees', commission.payees_page),
     path('commission/bills', commission.bills_page),
+    path('commission/listall', commission.bills_list_all),
     path('api/commission/rules/list', commission.api_rules_list),
     path('api/commission/rules/save', commission.api_rules_save),
     path('api/commission/rules/allocation/add', commission.api_rules_allocation_add),

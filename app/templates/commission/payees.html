@@ -20,6 +20,7 @@
     <a href="/commission/rules">01 ตั้งค่าตามสินค้า</a>
     <a href="/commission/payees" class="active">02 ผู้รับเงิน</a>
     <a href="/commission/bills">03 บิลขาย · กำหนดค่าคอม</a>
+    <a href="/commission/listall">04 บิลทั้งหมด</a>
   </div>
 
   <div class="com-card">
@@ -30,7 +31,12 @@
         <option value="DEPARTMENT">ฝ่ายภายใน</option>
         <option value="EXTERNAL_ORG">หน่วยงานภายนอก</option>
       </select>
-      <input type="text" id="payeeName" class="form-control" placeholder="ชื่อผู้รับเงิน" style="width:260px;">
+      <select id="payeeName" class="select2" style="width:260px;">
+        <option value="">-- เลือกผู้รับเงิน --</option>
+        {% for u in users %}
+        <option value="{{ u.id }}">{{ u.first_name }} {{ u.last_name }}{% if not u.first_name and not u.last_name %}{{ u.username }}{% endif %}</option>
+        {% endfor %}
+      </select>
       <input type="text" id="bankName" class="form-control" placeholder="ธนาคาร (ถ้ามี)" style="width:180px;">
       <input type="text" id="bankAccount" class="form-control" placeholder="เลขบัญชี (ถ้ามี)" style="width:180px;">
       <button class="btn btn-primary btn-sm" onclick="addPayee()">+ เพิ่มผู้รับเงิน</button>
@@ -54,13 +60,17 @@
 
 <script>
 async function addPayee(){
+  const nameSelect = document.getElementById('payeeName');
+  const userId = nameSelect.value;
+  const payeeName = userId ? nameSelect.options[nameSelect.selectedIndex].text.trim() : '';
   const payload = {
     payee_type: document.getElementById('payeeType').value,
-    payee_name: document.getElementById('payeeName').value.trim(),
+    payee_name: payeeName,
+    user_id: userId || null,
     bank_name: document.getElementById('bankName').value.trim(),
     bank_account: document.getElementById('bankAccount').value.trim(),
   };
-  if(!payload.payee_name) return;
+  if(!userId || !payload.payee_name) return;
   await fetch('/api/commission/payee/create', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
   location.reload();
 }

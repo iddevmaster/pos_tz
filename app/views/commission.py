@@ -53,6 +53,26 @@ def _menu_context(request):
     return cm_id, objMenu
 
 
+def _users_json():
+    import json as _json
+    users = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    return _json.dumps(
+        [{'id': u.id, 'name': (f'{u.first_name} {u.last_name}'.strip() or u.username)} for u in users],
+        ensure_ascii=False)
+
+
+def _get_or_create_payee_for_user(user_id):
+    """หา/สร้าง commission_payee ที่ผูกกับ auth_user คนนี้ (ผู้รับประเภท STAFF)"""
+    user = User.objects.get(id=user_id)
+    full_name = f'{user.first_name} {user.last_name}'.strip() or user.username
+    payee, _created = commission_payee.objects.get_or_create(
+        user_id=user_id,
+        defaults={'payee_type': 'STAFF', 'payee_name': full_name,
+                  'bank_name': '', 'bank_account': '',
+                  'active': 1, 'crt_date': dateTimeNow(), 'upd_date': dateTimeNow()})
+    return payee
+
+
 # ยอดฐานคำนวณค่าคอม = ยอดบิลหลังหัก vat ออก (สูตรเดียวกับที่ใช้อยู่เดิมใน finance.withdraw_list_one_com)
 def _base_amount(rpi):
     price = rpi.rpi_price_result or 0
@@ -60,13 +80,39 @@ def _base_amount(rpi):
     return price - after_vat
 
 
-def _policy_tree(rows_by_condition):
+def _allowed_policy_codes(course_obj):
+    """
+    เลือกนโยบายที่จะแสดงตาม flag ของสินค้า (course):
+    is_commission -> นโยบาย 1 (ค่า Commission IDC 3%)
+    is_consultant -> นโยบาย 2 (จ่ายบุคคลภายนอก)
+    is_operation  -> นโยบาย 3 (จ่ายค่าตอบแทนผู้ปฏิบัติงาน)
+    ถ้าไม่ได้เลือกอันไหนเลย -> นโยบาย 4 (ค่า Commission IDC) เท่านั้น
+    """
+    if course_obj is None:
+        return None
+    codes = []
+    if course_obj.is_commission:
+        codes.append('1')
+    if course_obj.is_consultant:
+        codes.append('2')
+    if course_obj.is_operation:
+        codes.append('3')
+    if not codes:
+        codes = ['4']
+    return codes
+
+
+def _policy_tree(rows_by_condition, course_obj=None):
     """
     rows_by_condition: dict condition_id -> extra dict to merge into the condition's json
+    course_obj: ถ้าระบุ จะกรองเฉพาะนโยบายที่เกี่ยวข้องกับสินค้านี้ตาม is_commission/is_operation/is_consultant
     คืนค่าเป็น list ของนโยบายเรียงตาม seq พร้อมเงื่อนไขย่อยเรียงตาม seq
     """
     tree = []
     policies = commission_policy.objects.filter(active=1).order_by('seq').prefetch_related('conditions')
+    allowed_codes = _allowed_policy_codes(course_obj)
+    if allowed_codes is not None:
+        policies = policies.filter(policy_code__in=allowed_codes)
     for p in policies:
         conditions = []
         for c in p.conditions.filter(active=1).order_by('seq'):
@@ -94,8 +140,7 @@ def _policy_tree(rows_by_condition):
 def rules_page(request):
     cm_id, objMenu = _menu_context(request)
     courses = course.objects.filter(cancelled=1, active=1).order_by('course_code')
-    payees = commission_payee.objects.filter(active=1).order_by('payee_type', 'payee_name')
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'courses': courses, 'payees': payees}
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'courses': courses, 'users_json': _users_json()}
     return render(request, 'commission/rules.html', context)
 
 
@@ -103,6 +148,7 @@ def rules_page(request):
 def api_rules_list(request):
     data = json.loads(request.body)
     course_id = data.get('course_id')
+    course_obj = course.objects.filter(pk=course_id).first()
 
     rows_by_condition = {}
     rules = commission_rule.objects.filter(course_id=course_id).prefetch_related('allocations__payee')
@@ -113,7 +159,7 @@ def api_rules_list(request):
             'rule_id': r.rule_id, 'rate': r.rate, 'active': bool(r.active), 'allocations': allocations,
         }
 
-    return JsonResponse({'policies': _policy_tree(rows_by_condition)}, safe=False)
+    return JsonResponse({'policies': _policy_tree(rows_by_condition, course_obj)}, safe=False)
 
 
 @csrf_exempt
@@ -142,12 +188,13 @@ def api_rules_save(request):
 def api_rules_allocation_add(request):
     data = json.loads(request.body)
     rule_id = data.get('rule_id')
-    payee_id = data.get('payee_id')
+    user_id = data.get('user_id')
     percent = data.get('percent')
 
+    payee = _get_or_create_payee_for_user(user_id)
     alloc = commission_rule_allocation.objects.create(
-        rule_id=rule_id, payee_id=payee_id, percent=percent or 0)
-    return JsonResponse({'status': 200, 'alloc_id': alloc.alloc_id})
+        rule_id=rule_id, payee=payee, percent=percent or 0)
+    return JsonResponse({'status': 200, 'alloc_id': alloc.alloc_id, 'payee_name': payee.payee_name})
 
 
 @csrf_exempt
@@ -165,7 +212,8 @@ def api_rules_allocation_delete(request):
 def payees_page(request):
     cm_id, objMenu = _menu_context(request)
     payees = commission_payee.objects.filter(active=1).order_by('payee_type', 'payee_name')
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'payees': payees}
+    users = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'payees': payees, 'users': users}
     return render(request, 'commission/payees.html', context)
 
 
@@ -221,9 +269,45 @@ def bills_page(request):
             'plan_id': plan.plan_id if plan else None,
             'is_locked': bool(plan.is_locked) if plan else False,
         })
-    payees_all = commission_payee.objects.filter(active=1).order_by('payee_type', 'payee_name')
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'rows': rows, 'payees_all': payees_all}
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'rows': rows, 'users_json': _users_json()}
     return render(request, 'commission/bills.html', context)
+
+
+@login_required(login_url='/login')
+def bills_list_all(request):
+    cm_id, objMenu = _menu_context(request)
+    rows_ev = []
+    rows_noev = []
+    items = register_payment_items.objects.select_related('register', 'register__course', 'rp').filter(
+        register__status='Y').order_by('-rpi_id')[:500]
+    for rpi in items:
+        sold = _bill_is_sold(rpi)
+        plan = commission_plan.objects.filter(rpi=rpi).first() if sold else None
+        if not sold:
+            status = 'OPEN'
+        elif not plan:
+            status = 'SOLD_NOPLAN'
+        elif not plan.is_locked:
+            status = 'SOLD_EDITING'
+        else:
+            status = 'SOLD_LOCKED'
+        row = {
+            'rpi_id': rpi.rpi_id,
+            'rp_doc_number': rpi.rp.rp_doc_number if rpi.rp else '-',
+            'register_number': rpi.register.register_number if rpi.register else '-',
+            'customer_name': rpi.rp.rp_name_customer if rpi.rp else '-',
+            'course_name': rpi.register.course.course_name if rpi.register and rpi.register.course else '-',
+            'amount': rpi.rpi_price_result,
+            'crt_date': rpi.rp.crt_date if rpi.rp else None,
+            'status': status,
+            'sold': sold,
+        }
+        if rpi.register and rpi.register.is_event == 'Y':
+            rows_ev.append(row)
+        else:
+            rows_noev.append(row)
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'rows_ev': rows_ev, 'rows_noev': rows_noev}
+    return render(request, 'commission/listall.html', context)
 
 
 @csrf_exempt
@@ -255,7 +339,8 @@ def api_plan_open(request):
 def api_plan_detail(request):
     data = json.loads(request.body)
     plan_id = data.get('plan_id')
-    plan = commission_plan.objects.get(plan_id=plan_id)
+    plan = commission_plan.objects.select_related('register', 'register__course').get(plan_id=plan_id)
+    course_obj = plan.register.course if plan.register else None
 
     rows_by_condition = {}
     lines = commission_plan_line.objects.filter(plan=plan).prefetch_related('allocations__payee')
@@ -284,7 +369,7 @@ def api_plan_detail(request):
         'status': 200,
         'plan_id': plan.plan_id,
         'is_locked': bool(plan.is_locked),
-        'policies': _policy_tree(rows_by_condition),
+        'policies': _policy_tree(rows_by_condition, course_obj),
         'payouts': payouts,
     }, safe=False)
 
@@ -317,9 +402,10 @@ def api_plan_allocation_add(request):
     if line.plan.is_locked:
         return JsonResponse({'status': 400, 'message': 'แผนนี้ถูกล็อกแล้ว กรุณาปลดล็อกก่อนแก้ไข'}, status=400)
 
+    payee = _get_or_create_payee_for_user(data.get('user_id'))
     alloc = commission_plan_allocation.objects.create(
-        line=line, payee_id=data.get('payee_id'), percent=data.get('percent') or 0)
-    return JsonResponse({'status': 200, 'alloc_id': alloc.alloc_id})
+        line=line, payee=payee, percent=data.get('percent') or 0)
+    return JsonResponse({'status': 200, 'alloc_id': alloc.alloc_id, 'payee_name': payee.payee_name})
 
 
 @csrf_exempt
@@ -520,14 +606,7 @@ def api_ev_alloc_add(request):
     user_id = data.get('user_id')
     percent = float(data.get('percent') or 0)
 
-    # auto get_or_create commission_payee จาก auth_user
-    user = User.objects.get(id=user_id)
-    full_name = f'{user.first_name} {user.last_name}'.strip() or user.username
-    payee, _ = commission_payee.objects.get_or_create(
-        user_id=user_id,
-        defaults={'payee_type': 'STAFF', 'payee_name': full_name,
-                  'bank_name': '', 'bank_account': '',
-                  'active': 1, 'crt_date': dateTimeNow(), 'upd_date': dateTimeNow()})
+    payee = _get_or_create_payee_for_user(user_id)
 
     rule = commission_event_rule.objects.get(ev_rule_id=ev_rule_id)
     total_revenue = (

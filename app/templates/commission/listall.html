@@ -1,0 +1,148 @@
+{% extends 'base.html' %} {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .com-wrap{ --paper:#F6F1E6; --paper-raised:#FBF8F1; --ink:#1E2A38; --ink-soft:#5B6677; --navy:#16233A;
+    --brass:#A8762E; --brass-light:#E9D9B8; --sage:#4C7A63; --sage-bg:#E4EFE8; --hairline:#D9CFB8; --radius:6px;
+    --terracotta:#B5533C; --terracotta-bg:#F6E4DE;
+    background:var(--paper); padding:20px; border-radius:8px; }
+  .com-wrap .serif{ font-family:'Noto Serif Thai', serif; }
+  .com-wrap .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  .la-header{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius);
+    padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .la-header h1{ font-size:19px; font-weight:700; margin:0; color:var(--ink); }
+  .la-header p{ font-size:12.5px; color:var(--ink-soft); margin:4px 0 0; }
+  .la-stats{ display:flex; gap:22px; }
+  .la-stat{ text-align:right; }
+  .la-stat .n{ font-size:20px; font-weight:600; color:var(--brass); }
+  .la-stat .l{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; }
+
+  .la-section-title{ display:flex; align-items:center; gap:10px; margin:22px 0 10px; }
+  .la-section-title:first-of-type{ margin-top:4px; }
+  .la-badge{ width:26px; height:26px; border-radius:50%; border:1.5px solid var(--brass); color:var(--brass);
+    font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex:0 0 26px; }
+  .la-section-title h2{ font-size:15px; font-weight:700; margin:0; color:var(--ink); }
+  .la-count{ font-size:11.5px; color:var(--ink-soft); }
+
+  .la-table{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius); overflow:hidden; }
+  .la-row{ display:grid; grid-template-columns:120px 1fr 1fr 130px 130px 160px 90px; gap:12px; align-items:center;
+    padding:12px 18px; border-bottom:1px solid var(--hairline); font-size:13.5px; transition:background .12s; }
+  .la-row.head{ font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);
+    background:var(--paper); font-weight:600; }
+  .la-row:not(.head):hover{ background:rgba(168,118,46,.05); }
+  .la-row:last-child{ border-bottom:none; }
+  .la-amt{ text-align:right; }
+  .la-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .bstatus{ font-size:10.5px; text-transform:uppercase; letter-spacing:.02em; padding:4px 10px 4px 8px;
+    border-radius:20px; width:fit-content; display:inline-flex; align-items:center; gap:5px; }
+  .bstatus::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex:0 0 6px; }
+  .bstatus.OPEN{ background:var(--terracotta-bg); color:var(--terracotta); }
+  .bstatus.SOLD_NOPLAN{ background:var(--brass-light); color:var(--brass); }
+  .bstatus.SOLD_EDITING{ background:#DCE6F2; color:#2C5282; }
+  .bstatus.SOLD_LOCKED{ background:var(--sage-bg); color:var(--sage); }
+
+  .com-empty{ font-size:12.5px; color:var(--ink-soft); font-style:italic; padding:26px; text-align:center; }
+  .com-btn{ border:1px solid var(--navy); background:var(--navy); color:#fff; border-radius:4px; padding:5px 12px;
+    font-size:12px; cursor:pointer; text-decoration:none; display:inline-block; transition:opacity .12s; }
+  .com-btn:hover{ opacity:.85; }
+  .com-btn.ghost{ background:transparent; color:var(--ink-soft); border-color:var(--hairline); cursor:default; }
+</style>
+
+<div class="com-wrap">
+  <div class="la-header">
+    <div>
+      <h1 class="serif">รายการบิลทั้งหมด</h1>
+      <p>ภาพรวมสถานะค่าคอมของทุกบิลในระบบ แยกตามมี/ไม่มี Event</p>
+    </div>
+    <div class="la-stats">
+      <div class="la-stat"><div class="n mono">{{ rows_ev|length }}</div><div class="l">มี Event</div></div>
+      <div class="la-stat"><div class="n mono">{{ rows_noev|length }}</div><div class="l">ไม่มี Event</div></div>
+    </div>
+  </div>
+
+  <div class="la-section-title">
+    <span class="la-badge serif">E</span>
+    <h2 class="serif">มี Event</h2>
+    <span class="la-count">({{ rows_ev|length }} รายการ)</span>
+  </div>
+  <div class="la-table">
+    <div class="la-row head">
+      <span>เลขที่บิล</span>
+      <span>ลูกค้า / เลขที่ลงทะเบียน</span>
+      <span>สินค้า</span>
+      <span style="text-align:right;">มูลค่าบิล</span>
+      <span>วันที่</span>
+      <span>สถานะค่าคอม</span>
+      <span></span>
+    </div>
+    {% for row in rows_ev %}
+    <div class="la-row">
+      <span class="mono">{{ row.rp_doc_number }}</span>
+      <span>{{ row.customer_name|default:"-" }}<div class="la-sub">{{ row.register_number }}</div></span>
+      <span>{{ row.course_name }}</span>
+      <span class="la-amt mono">฿ {{ row.amount|floatformat:2 }}</span>
+      <span class="la-sub mono">{{ row.crt_date|date:"d/m/Y" }}</span>
+      <span class="bstatus {{ row.status }}">
+        {% if row.status == 'OPEN' %}ยังไม่ปิดการขาย
+        {% elif row.status == 'SOLD_NOPLAN' %}ขายสำเร็จ · รอกำหนดแผน
+        {% elif row.status == 'SOLD_EDITING' %}ขายสำเร็จ · กำลังกำหนดแผน
+        {% else %}ขายสำเร็จ · ล็อกแผนแล้ว
+        {% endif %}
+      </span>
+      <span>
+        {% if row.sold %}
+        <a class="com-btn" href="/commission/bills#bill-{{ row.rpi_id }}">จัดการ</a>
+        {% else %}
+        <span class="com-btn ghost">-</span>
+        {% endif %}
+      </span>
+    </div>
+    {% empty %}
+    <div class="com-empty">ไม่มีบิลที่มี Event</div>
+    {% endfor %}
+  </div>
+
+  <div class="la-section-title">
+    <span class="la-badge serif">N</span>
+    <h2 class="serif">ไม่มี Event</h2>
+    <span class="la-count">({{ rows_noev|length }} รายการ)</span>
+  </div>
+  <div class="la-table">
+    <div class="la-row head">
+      <span>เลขที่บิล</span>
+      <span>ลูกค้า / เลขที่ลงทะเบียน</span>
+      <span>สินค้า</span>
+      <span style="text-align:right;">มูลค่าบิล</span>
+      <span>วันที่</span>
+      <span>สถานะค่าคอม</span>
+      <span></span>
+    </div>
+    {% for row in rows_noev %}
+    <div class="la-row">
+      <span class="mono">{{ row.rp_doc_number }}</span>
+      <span>{{ row.customer_name|default:"-" }}<div class="la-sub">{{ row.register_number }}</div></span>
+      <span>{{ row.course_name }}</span>
+      <span class="la-amt mono">฿ {{ row.amount|floatformat:2 }}</span>
+      <span class="la-sub mono">{{ row.crt_date|date:"d/m/Y" }}</span>
+      <span class="bstatus {{ row.status }}">
+        {% if row.status == 'OPEN' %}ยังไม่ปิดการขาย
+        {% elif row.status == 'SOLD_NOPLAN' %}ขายสำเร็จ · รอกำหนดแผน
+        {% elif row.status == 'SOLD_EDITING' %}ขายสำเร็จ · กำลังกำหนดแผน
+        {% else %}ขายสำเร็จ · ล็อกแผนแล้ว
+        {% endif %}
+      </span>
+      <span>
+        {% if row.sold %}
+        <a class="com-btn" href="/commission/bills#bill-{{ row.rpi_id }}">จัดการ</a>
+        {% else %}
+        <span class="com-btn ghost">-</span>
+        {% endif %}
+      </span>
+    </div>
+    {% empty %}
+    <div class="com-empty">ไม่มีบิลที่ไม่มี Event</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
