@@ -2134,8 +2134,8 @@ def approve_lis_event(request):
         objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
 
     registers = register_main.objects.select_related(
-        'ev__course', 'seller'
-    ).filter(status='W').order_by('-crt_date')[:50]
+        'seller', 'course'
+    ).filter(status='W', pay_type='2').order_by('-crt_date')[:50]
 
     obj = []
     for r in registers:
@@ -2143,14 +2143,28 @@ def approve_lis_event(request):
         customer_list = customers.objects.filter(customer_id=cus.customer_id).first() if cus else None
         payments = register_payment.objects.filter(register=r)
 
+        course_list = None
+        if r.ev_id:
+            try:
+                course_list = course_event.objects.select_related('course').get(ev_id=r.ev_id)
+            except course_event.DoesNotExist:
+                pass
+
+        payment_item = payments.first()
+        price = None
+        if payment_item:
+            rpi = register_payment_items.objects.filter(rp=payment_item).first()
+            price = rpi.rpi_price_result if rpi else None
+
         obj.append({
             'register': r,
             'register_id': r.register_id,
-            'course_list': r.ev,
+            'course_list': course_list,
             'customer_list': customer_list,
-            'payment_item': payments.first(),
+            'payment_item': payment_item,
             'payments': payments,
             'total_payment': payments.count(),
+            'price': price,
         })
 
     context = {'title': title, 'data': obj, 'listMenuPermission': objMenu}
@@ -2344,14 +2358,9 @@ def delete_close_the_event(request):
     register_id = request.POST['register_id']
     ev_id = request.POST['ev_id']
     uuid_without_dashes = str(register_id).replace('-', '')
-    contentev = event_register.objects.filter(ev_id=ev_id,register_id=uuid_without_dashes)
-    for sr in contentev:
-        contentev = event_register.objects.get(er_id=sr.er_id)
-        contentev.status = 'C'
-        contentev.save()
 
- 
-  
+    register_main.objects.filter(register_id=register_id).update(status='C')
+    fact_customer.objects.filter(register_id=uuid_without_dashes).update(status_bill='C')
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")

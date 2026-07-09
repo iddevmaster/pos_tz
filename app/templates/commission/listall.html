@@ -47,6 +47,15 @@
     font-size:12px; cursor:pointer; text-decoration:none; display:inline-block; transition:opacity .12s; }
   .com-btn:hover{ opacity:.85; }
   .com-btn.ghost{ background:transparent; color:var(--ink-soft); border-color:var(--hairline); cursor:default; }
+
+  .la-filter{ background:var(--paper-raised); border:1px solid var(--hairline); border-radius:var(--radius);
+    padding:12px 18px; margin-bottom:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .la-filter input, .la-filter select{ border:1px solid var(--hairline); border-radius:4px; padding:7px 10px;
+    font-size:13px; background:#fff; color:var(--ink); outline:none; }
+  .la-filter input{ flex:1; min-width:200px; }
+  .la-filter input:focus, .la-filter select:focus{ border-color:var(--brass); }
+  .la-filter label{ font-size:11.5px; color:var(--ink-soft); white-space:nowrap; }
+  .la-filter-count{ font-size:11.5px; color:var(--ink-soft); margin-left:auto; white-space:nowrap; }
 </style>
 
 <div class="com-wrap">
@@ -59,6 +68,20 @@
       <div class="la-stat"><div class="n mono">{{ rows_ev|length }}</div><div class="l">มี Event</div></div>
       <div class="la-stat"><div class="n mono">{{ rows_noev|length }}</div><div class="l">ไม่มี Event</div></div>
     </div>
+  </div>
+
+  <div class="la-filter">
+    <label>ค้นหา</label>
+    <input type="text" id="f-search" placeholder="เลขที่บิล / ลูกค้า / สินค้า ...">
+    <label>สถานะ</label>
+    <select id="f-status">
+      <option value="">ทั้งหมด</option>
+      <option value="OPEN">ยังไม่ปิดการขาย</option>
+      <option value="SOLD_NOPLAN">ขายสำเร็จ · รอกำหนดแผน</option>
+      <option value="SOLD_EDITING">ขายสำเร็จ · กำลังกำหนดแผน</option>
+      <option value="SOLD_LOCKED">ขายสำเร็จ · ล็อกแผนแล้ว</option>
+    </select>
+    <span class="la-filter-count" id="f-count"></span>
   </div>
 
   <div class="la-section-title">
@@ -77,7 +100,7 @@
       <span></span>
     </div>
     {% for row in rows_ev %}
-    <div class="la-row">
+    <div class="la-row" data-search="{{ row.rp_doc_number }} {{ row.customer_name }} {{ row.register_number }} {{ row.course_name }}" data-status="{{ row.status }}">
       <span class="mono">{{ row.rp_doc_number }}</span>
       <span>{{ row.customer_name|default:"-" }}<div class="la-sub">{{ row.register_number }}</div></span>
       <span>{{ row.course_name }}</span>
@@ -119,7 +142,7 @@
       <span></span>
     </div>
     {% for row in rows_noev %}
-    <div class="la-row">
+    <div class="la-row" data-search="{{ row.rp_doc_number }} {{ row.customer_name }} {{ row.register_number }} {{ row.course_name }}" data-status="{{ row.status }}">
       <span class="mono">{{ row.rp_doc_number }}</span>
       <span>{{ row.customer_name|default:"-" }}<div class="la-sub">{{ row.register_number }}</div></span>
       <span>{{ row.course_name }}</span>
@@ -145,4 +168,29 @@
     {% endfor %}
   </div>
 </div>
+<script>
+(function(){
+  const search = document.getElementById('f-search');
+  const statusSel = document.getElementById('f-status');
+  const countEl = document.getElementById('f-count');
+
+  function applyFilter(){
+    const q = search.value.trim().toLowerCase();
+    const st = statusSel.value;
+    let visible = 0;
+    document.querySelectorAll('.la-row[data-search]').forEach(row => {
+      const matchQ = !q || row.dataset.search.toLowerCase().includes(q);
+      const matchSt = !st || row.dataset.status === st;
+      const show = matchQ && matchSt;
+      row.style.display = show ? '' : 'none';
+      if(show) visible++;
+    });
+    countEl.textContent = visible + ' รายการ';
+  }
+
+  search.addEventListener('input', applyFilter);
+  statusSel.addEventListener('change', applyFilter);
+  applyFilter();
+})();
+</script>
 {% endblock %}

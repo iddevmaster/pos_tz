@@ -119,11 +119,11 @@ function readURL(input) {
             
             <th>ไอเทม</th>
             <th>สินค้า</th>
-            <th>รุ่น</th>
+     
             <th>ชื่อลูกค้า</th>
-            <th>ประเภทลูกค้า</th>
-            <th>ประเภทการชำระเงิน</th>
-            <th>วันที่อบรม</th>
+           
+          
+            <th>ราคาใบเสนอ</th>
             <th>#</th>
           </tr>
         </thead>
@@ -134,20 +134,10 @@ function readURL(input) {
             <td align="center">{{ forloop.counter }}</td>
             <td>{{res.register.register_number}}</td>
             <td>{{res.payment_item.rp_doc_number}}</td>
-        
-            <td>{{res.course_list.course.course_code}}</td>
-            <td>{{res.course_list.course.course_name}}</td>
-            <td>{{res.course_list.ev_generation}}</td>
+            <td>{{res.register.course.course_code}}</td>
+            <td>{{res.register.course.course_name}}</td>
             <td>{{res.customer_list.customer_name}}</td>
-          
 
-            <td align="center">
-              {% if res.register.pay_type == 1 %}
-              <span class="badge bg-success">เงินสด</span>
-              {% else %}
-              <span class="badge bg-danger">เครดิต</span>
-              {% endif %}
-            </td>
             <td align="center">
               {% if res.register.customer_type == 1 %}
               <span class="badge bg-success">บุคคล</span>
@@ -155,7 +145,7 @@ function readURL(input) {
               <span class="badge bg-info">บริษัท</span>
               {% endif %}
             </td>
-            <td>{{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}</td>
+            <td align="right">{% if res.price %}฿ {{res.price|floatformat:2}}{% else %}-{% endif %}</td>
             <td>
               {% comment %} {{res.total_payment}} {% endcomment %}
               {% if res.register.pay_type == 1 %}
@@ -199,7 +189,7 @@ function readURL(input) {
                     data-bs-target="#UpdateClick2"
                     onclick="setValueUpdateModal('{{res.register_id}}','{{res.course_list.ev_id}}')"
                   >
-                   ยืนยันรายการอบรม
+                   ยืนยันรายการ
                   </button>
 
                   <button
