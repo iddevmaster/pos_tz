@@ -2285,16 +2285,27 @@ def update_close_the_event(request):
     main.close_the_sale = 1
     main.save()
 
-    salesorder.objects.create(
-        register_id=uuid_without_dashes,
-        type_sa=accept_terms,
-        po=pos,
-        sq=sqs,
-        so=sos,
-        img=ev_logo,
-        crt_date=dateTimeNow(),
-        upd_date=dateTimeNow()
-    )
+    existing = salesorder.objects.filter(register=main).first()
+    if existing:
+        existing.type_sa = accept_terms
+        existing.po = pos
+        existing.sq = sqs
+        existing.so = sos
+        if ev_logo:
+            existing.img = ev_logo
+        existing.upd_date = dateTimeNow()
+        existing.save()
+    else:
+        salesorder.objects.create(
+            register=main,
+            type_sa=accept_terms,
+            po=pos,
+            sq=sqs,
+            so=sos,
+            img=ev_logo,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow()
+        )
 
 
 
@@ -2382,21 +2393,26 @@ def approve_list_invoice_com(request):
             cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
         objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
 
-    registers = register_main.objects.select_related(
-        'ev__course'
-    ).filter(
+    registers = register_main.objects.select_related('course').filter(
         pay_type=2,
         status='Y',
     ).order_by('-crt_date')[:200]
 
-    obj = []
+    obj_ev = []
+    obj_noev = []
     for r in registers:
-        ev = r.ev
         payment = register_payment.objects.filter(register=r).first()
         sale = salesorder.objects.filter(register=r).first()
         money = register_payment_items.objects.filter(rp__register=r).first()
 
-        obj.append({
+        ev = None
+        if r.ev_id:
+            try:
+                ev = course_event.objects.select_related('course').get(ev_id=r.ev_id)
+            except course_event.DoesNotExist:
+                pass
+
+        item = {
             'register_id': r.register_id,
             'register_number': r.register_number,
             'rp_doc_number': payment.rp_doc_number if payment else '',
@@ -2409,13 +2425,17 @@ def approve_list_invoice_com(request):
             'rv': sale.rv if sale else '',
             'status': sale.status if sale else '',
             'sale_id': sale.sale_id if sale else None,
-            'course_name': ev.course.course_name if ev and ev.course else '',
+            'course_name': ev.course.course_name if ev and ev.course else (r.course.course_name if r.course_id else ''),
             'start': ev.ev_date_start if ev else None,
             'end': ev.ev_date_end if ev else None,
             'ev_generation': ev.ev_generation if ev else '',
-        })
+        }
+        if r.ev_id:
+            obj_ev.append(item)
+        else:
+            obj_noev.append(item)
 
-    context = {'title': title, 'data': obj, 'listMenuPermission': objMenu}
+    context = {'title': title, 'data_ev': obj_ev, 'data_noev': obj_noev, 'listMenuPermission': objMenu}
 
     return render(request, 'register/approve_list_event_bill_credit.html',context)
 
