@@ -133,6 +133,17 @@
   </div>
 
   <div class="stat-card">
+    <div class="stat-icon icon-red">
+      <i class="bi bi-x-circle-fill"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">ยกเลิกบิล</div>
+      <div class="stat-value">{{ cancel_count }}</div>
+      <div class="stat-sub">รายการที่ถูกยกเลิก</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
     <div class="stat-icon icon-purple">
       <i class="bi bi-bar-chart-fill"></i>
     </div>
@@ -200,6 +211,7 @@
           <th>ประเภท</th>
           <th style="text-align:right">ยอดรวม</th>
           <th>สถานะ</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -235,10 +247,18 @@
               <span class="badge-status badge-default">{{ rp.register.status }}</span>
             {% endif %}
           </td>
+          <td>
+            <!-- {% if rp.register.status == 'W' %}
+            <button class="btn btn-outline-danger btn-sm"
+              onclick="openCancelModal('{{ rp.register.register_id }}', '{{ rp.rp_doc_number }}')">
+              <i class="bi bi-x-circle"></i> ยกเลิก
+            </button>
+            {% endif %} -->
+          </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="7" style="text-align:center; color:var(--t3); padding:30px;">
+          <td colspan="8" style="text-align:center; color:var(--t3); padding:30px;">
             <i class="bi bi-inbox" style="font-size:24px;"></i><br>ยังไม่มีรายการ
           </td>
         </tr>
@@ -247,5 +267,37 @@
     </table>
   </div>
 </div>
+
+<!-- Modal ยกเลิกบิล -->
+<div class="modal fade" id="cancelBillModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>ยกเลิกบิล</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{% url 'CancelBill' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="cancel_register_id" name="register_id">
+        <div class="modal-body">
+          <p>ต้องการยกเลิกบิล <strong id="cancel_doc_number"></strong> ใช่หรือไม่?</p>
+          <p style="color:var(--t3); font-size:12px;">สถานะจะเปลี่ยนเป็น "ยกเลิก" และไม่สามารถกู้คืนได้</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+          <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i>ยืนยันยกเลิก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openCancelModal(registerId, docNumber) {
+  document.getElementById('cancel_register_id').value = registerId;
+  document.getElementById('cancel_doc_number').textContent = docNumber || registerId;
+  new bootstrap.Modal(document.getElementById('cancelBillModal')).show();
+}
+</script>
 
 {% endblock %}

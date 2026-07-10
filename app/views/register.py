@@ -96,9 +96,10 @@ def register_home(request):
         crt_date__date=today
     ).count()
 
-    # รอยืนยัน (W) / สำเร็จ (Y)
+    # รอยืนยัน (W) / สำเร็จ (Y) / ยกเลิก (C)
     pending_count  = register_main.objects.filter(status='W').count()
     success_count  = register_main.objects.filter(status='Y').count()
+    cancel_count   = register_main.objects.filter(status='C').count()
 
     # รายการล่าสุด 8 รายการ
     recent_payments = register_payment.objects.select_related(
@@ -113,6 +114,7 @@ def register_home(request):
         'orders_today':  orders_today,
         'pending_count': pending_count,
         'success_count': success_count,
+        'cancel_count':  cancel_count,
         'recent_payments': recent_payments,
         'today': today,
         'listMenuPermission': objMenu,
@@ -2353,6 +2355,15 @@ def delete_close_the_event(request):
 
     messages.success(request, "ทำรายการสำเร็จ !")
     return redirect("/approve/update/event")
+
+
+def cancel_bill(request):
+    register_id = request.POST.get('register_id', '')
+    uuid_without_dashes = str(register_id).replace('-', '')
+    register_main.objects.filter(register_id=register_id).update(status='C')
+    fact_customer.objects.filter(register_id=uuid_without_dashes).update(status_bill='C')
+    messages.success(request, "ยกเลิกบิลสำเร็จ !")
+    return redirect("/")
 
 
 def approve_list_invoice_com(request):
