@@ -2701,12 +2701,12 @@ def approve_list_payment_accept_invoice(request):
     content.status = 'Y'
     content.save()
 
-    get_event_re = event_register.objects.get(er_id=content.er.er_id)
-    get_event_re.register
+    # get_event_re = event_register.objects.get(er_id=content.er.er_id)
+    # get_event_re.register
 
-    get_payments = register_payment.objects.get(register_id=get_event_re.register)
-    get_payments.status_bill = 'Y'
-    get_payments.save()
+    # get_payments = register_payment.objects.get(register_id=get_event_re.register)
+    # get_payments.status_bill = 'Y'
+    # get_payments.save()
     
 
    
