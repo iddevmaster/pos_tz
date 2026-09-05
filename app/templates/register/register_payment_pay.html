@@ -771,7 +771,7 @@ return false;
                 name="student_firstname_th"
                 onkeypress="setBillName();"
                 onkeyup="setBillName();"
-                value="{{student_data.student_firstname_th}}"
+                value="{{student_data.student_firstname_th|default:data.customer_fisrt}}"
                 required
 
                 readonly
@@ -788,14 +788,14 @@ return false;
                 name="student_lastname_th"
                 onkeypress="setBillName();"
                 onkeyup="setBillName();"
-                value="{{student_data.student_lastname_th}}"
+                value="{{student_data.student_lastname_th|default:data.customer_last}}"
                 readonly
               />
               <input
                 type="hidden"
                 id="rp_name_customer"
                 name="rp_name_customer"
-                value="{{student_data.student_firstname_th}} {{student_data.student_lastname_th}}"
+                value="{{student_data.student_firstname_th|default:data.customer_fisrt}} {{student_data.student_lastname_th|default:data.customer_last}}"
                 readonly
               />
             </div>
