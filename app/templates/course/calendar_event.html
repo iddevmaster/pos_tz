@@ -26,6 +26,9 @@
 });
   $(document).ready(function () {
 
+    $('#eventModal').on('hidden.bs.modal', function () {
+      resetTeacherForm();
+    });
 
     // Initialize Select2 inside modal
     $('#eventModal').on('shown.bs.modal', function () {
@@ -667,6 +670,28 @@ if (resultElement) {
 
 
 
+  function resetTeacherForm() {
+    document.getElementById("py").value = "1";
+    document.getElementById("pi").value = "1";
+    document.getElementById("tis_unit").value = "hour";
+    const quantity = document.getElementById("tis_quantity");
+    quantity.value = "1";
+    quantity.readOnly = false;
+    quantity.style.backgroundColor = "";
+    const compensation = document.getElementById("tis_compensation");
+    compensation.value = "0";
+    compensation.readOnly = true;
+    document.getElementById("tis_sum").value = "0";
+    document.getElementById("tis_expenses").value = "0";
+    document.getElementById("expenses_type").selectedIndex = 0;
+    document.getElementById("teacher_id").value = "";
+    // Refresh Select2 without triggering teacher lookup or another save.
+    $('#teacher').val('').trigger('change.select2');
+    ["status_hour", "status_people", "status_teacher"].forEach(function (id) {
+      document.getElementById(id).value = "";
+    });
+  }
+
   async function save() {
 
     await this.CheckHourbeforeSave()
@@ -742,6 +767,7 @@ if (resultElement) {
         // Display response
 
         if (data.status == 200) {
+          resetTeacherForm();
       
 
           setTimeout(() => {
@@ -1004,6 +1030,7 @@ if (resultElement) {
   function getComposetaion() {
     const teacher_id = document.getElementById("teacher_id").value
     const py = document.getElementById("pi").value
+    if (!teacher_id) return;
     const csrftoken = "{{ csrf_token }}";
     if ((py == 1) || (py == 2)) {
       fetch('/api/get/compensation', {
@@ -1015,6 +1042,9 @@ if (resultElement) {
       })
         .then(response => response.json())
         .then(data => {
+          // Ignore a lookup that finished after the form was reset or changed.
+          if (document.getElementById("teacher_id").value !== teacher_id ||
+              document.getElementById("pi").value !== py) return;
           if (data.length == 0) {
             document.getElementById("tis_compensation").value = 0
             return false;
