@@ -43,8 +43,13 @@ def unit_format(val):
 
 @register.filter
 def contains(value, arg):
-    """Checks if arg is in value."""
-    return arg in value
+    """Match a sidebar route exactly, ignoring leading/trailing slashes."""
+    if value is None or arg is None:
+        return False
+
+    current_path = str(value).strip('/')
+    menu_route = str(arg).strip('/')
+    return current_path == menu_route
 
 @register.filter
 def contains_parent(path):
