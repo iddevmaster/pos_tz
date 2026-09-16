@@ -13,12 +13,13 @@
     body { margin: 0; color: #222; font: 12px/1.35 Sarabun, Tahoma, sans-serif; }
     .page { width: 210mm; min-height: 297mm; padding: 14mm; margin: 0 auto; }
     .header { display: grid; grid-template-columns: 70px 1fr 205px; gap: 12px; align-items: start; }
+    .brand-logos { display: flex; flex-direction: column; align-items: center; }
     .logo { width: 65px; height: 65px; object-fit: contain; }
-    .company { position: relative; padding-right: 72px; }
+    .company { position: relative; }
     .company h1 { margin: 0 0 4px; font-size: 20px; }
     .company p { margin: 1px 0; }
     .partner-logos { width: 100%; height: 31px; object-fit: contain; object-position: left center; margin-top: 5px; }
-    .tz-logo { position: absolute; top: 3px; right: 0; width: 62px; height: 62px; object-fit: contain; }
+    .tz-logo { width: 65px; height: 50px; object-fit: contain; margin-top: 8px; }
     .doc-name { padding: 10px 4px 8px; color: #fff; background: #e7602e; text-align: center; font-size: 18px; font-weight: 700; }
     .doc-name small { display: block; font-size: 12px; font-weight: 400; }
     table { border-collapse: collapse; }
@@ -40,18 +41,20 @@
     .summary { display: grid; grid-template-columns: 62% 38%; border: 1px solid #888; border-top: 0; }
     .note { min-height: 225px; padding: 10px; border-right: 1px solid #888; }
     .note p { margin: 4px 0; }
-    .stamp { width: 105px; height: 65px; object-fit: contain; object-position: left center; margin-top: 6px; }
     .totals { width: 100%; align-self: start; }
     .totals td { height: 28px; padding: 5px 8px; border-bottom: 1px solid #ccc; }
     .totals td:last-child { text-align: right; white-space: nowrap; }
     .totals .grand td { background: #f4f4f4; font-weight: 700; }
     .words { padding: 6px 8px; border-top: 1px solid #ccc; }
-    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 145px; margin-top: 10px; border: 1px solid #888; }
+    .signatures { display: grid; grid-template-columns: repeat(2, 1fr); min-height: 145px; margin-top: 10px; border: 1px solid #888; }
     .signature { display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 18px 10px; text-align: center; border-right: 1px solid #888; }
     .signature:last-child { border-right: 0; }
-    .signature-image { height: 45px; }
-    .signature-image img { max-width: 130px; max-height: 45px; object-fit: contain; }
-    .signature-line { margin: 3px 0 5px; border-top: 1px dotted #555; }
+    .signature-image { height: 75px; }
+    .signature-image img { max-width: 200px; max-height: 80px; object-fit: contain; }
+    .stamp-box { justify-content: center; }
+    .stamp-box img { max-height: 100px; object-fit: contain; }
+    .receiver-signature .signature-image { display: flex; align-items: flex-end; justify-content: center; margin-bottom: -2px; }
+    .receiver-signature .signature-image img { position: relative; z-index: 1; }
     .footer { margin-top: 44px; text-align: right; color: #666; font-size: 9px; }
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -62,7 +65,10 @@
 <body>
 <div class="page">
   <header class="header">
-    <img class="logo" src="{% static 'images/IDdrives.png' %}" alt="ID Drives">
+    <div class="brand-logos">
+      <img class="logo" src="{% static 'images/IDdrives.png' %}" alt="ID Drives">
+      <img class="tz-logo" src="{% static 'images/newlogo_resize.png' %}" alt="Training Zenter">
+    </div>
     <section class="company">
       <h1>Training Zenter (ศูนย์เทรนนิ่ง TZ เซ็นเตอร์)</h1>
       <p>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</p>
@@ -71,7 +77,6 @@
       <p>E-mail: id.trainingcenter@iddrives.co.th, idaccount@iddrives.co.th</p>
       <p>www.trainingzenter.com</p>
       <img class="partner-logos" src="{% static 'images/all-logo-03.png' %}" alt="เครือข่ายพันธมิตร">
-      <img class="tz-logo" src="{% static 'images/newlogo_resize.png' %}" alt="Training Zenter">
     </section>
     <section>
       <div class="doc-name">ใบเสร็จรับเงิน/ใบกำกับภาษี<small>Receipt / Tax Invoice</small></div>
@@ -106,7 +111,6 @@
       {% for etcs in etc %}<p>- {{ etcs.name }}</p>{% endfor %}
       <p>{{ data.rp_ref1 }}<br>{{ data.rp_ref2 }}</p>
       <b>ได้รับชำระเงินตามรายการข้างต้นไว้ถูกต้องแล้ว</b>
-      <img class="stamp" src="{% static 'images/402827.png' %}" alt="ตราประทับบริษัท">
     </div>
     <div>
       <table class="totals">
@@ -123,9 +127,8 @@
   </section>
 
   <section class="signatures">
-    <div class="signature"><div class="signature-image"></div><div class="signature-line"></div><div>ผู้ชำระเงิน</div><div>{{ time|date:'d/m/Y' }}</div></div>
-    <div class="signature"><div class="signature-image">{% if is_show_signature == 1 and signa %}<img src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% endif %}</div><div class="signature-line"></div><div>{{ user.first_name }} {{ user.last_name }}</div><div>ผู้รับเงิน</div></div>
-    <div class="signature"><div class="signature-image">{% if signama %}<img src="{{ signama.image_cover.url }}" alt="ลายเซ็นผู้อนุมัติ">{% endif %}</div><div class="signature-line"></div><div>{% if manger %}{{ manger.first_name }} {{ manger.last_name }}{% endif %}</div><div>ผู้อนุมัติ</div></div>
+    <div class="signature stamp-box"><img src="{% static 'images/402827.png' %}" alt="ตราประทับบริษัท"></div>
+    <div class="signature receiver-signature"><div class="signature-image">{% if signa %}<img src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% endif %}</div><div>{{ user.first_name }} {{ user.last_name }}</div><div>ผู้รับเงิน</div></div>
   </section>
   <footer class="footer">FD-TZ-IDD-001</footer>
 </div>

@@ -1,0 +1,115 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ใบเสร็จรับเงิน/ใบกำกับภาษี {{ data.rp_doc_number }}</title>
+  <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
+  <link rel="stylesheet" href="{% static 'bill_reference.css' %}">
+  <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
+</head>
+<body>
+  <main class="sheet">
+    <header class="document-header">
+      <div class="brand">
+        <img class="brand-logo" src="{% static 'images/IDdrives.png' %}" alt="ID Drives">
+        <div class="brand-copy">
+          <h1>บริษัท ไอดีไดรฟ์ จำกัด</h1>
+          <div class="brand-subtitle">Training Zenter (ศูนย์เทรนนิ่ง TZ เซ็นเตอร์)</div>
+          <div>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</div>
+          <div>สาขา 00018 58/1 หมู่ 9 ถนนมิตรภาพ ตำบลทับกวาง อำเภอแก่งคอย จังหวัดสระบุรี 18260</div>
+          <div>Tax ID : 0405536000531 · Tel. 082-7513888, 088-5643772</div>
+          <div>id.trainingcenter@iddrives.co.th, idaccount@iddrives.co.th</div>
+          <div>www.trainingzenter.com</div>
+        </div>
+        <img class="tz-logo" src="{% static 'images/newlogo_resize.png' %}" alt="Training Zenter">
+      </div>
+      <div class="document-meta">
+        <div class="document-badge">ใบเสร็จรับเงิน/ใบกำกับภาษี<span>Receipt / Tax Invoice</span></div>
+        <table aria-label="ข้อมูลเอกสาร">
+          <tr><th>เลขที่</th><td>{{ data.rp_doc_number }}</td></tr>
+          <tr><th>วันที่</th><td>{{ data.crt_date }}</td></tr>
+        </table>
+      </div>
+    </header>
+
+    <section class="customer-grid" aria-label="ข้อมูลลูกค้า">
+      <div class="customer-column">
+        <div><span>ชื่อลูกค้า</span><strong>{{ data.rp_name_customer }}</strong></div>
+        <div><span>Tax ID</span><strong>{{ data.rp_tax }}</strong></div>
+        <div><span>ชื่อผู้ติดต่อ</span><strong>{{ data.rp_name_contact }}</strong></div>
+        <div><span>ที่อยู่</span><strong>{{ data.rp_address }}</strong></div>
+        <div><span>Tel</span><strong>{{ data.rp_phone }}</strong></div>
+        <div><span>STM โอน</span><strong>{{ items.stmdate }}</strong></div>
+      </div>
+      <div class="customer-column">
+        <div><span>รหัสลูกค้า</span><strong>{{ customer.customer_code }}</strong></div>
+        <div><span>ผู้เสนอโครงการ</span><strong>{{ data.rp_name_seller }}</strong></div>
+        <div><span>ฝ่าย / สาขา</span><strong>TN</strong></div>
+        <div><span>วันที่ฝึกอบรม</span><strong>{{ content_regist.ev.ev_date_start|date:'d/m/Y' }} - {{ content_regist.ev.ev_date_end|date:'d/m/Y' }}</strong></div>
+        <div><span>E-mail</span><strong>{{ data.rp_email }}</strong></div>
+        <div><span>หมายเหตุ</span><strong>{{ items.stmetc }}</strong></div>
+      </div>
+    </section>
+
+    <table class="items-table">
+      <thead><tr>
+        <th class="center">ลำดับ</th><th>รหัส</th><th>หลักสูตร</th><th class="center">จำนวน</th><th class="center">หน่วย</th><th class="right">ราคาต่อหน่วย</th><th class="right">ส่วนลด</th><th class="right">จำนวนเงิน</th>
+      </tr></thead>
+      <tbody><tr>
+        <td class="center">1</td><td>{{ items.rpi_code }}</td><td>{{ items.rpi_name }}</td><td class="center">{{ items.rpi_quantity }}</td><td class="center">{{ items.rpi_unit }}</td>
+        <td class="right">{{ items.rpi_price|floatformat:2|intcomma }}</td><td class="right">{{ items.rpi_price_discount }}</td>
+        <td class="right">{% if items.type_payment == 'Deposit' %}{{ items.rpi_price_result|floatformat:2|intcomma }}{% elif items.type_payment == 'Deposit2' %}{{ items.rpi_price|floatformat:2|intcomma }}{% else %}{{ rpi_price_all|floatformat:2|intcomma }}{% endif %}</td>
+      </tr></tbody>
+    </table>
+
+    <div class="bottom-grid">
+      <section class="payment-notes">
+        <h2>รายละเอียดการชำระเงิน</h2>
+        <p>{{ data.rp_ref1 }}<br>{{ data.rp_ref2 }}</p>
+      </section>
+      <table class="summary-table" aria-label="สรุปยอดเงิน">
+        <tr><th>รวมเงิน</th><td>{{ rpi_price_all_dis|floatformat:2|intcomma }}</td></tr>
+        {% if items.type_payment != 'Deposit2' %}<tr><th>ส่วนลด</th><td>{{ items.rpi_price_discount|floatformat:2|intcomma }}</td></tr>{% endif %}
+        {% if items.type_payment == 'Deposit' or items.type_payment == 'Deposit2' %}<tr><th>มัดจำ</th><td>{{ items.rpi_price_pay|floatformat:2|intcomma }}</td></tr>{% endif %}
+        <tr><th>ราคาก่อน VAT</th><td>{{ items.rpi_price_total|floatformat:2|intcomma }}</td></tr>
+        <tr><th>ภาษีมูลค่าเพิ่ม 7%</th><td>{{ items.rpi_price_vat|floatformat:2|intcomma }}</td></tr>
+        <tr class="grand-total"><th>ยอดรวมสุทธิ</th><td>{% if items.type_payment == 'Deposit' %}{{ items.rpi_price_pay|floatformat:2|intcomma }}{% elif items.type_payment == 'Deposit2' %}{{ items.rpi_price_result|floatformat:2|intcomma }}{% else %}{{ rpi_price_default|floatformat:2|intcomma }}{% endif %}</td></tr>
+        {% if items.type_payment == 'Deposit' or items.type_payment == 'Deposit2' %}<tr><th>คงเหลือ</th><td>{{ total|floatformat:2|intcomma }}</td></tr>{% endif %}
+        <tr><th colspan="2" class="amount-words">ตัวอักษร (<span id="result"></span>)</th></tr>
+      </table>
+    </div>
+
+    <section class="signatures" aria-label="ลายเซ็น">
+      <div class="sig-box"><img class="seal-logo" src="{% static 'images/402827.png' %}" alt="ID Drives"></div>
+      <div class="sig-box receiver">
+        {% if is_show_signature == 1 %}
+          {% if signa %}<img class="signature-image" src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% else %}<span class="signature-space"></span>{% endif %}
+        {% else %}
+          <img class="signature-image" src="/media/images/logo/white.png" alt="">
+        {% endif %}
+        <div class="sig-line"></div>
+        <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+        <div>ผู้รับเงิน</div>
+        <div>{{ time|date:'d/m/Y' }}</div>
+      </div>
+    </section>
+
+    <footer>
+      <div>Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On : ระบบ pos.trainingzenter <span id="showdate3"></span></div>
+      <div>เลขที่ ISO FD-TZ-IDD-001 13-01-2566</div>
+      <img src="{% static 'images/all-logo-03.png' %}" alt="โลโก้เครือบริษัท">
+    </footer>
+  </main>
+  <script>
+    window.addEventListener('load', function () {
+      var amount = {% if items.type_payment == 'Deposit2' %}'{{ items.rpi_price_result }}'{% elif items.type_payment == 'FullPayment' %}'{{ rpi_price_default }}'{% else %}'{{ items.rpi_price_pay }}'{% endif %};
+      if (typeof ArabicNumberToText === 'function') document.getElementById('result').textContent = ArabicNumberToText(amount);
+      var now = new Date();
+      document.getElementById('showdate3').textContent = ' วันที่ ' + now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) + ' เวลา ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      window.print();
+    });
+  </script>
+</body>
+</html>
