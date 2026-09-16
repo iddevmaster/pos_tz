@@ -1,723 +1,140 @@
-{% load static %} {% load humanize %}
-<!DOCTYPE html>
-<html lang="en">
-
+{% load static humanize %}
+<!doctype html>
+<html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{title}}</title>
-  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
-  <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ใบเสร็จรับเงิน/ใบกำกับภาษี {{ data.rp_doc_number }}</title>
+  <link rel="stylesheet" href="{% static 'fix_a4.css' %}">
   <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
-  <script type="text/javascript">
-    function myFunction() {
-   
-
-      var type = "{{items.type_payment }}";
-      
-      if(type == 'Deposit2'){
-        var monney = "{{items.rpi_price_result }}";
-      }else if (type == 'FullPayment') {
-        
-        var monney = "{{rpi_price_default }}";
-       
-      }
-      else {
-         var monney = "{{items.rpi_price_pay }}";
-      }
-      
-
-
-      var thaibath = ArabicNumberToText(monney);
-
-      
-      document.getElementById("result").innerHTML = thaibath;
-    }
-
-    function RunDate() {
-      const today = new Date();
-      var time = today.getHours() + ":" + today.getMinutes();
-      const result = today.toLocaleDateString("th-TH", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-      //  document.getElementById("showdate1").innerHTML = result;
-      //  document.getElementById("showdate2").innerHTML = result;
-      document.getElementById("showdate3").innerHTML =
-        " วันที่ " + result + " เวลา " + time;
-    }
-  </script>
-
-  <style scoped>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #222; font: 12px/1.35 Sarabun, Tahoma, sans-serif; }
+    .page { width: 210mm; min-height: 297mm; padding: 14mm; margin: 0 auto; }
+    .header { display: grid; grid-template-columns: 70px 1fr 205px; gap: 12px; align-items: start; }
+    .logo { width: 65px; height: 65px; object-fit: contain; }
+    .company { position: relative; padding-right: 72px; }
+    .company h1 { margin: 0 0 4px; font-size: 20px; }
+    .company p { margin: 1px 0; }
+    .partner-logos { width: 100%; height: 31px; object-fit: contain; object-position: left center; margin-top: 5px; }
+    .tz-logo { position: absolute; top: 3px; right: 0; width: 62px; height: 62px; object-fit: contain; }
+    .doc-name { padding: 10px 4px 8px; color: #fff; background: #e7602e; text-align: center; font-size: 18px; font-weight: 700; }
+    .doc-name small { display: block; font-size: 12px; font-weight: 400; }
+    table { border-collapse: collapse; }
+    .meta { width: 100%; }
+    .meta td { border: 1px solid #888; padding: 5px 7px; }
+    .meta td:first-child { width: 60px; }
+    .customer { display: grid; grid-template-columns: 62% 38%; margin-top: 10px; border: 1px solid #888; }
+    .customer > div { min-height: 53px; padding: 6px 8px; border-bottom: 1px solid #888; }
+    .customer > div:nth-child(odd) { border-right: 1px solid #888; }
+    .customer > div:nth-last-child(-n+2) { border-bottom: 0; }
+    .line { display: grid; grid-template-columns: 108px 1fr; margin: 1px 0; }
+    .line b { font-weight: 700; }
+    .items { width: 100%; table-layout: fixed; margin-top: 16px; }
+    .items th, .items td { border: 1px solid #888; padding: 6px 5px; vertical-align: top; overflow-wrap: anywhere; }
+    .items th { height: 48px; background: #eef0f2; text-align: center; vertical-align: middle; }
+    .items .product td { height: 78px; }
+    .center { text-align: center; }
+    .number { text-align: right; white-space: nowrap; }
+    .summary { display: grid; grid-template-columns: 62% 38%; border: 1px solid #888; border-top: 0; }
+    .note { min-height: 225px; padding: 10px; border-right: 1px solid #888; }
+    .note p { margin: 4px 0; }
+    .stamp { width: 105px; height: 65px; object-fit: contain; object-position: left center; margin-top: 6px; }
+    .totals { width: 100%; align-self: start; }
+    .totals td { height: 28px; padding: 5px 8px; border-bottom: 1px solid #ccc; }
+    .totals td:last-child { text-align: right; white-space: nowrap; }
+    .totals .grand td { background: #f4f4f4; font-weight: 700; }
+    .words { padding: 6px 8px; border-top: 1px solid #ccc; }
+    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 145px; margin-top: 10px; border: 1px solid #888; }
+    .signature { display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 18px 10px; text-align: center; border-right: 1px solid #888; }
+    .signature:last-child { border-right: 0; }
+    .signature-image { height: 45px; }
+    .signature-image img { max-width: 130px; max-height: 45px; object-fit: contain; }
+    .signature-line { margin: 3px 0 5px; border-top: 1px dotted #555; }
+    .footer { margin-top: 44px; text-align: right; color: #666; font-size: 9px; }
     @media print {
-      body {
-        -webkit-print-color-adjust: exact;
-      }
-
-      @page {
-        size: A4;
-        margin-bottom: 1cm;
-      }
-
-    }
-
-    body {
-      font-family: "Sarabun", sans-serif;
-      font-size: 12px;
-      left: 0;
-      position: relative;
-    }
-
-    .table-head {
-      position: relative;
-      bottom: 85px;
-    }
-
-    .table-title {
-      position: relative;
-      bottom: 85px;
-    }
-
-    .table-detail {
-      position: relative;
-      bottom: 70px;
-    }
-
-    .table-footer {
-      position: relative;
-      bottom: 50px;
-    }
-
-    tr {
-      height: 35px;
-    }
-
-
-
-    .cutword {
-      white-space: nowrap;
-      width: 250px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { margin: 0; border: 0; box-shadow: none; }
     }
   </style>
 </head>
-{% comment %} window.print() {% endcomment %}
-
-<body onLoad="myFunction();window.print();RunDate();">
-  <div class="page">
-    <table style="width: 100%" border="0" class="table-head">
-      <tbody>
-        <tr>
-          <td style="vertical-align: middle" align="left">
-            <img src="{% static 'images/IDdrives.png' %}" alt="IDLOGO" style="width: 100px; height: 100px" />
-          </td>
-          <td style="vertical-align: middle" align="center">
-            <h3>Training Zenter (ศูนย์เทรนนิ่ง TZ เซ็นเตอร์) </h3>
-            <h4>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</h4>
-          </td>
-
-          <td style="vertical-align: middle" align="right">
-            <img src="{% static 'images/newlogo_resize.png' %}" alt="TZLOGO" style="width: 100px; height: 100px" />
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">
-            <div align="center">
-              <div>
-                สาขา 00018 58/1 หมู่ 9 ถนนมิตรภาพ ตำบลทับกวาง อำเภอแก่งคอย
-                จังหวัดสระบุรี 18260
-              </div>
-              <div>
-                Tax ID : 0405536000531 Tel. 082-7513888 , 088-5643772 Email:
-                id.trainingcenter@iddrives.co.th, idaccount@iddrives.co.th
-                <br />
-                www.trainingzenter.com
-              </div>
-              <span style="font-size: 25px; font-weight: bold">
-                ใบเสร็จรับเงิน/ใบกำกับภาษี
-              </span>
-            </div>
-
-            <div align="right">
-              <div>เลขที่ <strong>{{data.rp_doc_number}}</strong></div>
-              <div>วันที่ <strong>{{data.crt_date}}</strong></div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <table style="width: 100%" border="0" class="table-title">
-      <tbody>
-        <tr style="
-    height: 35px;
-">
-          <td style="width: 15%">ชื่อลูกค้า</td>
-          <td style="border-bottom: black 1px dotted">
-            {{data.rp_name_customer}}
-          </td>
-          <td style="width: 15%">รหัสลูกค้า</td>
-          <td style="border-bottom: black 1px dotted">
-            {{customer.customer_code}}
-          </td>
-        </tr>
-        <tr style="
-    height: 35px;
-">
-          <td style="width: 15%">Tax ID</td>
-          <td style="border-bottom: black 1px dotted">{{data.rp_tax}}</td>
-          <td style="width: 15%">ผู้เสนอโครงการ</td>
-          <td style="border-bottom: black 1px dotted">
-            {{data.rp_name_seller}}
-          </td>
-        </tr>
-
-        <tr style="
-    height: 35px;
-">
-          <td style="width: 15%">ชื่อผู้ติดต่อ</td>
-          <td style="border-bottom: black 1px dotted">
-            {{data.rp_name_contact}}
-          </td>
-          <td style="width: 15%">ฝ่าย / สาขา</td>
-          <td style="border-bottom: black 1px dotted">TN</td>
-        </tr>
-        <tr style="
-    height: 35px;
-">
-          <td style="width: 15%">ที่อยู่</td>
-          <td style="border-bottom: black 1px dotted">{{data.rp_address}}</td>
-          <td style="width: 15%">วันที่ฝึกอบรม</td>
-          <td style="border-bottom: black 1px dotted">
-            {{content_regist.ev.ev_date_start|date:"d/m/Y"}} -
-            {{content_regist.ev.ev_date_end|date:"d/m/Y"}}
-          </td>
-        </tr>
-        <tr style="
-    height: 35px;
-">
-          <td style="width: 15%">Tel</td>
-          <td style="border-bottom: black 1px dotted">{{data.rp_phone}}</td>
-          <td style="width: 15%">E-mail</td>
-          <td style="border-bottom: black 1px dotted">{{data.rp_email}}</td>
-        </tr>
-        <tr style="
-          height: 35px;
-      ">
-          <td style="width: 15%">STM โอน</td>
-          <td style="border-bottom: black 1px dotted">{{items.stmdate}}</td>
-          <td style="width: 15%">หมายเหตุ</td>
-          <td style="border-bottom: black 1px dotted">{{items.stmetc}}</td>
-        </tr>
-
-      </tbody>
-    </table>
-
-
-     {% if items.type_payment == 'Deposit' %}
-          <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
-      <tbody>
-        <tr>
-          <td>ลำดับ</td>
-          <td>รหัส</td>
-          <td>หลักสูตร</td>
-          <td>จำนวน</td>
-          <td>หน่วย</td>
-          <td>ราคาต่อหน่วย</td>
-          <td>ส่วนลด</td>
-          <td>จำนวนเงิน</td>
-        </tr>
-        <tr>
-          <td align="center">1</td>
-          <td>{{items.rpi_code}}</td>
-          <td>
-            <div class="cutword">{{items.rpi_name}}</div>
-          </td>
-          <td align="center">{{items.rpi_quantity}}</td>
-          <td>{{items.rpi_unit}}</td>
-          <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
-          <td align="right">{{items.rpi_price_discount}}</td>
-          <td align="right">
-            {{items.rpi_price_result |floatformat:2|intcomma }}
-          </td>
-        </tr>
-
-        <tr>
-
-          <td colspan="5" rowspan="8" style="padding: 10px;vertical-align: top;padding-left: 5px">
-            <div style="display: flex;text-align: center;">
-              <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
-            </div>
-            {{data.rp_ref1}}
-            <br>
-            {{data.rp_ref2}}
-
-
-          </td>
-
-          <td colspan="2">รวมเงิน</td>
-          <td align="right">
-            {{rpi_price_all_dis |floatformat:2|intcomma }}
-          </td>
-        </tr>
-          <tr>
-          <td colspan="2">ส่วนลด</td>
-          <td align="right">
-            {{items.rpi_price_discount |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">มัดจำ</td>
-          <td align="right">
-            {{items.rpi_price_pay |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ราคาก่อน VAT</td>
-          <td align="right">
-            {{items.rpi_price_total |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ภาษีมูลค่าเพิ่ม 7&#37;</td>
-          <td align="right">
-            {{items.rpi_price_vat |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-         
-          <td colspan="2"> ยอดรวมสุทธิ</td>
-          <td align="right">
-            {{items.rpi_price_pay |floatformat:2|intcomma }}
-          </td>
-        </tr>
-               <tr>
-         
-          <td colspan="2"> คงเหลือ</td>
-          <td align="right">
-            {{total |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">ตัวอักษร (<span id="result"></span>)</td>
-        </tr>
-       
-        <tr>
-          <td colspan="8">
-            <table style="width: 100%; border-collapse: collapse" border="1">
-              <tbody>
-                <tr align="center">
-                  <td style="
-                        border-left-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <div style="display: flex;text-align: center;">
-                      <div style="flex: 1;">
-                        <img src="{% static 'images/402827.png' %}" alt="IDLOGO" style="width: 200px; height: 100px" />
-
-                      </div>
-
-                    </div>
-
-                  </td>
-                  <td style="
-                        border-right-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <br />
-
-
-                    {% if is_show_signature == 1 %}
-                    <img src="{{signa.image_cover.url}}" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% else %}
-                    <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% endif %}
-
-
-                    <br />
-                    <div style="
-    padding-top: 10px;
-">
-                      {{user.first_name}} {{user.last_name}}
-                    </div>
-                    <div>ผู้รับเงิน</div>
-                    <div>
-                      {{time|date:"d/m/Y"}} 
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="12" style="
-    border: hidden;
-">
-            Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
-            ระบบ
-            <span style="text-transform: uppercase"> pos.trainingzenter</span>
-            <span id="showdate3"></span>
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;text-align: center;
-">
-            เลขที่ ISO FD-TZ-IDD-001 13-01-2566
-
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;
-">
-            <div align="center">
-
-              <img src="{% static 'images/all-logo-03.png' %}" alt="TZLOGO" style="width: 100%; height: auto" />
-            </div>
-
-          </td>
-        </tr>
-
-
-      </tbody>
-    </table>
-
-     {% elif items.type_payment == 'Deposit2' %}
-            <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
-      <tbody>
-        <tr>
-          <td>ลำดับ</td>
-          <td>รหัส</td>
-          <td>หลักสูตร</td>
-          <td>จำนวน</td>
-          <td>หน่วย</td>
-          <td>ราคาต่อหน่วย</td>
-          <td>ส่วนลด</td>
-          <td>จำนวนเงิน</td>
-        </tr>
-        <tr>
-          <td align="center">1</td>
-          <td>{{items.rpi_code}}</td>
-          <td>
-            <div class="cutword">{{items.rpi_name}}</div>
-          </td>
-          <td align="center">{{items.rpi_quantity}}</td>
-          <td>{{items.rpi_unit}}</td>
-          <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
-          <td align="right">{{items.rpi_price_discount}}</td>
-          <td align="right">
-            {{items.rpi_price |floatformat:2|intcomma }}
-          </td>
-        </tr>
-
-        <tr>
-
-          <td colspan="5" rowspan="7" style="padding: 10px;vertical-align: top;padding-left: 5px">
-            <div style="display: flex;text-align: center;">
-              <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
-            </div>
-            {{data.rp_ref1}}
-            <br>
-            {{data.rp_ref2}}
-
-
-          </td>
-
-          <td colspan="2">รวมเงิน</td>
-          <td align="right">
-          {{rpi_price_all_dis |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">มัดจำ</td>
-          <td align="right">
-            {{items.rpi_price_pay |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ราคาก่อน VAT</td>
-          <td align="right">
-            {{items.rpi_price_total |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ภาษีมูลค่าเพิ่ม 7&#37;</td>
-          <td align="right">
-            {{items.rpi_price_vat |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-         
-          <td colspan="2"> ยอดรวมสุทธิ</td>
-          <td align="right">
-            {{items.rpi_price_result |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">ตัวอักษร (<span id="result"></span>)</td>
-        </tr>
-           <tr>
-          <td colspan="3">คงเหลือ {{total |floatformat:2|intcomma }} </td>
-        </tr>
-        <tr>
-          <td colspan="8">
-            <table style="width: 100%; border-collapse: collapse" border="1">
-              <tbody>
-                <tr align="center">
-                  <td style="
-                        border-left-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <div style="display: flex;text-align: center;">
-                      <div style="flex: 1;">
-                        <img src="{% static 'images/402827.png' %}" alt="IDLOGO" style="width: 200px; height: 100px" />
-
-                      </div>
-
-                    </div>
-
-                  </td>
-                  <td style="
-                        border-right-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <br />
-
-
-                    {% if is_show_signature == 1 %}
-                    <img src="{{signa.image_cover.url}}" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% else %}
-                    <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% endif %}
-
-
-                    <br />
-                    <div style="
-    padding-top: 10px;
-">
-                      {{user.first_name}} {{user.last_name}}
-                    </div>
-                    <div>ผู้รับเงิน</div>
-                    <div>
-                      {{time|date:"d/m/Y"}} 
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="12" style="
-    border: hidden;
-">
-            Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
-            ระบบ
-            <span style="text-transform: uppercase"> pos.trainingzenter</span>
-            <span id="showdate3"></span>
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;text-align: center;
-">
-            เลขที่ ISO FD-TZ-IDD-001 13-01-2566
-
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;
-">
-            <div align="center">
-
-              <img src="{% static 'images/all-logo-03.png' %}" alt="TZLOGO" style="width: 100%; height: auto" />
-            </div>
-
-          </td>
-        </tr>
-
-
-      </tbody>
-    </table>
-    {% else %}
-        <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
-      <tbody>
-        <tr>
-          <td>ลำดับ</td>
-          <td>รหัส</td>
-          <td>หลักสูตร</td>
-          <td>จำนวน</td>
-          <td>หน่วย</td>
-          <td>ราคาต่อหน่วย</td>
-          <td>ส่วนลด</td>
-          <td>จำนวนเงิน</td>
-        </tr>
-        <tr>
-          <td align="center">1</td>
-          <td>{{items.rpi_code}}</td>
-          <td>
-            <div >{{items.rpi_name}}</div>
-          </td>
-          <td align="center">{{items.rpi_quantity}}</td>
-          <td>{{items.rpi_unit}}</td>
-          <td align="right">{{items.rpi_price |floatformat:2|intcomma }}</td>
-          <td align="right">{{items.rpi_price_discount}}</td>
-          <td align="right">
-            {{rpi_price_all |floatformat:2|intcomma }}
-          </td>
-        </tr>
-
-        <tr>
-
-          <td colspan="5" rowspan="6" style="padding: 10px;vertical-align: top;padding-left: 5px">
-            <div style="display: flex;text-align: center;">
-              <div style="flex: 1;">รายละเอียดการชำระเงิน </div>
-            </div>
-            {{data.rp_ref1}}
-            <br>
-            {{data.rp_ref2}}
-          </td>
-
-          <td colspan="2">รวมเงิน</td>
-          <td align="right">
-          {{rpi_price_all_dis |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ส่วนลด</td>
-          <td align="right">
-            {{items.rpi_price_discount |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ราคาก่อน VAT</td>
-          <td align="right">
-            {{items.rpi_price_total |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">ภาษีมูลค่าเพิ่ม 7&#37;</td>
-          <td align="right">
-            {{items.rpi_price_vat |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <!-- จำนวนเงิน 7&#37; -->
-          <td colspan="2"> ยอดรวมสุทธิ</td>
-          <td align="right">
-            {{rpi_price_default |floatformat:2|intcomma }}
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3">ตัวอักษร (<span id="result"></span>)</td>
-        </tr>
-        <tr>
-          <td colspan="8">
-            <table style="width: 100%; border-collapse: collapse" border="1">
-              <tbody>
-                <tr align="center">
-                  <td style="
-                        border-left-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <div style="display: flex;text-align: center;">
-                      <div style="flex: 1;">
-                        <img src="{% static 'images/402827.png' %}" alt="IDLOGO" style="width: 200px; height: 100px" />
-
-                      </div>
-
-                    </div>
-
-                  </td>
-                  <td style="
-                        border-right-color: white;
-                        border-top-color: white;
-                        border-bottom-color: white;
-                      ">
-                    <br />
-
-
-                    {% if is_show_signature == 1 %}
-                    <img src="{{signa.image_cover.url}}" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% else %}
-                    <img src="/media/images/logo/white.png" alt="IDLOGO" style="width: 200px; height: 90px" />
-                    {% endif %}
-
-
-                    <br />
-                    <div style="
-    padding-top: 10px;
-">
-                      {{user.first_name}} {{user.last_name}}
-                    </div>
-                    <div>ผู้รับเงิน</div>
-                    <div>
-                      {{time|date:"d/m/Y"}} 
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="12" style="
-    border: hidden;
-">
-            Printed By : {{ user.first_name }} {{ user.last_name }} , Printed On :
-            ระบบ
-            <span style="text-transform: uppercase"> pos.trainingzenter</span>
-            <span id="showdate3"></span>
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;text-align: center;
-">
-            เลขที่ ISO FD-TZ-IDD-001 13-01-2566
-
-          </td>
-        </tr>
-
-        <tr style=" border: none;">
-          <td colspan="12" style="
-    border: hidden;
-">
-            <div align="center">
-
-              <img src="{% static 'images/all-logo-03.png' %}" alt="TZLOGO" style="width: 100%; height: auto" />
-            </div>
-
-          </td>
-        </tr>
-
-
-      </tbody>
-    </table>
-        
-    {% endif %}
-
-
-
-
-
-  </div>
+<body>
+<div class="page">
+  <header class="header">
+    <img class="logo" src="{% static 'images/IDdrives.png' %}" alt="ID Drives">
+    <section class="company">
+      <h1>Training Zenter (ศูนย์เทรนนิ่ง TZ เซ็นเตอร์)</h1>
+      <p>บริหารงานโดย บริษัท ไอดีไดรฟ์ จำกัด</p>
+      <p>สาขา 00018 58/1 หมู่ 9 ถนนมิตรภาพ ตำบลทับกวาง อำเภอแก่งคอย จังหวัดสระบุรี 18260</p>
+      <p>Tax ID: 0405536000531 โทร: 082-7513888, 088-5643772</p>
+      <p>E-mail: id.trainingcenter@iddrives.co.th, idaccount@iddrives.co.th</p>
+      <p>www.trainingzenter.com</p>
+      <img class="partner-logos" src="{% static 'images/all-logo-03.png' %}" alt="เครือข่ายพันธมิตร">
+      <img class="tz-logo" src="{% static 'images/newlogo_resize.png' %}" alt="Training Zenter">
+    </section>
+    <section>
+      <div class="doc-name">ใบเสร็จรับเงิน/ใบกำกับภาษี<small>Receipt / Tax Invoice</small></div>
+      <table class="meta">
+        <tr><td>เลขที่</td><td>{{ data.rp_doc_number }}</td></tr>
+        <tr><td>วันที่</td><td>{{ data.crt_date|date:'d/m/Y H:i' }}</td></tr>
+      </table>
+    </section>
+  </header>
+
+  <section class="customer">
+    <div><div class="line"><b>ชื่อลูกค้า :</b><span>{{ data.rp_name_customer }}</span></div><div class="line"><b>Tax ID :</b><span>{{ data.rp_tax }}</span></div></div>
+    <div><div class="line"><b>รหัสลูกค้า :</b><span>{{ customer.customer_code }}</span></div><div class="line"><b>ผู้เสนอขาย :</b><span>{{ data.rp_name_seller }}</span></div></div>
+    <div><div class="line"><b>ชื่อผู้ติดต่อ :</b><span>{{ data.rp_name_contact|default:'-' }}</span></div><div class="line"><b>ที่อยู่ :</b><span>{{ data.rp_address }}</span></div></div>
+    <div><div class="line"><b>ฝ่าย / สาขา :</b><span>TN</span></div><div class="line"><b>วันที่ฝึกอบรม :</b><span>{{ content_regist.ev.ev_date_start|date:'d/m/Y' }} - {{ content_regist.ev.ev_date_end|date:'d/m/Y' }}</span></div></div>
+    <div><div class="line"><b>โทร :</b><span>{{ data.rp_phone|default:'-' }}</span></div><div class="line"><b>E-mail :</b><span>{{ data.rp_email|default:'-' }}</span></div></div>
+    <div><div class="line"><b>STM โอน :</b><span>{{ items.stmdate|default:'-' }}</span></div><div class="line"><b>หมายเหตุ :</b><span>{{ items.stmetc|default:'-' }}</span></div></div>
+  </section>
+
+  <table class="items">
+    <colgroup><col style="width:7%"><col style="width:16%"><col style="width:28%"><col style="width:7%"><col style="width:8%"><col style="width:12%"><col style="width:10%"><col style="width:12%"></colgroup>
+    <thead><tr><th>ลำดับ<br>ที่</th><th>รหัสสินค้า</th><th>รายการสินค้า</th><th>จำนวน</th><th>หน่วย</th><th>ราคาต่อ<br>หน่วย</th><th>ส่วนลด</th><th>จำนวนเงิน</th></tr></thead>
+    <tbody>
+      <tr class="product"><td class="center">1</td><td>{{ items.rpi_code }}</td><td>{{ items.rpi_name }}</td><td class="center">{{ items.rpi_quantity }}</td><td class="center">{{ items.rpi_unit }}</td><td class="number">{{ items.rpi_price|floatformat:2|intcomma }}</td><td class="number">{{ items.rpi_price_discount|floatformat:2|intcomma }}</td><td class="number">{% if items.type_payment == 'Deposit' %}{{ items.rpi_price_pay|floatformat:2|intcomma }}{% else %}{{ items.rpi_price_result|floatformat:2|intcomma }}{% endif %}</td></tr>
+      {% for add_ons in add_on %}<tr><td class="center">{{ forloop.counter|add:1 }}</td><td>{{ add_ons.course_code }}</td><td>{{ add_ons.order_list }}</td><td class="center">{{ add_ons.qty }}</td><td class="center">{{ add_ons.unit }}</td><td class="number">{{ add_ons.rpi_price|floatformat:2|intcomma }}</td><td class="number">{{ add_ons.rpi_price_discount|floatformat:2|intcomma }}</td><td class="number">{{ add_ons.rpi_price_result|floatformat:2|intcomma }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+  <section class="summary">
+    <div class="note">
+      <b>หมายเหตุ :</b>
+      {% for etcs in etc %}<p>- {{ etcs.name }}</p>{% endfor %}
+      <p>{{ data.rp_ref1 }}<br>{{ data.rp_ref2 }}</p>
+      <b>ได้รับชำระเงินตามรายการข้างต้นไว้ถูกต้องแล้ว</b>
+      <img class="stamp" src="{% static 'images/402827.png' %}" alt="ตราประทับบริษัท">
+    </div>
+    <div>
+      <table class="totals">
+        {% if items.type_payment == 'Deposit' %}
+          <tr><td>รวมเงิน</td><td>{{ rpi_price_all|floatformat:2|intcomma }}</td></tr><tr><td>ส่วนลดสินค้า</td><td>{{ items.rpi_price_discount|floatformat:2|intcomma }}</td></tr><tr><td>เงินมัดจำที่รับ</td><td>{{ items.rpi_price_pay|floatformat:2|intcomma }}</td></tr><tr><td>ราคาก่อน VAT</td><td>{{ items.rpi_price_total|floatformat:2|intcomma }}</td></tr><tr><td>ภาษีมูลค่าเพิ่ม 7 %</td><td>{{ items.rpi_price_vat|floatformat:2|intcomma }}</td></tr><tr><td>คงเหลือ</td><td>{{ total|floatformat:2|intcomma }}</td></tr><tr class="grand"><td>จำนวนเงินทั้งสิ้น</td><td>{{ items.rpi_price_pay|floatformat:2|intcomma }}</td></tr>
+        {% elif items.type_payment == 'Deposit2' %}
+          <tr><td>รวมเงิน</td><td>{{ rpi_price_all_dis|floatformat:2|intcomma }}</td></tr><tr><td>เงินมัดจำที่รับ</td><td>{{ items.rpi_price_pay|floatformat:2|intcomma }}</td></tr><tr><td>ราคาก่อน VAT</td><td>{{ items.rpi_price_total|floatformat:2|intcomma }}</td></tr><tr><td>ภาษีมูลค่าเพิ่ม 7 %</td><td>{{ items.rpi_price_vat|floatformat:2|intcomma }}</td></tr><tr><td>คงเหลือ</td><td>{{ total|floatformat:2|intcomma }}</td></tr><tr class="grand"><td>จำนวนเงินทั้งสิ้น</td><td>{{ items.rpi_price_result|floatformat:2|intcomma }}</td></tr>
+        {% else %}
+          <tr><td>มัดจำ %</td><td>0</td></tr><tr><td>รวมเงิน</td><td>{{ rpi_price_all|floatformat:2|intcomma }}</td></tr><tr><td>ส่วนลดสินค้า</td><td>{{ items.rpi_price_discount|floatformat:2|intcomma }}</td></tr><tr><td>เงินหลังหักส่วนลด</td><td>{{ rpi_price_all_dis|floatformat:2|intcomma }}</td></tr><tr><td>ราคาก่อน VAT</td><td>{{ items.rpi_price_total|floatformat:2|intcomma }}</td></tr><tr><td>ภาษีมูลค่าเพิ่ม 7 %</td><td>{{ items.rpi_price_vat|floatformat:2|intcomma }}</td></tr><tr class="grand"><td>จำนวนเงินทั้งสิ้น</td><td>{{ rpi_price_default|floatformat:2|intcomma }}</td></tr>
+        {% endif %}
+      </table>
+      <div class="words"><span id="result"></span></div>
+    </div>
+  </section>
+
+  <section class="signatures">
+    <div class="signature"><div class="signature-image"></div><div class="signature-line"></div><div>ผู้ชำระเงิน</div><div>{{ time|date:'d/m/Y' }}</div></div>
+    <div class="signature"><div class="signature-image">{% if is_show_signature == 1 and signa %}<img src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% endif %}</div><div class="signature-line"></div><div>{{ user.first_name }} {{ user.last_name }}</div><div>ผู้รับเงิน</div></div>
+    <div class="signature"><div class="signature-image">{% if signama %}<img src="{{ signama.image_cover.url }}" alt="ลายเซ็นผู้อนุมัติ">{% endif %}</div><div class="signature-line"></div><div>{% if manger %}{{ manger.first_name }} {{ manger.last_name }}{% endif %}</div><div>ผู้อนุมัติ</div></div>
+  </section>
+  <footer class="footer">FD-TZ-IDD-001</footer>
+</div>
+<script>
+  (function () {
+    var amount = {% if items.type_payment == 'Deposit' %}'{{ items.rpi_price_pay }}'{% elif items.type_payment == 'Deposit2' %}'{{ items.rpi_price_result }}'{% else %}'{{ rpi_price_default }}'{% endif %};
+    if (typeof ArabicNumberToText === 'function') document.getElementById('result').textContent = ArabicNumberToText(amount);
+    window.addEventListener('load', function () { window.print(); });
+  }());
+</script>
 </body>
-
 </html>
