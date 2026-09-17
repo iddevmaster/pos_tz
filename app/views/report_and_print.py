@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from ..functions import dateTimeNow, last_day_of_month
 from django.contrib.auth.decorators import login_required 
-from django.db.models import Q, Count
+from django.db.models import Q, OuterRef, Subquery
 # from django.http import HttpResponse, response
 from datetime import date, timedelta
 from dateutil import rrule 
@@ -4056,23 +4056,76 @@ def student_print_certificate(request, student_id):
         return render(request, 'print/student_print_certificate_eng.html', context)
     
 def public_form_print(request):
-    
-    search = request.POST.get('search', None)
-    if search == "":
+    objMenu = []
+    course_list = course.objects.filter(
+        cancelled=1,
+        active=1,
+        course_event__isnull=False,
+    )
+    if request.user.is_authenticated:
+        try:
+            cm_id = user_detail.objects.get(user_id=request.user.id).cm_id
+            menu_groups = category_program_permission.objects.filter(cm_id=cm_id).values(
+                "group_value", "group_label"
+            ).annotate(dcount=Count("group_value")).order_by("group_label")
+            for group in menu_groups:
+                children = category_program_permission.objects.filter(
+                    cm_id=cm_id, group_value=group["group_value"]
+                ).order_by("page_label")
+                objMenu.append({
+                    "group_label": group["group_label"],
+                    "group_value": group["group_value"],
+                    "children": children,
+                })
+        except user_detail.DoesNotExist:
+            pass
+
+        try:
+            module = user_group.objects.get(user_id=request.user.id).module
+            course_list = course_list.filter(module=module)
+        except user_group.DoesNotExist:
+            pass
+
+    course_list = course_list.order_by("course_code", "course_name").distinct()
+
+    search = request.POST.get('search')
+    course_search = request.POST.get('course_search', '0')
+    if search is not None:
+        search = search.strip()
+    if request.method == "POST" and not search and course_search == '0':
         return redirect("/public/form/certificate")
-    try:
-        content = student.objects.filter(Q(student_firstname_th__icontains=search) |
-                                         Q(student_lastname_th__icontains=search) |
-                                         Q(student_firstname_eng__icontains=search) |
-                                         Q(student_lastname_eng__icontains=search)
-                                         ).order_by("-student_firstname_th")[0:20]
-    except:
-        content = []
-    if search != None:
-        s = search
-    else:
-        s = ""
-    context = {'title': defaultTitle,  'data': content, 'search': s}
+
+    content = []
+    if search or course_search != '0':
+        course_name = course_event.objects.filter(
+            ev_id=OuterRef("register__ev_id")
+        ).values("course__course_name")[:1]
+        content = student.objects.annotate(
+            course_name=Subquery(course_name)
+        ).filter(
+            course_name__isnull=False,
+            student_learning_status__in=[0, 1],
+        )
+        if search:
+            content = content.filter(
+                Q(student_firstname_th__icontains=search) |
+                Q(student_lastname_th__icontains=search) |
+                Q(student_firstname_eng__icontains=search) |
+                Q(student_lastname_eng__icontains=search)
+            )
+        if course_search != '0':
+            content = content.filter(register__ev__course_id=course_search)
+        content = content.order_by("-student_firstname_th")[0:20]
+
+    s = search or ""
+    context = {
+        'title': defaultTitle,
+        'data': content,
+        'search': s,
+        'course_search': course_search,
+        'course_list': course_list,
+        'listMenuPermission': objMenu,
+    }
     return render(request, 'public/public_form_print.html', context)
 
 

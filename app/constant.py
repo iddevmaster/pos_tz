@@ -131,6 +131,12 @@ listMenu = [
         "group_label": "หลักสูตร",
     },
     {
+        "value": "public/form/certificate",
+        "label": "ค้นหาและพิมพ์ใบประกาศ",
+        "group_value": "pRem5",
+        "group_label": "หลักสูตร",
+    },
+    {
         "value": "register/management",
         "label": "ดำเนินการ",
         "group_value": "pRem5",
