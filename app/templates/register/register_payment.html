@@ -765,7 +765,52 @@
     margin-bottom: 10px;
   }
 
+  .payment-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f8f9fc;
+  }
+
+  .payment-section-title {
+    flex: 0 0 auto;
+    font-weight: 600;
+  }
+
+  .payment-quota {
+    display: block;
+    margin-top: 3px;
+    color: #dc3545;
+    font-size: 0.9em;
+  }
+
+  .payment-event-info {
+    flex: 1;
+    color: #364152;
+    text-align: right;
+    line-height: 1.55;
+  }
+
+  .payment-event-code {
+    color: #4355c5;
+    font-weight: 700;
+  }
+
   @media (max-width: 768px) {
+    .payment-section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .payment-event-info {
+      text-align: left;
+    }
+
     .payment-options {
       grid-template-columns: 1fr;
     }
@@ -1295,8 +1340,16 @@
 
     <div class="card">
       <div class="card-body">
-        <div class="form-group">
-          <label>ชำระเงิน</label> <label style="color: red">จำนวนผู้เข้าอบรมเหลือ {{quata}} *</label>
+        <div class="payment-section-heading">
+          <div class="payment-section-title">
+            <div>ชำระเงิน</div>
+            <span class="payment-quota">จำนวนผู้เข้าอบรมเหลือ {{ quata }} *</span>
+          </div>
+          <div class="payment-event-info">
+            <span class="payment-event-code">{{ content_course.course.course_code }}</span>
+            หลักสูตร {{ content_course.course.course_name }} รุ่นที่ {{ content_course.ev_generation }}
+            ({{ content_course.ev_date_start|date:'d/m/Y' }} - {{ content_course.ev_date_end|date:'d/m/Y' }})
+          </div>
         </div>
         <input type="hidden" class="form-control" value="{{quata}}" id="quata" name="quata" required />
 
