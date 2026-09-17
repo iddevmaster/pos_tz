@@ -128,7 +128,7 @@
 
   <section class="signatures">
     <div class="signature stamp-box"><img src="{% static 'images/402827.png' %}" alt="ตราประทับบริษัท"></div>
-    <div class="signature receiver-signature"><div class="signature-image">{% if signa %}<img src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% endif %}</div><div>{{ user.first_name }} {{ user.last_name }}</div><div>ผู้รับเงิน</div></div>
+    <div class="signature receiver-signature"><div class="signature-image">{% if is_show_signature == 1 and signa %}<img src="{{ signa.image_cover.url }}" alt="ลายเซ็นผู้รับเงิน">{% endif %}</div><div>{{ user.first_name }} {{ user.last_name }}</div><div>ผู้รับเงิน</div></div>
   </section>
   <footer class="footer">FD-TZ-IDD-001</footer>
 </div>
