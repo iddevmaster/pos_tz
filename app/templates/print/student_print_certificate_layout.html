@@ -1,0 +1,15 @@
+{% load static %}
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><title>{{ data.student_code }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+<link href="{% static 'css/certificate_layout.css' %}" rel="stylesheet">
+</head><body>
+<div id="certificate-page" class="certificate-page"></div>
+{{ elements|json_script:'certificate-elements' }}
+<script src="{% static 'js/certificate_layout.js' %}"></script>
+<script>
+CertificatePage.render(document.getElementById('certificate-page'), JSON.parse(document.getElementById('certificate-elements').textContent));
+{% if print == 'true' %}
+window.addEventListener('load', async () => { await document.fonts.ready; CertificatePage.fit(document.getElementById('certificate-page')); window.print(); });
+{% endif %}
+</script></body></html>

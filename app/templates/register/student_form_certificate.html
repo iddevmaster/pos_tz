@@ -27,6 +27,12 @@
 </div>
 
 <section class="section">
+  {% if request.user.is_staff and perms.app.change_certificatelayout %}
+  <p>
+    <a class="btn btn-outline-primary" href="{% url 'certificate_settings_language' 'th' %}?student={{data.student_id}}">ออกแบบใบประกาศภาษาไทย</a>
+    <a class="btn btn-outline-primary" href="{% url 'certificate_settings_language' 'eng' %}?student={{data.student_id}}">ออกแบบใบประกาศ English</a>
+  </p>
+  {% endif %}
   <div class="card">
     <div class="card-body">
       <div class="row" style="padding-bottom: 35px">

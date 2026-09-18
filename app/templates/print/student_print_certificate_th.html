@@ -1,8 +1,6 @@
-{% load static %} 
-{% load i18n %}
-{% load ex_functions %}
+{% load static %} {% load i18n %} {% load ex_functions %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -15,28 +13,70 @@
     <style>
       @media print {
         @page {
-          size: landscape;
+          size: A4 landscape;
+          margin: 0;
         }
       }
       @import url(//db.onlinewebfonts.com/c/cc6c99b66a5b4c4e82ff2c6ed95077b4?family=Angsana+New);
       body {
         font-family: "Sarabun", sans-serif;
+        {% comment %} background-image: url('{% static "images/bg1.png"%}');
+        background-size: cover;
+        background-position: center center;
+        opacity: 0.5; {% endcomment %}
       }
-      .black-ribbon {
+      html, body {
+        margin: 0;
+        min-height: 100%;
+      }
+      .certificate-background {
         position: fixed;
-        z-index: 9999;
-        width: 180px;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
       }
+      .certificate-background img {
+        position: absolute;
+        width: 40%;
+        height: auto;
+        display: block;
+      }
+      .certificate-background .background-top {
+        top: 0;
+        left: 0;
+      }
+      .certificate-background .background-bottom {
+        bottom: 0;
+        right: 0;
+      }
+      body {
+        isolation: isolate;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      {% comment %} .showcase {
+        background-image: url('{% static "images/bg1.png"%}');
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        opacity: 0.6;
+      } {% endcomment %}
       .ls {
         top: 100;
-        left: 0;
-        padding-left: 300px;
+        left:0;
+        padding-left:300px;
         position: fixed;
         background-position: center center;
         background-repeat: no-repeat;
         opacity: 0.4;
-        width: 500px;
+        width:500px;
         height: 350px;
+      }
+
+      .black-ribbon {
+        position: fixed;
+        z-index: 9999;
+        width: 180px;
       }
       @media only all and (min-width: 768px) {
         .black-ribbon {
@@ -92,12 +132,11 @@
   </head>
   {% comment %} onLoad="onPrint()" {% endcomment %}
   <body onLoad="onPrint()">
+    <div class="certificate-background" aria-hidden="true">
+      <img src="{% static 'images/cer_head_rm.png' %}" class="background-top" alt="" />
+      <img src="{% static 'images/cer_footer_rm.png' %}" class="background-bottom" alt="" />
+    </div>
     <div>
-      <img
-        src="{% static 'images/cer_head_rm.png' %}"
-        style="width: 400px; height: auto"
-        class="black-ribbon stick-top stick-left"
-      />
       {% if detail.ev_logo %}
       <img
         src="{{detail.ev_logo.url}}"
@@ -105,11 +144,6 @@
         class="black-ribbon logo-customer"
       />
       {% endif %}
-      <img
-        src="{% static 'images/cer_footer_rm.png' %}"
-        style="width: 400px; height: auto"
-        class="black-ribbon stick-bottom stick-right"
-      />
       <img
         src="{% static 'images/id.png' %}"
         style="width: 95px; height: auto;padding-right: 40px;"
@@ -156,30 +190,14 @@
           <img src="{% static "images/newlogo_resize.png"%}" class="ls">
         </div>
         <div style="font-size: 1.5em">has successfully complete</div>
-      <div style="font-weight: bold; font-size: 35px">
+        <div style="font-weight: bold; font-size: 35px">
           {{detail.course.course_name}}
-        </div> 
-
-<!-- <div style="font-weight: bold; font-size: 35px">
-          {{detail.course.course_name_eng}}
-        </div>  -->
-  
-       
-
-
-
-        
- <div style="font-size: 35px; font-weight: bold">
-          <span> {{detail.ev_date_end|thai_date }} </span>
-        </div>    
-
-  
-  
-   
-  <!-- <div style="font-size: 35px; font-weight: bold">
-          <span> {{detail.ev_date_start|date:"j"}} - {{detail.ev_date_end|thai_date }} </span>
-        </div>    -->
-
+        </div>
+        <div style="font-size: 35px; font-weight: bold">
+          <span> {{detail.ev_date_end|thai_date}} </span>
+<!--- <span>  {{detail.ev_date_start|date:'d F Y'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
+      -->
+        </div>
         <hr style="width: 35em" />
       </div>
       <div align="center">

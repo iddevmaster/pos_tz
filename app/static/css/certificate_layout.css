@@ -1,0 +1,12 @@
+.certificate-page { position: relative; width: 297mm; height: 210mm; background: white; color: black; overflow: hidden; font-family: Sarabun, sans-serif; box-sizing: border-box; }
+.certificate-element { position: absolute; box-sizing: border-box; margin: 0; padding: 0; line-height: 1.25; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
+.certificate-element img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+/* Corner artwork must fill its frame; contain leaves empty side margins. */
+.certificate-element[data-id="header"] img { object-fit: cover; object-position: top left; }
+.certificate-element[data-id="footer"] img { object-fit: cover; object-position: bottom right; }
+.certificate-element .certificate-text { display: block; }
+@page { size: A4 landscape; margin: 0; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  .certificate-page { margin: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

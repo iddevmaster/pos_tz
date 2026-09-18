@@ -7,6 +7,19 @@ from .functions import generate_unique_name ,generateShortId
 # Create your models here.
 defaultModule ="tz"
 
+
+class CertificateLayout(models.Model):
+    language = models.CharField(max_length=3, unique=True, choices=[('th', 'ไทย'), ('eng', 'English')])
+    layout = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'แม่แบบใบประกาศ'
+        verbose_name_plural = 'แม่แบบใบประกาศ'
+
+    def __str__(self):
+        return self.get_language_display()
+
 # Master Data
 class location_thai(models.Model):
     location_id = models.AutoField(primary_key=True)

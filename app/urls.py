@@ -2,9 +2,12 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from .views.certificate_settings import certificate_settings
 from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification
 
 urlpatterns = [
+    path('certificate/settings/', certificate_settings, name='certificate_settings'),
+    path('certificate/settings/<str:language>/', certificate_settings, name='certificate_settings_language'),
     # Register
     path('', register.register_home),
     path('salesnotevent', register.register_homenotevent),
