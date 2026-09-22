@@ -4050,13 +4050,6 @@ def student_print_certificate(request, student_id):
         "course").get(ev_id=content.register.ev_id)
     context = {'title': defaultTitle,  'data': content,
                'detail': detail, 'print': print}
-    from ..models import CertificateLayout
-    from ..certificate_layout import render_elements
-    language = 'th' if lang == 'th' else 'eng'
-    layout = CertificateLayout.objects.filter(language=language).first()
-    if layout and layout.layout:
-        context['elements'] = render_elements(language, layout.layout, content, detail)
-        return render(request, 'print/student_print_certificate_layout.html', context)
     if lang == "th":
         return render(request, 'print/student_print_certificate_th.html', context)
     else:
