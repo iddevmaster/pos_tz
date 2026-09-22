@@ -1290,14 +1290,14 @@ function initTabEvents() {
                 </ul>
               </li>
               {% endcomment %} {% if user.is_staff == 1 %}
-              {% if perms.app.change_certificatelayout or perms.app.add_certificatelayout %}
+              {% comment %} {% if perms.app.change_certificatelayout or perms.app.add_certificatelayout %}
               <li class="sidebar-item {% if '/certificate/settings/' in request.path %}active{% endif %}">
                 <a href="{% url 'certificate_settings' %}" class="sidebar-link">
                   <i class="icon dripicons-document-edit"></i>
                   <span class="font-default">ตั้งค่าใบเซอร์</span>
                 </a>
               </li>
-              {% endif %}
+              {% endif %} {% endcomment %}
               <li class="{% if request.path == "/user/category/list" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/user/category/list" class="sidebar-link">
                   <i class="icon dripicons-bell"></i>
