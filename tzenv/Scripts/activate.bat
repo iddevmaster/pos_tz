@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\ข้อมูลWebsite หนองหิน\trainingzenter\tzenv
+set VIRTUAL_ENV=C:\Users\itser\OneDrive\ドキュメント\GitHub\pos_tz\tzenv
 
 if not defined PROMPT set PROMPT=$P$G
 

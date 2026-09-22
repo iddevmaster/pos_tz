@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\ข้อมูลWebsite หนองหิน\trainingzenter\tzenv"
+VIRTUAL_ENV="C:\Users\itser\OneDrive\ドキュメント\GitHub\pos_tz\tzenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
