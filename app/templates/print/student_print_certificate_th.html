@@ -163,7 +163,7 @@
           style="width: 80px; height: 80px"
         />
         <div>Certificate No. {{data.student_code}}</div>
-        <div>Expired Date. {{detail.ev_expired_cer_date|date:'d/m/Y'}}</div>
+        <div>วันที่หมดอายุ {{detail.ev_expired_cer_date|thai_date}}</div>
       </div>
 
       <img
@@ -197,8 +197,7 @@
           {{detail.course.course_name_eng}}
         </div>
         <div style="font-size: 35px; font-weight: bold">
-          {% comment %} <span> {{detail.ev_date_end|thai_date}} </span> {% endcomment %}
- <span>  {{detail.ev_date_start|date:'d F Y'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
+          <span>{{detail.ev_date_start|thai_date}} - {{detail.ev_date_end|thai_date}}</span>
       
         </div>
         <hr style="width: 35em" />
