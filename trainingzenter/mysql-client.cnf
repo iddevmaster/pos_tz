@@ -1,0 +1,3 @@
+[client]
+# Keep TLS encryption but do not require a trusted CA certificate.
+ssl-verify-server-cert=0
