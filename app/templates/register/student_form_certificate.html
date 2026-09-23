@@ -1,0 +1,98 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ใบรับรอง Certificate</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/register/management">ดำเนินการ</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/register/studentlist/{{data.register_id}}">ผู้เข้าอบรม</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ใบรับรอง Certificate
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <div class="row" style="padding-bottom: 35px">
+        <div class="col-lg-3 col-md-6">
+          <form
+            method="get"
+            action="/certificate/print/{{data.student_id}}"
+            autocomplete="off"
+            target="iframe_target"
+          >
+            <input type="hidden" name="print" value="false" />
+            <select
+              class="form-select"
+              id="lang"
+              name="lang"
+              onchange="this.form.submit()"
+            >
+              <option value="eng">ภาษาอังกฤษ</option>
+              <option value="th">ภาษาไทย</option>
+            </select>
+          </form>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="btn-group mb-1">
+            <div class="dropdown">
+              <button
+                class="btn btn-primary dropdown-toggle me-1"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="icon dripicons-print"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  onclick="window.open('/certificate/print/{{data.student_id}}?lang=eng','','width=950,height=650'); return false;"
+                  >ภาษาอังกฤษ</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  onclick="window.open('/certificate/print/{{data.student_id}}?lang=th','','width=950,height=650'); return false;"
+                  >ภาษาไทย</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <iframe
+        id="iframe_target"
+        name="iframe_target"
+        src="/certificate/print/{{data.student_id}}?print=false"
+        style="
+          height: 1000px;
+          width: 100%;
+          border: thin;
+          background-color: #ffffff;
+        "
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

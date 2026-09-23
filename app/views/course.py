@@ -10,7 +10,6 @@ from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd,checkpermi
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-import requests
 import datetime
 import json
 from django.core import serializers
