@@ -97,6 +97,33 @@ def setting_form_bill(request):
 
 @login_required(login_url='/login')
 def setting_form_certificate(request):
+    user_id = request.user.id
+    try:
+        cm_id = user_detail.objects.get(user_id=user_id).cm_id
+    except user_detail.DoesNotExist:
+        cm_id = 0
+
+    cleaned_path = request.path.strip('/')
+    if checkpermi(cleaned_path, cm_id) == 0:
+        return render(request, '403.html', status=403)
+
+    list_menu_permission = category_program_permission.objects.filter(
+        cm_id=cm_id
+    ).values('group_value', 'group_label').annotate(
+        dcount=Count('group_value')
+    ).order_by('group_label')
+    obj_menu = []
+    for menu_group in list_menu_permission:
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id,
+            group_value=menu_group['group_value'],
+        ).order_by('page_label')
+        obj_menu.append({
+            'group_label': menu_group['group_label'],
+            'group_value': menu_group['group_value'],
+            'children': children,
+        })
+
     setting, _ = certificate_setting.objects.get_or_create(
         certificate_setting_id=1,
         defaults={'template_type': 1},
@@ -115,7 +142,11 @@ def setting_form_certificate(request):
         messages.success(request, 'บันทึกการตั้งค่าใบเซอร์เรียบร้อยแล้ว')
         return redirect('certificate_setting_form')
 
-    context = {'title': defaultTitle, 'template_type': setting.template_type}
+    context = {
+        'title': defaultTitle,
+        'template_type': setting.template_type,
+        'listMenuPermission': obj_menu,
+    }
     return render(request, 'settingdes/certificate_form_create.html', context)
 
 

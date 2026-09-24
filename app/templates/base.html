@@ -1137,6 +1137,7 @@ function initTabEvents() {
               {% comment %}
               <p>Current URL: {{ request.path }}</p>
               {% endcomment %} {% for rs in listMenuPermission %}
+              {% if rs.group_value != "settings" %}
               <li
                 class="{% if request.path|contains_parent == rs.group_value %} sidebar-item active has-sub {% else %} sidebar-item has-sub {% endif %}"
               >
@@ -1161,6 +1162,7 @@ function initTabEvents() {
                   {% endfor %}
                 </ul>
               </li>
+              {% endif %}
               {% endfor %} {% comment %}
 
               <li class="sidebar-item">
@@ -1324,11 +1326,13 @@ function initTabEvents() {
                       <span class="font-default">ตั้งค่าคอม</span>
                     </a>
                   </li>
-                  <li class="submenu-item">
+                  {% if listMenuPermission|has_menu_permission:"certificate/setting" %}
+                  <li class="{% if request.path == '/certificate/setting' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="/certificate/setting">
                       <span class="font-default">ตั้งค่าใบเซอร์</span>
                     </a>
                   </li>
+                  {% endif %}
                 </ul>
               
               </li>

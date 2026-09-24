@@ -51,6 +51,21 @@ def contains(value, arg):
     menu_route = str(arg).strip('/')
     return current_path == menu_route
 
+
+@register.filter
+def has_menu_permission(menu_groups, route):
+    """Return True when the sidebar permission data contains the route."""
+    if not menu_groups:
+        return False
+    normalized_route = str(route).strip('/')
+    for group in menu_groups:
+        children = group.get('children', []) if isinstance(group, dict) else []
+        for child in children:
+            page_route = getattr(child, 'page_route', '')
+            if str(page_route).strip('/') == normalized_route:
+                return True
+    return False
+
 @register.filter
 def contains_parent(path):
     # เริ่มต้นค่า default ของ group_value เป็น None หรือค่าที่ต้องการ

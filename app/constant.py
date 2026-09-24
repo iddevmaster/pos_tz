@@ -137,6 +137,12 @@ listMenu = [
         "group_label": "หลักสูตร",
     },
     {
+        "value": "certificate/setting",
+        "label": "ตั้งค่าใบเซอร์",
+        "group_value": "settings",
+        "group_label": "ตั้งค่า",
+    },
+    {
         "value": "register/management",
         "label": "ดำเนินการ",
         "group_value": "pRem5",
