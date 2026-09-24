@@ -323,6 +323,11 @@ class bill_setting(models.Model):
     is_show_signature  = models.IntegerField(default=0, blank=False)
 
 
+class certificate_setting(models.Model):
+    certificate_setting_id = models.AutoField(primary_key=True)
+    template_type = models.PositiveSmallIntegerField(default=1)
+
+
 class billing_cycle_setting(models.Model):
     bcs_start_day = models.IntegerField(default=0, blank=False)
     bcs_end_day  = models.IntegerField(default=0, blank=False)

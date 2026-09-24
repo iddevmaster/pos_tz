@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  .certificate-option { display:block; height:100%; padding:16px; border:2px solid #e5e7eb; border-radius:12px; cursor:pointer; transition:.2s; }
+  .certificate-option:hover { border-color:#435ebe; box-shadow:0 6px 18px rgba(67,94,190,.14); transform:translateY(-2px); }
+  .certificate-radio:checked + .certificate-option { border-color:#435ebe; box-shadow:0 0 0 3px rgba(67,94,190,.14); }
+  .certificate-preview { position:relative; overflow:hidden; aspect-ratio:1.414/1; margin-top:14px; border:1px solid #d8dbe5; background:#fff; color:#202020; font-family:"Sarabun",sans-serif; }
+  .certificate-preview .corner-top, .certificate-preview .corner-bottom { position:absolute; width:42%; z-index:0; }
+  .certificate-preview .corner-top { top:0; left:0; }
+  .certificate-preview .corner-bottom { right:0; bottom:0; }
+  .certificate-preview-content { position:absolute; inset:8% 7%; z-index:1; text-align:center; display:flex; flex-direction:column; justify-content:center; line-height:1.3; }
+  .preview-title { font-size:clamp(12px,2vw,25px); font-weight:700; }
+  .preview-subtitle { font-size:clamp(8px,1.25vw,15px); font-weight:600; }
+  .preview-name { margin-top:2%; font-size:clamp(10px,1.7vw,21px); font-weight:700; }
+  .preview-course { font-size:clamp(9px,1.45vw,18px); font-weight:700; }
+  .preview-small { font-size:clamp(7px,1vw,12px); }
+  .preview-date { margin-top:1%; font-size:clamp(9px,1.4vw,17px); font-weight:700; }
+  .preview-logo { position:absolute; top:7%; right:5%; width:9%; z-index:2; }
+</style>
+
+<div class="row"><div class="col-12"><h3>ตั้งค่าใบเซอร์</h3></div></div>
+<section class="section">
+  <div class="card"><div class="card-body">
+    {% if messages %}{% for message in messages %}<div class="alert alert-success">{{ message }}</div>{% endfor %}{% endif %}
+    <form method="post" action="{% url 'certificate_setting_form' %}">
+      {% csrf_token %}
+      <p class="mb-3">เลือกรูปแบบข้อมูลที่แสดงบนใบเซอร์ภาษาไทย</p>
+      <div class="row g-4">
+        <div class="col-12 col-xl-6">
+          <input class="certificate-radio d-none" type="radio" name="template_type" id="template_type_1" value="1" {% if template_type == 1 %}checked{% endif %}>
+          <label class="certificate-option" for="template_type_1">
+            <span class="fw-bold">แบบที่ 1</span>
+            <span class="d-block text-muted">ชื่อหลักสูตรภาษาไทย และวันที่สิ้นสุดการอบรม</span>
+            <div class="certificate-preview">
+              <img class="corner-top" src="{% static 'images/cer_head_rm.png' %}" alt="">
+              <img class="corner-bottom" src="{% static 'images/cer_footer_rm.png' %}" alt="">
+              <img class="preview-logo" src="{% static 'images/newlogo_resize.png' %}" alt="">
+              <div class="certificate-preview-content">
+                <div class="preview-title">Certificate of Achievement</div><div class="preview-subtitle">This is to certify that</div>
+                <div class="preview-name">นายตัวอย่าง ผู้เข้าอบรม</div><div class="preview-small">has successfully complete</div>
+                <div class="preview-course">หลักสูตรการขับรถอย่างปลอดภัย</div><div class="preview-date">24 กันยายน 2569</div>
+              </div>
+            </div>
+          </label>
+        </div>
+        <div class="col-12 col-xl-6">
+          <input class="certificate-radio d-none" type="radio" name="template_type" id="template_type_2" value="2" {% if template_type == 2 %}checked{% endif %}>
+          <label class="certificate-option" for="template_type_2">
+            <span class="fw-bold">แบบที่ 2</span>
+            <span class="d-block text-muted">ชื่อหลักสูตรภาษาไทย/อังกฤษ และช่วงวันที่อบรม</span>
+            <div class="certificate-preview">
+              <img class="corner-top" src="{% static 'images/cer_head_rm.png' %}" alt="">
+              <img class="corner-bottom" src="{% static 'images/cer_footer_rm.png' %}" alt="">
+              <img class="preview-logo" src="{% static 'images/newlogo_resize.png' %}" alt="">
+              <div class="certificate-preview-content">
+                <div class="preview-title">Certificate of Achievement</div><div class="preview-subtitle">This is to certify that</div>
+                <div class="preview-name">นายตัวอย่าง ผู้เข้าอบรม</div><div class="preview-small">has successfully complete</div>
+                <div class="preview-course">หลักสูตรการขับรถอย่างปลอดภัย</div><div class="preview-course">Safe Driving Course</div>
+                <div class="preview-date">23 - 24 กันยายน 2569</div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="mt-4 text-center"><button type="submit" class="btn btn-primary px-5">บันทึก</button></div>
+    </form>
+  </div></div>
+</section>
+{% endblock %}

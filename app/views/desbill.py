@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import TruncMonth
-from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head,notifications,training
+from ..models import category_program_permission, course, course_event, teacher_income_setting, billing_cycle_setting, user_group, user_detail, desciption_bill,tax_setting,bill_setting,certificate_setting,commissionstages,location_thai,pay_item,register_main,customers,register_payment,register_payment_items,fact_commission,commissionstages,User,fact_customer,com_head,notifications,training
 from ..constant import defaultTitle, thai_months,unitPayChoices
 from ..functions import dateTimeNow, last_day_of_month,checkpermi
 from ..forms.finance_form import billing_cycle_setting_form
@@ -93,6 +93,30 @@ def setting_form_bill(request):
     context = {'title': defaultTitle, 'listMenuPermission': objMenu,'bill_id':bill.bill_id,'is_show_signature':bill.is_show_signature}
             
     return render(request, 'settingdes/bill_form_create.html', context)
+
+
+@login_required(login_url='/login')
+def setting_form_certificate(request):
+    setting, _ = certificate_setting.objects.get_or_create(
+        certificate_setting_id=1,
+        defaults={'template_type': 1},
+    )
+
+    if request.method == 'POST':
+        try:
+            template_type = int(request.POST.get('template_type', 1))
+        except (TypeError, ValueError):
+            template_type = 1
+        if template_type not in (1, 2):
+            template_type = 1
+
+        setting.template_type = template_type
+        setting.save(update_fields=['template_type'])
+        messages.success(request, 'บันทึกการตั้งค่าใบเซอร์เรียบร้อยแล้ว')
+        return redirect('certificate_setting_form')
+
+    context = {'title': defaultTitle, 'template_type': setting.template_type}
+    return render(request, 'settingdes/certificate_form_create.html', context)
 
 
 def setting_form_tax(request):

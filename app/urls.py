@@ -274,6 +274,8 @@ urlpatterns = [
          report_and_print.register_excel_learn_status),
     path('certificate/print/<slug:student_id>',
          report_and_print.student_print_certificate),
+    path('certificate/setting', desbill.setting_form_certificate,
+         name='certificate_setting_form'),
     path('manual/idcard', general.manual_idcard),
     path('register/excel/seller/view/<slug:doc_id>', report_and_print.register_excel_seller_view),
 

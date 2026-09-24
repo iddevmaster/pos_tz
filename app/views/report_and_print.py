@@ -20,7 +20,7 @@ from django.db.models.functions import Coalesce
 
 from ..forms.student_form import studentForm
 from ..constant import defaultTitle, api_id_card
-from ..models import category_program_permission,event_register,salesorder, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,com_income_setting,fact_customer,fact_signature,signature,commissionstages,fact_commission
+from ..models import category_program_permission,event_register,salesorder, course, course_event, customers, location_thai, register_main, register_payment, register_payment_items, student, pos_machine, register_ref, register_applove,user_group,user_detail,factbilldes,desciption_bill,teacher_income_setting,course_event,teacher,document,signature,add_on,billing_cycle_setting,conhead,condition,pay_item,fact_teacher_user,training,bill_setting,certificate_setting,com_income_setting,fact_customer,fact_signature,signature,commissionstages,fact_commission
 from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat, lastDateOfmonth, treeDigit, twoDigit, format_daterange, ymdtodmy,format_daterange_new,ymdtodmy_new,checkpermi,get_previous_month,get_previous_year
 
 
@@ -4048,8 +4048,13 @@ def student_print_certificate(request, student_id):
         return render(request, '404.html')
     detail = course_event.objects.select_related(
         "course").get(ev_id=content.register.ev_id)
+    certificate_config, _ = certificate_setting.objects.get_or_create(
+        certificate_setting_id=1,
+        defaults={'template_type': 1},
+    )
     context = {'title': defaultTitle,  'data': content,
-               'detail': detail, 'print': print}
+               'detail': detail, 'print': print,
+               'certificate_template_type': certificate_config.template_type}
     if lang == "th":
         return render(request, 'print/student_print_certificate_th.html', context)
     else:
