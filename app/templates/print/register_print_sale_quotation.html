@@ -18,14 +18,14 @@
     .tz-logo { width: 65px; height: 50px; object-fit: contain; margin-top: 8px; }
     .company h1 { margin: 0 0 4px; font-size: 20px; }
     .company p { margin: 1px 0; }
-    .partner-logos { width: 100%; height: 31px; object-fit: contain; object-position: left center; margin-top: 5px; }
+    .partner-logos { width: 100%; height: 55px; object-fit: contain; object-position: left center;}
     .doc-name { padding: 10px 4px 8px; color: #fff; background: #e7602e; text-align: center; font-size: 18px; font-weight: 700; }
     .doc-name small { display: block; font-size: 12px; font-weight: 400; }
     table { border-collapse: collapse; }
     .meta { width: 100%; }
     .meta td { border: 1px solid #888; padding: 5px 7px; }
     .meta td:first-child { width: 60px; }
-    .customer { display: grid; grid-template-columns: 62% 38%; margin-top: 10px; border: 1px solid #888; }
+    .customer { display: grid; grid-template-columns: 62% 38%; border: 1px solid #888; }
     .customer > div { min-height: 53px; padding: 6px 8px; border-bottom: 1px solid #888; }
     .customer > div:nth-child(odd) { border-right: 1px solid #888; }
     .customer > div:nth-last-child(-n+2) { border-bottom: 0; }
@@ -45,8 +45,9 @@
     .totals td:last-child { text-align: right; white-space: nowrap; }
     .totals .grand td { background: #f4f4f4; font-weight: 700; }
     .words { padding: 6px 8px; border-top: 1px solid #ccc; }
-    .payment { display: grid; grid-template-columns: 1fr 90px; gap: 10px; margin-top: 10px; padding: 8px 10px; border: 1px solid #888; }
-    .payment img { width: 80px; height: 80px; object-fit: contain; }
+    .payment { display: grid; grid-template-columns: minmax(0, 1fr) 110px 110px; gap: 10px; margin-top: 10px; padding: 8px 10px; border: 1px solid #888; break-inside: avoid; }
+    .payment-qr { text-align: center; font-size: 11px; }
+    .payment-qr img { display: block; width: 110px; height: 110px; object-fit: contain; margin: 4px auto 0; }
     .signatures { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 135px; margin-top: 10px; border: 1px solid #888; }
     .signature { display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 12px 10px; text-align: center; border-right: 1px solid #888; }
     .signature:last-child { border-right: 0; }
@@ -70,7 +71,7 @@
       <p>Tax ID: 0405536000531 โทร: 082-7513888, 088-5643772</p>
       <p>E-mail: id.trainingcenter@iddrives.co.th, idaccount@iddrives.co.th</p>
       <p>www.trainingzenter.com</p>
-      <img class="partner-logos" src="{% static 'images/all-logo-03.png' %}" alt="เครือข่ายพันธมิตร">
+      <img class="partner-logos" src="{% static 'images/all-logo-32.png' %}" alt="เครือข่ายพันธมิตร">
     </section>
     <section>
       <div class="doc-name">ใบเสนอราคา<small>Quotation</small></div>
@@ -108,8 +109,9 @@
   </section>
 
   <section class="payment">
-    <div><b>รายละเอียดการชำระเงิน</b><p>โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ ธนาคารไทยพาณิชย์ สาขาสี่แยกมะลิวัลย์ (ขอนแก่น)</p><p>เลขที่บัญชี 729-3-01791-5</p><p>เมื่อชำระแล้วกรุณาโทร 082-7513888 หรือส่งใบ Pay-in ทาง Line ID: TZ00018</p><p>E-mail: id.trainingcenter@iddrives.co.th, idfinance@iddrives.co.th</p></div>
-    <img src="{% static 'images/line_contract_update.jpg' %}" alt="Line ติดต่อ">
+    <div><b>รายละเอียดการชำระเงิน</b><p>โอนเงินเข้าบัญชี บจก.ไอดีไดรฟ์ ธนาคารไทยพาณิชย์ สาขาสี่แยกมะลิวัลย์ (ขอนแก่น)</p><p>เลขที่บัญชี 729-3-01791-5</p><p>เมื่อชำระแล้วกรุณาโทร 082-7513888 หรือส่งใบ Pay-in ทาง Line ID: @idtz</p><p>E-mail: id.trainingcenter@iddrives.co.th, idfinance@iddrives.co.th</p></div>
+    <div class="payment-qr"><b>LINE ส่งหลักฐาน</b><img src="{% static 'images/quotation_line.jpg' %}" alt="QR Code LINE สำหรับส่งหลักฐานการชำระเงิน"></div>
+    <div class="payment-qr"><b>แสกนจ่าย</b><img src="{% static 'images/quotation_promptpay.jpg' %}" alt="QR Code แสกนจ่าย บริษัท ไอดีไดรฟ์ จำกัด"></div>
   </section>
 
   <section class="signatures">
