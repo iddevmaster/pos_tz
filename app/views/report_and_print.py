@@ -304,20 +304,42 @@ def register_printnoev(request, rp_id):
     cus = fact_customer.objects.get(register_id=content.register_id)
  
     customer = customers.objects.get(customer_id=cus.customer_id)
-    rpi_price_rpi_pri = items.rpi_price * items.rpi_quantity 
-    # ราคารวม  rpi_price  สินค้า
-    if items.vat == '1':
-        rpi_total = items.rpi_price_total + items.rpi_price_vat
-    else:
-        rpi_total = items.rpi_price_total
-    # ราคารวม  ช่องแนวนอน
-   
-  
-    # ราคาก่อนvat
-    rpi_price_default = items.rpi_price_total  
+    rpi_price_all = float(items.rpi_price) * float(items.rpi_quantity)
+    rpi_price_all_dis = rpi_price_all - float(items.rpi_price_discount)
+    rpi_price_default_before_vat = (
+        float(items.rpi_price_result) - float(items.rpi_price_discount)
+    )
+    rpi_price_default = float(items.rpi_price_total) + float(items.rpi_price_vat)
 
-    context = {'title': defaultTitle,  'data': content,'etc':obj2,'add_on':dataadd,'rpi_total':rpi_total,'is_show_signature':bill.is_show_signature,
-               'items': items, "content_regist": content_regist,'rpi_price_rpi_pri':rpi_price_rpi_pri, 'rpi_price_default': rpi_price_default, 'machine': machine, 'customer': customer,'user':users,'signa':signa,'manger':mange,'time':content.crt_date,'signama':signama}
+    total = 0
+    if items.type_payment == 'Deposit':
+        total = (
+            float(items.rpi_price_result)
+            - float(items.rpi_price_pay)
+            - float(items.rpi_price_discount)
+        )
+
+    context = {
+        'title': defaultTitle,
+        'data': content,
+        'etc': obj2,
+        'add_on': dataadd,
+        'is_show_signature': bill.is_show_signature,
+        'total': total,
+        'rpi_price_default_before_vat': rpi_price_default_before_vat,
+        'rpi_price_all': rpi_price_all,
+        'rpi_price_all_dis': rpi_price_all_dis,
+        'items': items,
+        'content_regist': content_regist,
+        'rpi_price_default': rpi_price_default,
+        'machine': machine,
+        'customer': customer,
+        'user': users,
+        'signa': signa,
+        'manger': mange,
+        'time': content.crt_date,
+        'signama': signama,
+    }
     if content_regist.pay_type == 1:
         # ถ้าเป็นใบเสร็จอย่างย่อ
         if short == "yes":

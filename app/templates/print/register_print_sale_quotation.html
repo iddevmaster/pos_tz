@@ -30,30 +30,30 @@
     .customer > div:nth-child(odd) { border-right: 1px solid #888; }
     .customer > div:nth-last-child(-n+2) { border-bottom: 0; }
     .line { display: grid; grid-template-columns: 108px 1fr; margin: 1px 0; }
-    .items { width: 100%; table-layout: fixed; margin-top: 16px; }
+    .items { width: 100%; table-layout: fixed; margin-top: 10px; }
     .items th, .items td { border: 1px solid #888; padding: 6px 5px; vertical-align: top; overflow-wrap: anywhere; }
     .items th { height: 48px; background: #eef0f2; text-align: center; vertical-align: middle; }
-    .items .product td { height: 78px; }
+    .items .product td { height: 68px; }
     .center { text-align: center; }
     .number { text-align: right; white-space: nowrap; }
     .summary { display: grid; grid-template-columns: 62% 38%; border: 1px solid #888; border-top: 0; }
-    .note { min-height: 165px; padding: 10px; border-right: 1px solid #888; }
+    .note { position: relative; min-height: 130px; padding: 8px 10px; border-right: 1px solid #888; }
     .note p, .payment p { margin: 3px 0; }
-    .note-stamp { display: block; width: 190px; max-height: 100px; object-fit: contain; margin: 10px auto 0; }
+    .note-stamp { position: absolute; top: 18px; right: 65px; width: 105px; max-height: 60px; object-fit: contain; }
     .totals { width: 100%; align-self: start; }
     .totals td { height: 28px; padding: 5px 8px; border-bottom: 1px solid #ccc; }
     .totals td:last-child { text-align: right; white-space: nowrap; }
     .totals .grand td { background: #f4f4f4; font-weight: 700; }
     .words { padding: 6px 8px; border-top: 1px solid #ccc; }
-    .payment { display: grid; grid-template-columns: minmax(0, 1fr) 110px 110px; gap: 10px; margin-top: 10px; padding: 8px 10px; border: 1px solid #888; break-inside: avoid; }
+    .payment { display: grid; grid-template-columns: minmax(0, 1fr) 110px 110px; gap: 10px; margin-top: 7px; padding: 6px 10px; border: 1px solid #888; break-inside: avoid; }
     .payment-qr { text-align: center; font-size: 11px; }
     .payment-qr img { display: block; width: 110px; height: 110px; object-fit: contain; margin: 4px auto 0; }
-    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 135px; margin-top: 10px; border: 1px solid #888; }
+    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 115px; margin-top: 7px; border: 1px solid #888; }
     .signature { display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 12px 10px; text-align: center; border-right: 1px solid #888; }
     .signature:last-child { border-right: 0; }
-    .signature-image { display: flex; align-items: flex-end; justify-content: center; height: 65px; }
-    .signature-image img { max-width: 150px; max-height: 65px; object-fit: contain; }
-    .footer { margin-top: 20px; text-align: right; color: #666; font-size: 9px; }
+    .signature-image { display: flex; align-items: flex-end; justify-content: center; height: 52px; }
+    .signature-image img { max-width: 150px; max-height: 52px; object-fit: contain; }
+    .footer { display: none; }
     @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .page { margin: 0; border: 0; box-shadow: none; } }
   </style>
 </head>
