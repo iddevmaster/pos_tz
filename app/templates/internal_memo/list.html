@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>ทะเบียนบันทึกภายใน</h3><div class="memo-subtitle">ติดตามฉบับร่าง เอกสารที่ส่ง และสถานะการอนุมัติ</div></div><a class="btn btn-primary" href="{% url 'internal_memo_create' %}"><i class="bi bi-plus-lg"></i> สร้างบันทึก</a></div>
+  <section class="memo-card"><form class="memo-filter" method="get">
+    <select class="form-select" name="status"><option value="">ทุกสถานะ</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select class="form-select" name="branch"><option value="">ทุกสาขา</option>{% for branch in branches %}<option {% if request.GET.branch == branch %}selected{% endif %}>{{ branch }}</option>{% endfor %}</select>
+    <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="ค้นหาเรื่อง / เลขที่">
+    <input class="form-control" type="date" name="date_from" value="{{ request.GET.date_from }}"><input class="form-control" type="date" name="date_to" value="{{ request.GET.date_to }}"><button class="btn btn-outline-primary">ค้นหา</button>
+  </form></section>
+  <section class="memo-card"><div class="table-responsive"><table class="memo-table"><thead><tr><th>เลขที่</th><th>วันที่ส่ง</th><th>เรื่อง</th><th>เรียน</th><th>ผู้บันทึก</th><th>สถานะ</th><th>ผู้ดำเนินการ</th></tr></thead><tbody>
+    {% for memo in memos %}<tr><td><a href="{% url 'internal_memo_detail' memo.pk %}">{{ memo.memo_number }}</a></td><td>{{ memo.submitted_at|date:'d/m/Y H:i'|default:'-' }}</td><td>{{ memo.subject }}</td><td>{{ memo.recipient }}</td><td>{{ memo.creator.get_full_name|default:memo.creator.username }}</td><td><span class="memo-badge memo-{{ memo.status }}">{{ memo.get_status_display }}</span></td><td>{{ memo.approver.get_full_name|default:memo.approver.username }}</td></tr>{% empty %}<tr><td colspan="7" class="memo-empty">ไม่พบรายการ</td></tr>{% endfor %}
+  </tbody></table></div></section>
+</div>{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>{{ memo.subject }}</h3><div class="memo-subtitle">{{ memo.memo_number }}</div></div><span class="memo-badge memo-{{ memo.status }}">{{ memo.get_status_display }}</span></div>
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-file-earmark-text"></i></span>ข้อมูลเอกสาร</div><div class="memo-meta">
+    <div><span>เรียน</span>{{ memo.recipient }}</div><div><span>สาขา</span>{{ memo.branch }}</div><div><span>ผู้บันทึก</span>{{ memo.creator.get_full_name|default:memo.creator.username }}</div><div><span>ผู้อนุมัติชั้นที่ 1</span>{{ memo.approver.get_full_name|default:memo.approver.username }}</div>
+  </div></section>
+  <section class="memo-card"><div class="memo-card-title">รายละเอียด</div><div class="memo-content">{{ memo.detail }}</div></section>
+  {% if memo.attachments.all %}<section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-paperclip"></i></span>ไฟล์แนบ</div><ul class="memo-files">{% for attachment in memo.attachments.all %}<li><a href="{{ attachment.file.url }}" target="_blank" rel="noopener">{{ attachment.original_name }}</a></li>{% endfor %}</ul></section>{% endif %}
+  {% if memo.cc_users.all %}<section class="memo-card"><div class="memo-card-title">สำเนาถึง</div>{% for person in memo.cc_users.all %}<span class="memo-badge memo-DRAFT me-1">{{ person.get_full_name|default:person.username }}</span>{% endfor %}</section>{% endif %}
+  {% if memo.decision_note %}<section class="memo-card"><div class="memo-card-title">หมายเหตุจากผู้อนุมัติ</div>{{ memo.decision_note }}</section>{% endif %}
+  {% if memo.status == 'DRAFT' and memo.creator_id == user.id %}<form method="post" action="{% url 'internal_memo_submit' memo.pk %}" class="memo-actions mb-3">{% csrf_token %}<button class="btn btn-primary">ส่งให้ผู้อนุมัติ</button></form>{% endif %}
+  {% if memo.status == 'PENDING' and memo.approver_id == user.id %}<form method="post" action="{% url 'internal_memo_decide' memo.pk %}" class="memo-card">{% csrf_token %}<div class="memo-card-title">การอนุมัติ</div><textarea class="form-control mb-3" name="decision_note" rows="3" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea><div class="memo-actions"><button class="btn btn-outline-danger" name="decision" value="reject">ไม่อนุมัติ</button><button class="btn btn-success" name="decision" value="approve">อนุมัติ</button></div></form>{% endif %}
+  <div class="memo-actions"><a class="btn btn-outline-secondary" href="{% url 'internal_memo_list' %}">กลับไปทะเบียน</a></div>
+</div>{% endblock %}

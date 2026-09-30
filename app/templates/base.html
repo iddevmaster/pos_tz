@@ -12,6 +12,10 @@
     />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'assets/vendors/bootstrap-icons/bootstrap-icons.css' %}"
+    />
 
     <link
       rel="stylesheet"
@@ -1142,12 +1146,45 @@ function initTabEvents() {
                 class="{% if request.path|contains_parent == rs.group_value %} sidebar-item active has-sub {% else %} sidebar-item has-sub {% endif %}"
               >
                 <a href="#" class="sidebar-link">
+                  {% if rs.group_value == "internalMemo" %}
+                  <i class="bi bi-journal-text"></i>
+                  {% elif rs.group_value == "pRem5" %}
+                  <i class="bi bi-book"></i>
+                  {% elif rs.group_value == "5lgafI" %}
+                  <i class="bi bi-people"></i>
+                  {% elif rs.group_value == "z2NIxi" %}
+                  <i class="bi bi-file-earmark-check"></i>
+                  {% elif rs.group_value == "naSt0v" %}
+                  <i class="bi bi-cash-stack"></i>
+                  {% elif rs.group_value == "WRltr2" %}
+                  <i class="bi bi-bar-chart-line"></i>
+                  {% elif rs.group_value == "naSt14" %}
+                  <i class="bi bi-person-badge"></i>
+                  {% elif rs.group_value == "WR14515" %}
+                  <i class="bi bi-cart-check"></i>
+                  {% elif rs.group_value == "naStxx" %}
+                  <i class="bi bi-clipboard-data"></i>
+                  {% elif rs.group_value == "settings" %}
+                  <i class="bi bi-gear"></i>
+                  {% else %}
                   <i class="dripicons-pin"></i>
+                  {% endif %}
                   <span class="font-default">{{rs.group_label}} </span>
                 </a>
                 <ul
                   class="{% if request.path|contains_parent == rs.group_value %} submenu active {% else %} submenu {% endif %}"
                 >
+                  {% if rs.group_value == "internalMemo" %}
+                  <li class="{% if request.path == '/internal-memos/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="/internal-memos/create/"><span class="font-default">แบบฟอร์มบันทึกภายใน</span></a>
+                  </li>
+                  <li class="{% if request.path == '/internal-memos/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="/internal-memos/"><span class="font-default">ทะเบียนบันทึกภายใน</span></a>
+                  </li>
+                  <li class="{% if request.path == '/internal-memos/approval/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="/internal-memos/approval/"><span class="font-default">ตรวจสอบ / อนุมัติ</span></a>
+                  </li>
+                  {% else %}
                   {% for rsc in rs.children %}
                   
                   <li
@@ -1160,6 +1197,7 @@ function initTabEvents() {
                     </a>
                   </li>
                   {% endfor %}
+                  {% endif %}
                 </ul>
               </li>
               {% endif %}
@@ -1333,6 +1371,11 @@ function initTabEvents() {
                     </a>
                   </li>
                   {% endif %}
+                  <li class="{% if request.path == '/settings/internal-memo-approvers/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="{% url 'internal_memo_approver_setting' %}">
+                      <span class="font-default">ตั้งค่าผู้อนุมัติบันทึกภายใน</span>
+                    </a>
+                  </li>
                 </ul>
               
               </li>

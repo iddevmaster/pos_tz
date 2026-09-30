@@ -216,11 +216,29 @@ listMenu = [
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
     },
-        {
+    {
         "value": "approve/documents/internal",
         "label": "เอกสารบันทึกภายใน",
         "group_value": "z2NIxi",
         "group_label": "อนุมัติเอกสาร",
+    },
+    {
+        "value": "internal-memos/create/",
+        "label": "แบบฟอร์มบันทึกภายใน",
+        "group_value": "internalMemo",
+        "group_label": "บันทึกภายใน",
+    },
+    {
+        "value": "internal-memos/",
+        "label": "ทะเบียนบันทึกภายใน",
+        "group_value": "internalMemo",
+        "group_label": "บันทึกภายใน",
+    },
+    {
+        "value": "internal-memos/approval/",
+        "label": "ตรวจสอบ / อนุมัติ",
+        "group_value": "internalMemo",
+        "group_label": "บันทึกภายใน",
     },
     {
         "value": "approv/internal/manage",

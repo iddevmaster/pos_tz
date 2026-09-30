@@ -442,6 +442,54 @@ class document(models.Model):
     status_mange = models.CharField(max_length=1, unique=True, blank=True)
     status_gm = models.CharField(max_length=1, unique=True, blank=True)
     doc_in_hrc = models.CharField(max_length=256, unique=True, blank=True)
+
+
+class InternalMemo(models.Model):
+    STATUS_DRAFT = 'DRAFT'
+    STATUS_PENDING = 'PENDING'
+    STATUS_APPROVED = 'APPROVED'
+    STATUS_REJECTED = 'REJECTED'
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, 'ฉบับร่าง'),
+        (STATUS_PENDING, 'รออนุมัติ'),
+        (STATUS_APPROVED, 'อนุมัติแล้ว'),
+        (STATUS_REJECTED, 'ไม่อนุมัติ'),
+    )
+
+    memo_number = models.CharField(max_length=24, unique=True, blank=True)
+    recipient = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    branch = models.CharField(max_length=128, default='สำนักงานใหญ่')
+    detail = models.TextField()
+    creator = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='created_internal_memos'
+    )
+    approver = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='internal_memos_to_approve'
+    )
+    cc_users = models.ManyToManyField(
+        User, blank=True, related_name='internal_memos_cc'
+    )
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT
+    )
+    submitted_at = models.DateTimeField(blank=True, null=True)
+    decided_at = models.DateTimeField(blank=True, null=True)
+    decision_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class InternalMemoAttachment(models.Model):
+    memo = models.ForeignKey(
+        InternalMemo, on_delete=models.CASCADE, related_name='attachments'
+    )
+    file = models.FileField(upload_to='internal_memos/%Y/%m/')
+    original_name = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     
 class signature(models.Model):
     image_id = models.AutoField(primary_key=True)

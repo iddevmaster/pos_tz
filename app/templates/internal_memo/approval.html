@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>อนุมัติบันทึกภายใน</h3><div class="memo-subtitle">รายการส่งตรงถึงคุณในฐานะผู้อนุมัติชั้นที่ 1</div></div></div>
+  <div class="memo-tabs"><span class="memo-tab">รออนุมัติ ({{ pending_memos|length }})</span><span class="memo-tab">ดำเนินการแล้ว ({{ history_memos|length }})</span></div>
+  <section class="memo-card"><div class="table-responsive"><table class="memo-table"><thead><tr><th>เลขที่</th><th>วันที่ส่ง</th><th>เรื่อง</th><th>ผู้บันทึก</th><th>สาขา</th><th>ดำเนินการ</th></tr></thead><tbody>
+    {% for memo in pending_memos %}<tr><td>{{ memo.memo_number }}</td><td>{{ memo.submitted_at|date:'d/m/Y H:i' }}</td><td>{{ memo.subject }}</td><td>{{ memo.creator.get_full_name|default:memo.creator.username }}</td><td>{{ memo.branch }}</td><td><a class="btn btn-primary btn-sm" href="{% url 'internal_memo_detail' memo.pk %}">ตรวจสอบ</a></td></tr>{% empty %}<tr><td colspan="6" class="memo-empty">ไม่มีรายการค้างอนุมัติ</td></tr>{% endfor %}
+  </tbody></table></div></section>
+  {% if history_memos %}<section class="memo-card"><div class="memo-card-title">ประวัติล่าสุด</div><div class="table-responsive"><table class="memo-table"><tbody>{% for memo in history_memos %}<tr><td><a href="{% url 'internal_memo_detail' memo.pk %}">{{ memo.memo_number }}</a></td><td>{{ memo.subject }}</td><td><span class="memo-badge memo-{{ memo.status }}">{{ memo.get_status_display }}</span></td><td>{{ memo.decided_at|date:'d/m/Y H:i' }}</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+</div>{% endblock %}
