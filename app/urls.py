@@ -287,6 +287,8 @@ urlpatterns = [
     path('register/excel/seller/view/<slug:doc_id>', report_and_print.register_excel_seller_view),
 
     #     user
+    path('settings/users/create/', user.user_teacher_create,
+         name='user_teacher_create'),
     path('user/category/list', user.category_program_form_create,
          name="category_program_form_create"),
     path('user/category/delete', user.category_program_form_delete,

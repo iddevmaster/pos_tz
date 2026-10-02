@@ -579,22 +579,22 @@ function initTabEvents() {
         }
 
         .submenu-item {
-    border-radius: 8px;
-    margin: 4px 8px;
-    transition: all 0.2s ease;
+    border-radius: 10px;
+    margin: 3px 10px;
+    transition: background-color .2s ease, transform .2s ease;
 }
 
 /* hover */
 .submenu-item:hover {
-    background-color: #f5f7ff;
+    background-color: rgba(255,255,255,.09);
+    transform: translateX(3px);
 }
 
 /* 🔥 active */
 .submenu-item.active-menu {
-    background: linear-gradient(90deg, #696cff, #5f61e6);
+    background: linear-gradient(90deg, #2878ff, #4d9dff);
     color: #fff;
-    border-left: 4px solid #4f46e5;
-    box-shadow: 0 4px 10px rgba(105,108,255,0.2);
+    box-shadow: 0 7px 16px rgba(12,94,230,.28);
 }
 
 /* text ข้างใน */
@@ -1059,14 +1059,83 @@ function initTabEvents() {
         height: 40px;
       }
       .user-welcome {
-        color: white;
+        color: #e8f0ff;
       }
       .sidebar-wrapper {
-        background-image: linear-gradient(#03a1fc, yellow);
+        background:
+          radial-gradient(circle at 15% 0%, rgba(63,128,255,.24), transparent 34%),
+          linear-gradient(180deg, #172b4d 0%, #10213d 58%, #0b1830 100%);
+        border-right: 1px solid rgba(255,255,255,.08);
+        box-shadow: 8px 0 30px rgba(15,31,58,.18);
         position: fixed;
       }
       .sidebar-header {
-        background-image: url("{% static "images/bg.jpg" %}");
+        background: rgba(255,255,255,.035);
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        margin-bottom: 8px;
+        padding-bottom: 18px !important;
+      }
+      .sidebar-header .logo img {
+        background: rgba(255,255,255,.96);
+        border: 3px solid rgba(255,255,255,.25);
+        border-radius: 18px;
+        box-shadow: 0 8px 22px rgba(0,0,0,.2);
+        padding: 5px;
+      }
+      .sidebar-wrapper .menu .sidebar-title {
+        color: #7890b7;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+      .sidebar-wrapper .menu .sidebar-link {
+        color: #c8d5eb;
+        font-size: 16px;
+        line-height: 1.35;
+        border-radius: 11px;
+        margin: 3px 10px;
+        padding: .72rem .9rem;
+        transition: background-color .2s ease, color .2s ease, transform .2s ease;
+      }
+      .sidebar-wrapper .menu .sidebar-link i {
+        color: #79a9f7;
+        font-size: 1.1rem;
+      }
+      .sidebar-wrapper .menu .sidebar-link:hover {
+        color: #fff;
+        background: rgba(255,255,255,.08);
+        transform: translateX(2px);
+      }
+      .sidebar-wrapper .menu .sidebar-item.active > .sidebar-link {
+        color: #fff;
+        background: rgba(50,126,255,.18);
+        box-shadow: inset 3px 0 #4d9dff;
+      }
+      .sidebar-wrapper .menu .submenu {
+        background: rgba(5,18,39,.18);
+        border-radius: 12px;
+        margin: 2px 10px 8px;
+        padding: 5px 0;
+      }
+      .sidebar-wrapper .menu .submenu .submenu-item a {
+        color: #aebed8;
+        font-size: 14px;
+        line-height: 1.4;
+        padding: .62rem 1.15rem;
+      }
+      .sidebar-wrapper .font-default {
+        font-size: inherit;
+      }
+      .sidebar-wrapper .menu .submenu .submenu-item a:hover {
+        color: #fff;
+        margin-left: 0;
+      }
+      .sidebar-wrapper::-webkit-scrollbar {
+        width: 5px;
+      }
+      .sidebar-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,.18);
+        border-radius: 999px;
       }
 
 
@@ -1344,6 +1413,11 @@ function initTabEvents() {
                   <span class="font-default">ตั้งค่า</span>
                 </a>
                 <ul class="submenu">
+                  <li class="{% if request.path == '/settings/users/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="{% url 'user_teacher_create' %}">
+                      <span class="font-default">เพิ่มผู้ใช้งาน / ครูฝึก</span>
+                    </a>
+                  </li>
                   <li class="submenu-item">
                     <a href="/description/setting/form/create">
                       <span class="font-default">ตั้งค่าการฝึกอบรม</span>

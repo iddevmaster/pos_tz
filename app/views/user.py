@@ -1,10 +1,152 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Count
-from ..models import user_group, category_program,category_program_permission ,user_detail
+from ..models import user_group, category_program,category_program_permission,user_detail,teacher,compensation,fact_teacher_user
 from ..constant import defaultTitle, listMenu
 from ..forms.user_form import category_program_form
+from ..functions import dateTimeNow
+
+
+def _menu_context(user_id):
+    try:
+        cm_id = user_detail.objects.get(user_id=user_id).cm_id
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    groups = category_program_permission.objects.filter(cm_id=cm_id).values(
+        'group_value', 'group_label'
+    ).annotate(dcount=Count('group_value')).order_by('group_label')
+    menu = []
+    for group in groups:
+        menu.append({
+            **group,
+            'children': category_program_permission.objects.filter(
+                cm_id=cm_id, group_value=group['group_value']
+            ).order_by('page_label'),
+        })
+    return menu
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda current_user: current_user.is_staff, login_url='/403')
+def user_teacher_create(request):
+    categories = category_program.objects.filter(
+        active=1, cancelled=1
+    ).order_by('cm_name')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        password = request.POST.get('password', '')
+        password_confirm = request.POST.get('password_confirm', '')
+        category_id = request.POST.get('category', '')
+        is_teacher = request.POST.get('is_teacher') == '1'
+
+        errors = []
+        if not username:
+            errors.append('กรุณาระบุ Username')
+        elif User.objects.filter(username__iexact=username).exists():
+            errors.append('Username นี้ถูกใช้งานแล้ว')
+        if email and User.objects.filter(email__iexact=email).exists():
+            errors.append('Email นี้ถูกใช้งานแล้ว')
+        if not first_name or not last_name:
+            errors.append('กรุณาระบุชื่อและนามสกุล')
+        if len(password) < 8:
+            errors.append('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร')
+        if password != password_confirm:
+            errors.append('รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน')
+        try:
+            category = categories.get(pk=category_id)
+        except (category_program.DoesNotExist, ValueError):
+            category = None
+            errors.append('กรุณาเลือกกลุ่มผู้ใช้งาน')
+
+        identification_number = request.POST.get(
+            'teacher_identification_number', ''
+        ).strip()
+        if is_teacher:
+            if not identification_number:
+                errors.append('กรุณาระบุเลขบัตรประชาชน/Passport ของครูฝึก')
+            elif teacher.objects.filter(
+                teacher_identification_number=identification_number,
+                cancelled=1,
+            ).exists():
+                errors.append('เลขบัตรประชาชน/Passport นี้มีข้อมูลครูฝึกแล้ว')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            with transaction.atomic():
+                new_user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_active=request.POST.get('is_active') == '1',
+                )
+                user_group.objects.create(
+                    user=new_user,
+                    module=category.module,
+                )
+                user_detail.objects.create(user=new_user, cm=category)
+
+                if is_teacher:
+                    teacher_record = teacher.objects.create(
+                        teacher_identification_number=identification_number,
+                        tax_number=request.POST.get('tax_number', '').strip(),
+                        teacher_prefix_th=request.POST.get('teacher_prefix_th', ''),
+                        teacher_firstname_th=first_name,
+                        teacher_lastname_th=last_name,
+                        teacher_prefix_eng=request.POST.get('teacher_prefix_eng', ''),
+                        teacher_firstname_eng=request.POST.get(
+                            'teacher_firstname_eng', ''
+                        ).strip(),
+                        teacher_lastname_eng=request.POST.get(
+                            'teacher_lastname_eng', ''
+                        ).strip(),
+                        teacher_cover=request.FILES.get('teacher_cover'),
+                        teacher_type=request.POST.get('teacher_type', '1'),
+                        active=1,
+                        cancelled=1,
+                        crt_date=dateTimeNow(),
+                        upd_date=dateTimeNow(),
+                        module=category.module,
+                        level='4',
+                    )
+                    teacher_key = str(teacher_record.teacher_id).replace('-', '')
+                    fact_teacher_user.objects.create(
+                        user_id=new_user.id,
+                        teacher_id=teacher_key,
+                    )
+                    for py_id, field_name in (
+                        ('1', 'compensation_wi'),
+                        ('2', 'compensation_pi'),
+                        ('3', 'compensation_help'),
+                    ):
+                        compensation.objects.create(
+                            compensation=request.POST.get(field_name) or 0,
+                            teacher_id=teacher_key,
+                            status='Y',
+                            note='',
+                            compensation_group_id='1',
+                            py_id=py_id,
+                        )
+            messages.success(request, 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว')
+            return redirect('user_teacher_create')
+
+    context = {
+        'title': defaultTitle,
+        'categories': categories,
+        'listMenuPermission': _menu_context(request.user.id),
+    }
+    return render(request, 'user/user_teacher_create.html', context)
 
 
 @login_required(login_url='/login')

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}{% load static %}
+{% block content %}
+<div class="page-heading"><div class="page-title-headings"><div><h3>เพิ่มผู้ใช้งาน</h3><p class="text-muted mb-0">สร้างบัญชี Login และเลือกเพิ่มโปรไฟล์ครูฝึกได้ในครั้งเดียว</p></div><nav class="breadcrumb-header"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li><li class="breadcrumb-item">ตั้งค่า</li><li class="breadcrumb-item active">เพิ่มผู้ใช้งาน</li></ol></nav></div></div>
+<section class="section"><form method="post" enctype="multipart/form-data" autocomplete="off">{% csrf_token %}
+  <div class="card"><div class="card-header"><h4 class="card-title"><i class="bi bi-person-plus me-2"></i>ข้อมูลบัญชี Login</h4></div><div class="card-body"><div class="row g-3">
+    <div class="col-md-6"><label class="form-label">Username <span class="text-danger">*</span></label><input class="form-control" name="username" required value="{{ request.POST.username }}"></div>
+    <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="{{ request.POST.email }}"></div>
+    <div class="col-md-6"><label class="form-label">ชื่อ <span class="text-danger">*</span></label><input class="form-control" name="first_name" required value="{{ request.POST.first_name }}"></div>
+    <div class="col-md-6"><label class="form-label">นามสกุล <span class="text-danger">*</span></label><input class="form-control" name="last_name" required value="{{ request.POST.last_name }}"></div>
+    <div class="col-md-6"><label class="form-label">รหัสผ่าน <span class="text-danger">*</span></label><input class="form-control" type="password" name="password" minlength="8" required></div>
+    <div class="col-md-6"><label class="form-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label><input class="form-control" type="password" name="password_confirm" minlength="8" required></div>
+    <div class="col-md-6"><label class="form-label">กลุ่มผู้ใช้งาน <span class="text-danger">*</span></label><select class="form-select select2" name="category" required><option value=""></option>{% for item in categories %}<option value="{{ item.pk }}" {% if request.POST.category == item.pk|stringformat:'s' %}selected{% endif %}>{{ item.cm_name }}</option>{% endfor %}</select></div>
+    <div class="col-md-6 d-flex align-items-end"><div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="is_active" value="1" id="isActive" checked><label class="form-check-label" for="isActive">เปิดใช้งานบัญชี</label></div></div>
+  </div></div></div>
+
+  <div class="card"><div class="card-body"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="is_teacher" value="1" id="isTeacher" {% if request.POST.is_teacher == '1' %}checked{% endif %}><label class="form-check-label fw-bold" for="isTeacher">ผู้ใช้งานคนนี้เป็นครูฝึก / วิทยากรด้วย</label></div></div></div>
+
+  <div class="card" id="teacherFields" hidden><div class="card-header"><h4 class="card-title"><i class="bi bi-person-badge me-2"></i>ข้อมูลครูฝึก / วิทยากร</h4></div><div class="card-body"><div class="row g-3">
+    <div class="col-md-6"><label class="form-label">เลขบัตรประชาชน / Passport <span class="text-danger">*</span></label><input class="form-control teacher-required" name="teacher_identification_number" value="{{ request.POST.teacher_identification_number }}"></div>
+    <div class="col-md-6"><label class="form-label">เลขประจำตัวผู้เสียภาษี</label><input class="form-control" name="tax_number" value="{{ request.POST.tax_number }}"></div>
+    <div class="col-md-4"><label class="form-label">คำนำหน้าภาษาไทย</label><select class="form-select" name="teacher_prefix_th"><option value="">ไม่ระบุ</option><option>นาย</option><option>นาง</option><option>นางสาว</option><option>อาจารย์</option><option>ดร.</option></select></div>
+    <div class="col-md-4"><label class="form-label">ประเภทครูฝึก</label><select class="form-select" name="teacher_type"><option value="1">ครูหรือวิทยากรภายใน</option><option value="2">ครูหรือวิทยากรภายนอก</option></select></div>
+    <div class="col-md-4"><label class="form-label">รูปประจำตัว</label><input class="form-control" type="file" name="teacher_cover" accept="image/*"></div>
+    <div class="col-md-6"><label class="form-label">ชื่อภาษาอังกฤษ</label><input class="form-control" name="teacher_firstname_eng" value="{{ request.POST.teacher_firstname_eng }}"></div>
+    <div class="col-md-6"><label class="form-label">นามสกุลภาษาอังกฤษ</label><input class="form-control" name="teacher_lastname_eng" value="{{ request.POST.teacher_lastname_eng }}"></div>
+    <div class="col-md-4"><label class="form-label">ค่าตอบแทนวิทยากร</label><input class="form-control" type="number" min="0" name="compensation_wi" value="{{ request.POST.compensation_wi|default:0 }}"></div>
+    <div class="col-md-4"><label class="form-label">ค่าตอบแทนภาคปฏิบัติ</label><input class="form-control" type="number" min="0" name="compensation_pi" value="{{ request.POST.compensation_pi|default:0 }}"></div>
+    <div class="col-md-4"><label class="form-label">ค่าตอบแทนผู้ช่วย</label><input class="form-control" type="number" min="0" name="compensation_help" value="{{ request.POST.compensation_help|default:0 }}"></div>
+  </div></div></div>
+  <div class="card"><div class="card-body text-end"><a href="/" class="btn btn-light-secondary me-2">ยกเลิก</a><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกผู้ใช้งาน</button></div></div>
+</form></section>
+<script>
+(function(){var toggle=document.getElementById('isTeacher');var fields=document.getElementById('teacherFields');function sync(){fields.hidden=!toggle.checked;fields.querySelectorAll('.teacher-required').forEach(function(input){input.required=toggle.checked;});}toggle.addEventListener('change',sync);sync();})();
+</script>
+{% endblock %}
