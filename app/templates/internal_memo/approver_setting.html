@@ -3,13 +3,14 @@
 {% block content %}
 <div class="page-heading">
   <div class="page-title-headings">
-    <div><h3>ตั้งค่าผู้อนุมัติบันทึกภายใน</h3><p class="text-muted mb-0">กำหนดรายชื่อ User ที่สามารถถูกเลือกเป็นผู้อนุมัติชั้นที่ 1</p></div>
-    <nav aria-label="breadcrumb" class="breadcrumb-header"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li><li class="breadcrumb-item">ตั้งค่า</li><li class="breadcrumb-item active">ผู้อนุมัติบันทึกภายใน</li></ol></nav>
+    <div><h3>ตั้งค่าผู้ตรวจสอบและผู้อนุมัติบันทึกภายใน</h3><p class="text-muted mb-0">กำหนดผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2</p></div>
+    <nav aria-label="breadcrumb" class="breadcrumb-header"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li><li class="breadcrumb-item">ตั้งค่า</li><li class="breadcrumb-item active">ผู้ตรวจสอบและผู้อนุมัติ</li></ol></nav>
   </div>
 </div>
 <section class="section"><div class="card"><div class="card-body">
   <form method="post">{% csrf_token %}
-    <div class="form-group mb-4"><label class="mb-2">เลือกผู้อนุมัติ</label><select class="form-select select2" name="approvers" multiple data-placeholder="ค้นหาและเลือก User...">{% for person in users %}<option value="{{ person.id }}" {% if person.id in selected_ids %}selected{% endif %}>{{ person.get_full_name|default:person.username }}{% if person.email %} — {{ person.email }}{% endif %}</option>{% endfor %}</select><small class="text-muted">เลือกได้หลายคน รายชื่อที่เลือกจะปรากฏในแบบฟอร์มบันทึกภายในเท่านั้น</small></div>
+    <div class="form-group mb-4"><label class="mb-2">ผู้ตรวจสอบ ชั้น 1</label><select class="form-select select2" name="reviewers" multiple data-placeholder="ค้นหาและเลือกผู้ตรวจสอบ...">{% for person in users %}<option value="{{ person.id }}" {% if person.id in selected_reviewer_ids %}selected{% endif %}>{{ person.get_full_name|default:person.username }}{% if person.email %} — {{ person.email }}{% endif %}</option>{% endfor %}</select><small class="text-muted">ตรวจสอบเอกสารก่อนส่งต่อให้ผู้อนุมัติ ชั้น 2</small></div>
+    <div class="form-group mb-4"><label class="mb-2">ผู้อนุมัติ ชั้น 2</label><select class="form-select select2" name="approvers" multiple data-placeholder="ค้นหาและเลือกผู้อนุมัติ...">{% for person in users %}<option value="{{ person.id }}" {% if person.id in selected_approver_ids %}selected{% endif %}>{{ person.get_full_name|default:person.username }}{% if person.email %} — {{ person.email }}{% endif %}</option>{% endfor %}</select><small class="text-muted">อนุมัติเอกสารหลังผ่านการตรวจสอบ ชั้น 1</small></div>
     <div class="text-end"><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกการตั้งค่า</button></div>
   </form>
 </div></div></section>

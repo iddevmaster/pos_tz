@@ -1,0 +1,37 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div class="page-title-headings">
+    <div><h3>แก้ไขบันทึกภายใน</h3><p class="text-muted mb-0">{{ memo.memo_number }}</p></div>
+    <nav aria-label="breadcrumb" class="breadcrumb-header"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li><li class="breadcrumb-item"><a href="{% url 'internal_memo_list' %}">บันทึกภายใน</a></li><li class="breadcrumb-item active">แก้ไข</li></ol></nav>
+  </div>
+</div>
+<section class="section"><div class="memo-shell">
+  <form method="post" id="memoEditForm">{% csrf_token %}
+    <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-file-earmark-text"></i></span>ข้อมูลเอกสาร</div>
+      <div class="memo-grid">
+        <div class="memo-field"><label>เรียน <span class="memo-required">*</span></label><input class="form-control" name="recipient" required value="{% if request.method == 'POST' %}{{ request.POST.recipient }}{% else %}{{ memo.recipient }}{% endif %}"></div>
+        <div class="memo-field"><label>เรื่อง <span class="memo-required">*</span></label><input class="form-control" name="subject" required value="{% if request.method == 'POST' %}{{ request.POST.subject }}{% else %}{{ memo.subject }}{% endif %}"></div>
+        <div class="memo-field"><label>สาขา <span class="memo-required">*</span></label><select class="form-select select2" name="branch" required><option value="สำนักงานใหญ่" {% if request.POST.branch == 'สำนักงานใหญ่' or not request.POST and memo.branch == 'สำนักงานใหญ่' %}selected{% endif %}>สำนักงานใหญ่</option><option value="ศูนย์เทรนนิ่งเซ็นเตอร์" {% if request.POST.branch == 'ศูนย์เทรนนิ่งเซ็นเตอร์' or not request.POST and memo.branch == 'ศูนย์เทรนนิ่งเซ็นเตอร์' %}selected{% endif %}>ศูนย์เทรนนิ่งเซ็นเตอร์</option></select></div>
+        <div class="memo-field"><label>สถานะ</label><input class="form-control" value="{{ memo.get_status_display }}" readonly></div>
+      </div>
+    </section>
+    <section class="memo-card"><div class="memo-card-title">รายละเอียด <span class="memo-required">*</span></div><textarea class="form-control memo-detail" name="detail" required>{% if request.method == 'POST' %}{{ request.POST.detail }}{% else %}{{ memo.detail }}{% endif %}</textarea></section>
+    <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-person-check"></i></span>ผู้ตรวจสอบและผู้อนุมัติ</div>
+      <div class="memo-grid">
+        <div class="memo-field"><label>ผู้ตรวจสอบ ชั้น 1 <span class="memo-required">*</span></label><select class="form-select select2" id="memoReviewer" name="reviewer" required><option value=""></option>{% for person in reviewers %}<option value="{{ person.id }}" {% if request.method == 'POST' and request.POST.reviewer == person.id|stringformat:'s' or request.method != 'POST' and memo.reviewer_id == person.id %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select></div>
+        <div class="memo-field"><label>ผู้อนุมัติ ชั้น 2 <span class="memo-required">*</span></label><select class="form-select select2" id="memoApprover" name="approver" required><option value=""></option>{% for person in approvers %}<option value="{{ person.id }}" {% if request.method == 'POST' and request.POST.approver == person.id|stringformat:'s' or request.method != 'POST' and memo.approver_id == person.id %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select></div>
+      </div>
+    </section>
+    <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-people"></i></span>สำเนาถึง</div><select class="form-select select2" name="cc_users" multiple>{% for person in users %}{% if person.id != memo.creator_id %}<option value="{{ person.id }}" {% if person.id in selected_cc_ids %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endif %}{% endfor %}</select></section>
+    <div class="memo-actions memo-form-actions"><a class="btn btn-light-secondary" href="{% url 'internal_memo_list' %}">ยกเลิก</a><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกการแก้ไข</button></div>
+  </form>
+</div></section>
+<script>
+var memoReviewer=document.getElementById('memoReviewer');var memoApprover=document.getElementById('memoApprover');
+function syncMemoEditRoles(changed){if(memoReviewer.value&&memoReviewer.value===memoApprover.value){changed.value='';if(window.jQuery){jQuery(changed).trigger('change.select2');}alert('ผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2 ต้องเป็นคนละคนกัน');}Array.from(memoReviewer.options).forEach(function(option){option.disabled=Boolean(option.value&&option.value===memoApprover.value);});Array.from(memoApprover.options).forEach(function(option){option.disabled=Boolean(option.value&&option.value===memoReviewer.value);});}
+memoReviewer.addEventListener('change',function(){syncMemoEditRoles(memoReviewer);});memoApprover.addEventListener('change',function(){syncMemoEditRoles(memoApprover);});
+document.getElementById('memoEditForm').addEventListener('submit',function(event){if(memoReviewer.value&&memoReviewer.value===memoApprover.value){event.preventDefault();alert('ผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2 ต้องเป็นคนละคนกัน');}});syncMemoEditRoles(memoReviewer);
+</script>
+{% endblock %}

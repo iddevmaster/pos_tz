@@ -984,8 +984,7 @@ function initTabEvents() {
       body {
         font-family: "Sarabun", sans-serif;
         font-size: 16px;
-        background-image: url("{% static "images/rm218batch4-katie-20.jpg" %}");
-        background-size: cover;
+        background: linear-gradient(135deg, #f7f9fd 0%, #edf3fb 100%);
       }
 
       .btn {
@@ -1447,7 +1446,7 @@ function initTabEvents() {
                   {% endif %}
                   <li class="{% if request.path == '/settings/internal-memo-approvers/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="{% url 'internal_memo_approver_setting' %}">
-                      <span class="font-default">ตั้งค่าผู้อนุมัติบันทึกภายใน</span>
+                      <span class="font-default">ตั้งค่าผู้ตรวจสอบ / ผู้อนุมัติ</span>
                     </a>
                   </li>
                 </ul>

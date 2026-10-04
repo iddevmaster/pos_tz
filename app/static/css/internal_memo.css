@@ -16,6 +16,7 @@
 .memo-shell .select2-container .select2-selection--single { height:38px; border:1px solid #dce7f1; border-radius:.25rem; }
 .memo-shell .select2-container .select2-selection--single .select2-selection__rendered { color:#25396f; line-height:36px; padding-left:.75rem; }
 .memo-shell .select2-container .select2-selection--single .select2-selection__arrow { height:36px; }
+.memo-shell .select2-container .select2-selection--multiple { min-height:38px; border:1px solid #dce7f1; border-radius:.25rem; }
 .memo-detail { min-height:260px; resize:vertical; }
 .memo-toolbar { display:flex; gap:6px; padding:7px 9px; border:1px solid #dce7f1; border-bottom:0; border-radius:7px 7px 0 0; background:#f7f9fc; }
 .memo-toolbar button { color:#607080; background:transparent; border:0; padding:2px 7px; }
@@ -32,7 +33,7 @@
 .memo-table a { color:#435ebe; }
 .memo-empty { color:var(--memo-muted); text-align:center; padding:24px !important; }
 .memo-badge { display:inline-block; border-radius:999px; padding:4px 9px; font-size:11px; font-weight:700; }
-.memo-DRAFT { color:#607080; background:#e6eaee; }.memo-PENDING { color:#8a6900; background:#fff4cc; }.memo-APPROVED { color:#08783d; background:#d2ffe8; }.memo-REJECTED { color:#b4232f; background:#ffdede; }
+.memo-DRAFT { color:#607080; background:#e6eaee; }.memo-PENDING,.memo-PENDING_REVIEW { color:#8a6900; background:#fff4cc; }.memo-PENDING_APPROVAL { color:#2856a8; background:#dce9ff; }.memo-APPROVED { color:#08783d; background:#d2ffe8; }.memo-REJECTED { color:#b4232f; background:#ffdede; }
 .memo-tabs { display:flex; gap:4px; margin-bottom:15px; }.memo-tab { color:#435ebe; padding:8px 12px; border-radius:8px; background:#ebf3ff; }
 .memo-meta { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }.memo-meta div { padding:10px; border-bottom:1px solid #edf0f5; }.memo-meta span { display:block; color:var(--memo-muted); font-size:12px; }
 .memo-content { white-space:pre-wrap; line-height:1.7; min-height:160px; }

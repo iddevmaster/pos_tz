@@ -446,12 +446,16 @@ class document(models.Model):
 
 class InternalMemo(models.Model):
     STATUS_DRAFT = 'DRAFT'
-    STATUS_PENDING = 'PENDING'
+    STATUS_PENDING_REVIEW = 'PENDING_REVIEW'
+    STATUS_PENDING_APPROVAL = 'PENDING_APPROVAL'
+    # Kept as an alias for compatibility with older application code.
+    STATUS_PENDING = STATUS_PENDING_REVIEW
     STATUS_APPROVED = 'APPROVED'
     STATUS_REJECTED = 'REJECTED'
     STATUS_CHOICES = (
         (STATUS_DRAFT, 'ฉบับร่าง'),
-        (STATUS_PENDING, 'รออนุมัติ'),
+        (STATUS_PENDING_REVIEW, 'รอผู้ตรวจสอบ ชั้น 1'),
+        (STATUS_PENDING_APPROVAL, 'รอผู้อนุมัติ ชั้น 2'),
         (STATUS_APPROVED, 'อนุมัติแล้ว'),
         (STATUS_REJECTED, 'ไม่อนุมัติ'),
     )
@@ -464,6 +468,13 @@ class InternalMemo(models.Model):
     creator = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name='created_internal_memos'
     )
+    reviewer = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='internal_memos_to_review',
+    )
     approver = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name='internal_memos_to_approve'
     )
@@ -474,6 +485,8 @@ class InternalMemo(models.Model):
         max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT
     )
     submitted_at = models.DateTimeField(blank=True, null=True)
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    reviewer_note = models.TextField(blank=True)
     decided_at = models.DateTimeField(blank=True, null=True)
     decision_note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
