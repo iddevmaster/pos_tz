@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-heading">
+  <div class="page-title-headings">
+    <div><h3>แก้ไขโปรไฟล์</h3><p class="text-muted mb-0">จัดการข้อมูลบัญชีที่ใช้แสดงในระบบ</p></div>
+    <nav class="breadcrumb-header"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li><li class="breadcrumb-item active">แก้ไขโปรไฟล์</li></ol></nav>
+  </div>
+</div>
+<section class="section">
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm" style="border-radius:18px;overflow:hidden;">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="app-user-avatar" style="width:58px;height:58px;border-radius:17px;font-size:24px;"><i class="bi bi-person-fill"></i></div>
+            <div><h4 class="mb-1">{% if profile_user.first_name or profile_user.last_name %}{{ profile_user.first_name }} {{ profile_user.last_name }}{% else %}{{ profile_user.username }}{% endif %}</h4><div class="text-muted">{% if profile_user.is_staff %}ผู้ดูแลระบบ{% else %}ผู้ใช้งานระบบ{% endif %}</div></div>
+          </div>
+          <form method="post">{% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label">First name (ชื่อ) <span class="text-danger">*</span></label><input class="form-control" id="first_name" name="first_name" required autocomplete="given-name" value="{% if request.method == 'POST' %}{{ request.POST.first_name }}{% else %}{{ profile_user.first_name }}{% endif %}"></div>
+              <div class="col-md-6"><label class="form-label">Last name (นามสกุล) <span class="text-danger">*</span></label><input class="form-control" id="last_name" name="last_name" required autocomplete="family-name" value="{% if request.method == 'POST' %}{{ request.POST.last_name }}{% else %}{{ profile_user.last_name }}{% endif %}"></div>
+              <div class="col-md-6"><label class="form-label">Username</label><input class="form-control" name="username" autocomplete="username" value="{{ profile_user.username }}" readonly aria-readonly="true"><small class="text-muted">Username ไม่สามารถแก้ไขได้</small></div>
+              <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" name="email" autocomplete="email" value="{% if request.method == 'POST' %}{{ request.POST.email }}{% else %}{{ profile_user.email }}{% endif %}"></div>
+            </div>
+            <hr class="my-4">
+            <div class="mb-3"><h5 class="mb-1">เปลี่ยนรหัสผ่าน</h5><small class="text-muted">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</small></div>
+            <div class="row g-3">
+              <div class="col-md-4"><label class="form-label">รหัสผ่านปัจจุบัน</label><input class="form-control" type="password" name="current_password" autocomplete="current-password"></div>
+              <div class="col-md-4"><label class="form-label">รหัสผ่านใหม่</label><input class="form-control" type="password" name="new_password" autocomplete="new-password"><div class="text-danger mt-2" style="font-size:12px;line-height:1.55;"><div>1. มีอย่างน้อย 8 ตัวอักษร</div><div>2. ผสมตัวพิมพ์ใหญ่–เล็ก ตัวเลข และสัญลักษณ์</div><div>3. ไม่คล้าย Username หรือชื่อผู้ใช้</div></div></div>
+              <div class="col-md-4"><label class="form-label">ยืนยันรหัสผ่านใหม่</label><input class="form-control" type="password" name="new_password_confirm" autocomplete="new-password"></div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4"><a class="btn btn-light-secondary" href="/">ยกเลิก</a><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกโปรไฟล์</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

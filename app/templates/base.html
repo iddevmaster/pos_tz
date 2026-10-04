@@ -958,8 +958,8 @@ function initTabEvents() {
 
 .hamburger {
             display: block;
-            width: 35px;
-            height: 30px;
+            width: 24px;
+            height: 20px;
             cursor: pointer;
             position: relative;
         }
@@ -967,20 +967,53 @@ function initTabEvents() {
         .hamburger span {
             display: block;
             width: 100%;
-            height: 5px;
-            background-color: black;
+            height: 3px;
+            background-color: #25396f;
+            border-radius: 999px;
             position: absolute;
             transition: all 0.3s ease-in-out;
         }
 
         .hamburger span:nth-child(1) { top: 0; }
-        .hamburger span:nth-child(2) { top: 12px; }
-        .hamburger span:nth-child(3) { top: 24px; }
+        .hamburger span:nth-child(2) { top: 8px; }
+        .hamburger span:nth-child(3) { top: 16px; }
 
         /* เมื่อเมนูถูกเปิด */
-        .hamburger.active span:nth-child(1) { transform: translateY(12px) rotate(45deg); }
+        .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: translateY(-12px) rotate(-45deg); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+      .app-topbar { position:sticky; top:12px; z-index:900; display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:70px; margin:12px 0 24px; padding:10px 14px; background:rgba(255,255,255,.9); border:1px solid rgba(214,225,242,.9); border-radius:18px; box-shadow:0 10px 32px rgba(37,57,111,.1); backdrop-filter:blur(14px); }
+      .app-topbar-left,.app-topbar-right,.app-brand,.app-user { display:flex; align-items:center; }
+      .app-topbar-left,.app-topbar-right { gap:12px; }
+      .app-menu-button { display:grid; place-items:center; width:44px; height:44px; flex:0 0 44px; border:0; border-radius:13px; background:#edf3ff; transition:background .2s ease,transform .2s ease; }
+      .app-menu-button:hover { background:#dfeaff; transform:translateY(-1px); }
+      .app-brand { gap:11px; }
+      .app-brand-icon { display:grid; place-items:center; width:42px; height:42px; color:#fff; font-size:20px; border-radius:13px; background:linear-gradient(135deg,#2878ff,#435ebe); box-shadow:0 7px 16px rgba(40,120,255,.22); }
+      .app-brand-title { color:#25396f; font-size:16px; font-weight:700; line-height:1.25; }
+      .app-brand-subtitle { color:#8a97ad; font-size:12px; }
+      .app-user { gap:10px; min-width:0; padding:6px 10px 6px 7px; color:inherit; border:0; border-radius:14px; background:#f7f9fd; cursor:pointer; transition:background .2s ease,box-shadow .2s ease; }
+      .app-user:hover,.app-user[aria-expanded="true"] { background:#edf3ff; box-shadow:0 0 0 3px rgba(40,120,255,.08); }
+      .app-user.dropdown-toggle::after { display:none; }
+      .app-user-avatar { display:grid; place-items:center; width:38px; height:38px; flex:0 0 38px; color:#fff; border-radius:12px; background:linear-gradient(135deg,#172b4d,#2878ff); }
+      .app-user-name { color:#25396f; font-size:14px; font-weight:600; white-space:nowrap; }
+      .app-user-role { color:#8a97ad; font-size:11px; }
+      .app-user-chevron { color:#8a97ad; font-size:12px; transition:transform .2s ease; }
+      .app-user[aria-expanded="true"] .app-user-chevron { transform:rotate(180deg); }
+      .app-profile-menu { width:270px; margin-top:10px !important; padding:8px; border:1px solid #e3eaf5; border-radius:16px; box-shadow:0 16px 40px rgba(37,57,111,.16); }
+      .app-profile-head { display:flex; align-items:center; gap:11px; margin-bottom:6px; padding:10px; border-radius:12px; background:linear-gradient(135deg,#f4f7fd,#edf3ff); }
+      .app-profile-name { color:#25396f; font-size:14px; font-weight:700; }
+      .app-profile-meta { color:#8a97ad; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .app-profile-menu .dropdown-item { display:flex; align-items:center; gap:10px; padding:9px 11px; color:#4d5e7a; border-radius:10px; font-size:14px; }
+      .app-profile-menu .dropdown-item:hover { color:#2878ff; background:#f0f5ff; }
+      .app-profile-menu .dropdown-item.text-danger:hover { color:#fff !important; background:#d94b59; }
+      @media (max-width:767px) {
+        .app-topbar { top:7px; min-height:60px; margin-top:7px; padding:8px 10px; border-radius:14px; }
+        .app-brand-icon,.app-user-copy { display:none; }
+        .app-brand-title { font-size:14px; }
+        .app-brand-subtitle { display:none; }
+        .app-user { padding:4px; background:transparent; }
+      }
       body {
         font-family: "Sarabun", sans-serif;
         font-size: 16px;
@@ -1412,9 +1445,14 @@ function initTabEvents() {
                   <span class="font-default">ตั้งค่า</span>
                 </a>
                 <ul class="submenu">
+                  <li class="{% if request.path == '/settings/users/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="{% url 'user_manage_list' %}">
+                      <span class="font-default">จัดการผู้ใช้งาน</span>
+                    </a>
+                  </li>
                   <li class="{% if request.path == '/settings/users/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="{% url 'user_teacher_create' %}">
-                      <span class="font-default">เพิ่มผู้ใช้งาน / ครูฝึก</span>
+                      <span class="font-default">สร้าง User / ครูฝึก</span>
                     </a>
                   </li>
                   <li class="submenu-item">
@@ -1514,18 +1552,33 @@ function initTabEvents() {
         </div>
       </div>
       <div id="main">
-        <header class="mb-3">
-          <a href="#" class="burger-btn d-block d-xl-none">
-            <i class="bi bi-justify fs-3"></i>
-          </a>
-        
-        
-
-          <div class="hamburger" id="hamburger-btn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <header class="app-topbar">
+          <div class="app-topbar-left">
+            <button type="button" class="app-menu-button" id="hamburger-btn" aria-label="เปิดหรือปิดเมนู">
+              <span class="hamburger"><span></span><span></span><span></span></span>
+            </button>
+            <div class="app-brand">
+              <span class="app-brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+              <div><div class="app-brand-title">{{ title }}</div><div class="app-brand-subtitle">ระบบบริหารจัดการศูนย์ฝึกอบรม</div></div>
+            </div>
+          </div>
+          <div class="app-topbar-right">
+            <div class="dropdown">
+              <button class="app-user dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="app-user-avatar"><i class="bi bi-person-fill"></i></span>
+                <span class="app-user-copy"><span class="app-user-name d-block">{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}</span><span class="app-user-role d-block">{% if user.is_staff %}ผู้ดูแลระบบ{% else %}ผู้ใช้งานระบบ{% endif %}</span></span>
+                <i class="bi bi-chevron-down app-user-chevron"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end app-profile-menu">
+                <li><div class="app-profile-head"><span class="app-user-avatar"><i class="bi bi-person-fill"></i></span><div class="overflow-hidden"><div class="app-profile-name">{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}</div><div class="app-profile-meta">{{ user.username }}{% if user.email %} · {{ user.email }}{% endif %}</div></div></div></li>
+                <li><a class="dropdown-item" href="/"><i class="bi bi-house-door"></i>หน้าหลัก</a></li>
+                <li><a class="dropdown-item" href="{% url 'profile_edit' %}"><i class="bi bi-person-gear"></i>แก้ไขโปรไฟล์</a></li>
+                {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'internal_memo_approver_setting' %}"><i class="bi bi-gear"></i>ตั้งค่าผู้ตรวจสอบ / ผู้อนุมัติ</a></li>{% endif %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right"></i>ออกจากระบบ</a></li>
+              </ul>
+            </div>
+          </div>
         </header>
 
         <div class="page-heading">
@@ -1603,6 +1656,7 @@ function initTabEvents() {
     <script>
       document.getElementById("hamburger-btn").addEventListener("click", function() {
           document.getElementById("sidebar").classList.toggle("active");
+          this.querySelector(".hamburger").classList.toggle("active");
       });
       </script>
     <script>

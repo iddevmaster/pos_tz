@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-heading"><div class="page-title-headings"><div><h3>จัดการผู้ใช้งาน</h3><p class="text-muted mb-0">เพิ่ม แก้ไข ลบ และกำหนดกลุ่มสิทธิ์ของ User</p></div><a class="btn btn-primary" href="{% url 'user_teacher_create' %}"><i class="bi bi-person-plus me-1"></i>สร้าง User</a></div></div>
+<section class="section">
+  <div class="card"><div class="card-body">
+    <form class="row g-2 mb-4" method="get"><div class="col-md-5"><input class="form-control" name="q" value="{{ keyword }}" placeholder="ค้นหา Username, ชื่อ, นามสกุล หรือ Email"></div><div class="col-auto"><button class="btn btn-outline-primary" type="submit"><i class="bi bi-search me-1"></i>ค้นหา</button></div>{% if keyword %}<div class="col-auto"><a class="btn btn-light-secondary" href="{% url 'user_manage_list' %}">ล้าง</a></div>{% endif %}</form>
+    <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Username</th><th>ชื่อ–นามสกุล</th><th>Email</th><th>กลุ่มผู้ใช้งาน</th><th>สถานะ</th><th>สิทธิ์ Staff</th><th class="text-end">Action</th></tr></thead><tbody>
+      {% for account in accounts %}<tr><td class="fw-semibold">{{ account.username }}</td><td>{% if account.first_name or account.last_name %}{{ account.first_name }} {{ account.last_name }}{% else %}-{% endif %}</td><td>{{ account.email|default:'-' }}</td><td><span class="badge bg-light-primary text-primary">{{ account.category_name }}</span></td><td>{% if account.is_active %}<span class="badge bg-light-success text-success">เปิดใช้งาน</span>{% else %}<span class="badge bg-light-secondary text-secondary">ปิดใช้งาน</span>{% endif %}</td><td>{% if account.is_staff %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}-{% endif %}</td><td><div class="d-flex justify-content-end gap-1"><a class="btn btn-warning btn-sm" href="{% url 'user_manage_edit' account.pk %}" title="แก้ไข"><i class="bi bi-pencil-square"></i></a>{% if account.pk != user.pk %}<form method="post" action="{% url 'user_manage_delete' account.pk %}" onsubmit="return confirm('ยืนยันการลบ User {{ account.username|escapejs }}?');">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit" title="ลบ"><i class="bi bi-trash"></i></button></form>{% endif %}</div></td></tr>{% empty %}<tr><td class="text-center text-muted py-4" colspan="7">ไม่พบผู้ใช้งาน</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div></div>
+</section>
+{% endblock %}

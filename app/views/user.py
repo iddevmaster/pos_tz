@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.db.models.deletion import ProtectedError
 from ..models import user_group, category_program,category_program_permission,user_detail,teacher,compensation,fact_teacher_user
 from ..constant import defaultTitle, listMenu
 from ..forms.user_form import category_program_form
@@ -28,6 +32,66 @@ def _menu_context(user_id):
             ).order_by('page_label'),
         })
     return menu
+
+
+@login_required(login_url='/login')
+def profile_edit(request):
+    profile_user = request.user
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        current_password = request.POST.get('current_password', '')
+        new_password = request.POST.get('new_password', '')
+        new_password_confirm = request.POST.get('new_password_confirm', '')
+        errors = []
+
+        if not first_name:
+            errors.append('กรุณาระบุชื่อ')
+        if not last_name:
+            errors.append('กรุณาระบุนามสกุล')
+        if email and User.objects.filter(
+            email__iexact=email
+        ).exclude(pk=profile_user.pk).exists():
+            errors.append('Email นี้ถูกใช้งานแล้ว')
+        wants_password_change = bool(
+            current_password or new_password or new_password_confirm
+        )
+        if wants_password_change:
+            if not profile_user.check_password(current_password):
+                errors.append('รหัสผ่านปัจจุบันไม่ถูกต้อง')
+            if not new_password:
+                errors.append('กรุณาระบุรหัสผ่านใหม่')
+            elif new_password != new_password_confirm:
+                errors.append('รหัสผ่านใหม่และการยืนยันไม่ตรงกัน')
+            else:
+                try:
+                    validate_password(new_password, profile_user)
+                except ValidationError as error:
+                    errors.extend(error.messages)
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            profile_user.first_name = first_name
+            profile_user.last_name = last_name
+            profile_user.email = email
+            profile_user.save(update_fields=[
+                'first_name', 'last_name', 'email'
+            ])
+            if wants_password_change:
+                profile_user.set_password(new_password)
+                profile_user.save(update_fields=['password'])
+                update_session_auth_hash(request, profile_user)
+            messages.success(request, 'แก้ไขโปรไฟล์เรียบร้อยแล้ว')
+            return redirect('profile_edit')
+
+    return render(request, 'user/profile_edit.html', {
+        'title': defaultTitle,
+        'listMenuPermission': _menu_context(request.user.id),
+        'profile_user': profile_user,
+    })
 
 
 @login_required(login_url='/login')
@@ -139,7 +203,7 @@ def user_teacher_create(request):
                             py_id=py_id,
                         )
             messages.success(request, 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว')
-            return redirect('user_teacher_create')
+            return redirect('user_manage_list')
 
     context = {
         'title': defaultTitle,
@@ -147,6 +211,143 @@ def user_teacher_create(request):
         'listMenuPermission': _menu_context(request.user.id),
     }
     return render(request, 'user/user_teacher_create.html', context)
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda current_user: current_user.is_staff, login_url='/403')
+def user_manage_list(request):
+    keyword = request.GET.get('q', '').strip()
+    accounts = User.objects.all().order_by('first_name', 'last_name', 'username')
+    if keyword:
+        accounts = accounts.filter(
+            Q(username__icontains=keyword)
+            | Q(first_name__icontains=keyword)
+            | Q(last_name__icontains=keyword)
+            | Q(email__icontains=keyword)
+        )
+    accounts = list(accounts)
+    details = {
+        item.user_id: item.cm.cm_name
+        for item in user_detail.objects.filter(
+            user_id__in=[account.id for account in accounts]
+        ).select_related('cm')
+    }
+    for account in accounts:
+        account.category_name = details.get(account.id, '-')
+    return render(request, 'user/user_manage_list.html', {
+        'title': defaultTitle,
+        'listMenuPermission': _menu_context(request.user.id),
+        'accounts': accounts,
+        'keyword': keyword,
+    })
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda current_user: current_user.is_staff, login_url='/403')
+def user_manage_edit(request, pk):
+    account = get_object_or_404(User, pk=pk)
+    categories = category_program.objects.filter(
+        active=1, cancelled=1
+    ).order_by('cm_name')
+    try:
+        current_category_id = account.user_detail.cm_id
+    except user_detail.DoesNotExist:
+        current_category_id = None
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        category_id = request.POST.get('category', '').strip()
+        new_password = request.POST.get('new_password', '')
+        new_password_confirm = request.POST.get('new_password_confirm', '')
+        errors = []
+
+        if not username:
+            errors.append('กรุณาระบุ Username')
+        elif User.objects.filter(
+            username__iexact=username
+        ).exclude(pk=account.pk).exists():
+            errors.append('Username นี้ถูกใช้งานแล้ว')
+        if not first_name or not last_name:
+            errors.append('กรุณาระบุชื่อและนามสกุล')
+        if email and User.objects.filter(
+            email__iexact=email
+        ).exclude(pk=account.pk).exists():
+            errors.append('Email นี้ถูกใช้งานแล้ว')
+        try:
+            category = categories.get(pk=category_id)
+        except (category_program.DoesNotExist, ValueError):
+            category = None
+            errors.append('กรุณาเลือกกลุ่มผู้ใช้งาน')
+        if new_password or new_password_confirm:
+            if new_password != new_password_confirm:
+                errors.append('รหัสผ่านใหม่และการยืนยันไม่ตรงกัน')
+            else:
+                try:
+                    validate_password(new_password, account)
+                except ValidationError as error:
+                    errors.extend(error.messages)
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            with transaction.atomic():
+                account.username = username
+                account.first_name = first_name
+                account.last_name = last_name
+                account.email = email
+                is_current_account = account.pk == request.user.pk
+                account.is_active = (
+                    True if is_current_account
+                    else request.POST.get('is_active') == '1'
+                )
+                account.is_staff = (
+                    True if is_current_account
+                    else request.POST.get('is_staff') == '1'
+                )
+                if new_password:
+                    account.set_password(new_password)
+                account.save()
+                user_detail.objects.update_or_create(
+                    user=account, defaults={'cm': category}
+                )
+                user_group.objects.update_or_create(
+                    user=account, defaults={'module': category.module}
+                )
+            messages.success(request, 'แก้ไขผู้ใช้งานเรียบร้อยแล้ว')
+            return redirect('user_manage_list')
+
+    return render(request, 'user/user_manage_edit.html', {
+        'title': defaultTitle,
+        'listMenuPermission': _menu_context(request.user.id),
+        'account': account,
+        'categories': categories,
+        'current_category_id': current_category_id,
+    })
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda current_user: current_user.is_staff, login_url='/403')
+def user_manage_delete(request, pk):
+    if request.method != 'POST':
+        return redirect('user_manage_list')
+    account = get_object_or_404(User, pk=pk)
+    if account.pk == request.user.pk:
+        messages.error(request, 'ไม่สามารถลบบัญชีที่กำลังใช้งานอยู่ได้')
+        return redirect('user_manage_list')
+    username = account.username
+    try:
+        account.delete()
+        messages.success(request, f'ลบผู้ใช้งาน {username} เรียบร้อยแล้ว')
+    except ProtectedError:
+        messages.error(
+            request,
+            'ไม่สามารถลบผู้ใช้งานนี้ได้ เนื่องจากมีข้อมูลเอกสารอ้างอิงอยู่',
+        )
+    return redirect('user_manage_list')
 
 
 @login_required(login_url='/login')

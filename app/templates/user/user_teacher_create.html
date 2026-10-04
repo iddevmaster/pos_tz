@@ -27,7 +27,7 @@
     <div class="col-md-4"><label class="form-label">ค่าตอบแทนภาคปฏิบัติ</label><input class="form-control" type="number" min="0" name="compensation_pi" value="{{ request.POST.compensation_pi|default:0 }}"></div>
     <div class="col-md-4"><label class="form-label">ค่าตอบแทนผู้ช่วย</label><input class="form-control" type="number" min="0" name="compensation_help" value="{{ request.POST.compensation_help|default:0 }}"></div>
   </div></div></div>
-  <div class="card"><div class="card-body text-end"><a href="/" class="btn btn-light-secondary me-2">ยกเลิก</a><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกผู้ใช้งาน</button></div></div>
+  <div class="card"><div class="card-body text-end"><a href="{% url 'user_manage_list' %}" class="btn btn-light-secondary me-2">ยกเลิก</a><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกผู้ใช้งาน</button></div></div>
 </form></section>
 <script>
 (function(){var toggle=document.getElementById('isTeacher');var fields=document.getElementById('teacherFields');function sync(){fields.hidden=!toggle.checked;fields.querySelectorAll('.teacher-required').forEach(function(input){input.required=toggle.checked;});}toggle.addEventListener('change',sync);sync();})();

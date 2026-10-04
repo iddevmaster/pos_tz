@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo
 
 urlpatterns = [
+    path('profile/edit/', user.profile_edit, name='profile_edit'),
     path('internal-memos/', internal_memo.memo_list, name='internal_memo_list'),
     path('internal-memos/create/', internal_memo.memo_create, name='internal_memo_create'),
     path('internal-memos/approval/', internal_memo.memo_approval, name='internal_memo_approval'),
@@ -289,8 +290,14 @@ urlpatterns = [
     path('register/excel/seller/view/<slug:doc_id>', report_and_print.register_excel_seller_view),
 
     #     user
+    path('settings/users/', user.user_manage_list,
+         name='user_manage_list'),
     path('settings/users/create/', user.user_teacher_create,
          name='user_teacher_create'),
+    path('settings/users/<int:pk>/edit/', user.user_manage_edit,
+         name='user_manage_edit'),
+    path('settings/users/<int:pk>/delete/', user.user_manage_delete,
+         name='user_manage_delete'),
     path('user/category/list', user.category_program_form_create,
          name="category_program_form_create"),
     path('user/category/delete', user.category_program_form_delete,
