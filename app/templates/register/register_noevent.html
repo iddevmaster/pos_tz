@@ -152,10 +152,17 @@ else {
     // Initialize Select2
 
 
-            $(".select2").select2({
-              
+        var courseSelect = $("#course_id");
+        courseSelect.select2({
           placeholder: "เลือกข้อมูล",
           allowClear: true,
+          width: "100%",
+          dropdownCssClass: "sales-course-dropdown"
+        });
+        $(".select2").not(courseSelect).select2({
+          placeholder: "เลือกข้อมูล",
+          allowClear: true,
+          width: "100%"
         });
   });
 
@@ -272,9 +279,9 @@ const selectedValue = selectElement.value;
             display: block;
             animation: slideIn 0.5s ease-out;
         }
-        .select2-selection.select2-selection--single {
-    width: 700px !important; /* ใช้ !important หากมี CSS อื่นที่ขัดแย้ง */
-}
+        #course_id + .select2-container { width:100% !important; max-width:100%; }
+        .sales-course-dropdown { max-width:min(760px, calc(100vw - 32px)); }
+        .sales-course-dropdown .select2-results__option { white-space:normal; overflow-wrap:anywhere; line-height:1.45; padding:8px 12px; }
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
@@ -303,7 +310,7 @@ const selectedValue = selectElement.value;
         {% csrf_token %}
        
         <div class="row">
-          <div class="col-md-6 mb-4">
+          <div class="col-md-6 mb-4" style="min-width:0;">
             <div class="form-group">
               <label>หลักสูตร  
 			  </label> <label style="color: red">*</label>
