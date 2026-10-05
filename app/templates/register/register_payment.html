@@ -366,14 +366,8 @@
   }
 
   function sumUnit() {
-    
-    let rpi_quantity = document.getElementById("rpi_quantity").value;
-    let rpi_price = document.getElementById("rpi_price").value;
     let type_payment = document.getElementById("type_payment").value;
-    let sum = parseFloat(rpi_quantity) * parseFloat(rpi_price);
-    let fix = isNaN(sum) ? 0 : sum;
     document.getElementById("rpi_price_discount").value = 0;
-    document.getElementById("rpi_price_total").value = fix.toFixed(2);
 
     if (type_payment == 'FullPayment') {
       sumVat();
@@ -392,29 +386,29 @@
 
 
   function sumDiscount() {
-    let rpi_quantity = document.getElementById("rpi_quantity").value;
-    let rpi_price = document.getElementById("rpi_price").value;
-    let total = parseFloat(rpi_quantity) * parseFloat(rpi_price);
-
-    let rpi_price_discount =
-      document.getElementById("rpi_price_discount").value;
-    let sum = parseFloat(total) - parseFloat(rpi_price_discount);
-    let fix = isNaN(sum) ? 0 : sum;
-    document.getElementById("rpi_price_total").value = fix.toFixed(2);
-    sumVat();
+    let type_payment = document.getElementById("type_payment").value;
+    type_payment == 'Deposit' ? sumVatDeposit() : sumVat();
   }
+
+  function numberValue(id) {
+    let value = parseFloat(document.getElementById(id).value);
+    return isNaN(value) ? 0 : value;
+  }
+
+  function orderTotal() {
+    let total = (numberValue("rpi_quantity") * numberValue("rpi_price"))
+      - numberValue("rpi_price_discount")
+      + numberValue("addon_total");
+    return Math.max(0, total);
+  }
+
   function sumVat() {
 
     let ev_vat = document.getElementById("ev_vat").value;
-    let type_payment = document.getElementById("type_payment").value;
-    let rpi_price_total = document.getElementById("rpi_price_total").value;
-    let addontotal = document.getElementById("addon_total").value;
-    
-    document.getElementById("rpi_price_total").value = parseFloat(rpi_price_total) + parseFloat(addontotal);
-    let rpi_price_total_all = document.getElementById("rpi_price_total").value;
+    let rpi_price_total_all = orderTotal();
+    document.getElementById("rpi_price_total").value = rpi_price_total_all.toFixed(2);
     let sum;
     let rpi_price_result;
-    let pay;
 
     if (parseInt(ev_vat) == 1) {
 
@@ -425,11 +419,11 @@
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
       document.getElementById("before_price_vat").value = fix.toFixed(2);
-      document.getElementById("rpi_price_result").value = rpi_price_total_all;
+      document.getElementById("rpi_price_result").value = rpi_price_total_all.toFixed(2);
 
     } else {
-      sum = (parseFloat(rpi_price_total) * 7) / 100;
-      rpi_price_result = parseFloat(rpi_price_total) + parseFloat(sum);
+      sum = (rpi_price_total_all * 7) / 100;
+      rpi_price_result = rpi_price_total_all + sum;
 
       let fix = isNaN(sum) ? 0 : sum;
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
@@ -442,35 +436,27 @@
   function sumVatDeposit() {
 
     let ev_vat = document.getElementById("ev_vat").value;
-    
-    let type_payment = document.getElementById("type_payment").value;
-    let rpi_price_total = document.getElementById("rpi_price_total").value;
-    let addontotal = document.getElementById("addon_total").value;
-    let pay = document.getElementById("pay").value;
-    let quantity = document.getElementById("rpi_quantity").value;
-
-
-    document.getElementById("rpi_price_total").value = parseFloat(pay) + parseFloat(addontotal);
-    let rpi_price_total_all = document.getElementById("rpi_price_total").value;
+    let rpi_price_total_all = orderTotal();
+    let deposit_total = numberValue("pay") + numberValue("addon_total");
+    document.getElementById("rpi_price_total").value = rpi_price_total_all.toFixed(2);
     let sum;
     let rpi_price_result;
-    let pays;
     
     if (parseInt(ev_vat) == 1) {
 
-      sum = (parseFloat(rpi_price_total_all) * 100) / 107;
-      rpi_price_result = parseFloat(rpi_price_total_all) - parseFloat(sum);
+      sum = (deposit_total * 100) / 107;
+      rpi_price_result = deposit_total - sum;
 
       let fix = isNaN(sum) ? 0 : sum;
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix2.toFixed(2);
       document.getElementById("before_price_vat").value = fix.toFixed(2);
-      document.getElementById("rpi_price_result").value = rpi_price_total_all;
+      document.getElementById("rpi_price_result").value = deposit_total.toFixed(2);
 
     } else {
       
-      sum = (parseFloat(rpi_price_total_all) * 7) / 100;
-      rpi_price_result = parseFloat(rpi_price_total_all) + parseFloat(sum);
+      sum = (deposit_total * 7) / 100;
+      rpi_price_result = deposit_total + sum;
       let fix = isNaN(sum) ? 0 : sum;
       let fix2 = isNaN(rpi_price_result) ? 0 : rpi_price_result;
       document.getElementById("rpi_price_vat").value = fix.toFixed(2);
@@ -1461,8 +1447,8 @@
           <div class="form-group">
             <label>จำนวนเงินมัดจำ</label>
             <label style="color: red">*</label>
-            <input type="text" class="form-control" id="pay" name="pay" value="0" onkeypress="sumUnit();validate(event)"
-              onkeyup="sumUnit();validate(event)" />
+            <input type="text" class="form-control" id="pay" name="pay" value="0"
+              onkeypress="validate(event)" oninput="sumVatDeposit()" />
           </div>
         </div>
         <div class="form-group" align="center">

@@ -114,6 +114,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>เลขที่ทะเบียนลูกค้า</td>
       <td>ชื่อลูกค้า</td>
       <td>หลักสูตร</td>
+      <td>วันที่อบรม</td>
       <td>รุ่นของการอบรม</td>
       <td>วันที่ออกใบเสนอราคา</td>
       <td>วันที่ปิดใบเสนอราคา</td>
@@ -135,6 +136,11 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>
         {{res.course.course_code}}
         {{res.course.course_name}}
+      </td>
+      <td align="center">
+        {% if res.course_list %}
+        {{res.course_list.ev_date_start|date:"d/m/Y"}} - {{res.course_list.ev_date_end|date:"d/m/Y"}}
+        {% endif %}
       </td>
       <td align="center">{{res.course_list.ev_generation}}</td>
       <td>{{res.main.crt_date|date:"d/m/Y H:i"}}</td>
@@ -201,7 +207,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     </tr>
    
     <tr style="font-weight: bold">
-      <td colspan="10" align="right">จำนวนยอดทั้งหมด</td>
+      <td colspan="11" align="right">จำนวนยอดทั้งหมด</td>
       <td align="right">{{total_sum|floatformat:2|intcomma}}</td>
       <td></td>
       <td></td>

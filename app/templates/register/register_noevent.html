@@ -159,7 +159,14 @@ else {
           width: "100%",
           dropdownCssClass: "sales-course-dropdown"
         });
-        $(".select2").not(courseSelect).select2({
+        var customerSelect = $("#customer_id");
+        customerSelect.select2({
+          placeholder: "เลือกข้อมูลลูกค้า",
+          allowClear: true,
+          width: "100%",
+          dropdownCssClass: "sales-customer-dropdown"
+        });
+        $(".select2").not(courseSelect).not(customerSelect).select2({
           placeholder: "เลือกข้อมูล",
           allowClear: true,
           width: "100%"
@@ -280,8 +287,24 @@ const selectedValue = selectElement.value;
             animation: slideIn 0.5s ease-out;
         }
         #course_id + .select2-container { width:100% !important; max-width:100%; }
+        #customer_id + .select2-container { width:100% !important; max-width:100%; }
         .sales-course-dropdown { max-width:min(760px, calc(100vw - 32px)); }
         .sales-course-dropdown .select2-results__option { white-space:normal; overflow-wrap:anywhere; line-height:1.45; padding:8px 12px; }
+        .sales-customer-dropdown { max-width:calc(100vw - 32px); }
+        .sales-customer-dropdown .select2-results__options {
+          max-height:280px;
+          overflow-x:hidden;
+          overflow-y:scroll;
+          scrollbar-gutter:stable;
+          overscroll-behavior:contain;
+        }
+        .sales-customer-dropdown .select2-results__option {
+          box-sizing:border-box;
+          min-height:36px;
+          padding:8px 12px;
+          line-height:20px;
+          overflow-wrap:anywhere;
+        }
 </style>
 <div class="row">
   <div class="col-12 col-md-6 order-md-1 order-last">
