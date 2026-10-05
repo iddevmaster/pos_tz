@@ -130,7 +130,11 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
     </tr>
     {% for res in data %}
     <tr>
-      <td>{{res.main.rp_doc_number}}</td>
+      <td>
+        <a href="/register/payment/history/{{res.main.register_id}}" target="_blank" rel="noopener noreferrer">
+          {{res.main.rp_doc_number}}
+        </a>
+      </td>
       <td>{{res.customer_list.customer_code}}</td>
       <td>{{res.customer_list.customer_name}}</td>
       <td>
