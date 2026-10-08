@@ -15,12 +15,22 @@
             <div class="app-user-avatar" style="width:58px;height:58px;border-radius:17px;font-size:24px;"><i class="bi bi-person-fill"></i></div>
             <div><h4 class="mb-1">{% if profile_user.first_name or profile_user.last_name %}{{ profile_user.first_name }} {{ profile_user.last_name }}{% else %}{{ profile_user.username }}{% endif %}</h4><div class="text-muted">{% if profile_user.is_staff %}ผู้ดูแลระบบ{% else %}ผู้ใช้งานระบบ{% endif %}</div></div>
           </div>
-          <form method="post">{% csrf_token %}
+          <form method="post" enctype="multipart/form-data">{% csrf_token %}
             <div class="row g-3">
               <div class="col-md-6"><label class="form-label">First name (ชื่อ) <span class="text-danger">*</span></label><input class="form-control" id="first_name" name="first_name" required autocomplete="given-name" value="{% if request.method == 'POST' %}{{ request.POST.first_name }}{% else %}{{ profile_user.first_name }}{% endif %}"></div>
               <div class="col-md-6"><label class="form-label">Last name (นามสกุล) <span class="text-danger">*</span></label><input class="form-control" id="last_name" name="last_name" required autocomplete="family-name" value="{% if request.method == 'POST' %}{{ request.POST.last_name }}{% else %}{{ profile_user.last_name }}{% endif %}"></div>
               <div class="col-md-6"><label class="form-label">Username</label><input class="form-control" name="username" autocomplete="username" value="{{ profile_user.username }}" readonly aria-readonly="true"><small class="text-muted">Username ไม่สามารถแก้ไขได้</small></div>
               <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" name="email" autocomplete="email" value="{% if request.method == 'POST' %}{{ request.POST.email }}{% else %}{{ profile_user.email }}{% endif %}"></div>
+            </div>
+            <hr class="my-4">
+            <div class="mb-3"><h5 class="mb-1">ลายเซ็น</h5><small class="text-muted">ใช้แสดงในเอกสาร/ใบเสร็จที่พิมพ์จากระบบ{% if is_fact_signature %} · <span class="text-success">อยู่ในรายชื่อผู้ลงนาม</span>{% endif %}</small></div>
+            <div class="row g-3 align-items-center">
+              <div class="col-md-6">
+                <div class="border rounded d-flex align-items-center justify-content-center bg-white" style="height:140px;">
+                  {% if user_signature and user_signature.image_cover %}<img id="signature_preview" src="{{ user_signature.image_cover.url }}" alt="ลายเซ็น" style="max-height:120px;max-width:100%;object-fit:contain;">{% else %}<img id="signature_preview" alt="ลายเซ็น" style="max-height:120px;max-width:100%;object-fit:contain;display:none;"><span id="signature_empty" class="text-muted">ยังไม่มีลายเซ็น</span>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6"><label class="form-label">อัปโหลดลายเซ็น{% if user_signature %}ใหม่{% endif %}</label><input class="form-control" type="file" name="signature_image" id="signature_image" accept="image/*"><small class="text-muted">แนะนำไฟล์ PNG พื้นหลังโปร่งใส · เว้นว่างไว้หากไม่ต้องการเปลี่ยน</small></div>
             </div>
             <hr class="my-4">
             <div class="mb-3"><h5 class="mb-1">เปลี่ยนรหัสผ่าน</h5><small class="text-muted">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</small></div>
@@ -36,4 +46,15 @@
     </div>
   </div>
 </section>
+<script>
+document.getElementById('signature_image').addEventListener('change', function () {
+  var file = this.files && this.files[0];
+  if (!file) return;
+  var preview = document.getElementById('signature_preview');
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = '';
+  var empty = document.getElementById('signature_empty');
+  if (empty) empty.style.display = 'none';
+});
+</script>
 {% endblock %}

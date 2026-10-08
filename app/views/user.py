@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
-from ..models import user_group, category_program,category_program_permission,user_detail,teacher,compensation,fact_teacher_user
+from ..models import user_group, category_program,category_program_permission,user_detail,teacher,compensation,fact_teacher_user,signature,fact_signature
 from ..constant import defaultTitle, listMenu
 from ..forms.user_form import category_program_form
 from ..functions import dateTimeNow
@@ -34,9 +34,19 @@ def _menu_context(user_id):
     return menu
 
 
+def _user_signature(user_id):
+    sign = signature.objects.filter(user_id=str(user_id)).first()
+    if sign is None:
+        fact = fact_signature.objects.filter(user_id=user_id).first()
+        if fact:
+            sign = signature.objects.filter(image_id=fact.fact_id).first()
+    return sign
+
+
 @login_required(login_url='/login')
 def profile_edit(request):
     profile_user = request.user
+    user_sign = _user_signature(profile_user.id)
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
@@ -70,10 +80,19 @@ def profile_edit(request):
                 except ValidationError as error:
                     errors.extend(error.messages)
 
+        signature_file = request.FILES.get('signature_image')
+        if signature_file and not (signature_file.content_type or '').startswith('image/'):
+            errors.append('ไฟล์ลายเซ็นต้องเป็นรูปภาพเท่านั้น')
+
         if errors:
             for error in errors:
                 messages.error(request, error)
         else:
+            if signature_file:
+                if user_sign is None:
+                    user_sign = signature(user_id=str(profile_user.id))
+                user_sign.image_cover = signature_file
+                user_sign.save()
             profile_user.first_name = first_name
             profile_user.last_name = last_name
             profile_user.email = email
@@ -91,6 +110,8 @@ def profile_edit(request):
         'title': defaultTitle,
         'listMenuPermission': _menu_context(request.user.id),
         'profile_user': profile_user,
+        'user_signature': user_sign,
+        'is_fact_signature': fact_signature.objects.filter(user_id=profile_user.id).exists(),
     })
 
 
