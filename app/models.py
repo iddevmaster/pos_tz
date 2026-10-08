@@ -629,11 +629,11 @@ class notifications(models.Model):
     notification_type = models.CharField(max_length=1, blank=False)
     title = models.CharField(max_length=255, blank=False)
     message = models.CharField(max_length=255, blank=False)
-    reference_id = models.CharField(max_length=1, blank=False)
+    reference_id = models.CharField(max_length=255, blank=False)
     reference_type = models.CharField(max_length=255, blank=False)
     is_read = models.CharField(max_length=1, blank=False)
     read_at = models.DateTimeField(blank=True, null=True)
-    action_url = models.CharField(max_length=1, blank=False)
+    action_url = models.CharField(max_length=255, blank=False)
     priority = models.CharField(max_length=1, blank=False)
     created_by = models.IntegerField(blank=True, default=None)
     crt_date = models.DateTimeField(blank=True, null=True)
@@ -641,4 +641,113 @@ class notifications(models.Model):
     cm = models.ForeignKey(category_program, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    
+
+# ติดตามลูกค้าเก่า (เตือนต่ออายุก่อนครบ 2 ปี นับจากวันที่กรอกเลข SQ / SO / PO)
+class customer_followup(models.Model):
+    STATUS_WAITING = 'waiting'
+    STATUS_ALERTING = 'alerting'
+    STATUS_FOLLOWING = 'following'
+    STATUS_QUOTED = 'quoted'
+    STATUS_WON = 'won'
+    STATUS_POOL = 'pool'
+    STATUS_CHOICES = (
+        (STATUS_WAITING, 'ยังไม่ถึงกำหนดเตือน'),
+        (STATUS_ALERTING, 'เตือนแล้ว รอติดตาม'),
+        (STATUS_FOLLOWING, 'กำลังติดตาม'),
+        (STATUS_QUOTED, 'ออกใบเสนอราคาใหม่แล้ว'),
+        (STATUS_WON, 'ปิดการขายแล้ว'),
+        (STATUS_POOL, 'ลูกค้าตกค้าง'),
+    )
+
+    followup_id = models.AutoField(primary_key=True)
+    # ฐานข้อมูลเก็บ register_main คนละ charset กับตารางใหม่ จึงไม่สร้าง FK constraint
+    source_register = models.OneToOneField(
+        register_main, on_delete=models.CASCADE, db_constraint=False,
+        related_name='followup')
+    source_sale_id = models.IntegerField(blank=True, null=True)
+    source_doc_no = models.CharField(max_length=256, blank=True, default='')
+    course = models.ForeignKey(
+        course, on_delete=models.SET_NULL, blank=True, null=True)
+    customer_name = models.CharField(max_length=256, blank=True, default='')
+    customer_tax = models.CharField(max_length=64, blank=True, default='')
+    customer_phone = models.CharField(max_length=64, blank=True, default='')
+    base_date = models.DateField()
+    due_date = models.DateField()
+    owner_sale = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_owner')
+    original_sale = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_original')
+    alert_level = models.IntegerField(default=0)
+    first_alert_date = models.DateField(blank=True, null=True)
+    last_alert_date = models.DateField(blank=True, null=True)
+    followup_count = models.IntegerField(default=0)
+    last_followup_date = models.DateField(blank=True, null=True)
+    protect_until = models.DateField(blank=True, null=True)
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=STATUS_WAITING)
+    pool_date = models.DateTimeField(blank=True, null=True)
+    claimed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_claimed')
+    claim_until = models.DateField(blank=True, null=True)
+    new_register = models.ForeignKey(
+        register_main, on_delete=models.SET_NULL, db_constraint=False,
+        blank=True, null=True, related_name='followup_renewal')
+    new_doc_no = models.CharField(max_length=256, blank=True, default='')
+    crt_date = models.DateTimeField(auto_now_add=True)
+    upd_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('due_date',)
+
+
+class customer_followup_log(models.Model):
+    CHANNEL_CHOICES = (
+        ('phone', 'โทรศัพท์'),
+        ('line', 'Line'),
+        ('email', 'อีเมล'),
+        ('visit', 'เข้าพบ'),
+        ('other', 'อื่น ๆ'),
+    )
+
+    followup = models.ForeignKey(
+        customer_followup, on_delete=models.CASCADE, related_name='logs')
+    contact_name = models.CharField(max_length=256)
+    contact_phone = models.CharField(max_length=64)
+    channel = models.CharField(max_length=16, choices=CHANNEL_CHOICES)
+    result = models.CharField(max_length=256)
+    note = models.TextField(blank=True, default='')
+    counted = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    crt_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-crt_date',)
+
+
+class customer_followup_owner_log(models.Model):
+    REASON_CHOICES = (
+        ('auto_pool', 'หมดสิทธิ์ ย้ายไปลูกค้าตกค้าง'),
+        ('claim', 'รับเรื่องจากลูกค้าตกค้าง'),
+        ('claim_expired', 'หมดเวลารับเรื่อง'),
+        ('sale_desk', 'Sale Desk บันทึกผู้ขาย'),
+    )
+
+    followup = models.ForeignKey(
+        customer_followup, on_delete=models.CASCADE, related_name='owner_logs')
+    from_user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_owner_from')
+    to_user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_owner_to')
+    reason = models.CharField(max_length=16, choices=REASON_CHOICES)
+    user_crt = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='followup_owner_crt')
+    crt_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-crt_date',)

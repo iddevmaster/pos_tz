@@ -1,0 +1,32 @@
+{% extends 'base.html' %}{% load static ex_functions %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}"><link rel="stylesheet" href="{% static 'css/customer_followup.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>{{ heading }}</h3><div class="memo-subtitle">{{ subtitle }}</div></div></div>
+  <section class="memo-card"><form class="memo-filter" method="get">
+    {% if mode != 'pool' %}<select class="form-select" name="status"><option value="">ทุกสถานะ (ที่กำลังดำเนินการ)</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>{% endif %}
+    {% if mode == 'registry' %}<select class="form-select select2" name="sale"><option value="">Sale ทุกคน</option>{% for s in sales %}<option value="{{ s.id }}" {% if request.GET.sale == s.id|stringformat:'s' %}selected{% endif %}>{{ s|user_display }}</option>{% endfor %}</select>{% endif %}
+    <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="ลูกค้า / เลขผู้เสียภาษี / เลขเอกสาร / หลักสูตร">
+    <input class="form-control" type="date" name="due_from" value="{{ request.GET.due_from }}" title="ครบกำหนดตั้งแต่">
+    <input class="form-control" type="date" name="due_to" value="{{ request.GET.due_to }}" title="ครบกำหนดถึง">
+    <button class="btn btn-outline-primary">ค้นหา</button>
+  </form></section>
+  <section class="memo-card"><div class="table-responsive"><table class="memo-table"><thead><tr>
+    <th>ลูกค้า</th><th>หลักสูตรเดิม</th><th>เอกสารเดิม</th><th>ครบกำหนด</th><th>Sale</th><th>ติดตาม</th><th>สิทธิ์ถึง</th><th>สถานะ</th><th>ใบเสนอราคาใหม่</th><th></th>
+  </tr></thead><tbody>
+  {% for f in followups %}<tr>
+    <td>{{ f.customer_name|default:'-' }}{% if f.customer_tax %}<br><small class="text-muted">{{ f.customer_tax }}</small>{% endif %}</td>
+    <td>{{ f.course.course_name|default:'-' }}</td>
+    <td><small>{{ f.source_doc_no|default:'-' }}</small><br><small class="text-muted">{{ f.base_date|date:'d/m/Y' }}</small></td>
+    <td>{{ f.due_date|date:'d/m/Y' }}<br><small class="{% if f.days_left < 0 %}fu-days-late{% elif f.days_left <= 30 %}fu-days-soon{% endif %}">{% if f.days_left < 0 %}เกิน {{ f.days_left|stringformat:'d'|slice:'1:' }} วัน{% else %}อีก {{ f.days_left }} วัน{% endif %}</small></td>
+    <td>{% if f.status == 'pool' %}{% if f.claimed_by %}รับเรื่อง: {{ f.claimed_by|user_display }}<br><small class="text-muted">ล็อกถึง {{ f.claim_until|date:'d/m/Y' }}</small>{% else %}<span class="text-muted">ว่าง</span>{% endif %}<br><small class="text-muted">เดิม: {{ f.original_sale|user_display }}</small>{% else %}{{ f.owner_sale|user_display }}{% endif %}</td>
+    <td>{{ f.followup_count }} ครั้ง{% if f.last_followup_date %}<br><small class="text-muted">{{ f.last_followup_date|date:'d/m/Y' }}</small>{% endif %}</td>
+    <td>{% if f.status == 'alerting' or f.status == 'following' %}{{ f.protect_until|date:'d/m/Y'|default:'-' }}{% if f.protect_days_left is not None and f.protect_days_left <= 14 %}<br><small class="fu-days-soon">อีก {{ f.protect_days_left }} วัน</small>{% endif %}{% else %}-{% endif %}</td>
+    <td>{% include 'customer_followup/_status.html' %}</td>
+    <td>{{ f.new_doc_no|default:'-' }}</td>
+    <td><div class="d-flex gap-1">
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'customer_followup_detail' f.pk %}">ดู</a>
+      {% if mode == 'pool' and not f.claimed_by %}<form method="post" action="{% url 'customer_followup_claim' f.pk %}" onsubmit="return confirm('ยืนยันรับเรื่องลูกค้า {{ f.customer_name|escapejs }}?');">{% csrf_token %}<button class="btn btn-sm btn-primary">รับเรื่อง</button></form>{% endif %}
+    </div></td>
+  </tr>{% empty %}<tr><td colspan="10" class="memo-empty">ไม่พบรายการ</td></tr>{% endfor %}
+  </tbody></table></div>{% if followups|length == 500 %}<div class="text-muted mt-2">แสดง 500 รายการแรก กรุณาใช้ตัวกรอง</div>{% endif %}</section>
+</div>{% endblock %}

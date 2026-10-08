@@ -1,0 +1,62 @@
+{% extends 'base.html' %}{% load static ex_functions %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}"><link rel="stylesheet" href="{% static 'css/customer_followup.css' %}">{% endblock %}
+{% block content %}{% with f=followup %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>{{ f.customer_name|default:'-' }}</h3><div class="memo-subtitle">{{ f.course.course_name|default:'-' }} · ครบกำหนดต่ออายุ {{ f.due_date|date:'d/m/Y' }}</div></div>{% include 'customer_followup/_status.html' %}</div>
+
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-person-vcard"></i></span>ข้อมูลลูกค้าและบิลเดิม</div><div class="memo-meta">
+    <div><span>ลูกค้า</span>{{ f.customer_name|default:'-' }}</div>
+    <div><span>เลขผู้เสียภาษี</span>{{ f.customer_tax|default:'-' }}</div>
+    <div><span>เบอร์โทร (บิลเดิม)</span>{{ f.customer_phone|default:'-' }}</div>
+    <div><span>ผู้ติดต่อ (บิลเดิม)</span>{{ payment.rp_name_contact|default:'-' }}</div>
+    <div><span>เอกสารเดิม</span>{{ f.source_doc_no|default:'-' }}</div>
+    <div><span>วันที่กรอก SQ/SO/PO</span>{{ f.base_date|date:'d/m/Y' }}</div>
+    <div><span>รายการเดิม</span>{{ item.rpi_name|default:'-' }}</div>
+    <div><span>จำนวน / ราคาต่อหน่วย</span>{% if item %}{{ item.rpi_quantity }} คน / {{ item.rpi_price|floatformat:2 }} บาท{% else %}-{% endif %}</div>
+  </div></section>
+
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-hourglass-split"></i></span>สถานะการติดตาม</div><div class="memo-meta">
+    <div><span>Sale เดิม</span>{{ f.original_sale|user_display }}</div>
+    <div><span>Sale ปัจจุบัน</span>{{ f.owner_sale|user_display }}</div>
+    <div><span>ครบกำหนด</span>{{ f.due_date|date:'d/m/Y' }} ({% if f.days_left < 0 %}เกินกำหนดแล้ว{% else %}อีก {{ f.days_left }} วัน{% endif %})</div>
+    <div><span>เตือนครั้งแรก / ล่าสุด</span>{{ f.first_alert_date|date:'d/m/Y'|default:'-' }} / {{ f.last_alert_date|date:'d/m/Y'|default:'-' }}{% if f.alert_level %} (ระดับ {{ f.alert_level }} วัน){% endif %}</div>
+    <div><span>ติดตามแล้ว</span>{{ f.followup_count }} ครั้ง{% if f.followup_count < min_followups and f.status != 'pool' %} <small class="text-muted">(ครบ {{ min_followups }} ครั้ง สิทธิ์จะนับต่อจากการติดตามครั้งล่าสุด)</small>{% endif %}</div>
+    <div><span>สิทธิ์ Sale ปัจจุบันถึง</span>{% if f.status == 'pool' %}{% if f.claimed_by %}ล็อกถึง {{ f.claim_until|date:'d/m/Y' }}{% else %}ว่าง รอ Sale รับเรื่อง{% endif %}{% else %}{{ f.protect_until|date:'d/m/Y'|default:'-' }}{% endif %}</div>
+    <div><span>ใบเสนอราคาใหม่</span>{{ f.new_doc_no|default:'-' }}{% if f.new_register %} <small class="text-muted">({{ f.new_register.register_number }})</small>{% endif %}</div>
+  </div></section>
+
+  <div class="memo-actions mb-3">
+    {% if can_claim %}<form method="post" action="{% url 'customer_followup_claim' f.pk %}" onsubmit="return confirm('ยืนยันรับเรื่อง? รายการจะถูกล็อกไว้ {{ claim_days }} วัน');">{% csrf_token %}<button class="btn btn-primary"><i class="bi bi-hand-index"></i> รับเรื่อง</button></form>{% endif %}
+    {% if can_work and f.status != 'quoted' %}<a class="btn btn-success" href="{% url 'customer_followup_quote' f.pk %}"><i class="bi bi-file-earmark-plus"></i> นำข้อมูลเดิมไปออกใบเสนอราคา</a>{% endif %}
+  </div>
+
+  {% if can_work %}<form method="post" action="{% url 'customer_followup_log' f.pk %}" class="memo-card">{% csrf_token %}
+    <div class="memo-card-title"><span class="memo-icon"><i class="bi bi-telephone"></i></span>บันทึกการติดตาม</div>
+    <div class="row g-2">
+      <div class="col-md-4"><label>ชื่อ - นามสกุลผู้ติดต่อ <span class="memo-required">*</span></label><input class="form-control" name="contact_name" required maxlength="256"></div>
+      <div class="col-md-3"><label>เบอร์โทร <span class="memo-required">*</span></label><input class="form-control" name="contact_phone" required maxlength="64"></div>
+      <div class="col-md-2"><label>ช่องทาง <span class="memo-required">*</span></label><select class="form-select" name="channel" required>{% for value,label in channel_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+      <div class="col-md-3"><label>ผลการติดต่อ <span class="memo-required">*</span></label><input class="form-control" name="result" required maxlength="256" placeholder="เช่น สนใจ ขอใบเสนอราคา"></div>
+      <div class="col-12"><label>รายละเอียด</label><textarea class="form-control" name="note" rows="2"></textarea></div>
+    </div>
+    <div class="memo-form-actions mt-2"><button class="btn btn-primary">บันทึก</button></div>
+  </form>{% endif %}
+
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-clock-history"></i></span>รายงานความก้าวหน้า</div>
+    {% for log in logs %}<div class="fu-log"><strong>{{ log.contact_name }}</strong> · {{ log.contact_phone }} · {{ log.get_channel_display }} — {{ log.result }}{% if not log.counted %} <small>(ไม่นับครั้ง)</small>{% endif %}{% if log.note %}<div>{{ log.note|linebreaksbr }}</div>{% endif %}<small>{{ log.crt_date|date:'d/m/Y H:i' }} โดย {{ log.user|user_display }}</small></div>{% empty %}<div class="memo-empty">ยังไม่มีการบันทึกติดตาม</div>{% endfor %}
+  </section>
+
+  {% if owner_logs %}<section class="memo-card"><div class="memo-card-title">ประวัติการเปลี่ยน Sale</div>
+    {% for o in owner_logs %}<div class="fu-log">{{ o.get_reason_display }}: {{ o.from_user|user_display }} → {{ o.to_user|user_display }}<br><small>{{ o.crt_date|date:'d/m/Y H:i' }}{% if o.user_crt %} โดย {{ o.user_crt|user_display }}{% endif %}</small></div>{% endfor %}
+  </section>{% endif %}
+
+  {% if can_manage %}<form method="post" action="{% url 'customer_followup_assign' f.pk %}" class="memo-card">{% csrf_token %}
+    <div class="memo-card-title"><span class="memo-icon"><i class="bi bi-person-check"></i></span>Sale Desk: บันทึกผู้ขายและเลขที่ใบเสนอราคาใหม่</div>
+    <div class="row g-2">
+      <div class="col-md-5"><label>ผู้ขาย <span class="memo-required">*</span></label><select class="form-select select2" name="seller_id" required><option value="">เลือกผู้ขาย</option>{% for s in sales %}<option value="{{ s.id }}">{{ s|user_display }}</option>{% endfor %}</select></div>
+      <div class="col-md-5"><label>เลขที่ใบเสนอราคาใหม่ <span class="memo-required">*</span></label><input class="form-control" name="doc_no" required placeholder="เลขที่ใบเสนอราคา เช่น TZ69/..."></div>
+      <div class="col-md-2 d-flex align-items-end"><button class="btn btn-warning w-100" onclick="return confirm('ยืนยัน? ผู้ขายของใบเสนอราคาใหม่จะถูกเปลี่ยนเป็นผู้ขายที่เลือก (รวมค่าคอมที่ยังไม่จ่าย)');">บันทึก</button></div>
+    </div>
+  </form>{% endif %}
+
+  <div class="memo-actions"><a class="btn btn-outline-secondary" href="javascript:history.back()">กลับ</a></div>
+</div>{% endwith %}{% endblock %}

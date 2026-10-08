@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo,customer_followup
 
 urlpatterns = [
     path('profile/edit/', user.profile_edit, name='profile_edit'),
@@ -15,6 +15,14 @@ urlpatterns = [
     path('internal-memos/<int:pk>/', internal_memo.memo_detail, name='internal_memo_detail'),
     path('internal-memos/<int:pk>/submit/', internal_memo.memo_submit, name='internal_memo_submit'),
     path('internal-memos/<int:pk>/decide/', internal_memo.memo_decide, name='internal_memo_decide'),
+    path('customer-followup', customer_followup.followup_list, name='customer_followup_list'),
+    path('customer-followup/pool', customer_followup.followup_pool, name='customer_followup_pool'),
+    path('customer-followup/registry', customer_followup.followup_registry, name='customer_followup_registry'),
+    path('customer-followup/<int:pk>', customer_followup.followup_detail, name='customer_followup_detail'),
+    path('customer-followup/<int:pk>/log', customer_followup.followup_log_create, name='customer_followup_log'),
+    path('customer-followup/<int:pk>/claim', customer_followup.followup_claim, name='customer_followup_claim'),
+    path('customer-followup/<int:pk>/quote', customer_followup.followup_quote, name='customer_followup_quote'),
+    path('customer-followup/<int:pk>/assign', customer_followup.followup_assign, name='customer_followup_assign'),
     # Register
     path('', register.register_home),
     path('salesnotevent', register.register_homenotevent),

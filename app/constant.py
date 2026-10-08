@@ -241,6 +241,24 @@ listMenu = [
         "group_label": "บันทึกภายใน",
     },
     {
+        "value": "customer-followup",
+        "label": "ติดตามลูกค้า",
+        "group_value": "customerFollowup",
+        "group_label": "ติดตามลูกค้า",
+    },
+    {
+        "value": "customer-followup/pool",
+        "label": "ลูกค้าตกค้าง",
+        "group_value": "customerFollowup",
+        "group_label": "ติดตามลูกค้า",
+    },
+    {
+        "value": "customer-followup/registry",
+        "label": "ทะเบียนติดตามลูกค้า",
+        "group_value": "customerFollowup",
+        "group_label": "ติดตามลูกค้า",
+    },
+    {
         "value": "approv/internal/manage",
         "label": "ตรวจสอบและอนุมัติ",
         "group_value": "z2NIxi",

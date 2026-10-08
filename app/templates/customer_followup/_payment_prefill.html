@@ -1,0 +1,13 @@
+{% with prefill=request.session.followup_prefill %}{% if prefill and prefill.register_id == content_regist.register_id|stringformat:'s' %}
+<script>
+  // ใบเสนอราคาที่เปิดจากเมนูติดตามลูกค้า: กรอกจำนวนคน / ราคาตามที่ Sale กำหนดไว้
+  document.addEventListener('DOMContentLoaded', function () {
+    var quantity = document.getElementById('rpi_quantity');
+    var price = document.getElementById('rpi_price');
+    if (quantity) { quantity.value = '{{ prefill.quantity }}'; }
+    if (price) { price.value = '{{ prefill.price|stringformat:".2f" }}'; }
+    var target = quantity || price;
+    if (target) { target.dispatchEvent(new Event('change')); }
+  });
+</script>
+{% endif %}{% endwith %}

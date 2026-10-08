@@ -85,3 +85,10 @@ def contains_parent(path):
 @register.filter
 def subtractt(value, arg):
     return value - arg
+
+
+@register.filter
+def user_display(user):
+    if not user:
+        return '-'
+    return user.get_full_name() or user.username

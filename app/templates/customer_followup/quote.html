@@ -1,0 +1,32 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>ออกใบเสนอราคาจากข้อมูลเดิม</h3><div class="memo-subtitle">{{ followup.customer_name }} · บิลเดิม {{ followup.source_doc_no|default:'-' }}</div></div></div>
+  <form method="post" class="memo-card">{% csrf_token %}
+    <div class="memo-card-title">เลือกหลักสูตรใหม่</div>
+    <div class="mb-2">
+      <label class="me-3"><input type="radio" name="mode" value="event" checked onchange="toggleMode()"> แบบมีอีเวนต์ (รุ่นที่เปิดอบรม)</label>
+      <label><input type="radio" name="mode" value="noevent" onchange="toggleMode()"> แบบไม่มีอีเวนต์</label>
+    </div>
+    <div id="box-event" class="mb-3"><select class="form-select" name="ev_id">
+      {% for ev in events %}<option value="{{ ev.ev_id }}">{{ ev.ev_date_start|date:'d/m/Y' }} - {{ ev.course.course_name }} รุ่นที่ {{ ev.ev_generation }}{% if ev.course_id == source.course_id %} ★ หลักสูตรเดิม{% endif %}</option>{% empty %}<option value="">ไม่มีรุ่นที่เปิดอบรม</option>{% endfor %}
+    </select></div>
+    <div id="box-noevent" class="mb-3" style="display:none"><select class="form-select" name="course_id">
+      {% for c in courses %}<option value="{{ c.course_id }}" {% if c.course_id == source.course_id %}selected{% endif %}>{{ c.course_name }}</option>{% endfor %}
+    </select></div>
+    <div class="row g-2">
+      <div class="col-md-3"><label>จำนวนคน</label><input class="form-control" type="number" min="1" name="rpi_quantity" value="{{ item.rpi_quantity|default:1 }}"></div>
+      <div class="col-md-3"><label>ราคาต่อหน่วย (บาท)</label><input class="form-control" type="number" step="0.01" min="0" name="rpi_price" value="{{ item.rpi_price|default:0|stringformat:'.2f' }}"></div>
+      <div class="col-md-3"><label>การชำระเงิน</label><select class="form-select" name="pay_type"><option value="1" {% if source.pay_type == 1 %}selected{% endif %}>เงินสด</option><option value="2" {% if source.pay_type == 2 %}selected{% endif %}>เครดิต</option></select></div>
+    </div>
+    <p class="text-muted mt-2 mb-0">ข้อมูลลูกค้าจะดึงมาจากบิลเดิมทั้งหมด เมื่อกดถัดไป ระบบจะพาไปหน้ากรอกรายการขายตามขั้นตอนปกติ และกรอกจำนวนคนกับราคาไว้ให้แล้ว แก้ไขได้ก่อนบันทึก</p>
+    <div class="memo-form-actions mt-3"><a class="btn btn-outline-secondary" href="{% url 'customer_followup_detail' followup.pk %}">ยกเลิก</a><button class="btn btn-success">ถัดไป</button></div>
+  </form>
+</div>
+<script>
+function toggleMode() {
+  const mode = document.querySelector('input[name=mode]:checked').value;
+  document.getElementById('box-event').style.display = mode === 'event' ? '' : 'none';
+  document.getElementById('box-noevent').style.display = mode === 'event' ? 'none' : '';
+}
+</script>{% endblock %}
