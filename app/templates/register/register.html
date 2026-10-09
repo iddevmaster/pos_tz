@@ -16,6 +16,10 @@
 
     function selectCus(x) {
  showExistingForm(x);
+      const hint = document.getElementById('cusEmptyHint');
+      if (hint) {
+        hint.style.display = 'none';
+      }
     }
 
 
@@ -65,8 +69,40 @@ if(selectedValue != null){
 
    if(selectedValue == 'new'){ 
 
-    const student_firstname_th = document.getElementById('student_firstname_th').value;
-    const student_lastname_th = document.getElementById('student_lastname_th').value;
+    const firstnameEl = document.getElementById('student_firstname_th');
+    const lastnameEl = document.getElementById('student_lastname_th');
+    let student_firstname_th = firstnameEl ? firstnameEl.value : document.getElementById('customer_name').value;
+    let student_lastname_th = lastnameEl ? lastnameEl.value : '-';
+
+    // นิติบุคคล: ต้องมีชื่อบริษัท และ TAX ID 13 หลัก
+    if (getCustomerEntity() == '2') {
+      const companyEl = document.getElementById('company_name');
+      const company_name = (companyEl || document.getElementById('customer_name')).value.trim();
+      if (!company_name) {
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'ชื่อบริษัท / นิติบุคคล',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+      if (!/^[0-9]{13}$/.test(document.getElementById('customer_tax').value.trim())) {
+        Swal.fire({
+       title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
+       text: 'TAX ID นิติบุคคล ต้องเป็นตัวเลข 13 หลัก',
+       icon: 'error',
+     confirmButtonText: 'OK'
+    });
+        return false;
+      }
+      if (companyEl) {
+        document.getElementById('customer_name').value = company_name;
+      }
+      // นิติบุคคล ไม่มีชื่อ-นามสกุล
+      student_firstname_th = company_name;
+      student_lastname_th = '-';
+    }
     const customer_tax = document.getElementById('customer_tax').value;
     const customer_phone = document.getElementById('customer_phone').value;
     const customer_email = document.getElementById('customer_email').value;
@@ -205,6 +241,35 @@ else {
 
         }
         
+  function getCustomerEntity() {
+    const checked = document.querySelector('input[name="customer_entity"]:checked');
+    return checked ? checked.value : '1';
+  }
+
+  // 1 = บุคคล , 2 = นิติบุคคล
+  function setCustomerEntity(value) {
+    const isCompany = value == '2';
+    const companyField = document.getElementById('companyNameField');
+    const nameLabel = document.getElementById('customerNameLabel');
+    document.getElementById('taxRequired').style.display = isCompany ? '' : 'none';
+    document.querySelectorAll('.person-name-field').forEach(function (el) {
+      el.style.display = isCompany ? 'none' : '';
+    });
+    if (companyField) {
+      companyField.style.display = isCompany ? '' : 'none';
+      if (!isCompany) {
+        setBillName();
+      }
+    }
+    if (nameLabel) {
+      nameLabel.textContent = isCompany ? 'ชื่อบริษัท / นิติบุคคล' : 'ชื่อ';
+    }
+  }
+
+  $(function () {
+    setCustomerEntity(getCustomerEntity());
+  });
+
   function setBillName() {
     let student_firstname_th = document.getElementById(
       "student_firstname_th"
@@ -305,6 +370,81 @@ const selectedValue = selectElement.value;
           padding:8px 12px;
           line-height:20px;
           overflow-wrap:anywhere;
+        }
+        .customer-card__header {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .customer-card__header .card-title i { margin-right: 4px; }
+        .cus-choice {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 12px;
+        }
+        .cus-choice__item {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin: 0;
+          padding: 14px 16px;
+          border: 1.5px solid #dce1ec;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: border-color .15s, background-color .15s, box-shadow .15s;
+        }
+        .cus-choice__item:hover { border-color: #9aa9e0; }
+        .cus-choice__item input { position: absolute; opacity: 0; pointer-events: none; }
+        .cus-choice__item:has(input:checked) {
+          border-color: #435ebe;
+          background: #f1f4ff;
+          box-shadow: 0 0 0 3px rgba(67, 94, 190, .12);
+        }
+        .cus-choice__item:has(input:focus-visible) { outline: 2px solid #435ebe; outline-offset: 2px; }
+        .cus-choice__icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: #eef1f8;
+          color: #435ebe;
+          font-size: 1.25rem;
+        }
+        .cus-choice__item:has(input:checked) .cus-choice__icon { background: #435ebe; color: #fff; }
+        .cus-choice__text { display: flex; flex-direction: column; line-height: 1.35; }
+        .cus-choice__text small { color: #7c8db5; }
+        .cus-empty { margin: 16px 0 0; color: #7c8db5; text-align: center; }
+        .customer-card .form-section {
+          margin: 16px 0 0;
+          padding: 20px;
+          border: 1px solid #e9edf5;
+          border-radius: 12px;
+          background: #fbfcfe;
+        }
+        .cus-entity {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 12px;
+        }
+        .cus-entity__label { font-weight: 600; }
+        .cus-section-title {
+          margin: 24px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #e9edf5;
+          color: #435ebe;
+        }
+        .cus-section-title i { margin-right: 4px; }
+        .cus-req { color: #dc3545; }
+        .cus-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+        @media (max-width: 575.98px) {
+          .customer-card .form-section { padding: 16px; }
+          .cus-actions .btn { width: 100%; }
         }
 </style>
 <div class="row">
@@ -426,220 +566,204 @@ const selectedValue = selectElement.value;
     </div>
   </div>
   {% if content_regist.register_id != None %}
-  <div class="card">
-    <div class="card-body">
-      
-      <div class="row">
-        <div class="col-lg-6 col-md-6">
-          <div class="form-grop">
-           ข้อมูลลูกค้า
-          </div>
-        </div>
-
-  
-        <div class="col-lg-6 col-md-6">
-
-          {% if content_regist.customer_type == 1 %}
-          <div class="form-grop" align="right">
-            <button type="button" onclick="load_dataTest();" class="btn btn-info rounded-pill">
-             ข้อมูลจากบัตรประชาชน
-            </button>
-          </div>
-          {% endif %}
-          
-        </div>
+  <div class="card customer-card">
+    <div class="card-header customer-card__header">
+      <div>
+        <h4 class="card-title mb-1"><i class="bi bi-person-vcard"></i> ข้อมูลลูกค้า</h4>
+        <p class="text-muted small mb-0">เลือกลูกค้าใหม่หรือลูกค้าเก่า แล้วกรอกข้อมูลสำหรับออกใบเสร็จ</p>
       </div>
+      {% if content_regist.customer_type == 1 %}
+      <button type="button" onclick="load_dataTest();" class="btn btn-outline-info rounded-pill">
+        <i class="bi bi-credit-card-2-front"></i> ข้อมูลจากบัตรประชาชน
+      </button>
+      {% endif %}
+    </div>
+    <div class="card-body">
       <form action="/register/customer/read_idcard/" method="post" id="read_id_card">
         {% csrf_token %}
         <input type="hidden" name="data" id="result_id_card">
       </form>
 
-
       <form method="post"  onsubmit="return validateForm();"  action="{% url 'CreateCustomer' %}">
         {% csrf_token %}
 
-           <div class="row">
-  
-           <div class="col-lg-12 col-md-12">
-           <div class="form-check form-check-inline"  id="new-option">
-                <input class="form-check-input" type="radio" id="new" name="customerType" value="new" onclick="selectCus('new')">
-                <label class="form-check-label" for="new">ลูกค้าใหม่</label>
+        <div class="cus-choice">
+          <label class="cus-choice__item" for="new" id="new-option">
+            <input type="radio" id="new" name="customerType" value="new" onclick="selectCus('new')">
+            <span class="cus-choice__icon"><i class="bi bi-person-plus"></i></span>
+            <span class="cus-choice__text">
+              <strong>ลูกค้าใหม่</strong>
+              <small>สร้างข้อมูลลูกค้าใหม่</small>
+            </span>
+          </label>
+          <label class="cus-choice__item" for="existing" id="existing-option">
+            <input type="radio" id="existing" name="customerType" value="existing" onclick="selectCus('existing')">
+            <span class="cus-choice__icon"><i class="bi bi-person-check"></i></span>
+            <span class="cus-choice__text">
+              <strong>ลูกค้าเก่า</strong>
+              <small>เลือกจากรายชื่อลูกค้าที่มีอยู่</small>
+            </span>
+          </label>
+        </div>
+        <p class="cus-empty" id="cusEmptyHint">กรุณาเลือก ลูกค้าใหม่ หรือ ลูกค้าเก่า</p>
+
+        <div id="newCustomerForm" class="form-section hidden">
+          <div class="cus-entity">
+            <span class="cus-entity__label">ประเภทลูกค้า <span class="cus-req">*</span></span>
+            <div class="btn-group" role="group" aria-label="ประเภทลูกค้า">
+              <input type="radio" class="btn-check" id="customer_entity_1" name="customer_entity" value="1" {% if content_regist.customer_type != 2 %}checked{% endif %} onclick="setCustomerEntity(this.value)">
+              <label class="btn btn-outline-primary" for="customer_entity_1"><i class="bi bi-person"></i> บุคคล</label>
+              <input type="radio" class="btn-check" id="customer_entity_2" name="customer_entity" value="2" {% if content_regist.customer_type == 2 %}checked{% endif %} onclick="setCustomerEntity(this.value)">
+              <label class="btn btn-outline-primary" for="customer_entity_2"><i class="bi bi-building"></i> นิติบุคคล</label>
             </div>
-            <div class="form-check form-check-inline"  id="existing-option" >
-                <input class="form-check-input" type="radio"  id="existing" name="customerType" value="existing" onclick="selectCus('existing')">
-                <label class="form-check-label" for="same">ลูกค้าเก่า</label>
+          </div>
+
+          <h6 class="cus-section-title"><i class="bi bi-person-lines-fill"></i> ชื่อและเลขผู้เสียภาษี</h6>
+          <div class="row g-3">
+            {% if content_regist.customer_type == 1 %}
+            <div class="col-md-6 person-name-field">
+              <label class="form-label" for="student_firstname_th">ชื่อ <span class="cus-req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="student_firstname_th"
+                name="student_firstname_th"
+                placeholder="ชื่อ"
+                onkeypress="setBillName();"
+                onkeyup="setBillName();"
+                value="{{idcard_data.FirstNameTh}}"
+              />
             </div>
-        </div>
-       
-      <div id="newCustomerForm" class="form-section hidden">
- <div class="row">
-
-
-        {% if content_regist.customer_type == 1 %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ชื่อ</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="student_firstname_th"
-              name="student_firstname_th"
-              onkeypress="setBillName();"
-              onkeyup="setBillName();"
-              value="{{idcard_data.FirstNameTh}}"
-            />
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>นามสกุล</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              id="student_lastname_th"
-              name="student_lastname_th"
-              onkeypress="setBillName();"
-              onkeyup="setBillName();"
-              value="{{idcard_data.LastNameTh}}"
-            />  
-            <input
-            type="hidden"
-            name="customer_name"
-            id="customer_name"
-            
-            value="{{idcard_data.FirstNameTh}} {{idcard_data.LastNameTh}}"
-          />
-          </div>
-        </div>
-        {% else %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ชื่อ</label>  <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_name"
-              id="customer_name"
-              
-            />
-          </div>
-        </div>
-        {% endif %}
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>TAX ID / เลขประจำตัวประชาชน</label> 
-            <input
-              type="text"
-              class="form-control"
-              name="customer_tax"
-              id="customer_tax"
-              value="{{idcard_data.CitizenNo}}"
-            />
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>Tel.</label> <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_phone"
-              id="customer_phone"
-              
-            />
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>Email</label> 
-            <input
-              type="text"
-              class="form-control"
-              name="customer_email"
-              id="customer_email"
-            />
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6">
-          <div class="form-group">
-            <label>ที่อยู่เลขที่</label>  <label style="color: red">*</label>
-            <input
-              type="text"
-              class="form-control"
-              name="customer_address"
-              id="customer_address"
-              
-              value="{{address}}"
-            />
-          </div>
-        </div>
-
-        <div class="col-lg-12 col-md-12">
-          <div class="form-group">
-            <label>ตำบล-อำเภอ-จังหวัด-ไปรษณีย์</label> <label style="color: red">*</label>
-            <select
-              class="form-select"
-              
-              name="location_id"
-              id="selLocations"
-            >
-            
-            {% if location != None %}
-            <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
+            <div class="col-md-6 person-name-field">
+              <label class="form-label" for="student_lastname_th">นามสกุล <span class="cus-req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="student_lastname_th"
+                name="student_lastname_th"
+                placeholder="นามสกุล"
+                onkeypress="setBillName();"
+                onkeyup="setBillName();"
+                value="{{idcard_data.LastNameTh}}"
+              />
+              <input
+                type="hidden"
+                name="customer_name"
+                id="customer_name"
+                value="{{idcard_data.FirstNameTh}} {{idcard_data.LastNameTh}}"
+              />
+            </div>
+            <div class="col-md-6" id="companyNameField" style="display: none">
+              <label class="form-label" for="company_name">ชื่อบริษัท / นิติบุคคล (ออกใบเสร็จ) <span class="cus-req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="company_name"
+                placeholder="เช่น บริษัท ตัวอย่าง จำกัด"
+              />
+            </div>
+            {% else %}
+            <div class="col-md-6">
+              <label class="form-label" for="customer_name"><span id="customerNameLabel">ชื่อ</span> <span class="cus-req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                name="customer_name"
+                id="customer_name"
+              />
+            </div>
             {% endif %}
+            <div class="col-md-6">
+              <label class="form-label" for="customer_tax">TAX ID / เลขประจำตัวประชาชน <span class="cus-req" id="taxRequired" style="display: none">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                name="customer_tax"
+                id="customer_tax"
+                inputmode="numeric"
+                placeholder="เลข 13 หลัก"
+                value="{{idcard_data.CitizenNo}}"
+              />
+            </div>
+          </div>
 
-              <option value="">-เลือกข้อมูล-</option>
-            </select>
+          <h6 class="cus-section-title"><i class="bi bi-telephone"></i> ข้อมูลติดต่อ</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="customer_phone">เบอร์โทร <span class="cus-req">*</span></label>
+              <input
+                type="tel"
+                class="form-control"
+                name="customer_phone"
+                id="customer_phone"
+                placeholder="เช่น 0812345678"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="customer_email">Email</label>
+              <input
+                type="text"
+                class="form-control"
+                name="customer_email"
+                id="customer_email"
+                placeholder="name@example.com"
+              />
+            </div>
+          </div>
+
+          <h6 class="cus-section-title"><i class="bi bi-geo-alt"></i> ที่อยู่</h6>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="customer_address">ที่อยู่เลขที่ <span class="cus-req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                name="customer_address"
+                id="customer_address"
+                placeholder="บ้านเลขที่ หมู่ ซอย ถนน"
+                value="{{address}}"
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="selLocations">ตำบล - อำเภอ - จังหวัด - ไปรษณีย์ <span class="cus-req">*</span></label>
+              <select
+                class="form-select"
+                name="location_id"
+                id="selLocations"
+              >
+              {% if location != None %}
+              <option value="{{location.location_id}}" selected>{{location.district_name}} - {{location.amphur_name}} - {{location.province_name}} - {{location.zipcode}}</option>
+              {% endif %}
+                <option value="">-เลือกข้อมูล-</option>
+              </select>
+            </div>
           </div>
         </div>
 
-
- 
-        
-      </div> 
-      
-
- </div>
-
-
-        <div  id="existingCustomerForm"  class="form-section hidden">
-     <div class="row">
-                <div class="col-lg-12 col-md-12">
-         <div class="form-group">
-            <label>ลูกค้า  
-      </label> <label style="color: red">*</label>
-            <select
-              class="select2"
-              id="customer_id"
-              name="customer_id"
-              
-              onchange="myFunction(this)" 
-              
-            >
-              <option value="">-เลือกลูกค้า-</option>
-              {% for res in customers %}
-              <option value="{{res.customer_id}}">
-                {{res.customer_name}}  - {{res.customer_code}}  
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
+        <div id="existingCustomerForm" class="form-section hidden">
+          <label class="form-label" for="customer_id">ลูกค้า <span class="cus-req">*</span></label>
+          <select
+            class="select2"
+            id="customer_id"
+            name="customer_id"
+            onchange="myFunction(this)"
+          >
+            <option value="">-เลือกลูกค้า-</option>
+            {% for res in customers %}
+            <option value="{{res.customer_id}}">
+              {{res.customer_name}}  - {{res.customer_code}}
+            </option>
+            {% endfor %}
+          </select>
+          <p class="text-muted small mt-2 mb-0">ค้นหาด้วยชื่อลูกค้าหรือรหัสลูกค้า</p>
         </div>
-        
-      </div> 
 
-
-        
-      </div> 
-
-      <div class="form-group" align="center">
-        <button type="submit" class="btn btn-success rounded-pill">
-          บันทึกข้อมูล
-        </button>
-      </div>
-    </form>
+        <div class="cus-actions">
+          <button type="submit" class="btn btn-success rounded-pill px-4">
+            <i class="bi bi-save"></i> บันทึกข้อมูล
+          </button>
+        </div>
+      </form>
 
     </div>
   </div>

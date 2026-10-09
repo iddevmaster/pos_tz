@@ -219,6 +219,8 @@ class customers(models.Model):
     customer_email = models.CharField(max_length=64, blank=True, default=None)
     customer_address = models.CharField(
         max_length=512, blank=True, default=None)
+    # customer_entity 1 = บุคคล , 2 = นิติบุคคล
+    customer_entity = models.IntegerField(default=1, blank=True)
     location = models.ForeignKey(
         location_thai, on_delete=models.CASCADE)
     register = models.ForeignKey(register_main, on_delete=models.CASCADE)
