@@ -119,7 +119,13 @@
               {{res.pay_item.rpi_name}} 
               {% endif %}
             </td>
-            <td>{{res.customer_list.customer_name}}</td>
+            <td>
+              {% if res.regis.customer_type == 1 and res.customer_list.customer_fisrt and res.customer_list.customer_fisrt != '-' %}
+              {{res.customer_list.customer_fisrt}} {% if res.customer_list.customer_last != '-' %}{{res.customer_list.customer_last|default_if_none:''}}{% endif %}
+              {% else %}
+              {{res.customer_list.customer_name}}
+              {% endif %}
+            </td>
             <td align="center">
               {% if res.regis.customer_type == 1 %}
 
