@@ -11,7 +11,7 @@
     <button class="btn btn-outline-primary">ค้นหา</button>
   </form></section>
   <section class="memo-card"><div class="table-responsive"><table class="memo-table"><thead><tr>
-    <th>ลูกค้า</th><th>หลักสูตรเดิม</th><th>เอกสารเดิม</th><th>ครบกำหนด</th><th>Sale</th><th>ติดตาม</th><th>สิทธิ์ถึง</th><th>สถานะ</th><th>ใบเสนอราคาใหม่</th><th></th>
+    <th>ลูกค้า</th><th>หลักสูตรเดิม</th><th>เอกสารเดิม</th><th>ครบกำหนด</th><th>Sale</th><th>ติดตาม</th><th>สิทธิ์ถึง</th><th>สถานะ</th><th></th>
   </tr></thead><tbody>
   {% for f in followups %}<tr>
     <td>{{ f.customer_name|default:'-' }}{% if f.customer_tax %}<br><small class="text-muted">{{ f.customer_tax }}</small>{% endif %}</td>
@@ -22,11 +22,10 @@
     <td>{{ f.followup_count }} ครั้ง{% if f.last_followup_date %}<br><small class="text-muted">{{ f.last_followup_date|date:'d/m/Y' }}</small>{% endif %}</td>
     <td>{% if f.status == 'alerting' or f.status == 'following' %}{{ f.protect_until|date:'d/m/Y'|default:'-' }}{% if f.protect_days_left is not None and f.protect_days_left <= 14 %}<br><small class="fu-days-soon">อีก {{ f.protect_days_left }} วัน</small>{% endif %}{% else %}-{% endif %}</td>
     <td>{% include 'customer_followup/_status.html' %}</td>
-    <td>{{ f.new_doc_no|default:'-' }}</td>
     <td><div class="d-flex gap-1">
       <a class="btn btn-sm btn-outline-primary" href="{% url 'customer_followup_detail' f.pk %}">ดู</a>
       {% if mode == 'pool' and not f.claimed_by %}<form method="post" action="{% url 'customer_followup_claim' f.pk %}" onsubmit="return confirm('ยืนยันรับเรื่องลูกค้า {{ f.customer_name|escapejs }}?');">{% csrf_token %}<button class="btn btn-sm btn-primary">รับเรื่อง</button></form>{% endif %}
     </div></td>
-  </tr>{% empty %}<tr><td colspan="10" class="memo-empty">ไม่พบรายการ</td></tr>{% endfor %}
+  </tr>{% empty %}<tr><td colspan="9" class="memo-empty">ไม่พบรายการ</td></tr>{% endfor %}
   </tbody></table></div>{% if followups|length == 500 %}<div class="text-muted mt-2">แสดง 500 รายการแรก กรุณาใช้ตัวกรอง</div>{% endif %}</section>
 </div>{% endblock %}

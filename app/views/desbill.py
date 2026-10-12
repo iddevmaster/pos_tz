@@ -130,21 +130,20 @@ def setting_form_certificate(request):
     )
 
     if request.method == 'POST':
-        try:
-            template_type = int(request.POST.get('template_type', 1))
-        except (TypeError, ValueError):
-            template_type = 1
-        if template_type not in (1, 2):
-            template_type = 1
-
-        setting.template_type = template_type
-        setting.save(update_fields=['template_type'])
+        for field in ('template_type', 'template_type_eng'):
+            try:
+                value = int(request.POST.get(field, 1))
+            except (TypeError, ValueError):
+                value = 1
+            setattr(setting, field, value if value in (1, 2) else 1)
+        setting.save(update_fields=['template_type', 'template_type_eng'])
         messages.success(request, 'บันทึกการตั้งค่าใบเซอร์เรียบร้อยแล้ว')
         return redirect('certificate_setting_form')
 
     context = {
         'title': defaultTitle,
         'template_type': setting.template_type,
+        'template_type_eng': setting.template_type_eng,
         'listMenuPermission': obj_menu,
     }
     return render(request, 'settingdes/certificate_form_create.html', context)

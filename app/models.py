@@ -328,6 +328,8 @@ class bill_setting(models.Model):
 class certificate_setting(models.Model):
     certificate_setting_id = models.AutoField(primary_key=True)
     template_type = models.PositiveSmallIntegerField(default=1)
+    # รูปแบบใบเซอร์ภาษาอังกฤษ 1 = วันที่อบรม, 2 = ช่วงวันที่อบรม
+    template_type_eng = models.PositiveSmallIntegerField(default=1)
 
 
 class billing_cycle_setting(models.Model):
@@ -644,20 +646,16 @@ class notifications(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-# ติดตามลูกค้าเก่า (เตือนต่ออายุก่อนครบ 2 ปี นับจากวันที่กรอกเลข SQ / SO / PO)
+# ติดตามลูกค้าเก่า (เตือนต่ออายุก่อนครบ 1 ปี นับจากวันที่กรอกเลข SQ / SO / PO)
 class customer_followup(models.Model):
     STATUS_WAITING = 'waiting'
     STATUS_ALERTING = 'alerting'
     STATUS_FOLLOWING = 'following'
-    STATUS_QUOTED = 'quoted'
-    STATUS_WON = 'won'
     STATUS_POOL = 'pool'
     STATUS_CHOICES = (
         (STATUS_WAITING, 'ยังไม่ถึงกำหนดเตือน'),
         (STATUS_ALERTING, 'เตือนแล้ว รอติดตาม'),
-        (STATUS_FOLLOWING, 'กำลังติดตาม'),
-        (STATUS_QUOTED, 'ออกใบเสนอราคาใหม่แล้ว'),
-        (STATUS_WON, 'ปิดการขายแล้ว'),
+        (STATUS_FOLLOWING, 'ติดตามแล้ว'),
         (STATUS_POOL, 'ลูกค้าตกค้าง'),
     )
 

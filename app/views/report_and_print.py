@@ -4076,7 +4076,8 @@ def student_print_certificate(request, student_id):
     )
     context = {'title': defaultTitle,  'data': content,
                'detail': detail, 'print': print,
-               'certificate_template_type': certificate_config.template_type}
+               'certificate_template_type': certificate_config.template_type,
+               'certificate_template_type_eng': certificate_config.template_type_eng}
     if lang == "th":
         return render(request, 'print/student_print_certificate_th.html', context)
     else:

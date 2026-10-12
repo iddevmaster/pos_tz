@@ -1,15 +1,14 @@
 """กติกาการติดตามลูกค้าเก่า / ลูกค้าตกค้าง
 
-- ครบกำหนดต่ออายุ = วันที่กรอกเลข SQ / SO / PO (salesorder.crt_date) + 2 ปี
-- เตือน Sale เจ้าของเมื่อเหลือ 90 / 60 / 30 วัน
+- ครบกำหนดต่ออายุ = วันที่กรอกเลข SQ / SO / PO (salesorder.crt_date) + 1 ปี
+- เตือน Sale เจ้าของเมื่อเหลือ 90 / 60 / 30 วัน เฉพาะรายการที่ยังไม่มีการติดตาม
+  ติดตามแล้วหยุดเตือน สถานะค้างเป็น "ติดตามแล้ว"
 - สิทธิ์ของ Sale เจ้าของ (protect_until)
     ไม่เคยติดตาม      : เตือนครั้งแรก + 3 เดือน
     ติดตาม 1-2 ครั้ง   : เตือนครั้งล่าสุด + 3 เดือน
     ติดตาม 3 ครั้งขึ้นไป : max(เตือนครั้งล่าสุด, ติดตามครั้งล่าสุด) + 3 เดือน
 - หมดสิทธิ์แล้วย้ายไปลูกค้าตกค้างอัตโนมัติ Sale คนใดก็รับเรื่องได้ ล็อก 90 วัน
-- ออกใบเสนอราคาใหม่แล้ว (quoted) หยุดนับ ถ้าปิดการขายได้ (มี salesorder) = won
 """
-from collections import Counter
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -20,18 +19,15 @@ from .functions import dateTimeNow
 from .models import (
     customer_followup,
     customer_followup_owner_log,
-    event_register,
-    fact_commission,
     fact_customer,
     notifications,
-    register_main,
     register_payment,
     salesorder,
     user_detail,
 )
 
 ALERT_LEVELS = (90, 60, 30)
-RENEW_YEARS = 2
+RENEW_YEARS = 1
 PROTECT_MONTHS = 3
 MIN_FOLLOWUPS = 3
 CLAIM_DAYS = 90
@@ -114,11 +110,6 @@ def _users_in(categories):
     )
 
 
-def _renewal_sale_order(register_id):
-    er_ids = event_register.objects.filter(register_id=register_id).values_list('er_id', flat=True)
-    return salesorder.objects.filter(er_id__in=list(er_ids)).order_by('-crt_date').first()
-
-
 def _doc_label(sale, payment):
     parts = []
     for label, value in (('SQ', sale.sq), ('SO', sale.so), ('PO', sale.po)):
@@ -172,7 +163,10 @@ def sync_new_followups(dry_run=False):
 
 def process_alerts(run_date, dry_run=False):
     alerted = []
-    for followup in customer_followup.objects.filter(status__in=ACTIVE_STATUSES):
+    # ติดตามแล้ว (following) ไม่ต้องเตือนรอบถัดไป
+    for followup in customer_followup.objects.filter(
+        status__in=(customer_followup.STATUS_WAITING, customer_followup.STATUS_ALERTING)
+    ):
         days_left = (followup.due_date - run_date).days
         reached = [level for level in ALERT_LEVELS if days_left <= level]
         if not reached:
@@ -245,53 +239,9 @@ def release_expired_claims(run_date, dry_run=False):
     return expired
 
 
-def revert_quote(followup):
-    """ใบเสนอราคาใหม่ถูกลบ / ขายไม่สำเร็จ: กลับไปติดตามต่อ หรือกลับเข้าลูกค้าตกค้าง"""
-    followup.new_register = None
-    followup.new_doc_no = ''
-    if followup.pool_date:
-        followup.status = customer_followup.STATUS_POOL
-    elif followup.followup_count:
-        followup.status = customer_followup.STATUS_FOLLOWING
-    elif followup.alert_level:
-        followup.status = customer_followup.STATUS_ALERTING
-    else:
-        followup.status = customer_followup.STATUS_WAITING
-
-
-def update_quoted(dry_run=False):
-    changes = Counter()
-    for followup in customer_followup.objects.filter(
-        status=customer_followup.STATUS_QUOTED
-    ).select_related('new_register'):
-        try:
-            renewal = followup.new_register
-        except register_main.DoesNotExist:
-            renewal = None
-        if renewal is None:
-            revert_quote(followup)
-            changes['reverted'] += 1
-        elif renewal.close_the_sale == 2:
-            revert_quote(followup)
-            changes['reverted'] += 1
-        else:
-            if not followup.new_doc_no:
-                payment = register_payment.objects.filter(
-                    register_id=renewal.register_id).order_by('-rp_id').first()
-                if payment and payment.rp_doc_number:
-                    followup.new_doc_no = payment.rp_doc_number
-            if _renewal_sale_order(renewal.register_id):
-                followup.status = customer_followup.STATUS_WON
-                changes['won'] += 1
-        if not dry_run:
-            followup.save()
-    return changes
-
-
 def run_daily(run_date=None, dry_run=False):
     run_date = run_date or today()
     created = sync_new_followups(dry_run=dry_run)
-    quoted = update_quoted(dry_run=dry_run)
     alerted = process_alerts(run_date, dry_run=dry_run)
     moved = move_to_pool(run_date, dry_run=dry_run)
     expired = release_expired_claims(run_date, dry_run=dry_run)
@@ -311,40 +261,10 @@ def run_daily(run_date=None, dry_run=False):
         )
     return {
         'created': len(created),
-        'won': quoted['won'],
-        'reverted': quoted['reverted'],
         'alerted': len(alerted),
         'moved_to_pool': len(moved),
         'claims_released': len(expired),
     }
-
-
-def assign_by_sale_desk(followup, seller, renewal_register, doc_no, actor):
-    """Sale Desk บันทึกชื่อผู้ขายและเลขที่ใบเสนอราคาใหม่ ผู้ขายจะได้ค่าคอมของใบใหม่"""
-    with transaction.atomic():
-        customer_followup_owner_log.objects.create(
-            followup=followup,
-            from_user_id=followup.owner_sale_id or followup.claimed_by_id,
-            to_user=seller, reason='sale_desk', user_crt=actor)
-        renewal_register.seller = seller
-        renewal_register.user_update = actor
-        renewal_register.upd_date = dateTimeNow()
-        renewal_register.save(update_fields=['seller', 'user_update', 'upd_date'])
-        fact_commission.objects.filter(
-            register_id=str(renewal_register.register_id).replace('-', ''), status='W'
-        ).update(user_id=seller.id)
-
-        followup.owner_sale = seller
-        followup.claimed_by = None
-        followup.claim_until = None
-        followup.new_register = renewal_register
-        followup.new_doc_no = doc_no
-        followup.status = (
-            customer_followup.STATUS_WON
-            if _renewal_sale_order(renewal_register.register_id)
-            else customer_followup.STATUS_QUOTED
-        )
-        followup.save()
 
 
 def sale_users():

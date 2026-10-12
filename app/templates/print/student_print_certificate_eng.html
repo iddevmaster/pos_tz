@@ -171,10 +171,18 @@
         </div>
         <div style="font-size: 35px; font-weight: bold">
           {% language 'en' %}
+          {% if certificate_template_type_eng == 2 and detail.ev_date_end and detail.ev_date_end|date:'Ymd' != detail.ev_date_start|date:'Ymd' %}
+            {% if detail.ev_date_start|date:'Ym' == detail.ev_date_end|date:'Ym' %}
+          <span> {{detail.ev_date_start|date:'d'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
+            {% elif detail.ev_date_start|date:'Y' == detail.ev_date_end|date:'Y' %}
+          <span> {{detail.ev_date_start|date:'d F'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
+            {% else %}
+          <span> {{detail.ev_date_start|date:'d F Y'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
+            {% endif %}
+          {% else %}
           <span> {{detail.ev_date_start|date:'d F Y'}} </span>
+          {% endif %}
           {% endlanguage %}
-<!--- <span>  {{detail.ev_date_start|date:'d F Y'}} - {{detail.ev_date_end|date:'d F Y'}} </span>
-      -->
         </div>
         <hr style="width: 35em" />
       </div>

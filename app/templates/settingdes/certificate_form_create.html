@@ -63,6 +63,45 @@
           </label>
         </div>
       </div>
+
+      <hr class="my-4">
+      <p class="mb-3">เลือกรูปแบบข้อมูลที่แสดงบนใบเซอร์ภาษาอังกฤษ</p>
+      <div class="row g-4">
+        <div class="col-12 col-xl-6">
+          <input class="certificate-radio d-none" type="radio" name="template_type_eng" id="template_type_eng_1" value="1" {% if template_type_eng == 1 %}checked{% endif %}>
+          <label class="certificate-option" for="template_type_eng_1">
+            <span class="fw-bold">แบบที่ 1</span>
+            <span class="d-block text-muted">ชื่อหลักสูตรภาษาอังกฤษ และวันที่อบรม</span>
+            <div class="certificate-preview">
+              <img class="corner-top" src="{% static 'images/cer_head_rm.png' %}" alt="">
+              <img class="corner-bottom" src="{% static 'images/cer_footer_rm.png' %}" alt="">
+              <img class="preview-logo" src="{% static 'images/newlogo_resize.png' %}" alt="">
+              <div class="certificate-preview-content">
+                <div class="preview-title">Certificate of Achievement</div><div class="preview-subtitle">This is to certify that</div>
+                <div class="preview-name">Mr. Example Trainee</div><div class="preview-small">has successfully complete</div>
+                <div class="preview-course">Safe Driving Course</div><div class="preview-date">23 September 2026</div>
+              </div>
+            </div>
+          </label>
+        </div>
+        <div class="col-12 col-xl-6">
+          <input class="certificate-radio d-none" type="radio" name="template_type_eng" id="template_type_eng_2" value="2" {% if template_type_eng == 2 %}checked{% endif %}>
+          <label class="certificate-option" for="template_type_eng_2">
+            <span class="fw-bold">แบบที่ 2</span>
+            <span class="d-block text-muted">ชื่อหลักสูตรภาษาอังกฤษ และช่วงวันที่อบรม</span>
+            <div class="certificate-preview">
+              <img class="corner-top" src="{% static 'images/cer_head_rm.png' %}" alt="">
+              <img class="corner-bottom" src="{% static 'images/cer_footer_rm.png' %}" alt="">
+              <img class="preview-logo" src="{% static 'images/newlogo_resize.png' %}" alt="">
+              <div class="certificate-preview-content">
+                <div class="preview-title">Certificate of Achievement</div><div class="preview-subtitle">This is to certify that</div>
+                <div class="preview-name">Mr. Example Trainee</div><div class="preview-small">has successfully complete</div>
+                <div class="preview-course">Safe Driving Course</div><div class="preview-date">23 - 24 September 2026</div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
       <div class="mt-4 text-center"><button type="submit" class="btn btn-primary px-5">บันทึก</button></div>
     </form>
   </div></div>

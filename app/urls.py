@@ -21,8 +21,6 @@ urlpatterns = [
     path('customer-followup/<int:pk>', customer_followup.followup_detail, name='customer_followup_detail'),
     path('customer-followup/<int:pk>/log', customer_followup.followup_log_create, name='customer_followup_log'),
     path('customer-followup/<int:pk>/claim', customer_followup.followup_claim, name='customer_followup_claim'),
-    path('customer-followup/<int:pk>/quote', customer_followup.followup_quote, name='customer_followup_quote'),
-    path('customer-followup/<int:pk>/assign', customer_followup.followup_assign, name='customer_followup_assign'),
     # Register
     path('', register.register_home),
     path('salesnotevent', register.register_homenotevent),
