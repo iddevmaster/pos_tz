@@ -275,7 +275,8 @@ def user_online_list(request):
     online_since = (now - timedelta(minutes=ONLINE_MINUTES)).timestamp()
     latest = {}
     for session in Session.objects.filter(expire_date__gte=now):
-        data = session.get_decoded()
+        # session ของ request ปัจจุบันยังไม่ถูกบันทึกลง DB จึงอ่านจาก memory แทน
+        data = request.session if session.session_key == request.session.session_key else session.get_decoded()
         user_id = data.get('_auth_user_id')
         if not user_id:
             continue
