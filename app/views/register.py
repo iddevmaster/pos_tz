@@ -362,8 +362,9 @@ def customer_create(request):
             customer_address=customer_address,
             location_id=location_id,
             register_id=register_id,
-            customer_fisrt=request.POST['student_firstname_th'],
-            customer_last=request.POST['student_lastname_th'])
+            customer_entity=request.POST.get('customer_entity', 1),
+            customer_fisrt=request.POST['student_firstname_th'] if request.POST.get('customer_entity') != '2' else '-',
+            customer_last=request.POST['student_lastname_th'] if request.POST.get('customer_entity') != '2' else '-')
         else:
             customer_code = "C" + str(dateTimeIntNow())
             customer_name = request.POST['customer_name']
@@ -381,6 +382,7 @@ def customer_create(request):
             customer_address=customer_address,
             location_id=location_id,
             register_id=register_id,
+            customer_entity=request.POST.get('customer_entity', 1),
             customer_fisrt='-',
             customer_last='-')
     # 
@@ -483,8 +485,9 @@ def customer_createno(request):
             customer_address=customer_address,
             location_id=location_id,
             register_id=register_id,
-            customer_fisrt=request.POST['student_firstname_th'],
-            customer_last=request.POST['student_lastname_th'])
+            customer_entity=request.POST.get('customer_entity', 1),
+            customer_fisrt=request.POST['student_firstname_th'] if request.POST.get('customer_entity') != '2' else '-',
+            customer_last=request.POST['student_lastname_th'] if request.POST.get('customer_entity') != '2' else '-')
         else:
             customer_code = "C" + str(dateTimeIntNow())
             customer_name = request.POST['customer_name']
@@ -502,6 +505,7 @@ def customer_createno(request):
             customer_address=customer_address,
             location_id=location_id,
             register_id=register_id,
+            customer_entity=request.POST.get('customer_entity', 1),
             customer_fisrt='-',
             customer_last='-')
     # 

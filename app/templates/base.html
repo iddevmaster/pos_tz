@@ -1452,6 +1452,11 @@ function initTabEvents() {
                       <span class="font-default">จัดการผู้ใช้งาน</span>
                     </a>
                   </li>
+                  <li class="{% if request.path == '/settings/users/online/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="{% url 'user_online_list' %}">
+                      <span class="font-default">User ที่อยู่ในระบบ</span>
+                    </a>
+                  </li>
                   <li class="{% if request.path == '/settings/users/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="{% url 'user_teacher_create' %}">
                       <span class="font-default">สร้าง User / ครูฝึก</span>

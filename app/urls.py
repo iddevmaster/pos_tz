@@ -300,6 +300,8 @@ urlpatterns = [
     #     user
     path('settings/users/', user.user_manage_list,
          name='user_manage_list'),
+    path('settings/users/online/', user.user_online_list,
+         name='user_online_list'),
     path('settings/users/create/', user.user_teacher_create,
          name='user_teacher_create'),
     path('settings/users/<int:pk>/edit/', user.user_manage_edit,

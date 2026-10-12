@@ -1,9 +1,11 @@
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -260,6 +262,56 @@ def user_manage_list(request):
         'listMenuPermission': _menu_context(request.user.id),
         'accounts': accounts,
         'keyword': keyword,
+    })
+
+
+ONLINE_MINUTES = 5
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda current_user: current_user.is_staff, login_url='/403')
+def user_online_list(request):
+    now = datetime.now()
+    online_since = (now - timedelta(minutes=ONLINE_MINUTES)).timestamp()
+    latest = {}
+    for session in Session.objects.filter(expire_date__gte=now):
+        data = session.get_decoded()
+        user_id = data.get('_auth_user_id')
+        if not user_id:
+            continue
+        last_activity = data.get('last_activity', 0)
+        current = latest.get(int(user_id))
+        if current is None or last_activity > current['last_activity']:
+            latest[int(user_id)] = {
+                'last_activity': last_activity,
+                'last_ip': data.get('last_ip', '-'),
+                'last_agent': data.get('last_agent', '-'),
+                'session_count': (current or {}).get('session_count', 0) + 1,
+            }
+        else:
+            current['session_count'] += 1
+
+    accounts = list(User.objects.filter(id__in=latest.keys()))
+    details = {
+        item.user_id: item.cm.cm_name
+        for item in user_detail.objects.filter(user_id__in=latest.keys()).select_related('cm')
+    }
+    for account in accounts:
+        info = latest[account.id]
+        account.category_name = details.get(account.id, '-')
+        account.last_activity = datetime.fromtimestamp(info['last_activity']) if info['last_activity'] else None
+        account.is_online = info['last_activity'] >= online_since
+        account.last_ip = info['last_ip']
+        account.last_agent = info['last_agent']
+        account.session_count = info['session_count']
+    accounts.sort(key=lambda a: (not a.is_online, -(a.last_activity.timestamp() if a.last_activity else 0)))
+
+    return render(request, 'user/user_online_list.html', {
+        'title': defaultTitle,
+        'listMenuPermission': _menu_context(request.user.id),
+        'accounts': accounts,
+        'online_count': sum(1 for a in accounts if a.is_online),
+        'online_minutes': ONLINE_MINUTES,
     })
 
 
