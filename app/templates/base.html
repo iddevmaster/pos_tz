@@ -1672,9 +1672,11 @@ function initTabEvents() {
       $(document).ready(function () {
 
         
-        $(".select2").not(".select2-hidden-accessible").select2({
-          placeholder: "เลือกข้อมูล",
-          allowClear: true,
+        $(".select2").not(".select2-hidden-accessible").each(function () {
+          $(this).select2({
+            placeholder: $(this).data("placeholder") || "เลือกข้อมูล",
+            allowClear: true,
+          });
         });
 
         $("#selLocations").select2({
