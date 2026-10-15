@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{title}}</title>
+  <title>Commission_{{code}}_{{year_current}}_{{current_m}}</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
   <link rel="stylesheet" href="{% static 'fix_a4.css' %}" />
   <script src="{% static 'libs/thaibath/thaibath.js' %}"></script>
@@ -98,11 +98,64 @@
     .fs10{
       font-size:10px;
     }
+
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      background: #fff;
+      border-bottom: 1px solid #D3D3D3;
+    }
+
+    .print-toolbar button {
+      font-family: "Sarabun", sans-serif;
+      font-size: 14px;
+      height: 36px;
+      padding: 0 18px;
+      border: 1px solid #435ebe;
+      border-radius: 5px;
+      background: #435ebe;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .print-toolbar button.secondary {
+      background: #fff;
+      color: #435ebe;
+    }
+
+    @media print {
+      .print-toolbar {
+        display: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .page22 {
+        width: 100%;
+        min-height: auto;
+        margin: 0;
+        border: initial;
+        border-radius: initial;
+        box-shadow: initial;
+        background: initial;
+      }
+    }
   </style>
 </head>
 {% comment %} window.print() {% endcomment %}
 
 <body onLoad="myFunction();window.print();RunDate();">
+  <div class="print-toolbar">
+    <button type="button" onclick="window.print()">พิมพ์ / บันทึก PDF</button>
+    <button type="button" class="secondary" onclick="window.close()">ปิด</button>
+  </div>
   <div class="page22">
     <br>
     <br>
