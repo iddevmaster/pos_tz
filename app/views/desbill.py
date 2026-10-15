@@ -176,7 +176,7 @@ def setting_form_tax(request):
 
     
 
-    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'tax_id':tax.tax_id,'tax':tax.tax}
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,'tax_id':tax.tax_id,'tax':tax.tax,'tax_com':tax.tax_com}
             
     return render(request, 'settingdes/tax_form_create.html', context)
 
@@ -186,9 +186,12 @@ def savetax(request):
     data = json.loads(request.body)
     tax_id = data.get("tax_id")
     taxu = data.get("tax")
+    tax_com = data.get("tax_com")
 
-  
-    tax_setting.objects.filter(tax_id=tax_id).update(tax=taxu)
+    fields = {'tax': taxu}
+    if tax_com not in (None, ''):
+        fields['tax_com'] = tax_com
+    tax_setting.objects.filter(tax_id=tax_id).update(**fields)
     datas = {'status':'200'}
     return JsonResponse(data,safe=False)
 

@@ -21,13 +21,8 @@ return false; // Prevent default behavior
 
 
 setTimeout(() => {
-const it = document.getElementById("tax").value;
-if (it.charAt(0) == "0") {
-if (it.charAt(1)) {
-let result = removeFirstCharacter(it);
-document.getElementById("tax").value = result 
-}
-}
+const input = event.target;
+input.value = input.value.replace(/^0+(?=\d)/, "");
 }, 20);
 }
 
@@ -37,7 +32,17 @@ document.getElementById("tax").value = result
  
  const tax_id = document.getElementById("tax_id").value;
  const tax = document.getElementById("tax").value;
+ const tax_com = document.getElementById("tax_com").value;
 
+ if (tax === "" || tax_com === "") {
+   Swal.fire({
+     title: 'แจ้งเตือน',
+     text: 'กรุณากรอกภาษีให้ครบ',
+     icon: 'warning',
+     confirmButtonText: 'OK'
+   });
+   return;
+ }
 
 
  let data = await fetch('/api/savetax', {
@@ -45,7 +50,7 @@ document.getElementById("tax").value = result
    headers: {
        'Content-Type': 'application/json',
    },
-   body: JSON.stringify({'tax_id':tax_id,'tax':tax})
+   body: JSON.stringify({'tax_id':tax_id,'tax':tax,'tax_com':tax_com})
    })
    .then(response => response.json())
    .then(data => {
@@ -95,6 +100,11 @@ document.getElementById("tax").value = result
           <div class="col-12 col-lg-12 col-md-12">
             ภาษี % <label style="color: red"> *</label>
             <input type="text" class="form-control" name="tax" id="tax"  value="{{tax}}"  required   onkeydown="allowOnlyNumbers(event)" />
+          </div>
+          <div class="col-12 col-lg-12 col-md-12" style="padding-top: 15px">
+            ภาษีค่าคอม Sale % <label style="color: red"> *</label>
+            <input type="text" class="form-control" name="tax_com" id="tax_com"  value="{{tax_com}}"  required   onkeydown="allowOnlyNumbers(event)" />
+            <small class="text-muted">ใช้หักภาษีตอนส่งเบิกค่าคอม (finance/sale/com)</small>
           </div>
         </div>
         <div style="padding-top: 25px" align="center">
