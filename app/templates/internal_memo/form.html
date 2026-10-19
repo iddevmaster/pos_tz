@@ -25,16 +25,20 @@
       <textarea class="form-control memo-detail" id="memoDetail" name="detail" required placeholder="พิมพ์รายละเอียดของบันทึก...">{{ request.POST.detail }}</textarea>
     </section>
     <div class="memo-two-panels">
-      <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-person-check"></i></span>ลำดับการตรวจสอบและอนุมัติ</div><div class="memo-hint mb-2">เอกสารจะส่งให้ผู้ตรวจสอบ ชั้น 1 ก่อนส่งต่อไปยังผู้อนุมัติ ชั้น 2</div>
-        <div class="memo-field mb-3"><label>ผู้ตรวจสอบ ชั้น 1 <span class="memo-required">*</span></label><select class="form-select select2" id="memoReviewer" name="reviewer" required data-placeholder="เลือกหรือค้นหาผู้ตรวจสอบ..."><option value=""></option>{% for person in reviewers %}<option value="{{ person.id }}" {% if request.POST.reviewer == person.id|stringformat:'s' %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select>{% if not reviewers %}<div class="text-danger mt-1"><small>ยังไม่ได้ตั้งค่าผู้ตรวจสอบ กรุณาติดต่อผู้ดูแลระบบ</small></div>{% endif %}</div>
-        <div class="memo-field"><label>ผู้อนุมัติ ชั้น 2 <span class="memo-required">*</span></label><select class="form-select select2" id="memoApprover" name="approver" required data-placeholder="เลือกหรือค้นหาผู้อนุมัติ..."><option value=""></option>{% for person in approvers %}<option value="{{ person.id }}" {% if request.POST.approver == person.id|stringformat:'s' %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select>{% if not approvers %}<div class="text-danger mt-1"><small>ยังไม่ได้ตั้งค่าผู้อนุมัติ กรุณาติดต่อผู้ดูแลระบบ</small></div>{% endif %}</div>
+      <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-person-check"></i></span>ลำดับการตรวจสอบและอนุมัติ</div>
+        <div class="memo-field mb-3"><label>รูปแบบการอนุมัติ <span class="memo-required">*</span></label>
+          <div class="form-check"><input class="form-check-input" type="radio" name="workflow" id="workflowReview" value="review" {% if request.POST.workflow != 'direct' %}checked{% endif %}><label class="form-check-label" for="workflowReview">ตรวจสอบ แล้วค่อยอนุมัติ</label></div>
+          <div class="form-check"><input class="form-check-input" type="radio" name="workflow" id="workflowDirect" value="direct" {% if request.POST.workflow == 'direct' %}checked{% endif %}><label class="form-check-label" for="workflowDirect">ไม่มีตรวจสอบ ส่งรออนุมัติเลย</label></div>
+        </div>
+        <div class="memo-field mb-3" id="memoReviewerField"><label>ผู้ตรวจสอบ ชั้น 1 <span class="memo-required">*</span></label><select class="form-select select2" id="memoReviewer" name="reviewer" required data-placeholder="เลือกหรือค้นหาผู้ตรวจสอบ..."><option value=""></option>{% for person in reviewers %}<option value="{{ person.id }}" {% if request.POST.reviewer == person.id|stringformat:'s' %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select>{% if not reviewers %}<div class="text-danger mt-1"><small>ยังไม่ได้ตั้งค่าผู้ตรวจสอบ กรุณาติดต่อผู้ดูแลระบบ</small></div>{% endif %}</div>
+        <div class="memo-field"><label>ผู้อนุมัติ <span class="memo-required">*</span></label><select class="form-select select2" id="memoApprover" name="approver" required data-placeholder="เลือกหรือค้นหาผู้อนุมัติ..."><option value=""></option>{% for person in approvers %}<option value="{{ person.id }}" {% if request.POST.approver == person.id|stringformat:'s' %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>{% endfor %}</select>{% if not approvers %}<div class="text-danger mt-1"><small>ยังไม่ได้ตั้งค่าผู้อนุมัติ กรุณาติดต่อผู้ดูแลระบบ</small></div>{% endif %}</div>
       </section>
       <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-paperclip"></i></span>ไฟล์แนบ <span class="memo-hint ms-auto">PDF, JPG, PNG · ไม่เกิน 10 MB · สูงสุด 5 ไฟล์</span></div>
         <label class="memo-drop" for="memoFiles"><span><i class="bi bi-cloud-arrow-up fs-4"></i><br>คลิกเพื่อเลือกไฟล์จากเครื่อง</span></label><input hidden id="memoFiles" type="file" name="attachments" multiple accept=".pdf,.jpg,.jpeg,.png"><div id="fileNames" class="memo-hint mt-2"></div>
       </section>
     </div>
     <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-people"></i></span>สำเนาถึง (ไม่บังคับ)<span class="memo-hint ms-auto">เห็นบันทึกได้เมื่อส่งเข้ากระบวนการแล้ว</span></div><select class="form-select select2" name="cc_users" multiple data-placeholder="เลือกหรือค้นหาผู้รับสำเนา...">{% for person in users %}{% if person.id != user.id %}<option value="{{ person.id }}">{{ person.get_full_name|default:person.username }}</option>{% endif %}{% endfor %}</select></section>
-    <div class="memo-actions memo-form-actions"><a href="{% url 'internal_memo_list' %}" class="btn btn-light-secondary">ยกเลิก</a><button class="btn btn-outline-primary" name="action" value="draft"><i class="bi bi-save me-1"></i>บันทึกฉบับร่าง</button><button class="btn btn-primary" name="action" value="submit"><i class="bi bi-send me-1"></i>ส่งให้ผู้ตรวจสอบ ชั้น 1</button></div>
+    <div class="memo-actions memo-form-actions"><a href="{% url 'internal_memo_list' %}" class="btn btn-light-secondary">ยกเลิก</a><button class="btn btn-outline-primary" name="action" value="draft"><i class="bi bi-save me-1"></i>บันทึกฉบับร่าง</button><button class="btn btn-primary" name="action" value="submit"><i class="bi bi-send me-1"></i><span id="memoSubmitLabel">ส่งให้ผู้ตรวจสอบ ชั้น 1</span></button></div>
   </form>
 </div></section>
 <script>
@@ -60,6 +64,26 @@ function syncMemoRoleOptions(changedSelect) {
   });
 }
 
+var memoReviewerField = document.getElementById('memoReviewerField');
+var memoSubmitLabel = document.getElementById('memoSubmitLabel');
+
+function syncMemoWorkflow() {
+  var direct = document.getElementById('workflowDirect').checked;
+  memoReviewerField.style.display = direct ? 'none' : '';
+  memoReviewer.required = !direct;
+  if (direct && memoReviewer.value) {
+    memoReviewer.value = '';
+    if (window.jQuery) {
+      jQuery(memoReviewer).trigger('change.select2');
+    }
+    syncMemoRoleOptions(memoReviewer);
+  }
+  memoSubmitLabel.textContent = direct ? 'ส่งให้ผู้อนุมัติ' : 'ส่งให้ผู้ตรวจสอบ ชั้น 1';
+}
+
+document.querySelectorAll('input[name="workflow"]').forEach(function(radio) {
+  radio.addEventListener('change', syncMemoWorkflow);
+});
 memoReviewer.addEventListener('change', function() { syncMemoRoleOptions(memoReviewer); });
 memoApprover.addEventListener('change', function() { syncMemoRoleOptions(memoApprover); });
 document.getElementById('memoForm').addEventListener('submit', function(event) {
@@ -69,5 +93,6 @@ document.getElementById('memoForm').addEventListener('submit', function(event) {
   }
 });
 syncMemoRoleOptions(memoReviewer);
+syncMemoWorkflow();
 </script>
 {% endblock %}

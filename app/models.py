@@ -479,6 +479,7 @@ class InternalMemo(models.Model):
         on_delete=models.PROTECT,
         related_name='internal_memos_to_review',
     )
+    require_review = models.BooleanField(default=True)
     approver = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name='internal_memos_to_approve'
     )

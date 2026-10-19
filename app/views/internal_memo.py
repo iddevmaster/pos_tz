@@ -28,6 +28,36 @@ def _can_view_all_memos(user):
     return user.is_staff
 
 
+def _submitted_status(require_review):
+    if require_review:
+        return InternalMemo.STATUS_PENDING_REVIEW
+    return InternalMemo.STATUS_PENDING_APPROVAL
+
+
+def _submitted_message(require_review):
+    if require_review:
+        return 'ส่งบันทึกให้ผู้ตรวจสอบ ชั้น 1 แล้ว'
+    return 'ส่งบันทึกให้ผู้อนุมัติแล้ว'
+
+
+def _validate_workflow(request, reviewers, approvers, errors):
+    require_review = request.POST.get('workflow', 'review') != 'direct'
+    reviewer = None
+    if require_review:
+        try:
+            reviewer = reviewers.get(pk=request.POST.get('reviewer', '').strip())
+        except (User.DoesNotExist, ValueError):
+            errors.append('กรุณาเลือกผู้ตรวจสอบ ชั้น 1')
+    try:
+        approver = approvers.get(pk=request.POST.get('approver', '').strip())
+    except (User.DoesNotExist, ValueError):
+        approver = None
+        errors.append('กรุณาเลือกผู้อนุมัติ')
+    if reviewer and approver and reviewer.pk == approver.pk:
+        errors.append('ผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2 ต้องเป็นคนละคนกัน')
+    return require_review, reviewer, approver
+
+
 def _memo_user_display(memo, field_name):
     try:
         person = getattr(memo, field_name)
@@ -157,8 +187,6 @@ def memo_create(request):
         subject = request.POST.get('subject', '').strip()
         branch = request.POST.get('branch', '').strip() or 'สำนักงานใหญ่'
         detail = request.POST.get('detail', '').strip()
-        reviewer_id = request.POST.get('reviewer', '').strip()
-        approver_id = request.POST.get('approver', '').strip()
         action = request.POST.get('action', 'draft')
         attachments = request.FILES.getlist('attachments')
 
@@ -169,18 +197,9 @@ def memo_create(request):
             errors.append('กรุณาระบุเรื่อง')
         if not detail:
             errors.append('กรุณาระบุรายละเอียด')
-        try:
-            reviewer = reviewers.get(pk=reviewer_id)
-        except (User.DoesNotExist, ValueError):
-            reviewer = None
-            errors.append('กรุณาเลือกผู้ตรวจสอบ ชั้น 1')
-        try:
-            approver = approvers.get(pk=approver_id)
-        except (User.DoesNotExist, ValueError):
-            approver = None
-            errors.append('กรุณาเลือกผู้อนุมัติ ชั้น 2')
-        if reviewer and approver and reviewer.pk == approver.pk:
-            errors.append('ผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2 ต้องเป็นคนละคนกัน')
+        require_review, reviewer, approver = _validate_workflow(
+            request, reviewers, approvers, errors
+        )
         if len(attachments) > MAX_ATTACHMENTS:
             errors.append('แนบไฟล์ได้สูงสุด 5 ไฟล์')
         for attachment in attachments:
@@ -204,8 +223,9 @@ def memo_create(request):
                     detail=detail,
                     creator=request.user,
                     reviewer=reviewer,
+                    require_review=require_review,
                     approver=approver,
-                    status=(InternalMemo.STATUS_PENDING_REVIEW if action == 'submit' else InternalMemo.STATUS_DRAFT),
+                    status=(_submitted_status(require_review) if action == 'submit' else InternalMemo.STATUS_DRAFT),
                     submitted_at=(now if action == 'submit' else None),
                 )
                 memo.memo_number = 'MEMO-{0}-{1:05d}'.format(now.year, memo.pk)
@@ -218,7 +238,7 @@ def memo_create(request):
                     )
             messages.success(
                 request,
-                'ส่งบันทึกให้ผู้ตรวจสอบ ชั้น 1 แล้ว' if action == 'submit' else 'บันทึกฉบับร่างแล้ว',
+                _submitted_message(require_review) if action == 'submit' else 'บันทึกฉบับร่างแล้ว',
             )
             return redirect('internal_memo_detail', pk=memo.pk)
 
@@ -252,8 +272,6 @@ def memo_edit(request, pk):
         subject = request.POST.get('subject', '').strip()
         branch = request.POST.get('branch', '').strip()
         detail = request.POST.get('detail', '').strip()
-        reviewer_id = request.POST.get('reviewer', '').strip()
-        approver_id = request.POST.get('approver', '').strip()
         errors = []
 
         if not recipient:
@@ -264,18 +282,9 @@ def memo_edit(request, pk):
             errors.append('กรุณาระบุสาขา')
         if not detail:
             errors.append('กรุณาระบุรายละเอียด')
-        try:
-            reviewer = reviewers.get(pk=reviewer_id)
-        except (User.DoesNotExist, ValueError):
-            reviewer = None
-            errors.append('กรุณาเลือกผู้ตรวจสอบ ชั้น 1')
-        try:
-            approver = approvers.get(pk=approver_id)
-        except (User.DoesNotExist, ValueError):
-            approver = None
-            errors.append('กรุณาเลือกผู้อนุมัติ ชั้น 2')
-        if reviewer and approver and reviewer.pk == approver.pk:
-            errors.append('ผู้ตรวจสอบ ชั้น 1 และผู้อนุมัติ ชั้น 2 ต้องเป็นคนละคนกัน')
+        require_review, reviewer, approver = _validate_workflow(
+            request, reviewers, approvers, errors
+        )
 
         if errors:
             for error in errors:
@@ -286,10 +295,20 @@ def memo_edit(request, pk):
             memo.branch = branch
             memo.detail = detail
             memo.reviewer = reviewer
+            memo.require_review = require_review
             memo.approver = approver
+            # Move an in-flight memo to the step that matches the new workflow.
+            if not require_review and memo.status == InternalMemo.STATUS_PENDING_REVIEW:
+                memo.status = InternalMemo.STATUS_PENDING_APPROVAL
+            elif (
+                require_review
+                and memo.status == InternalMemo.STATUS_PENDING_APPROVAL
+                and memo.reviewed_at is None
+            ):
+                memo.status = InternalMemo.STATUS_PENDING_REVIEW
             memo.save(update_fields=[
                 'recipient', 'subject', 'branch', 'detail', 'reviewer',
-                'approver', 'updated_at',
+                'require_review', 'approver', 'status', 'updated_at',
             ])
             memo.cc_users.set(users.filter(pk__in=request.POST.getlist('cc_users')))
             messages.success(request, 'แก้ไขบันทึกภายในเรียบร้อยแล้ว')
@@ -375,13 +394,15 @@ def memo_submit(request, pk):
         InternalMemo,
         pk=pk,
         creator=request.user,
-        reviewer__isnull=False,
         status=InternalMemo.STATUS_DRAFT,
     )
-    memo.status = InternalMemo.STATUS_PENDING_REVIEW
+    if memo.require_review and memo.reviewer_id is None:
+        messages.error(request, 'กรุณาเลือกผู้ตรวจสอบ ชั้น 1 ก่อนส่ง')
+        return redirect('internal_memo_detail', pk=pk)
+    memo.status = _submitted_status(memo.require_review)
     memo.submitted_at = timezone.now()
     memo.save(update_fields=['status', 'submitted_at', 'updated_at'])
-    messages.success(request, 'ส่งบันทึกให้ผู้ตรวจสอบ ชั้น 1 แล้ว')
+    messages.success(request, _submitted_message(memo.require_review))
     return redirect('internal_memo_detail', pk=pk)
 
 
