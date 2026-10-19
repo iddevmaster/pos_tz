@@ -80,11 +80,7 @@ def _visible_memo_or_404(request, pk):
     return memo
 
 
-@login_required(login_url='/login')
-def memo_list(request):
-    memos = InternalMemo.objects.select_related('creator', 'reviewer', 'approver')
-    if not _can_view_all_memos(request.user):
-        memos = memos.filter(creator=request.user)
+def _render_memo_list(request, memos, extra_context):
     branches = memos.order_by().values_list('branch', flat=True).distinct()
 
     status = request.GET.get('status', '').strip()
@@ -116,8 +112,35 @@ def memo_list(request):
         'memos': memos,
         'branches': branches,
         'status_choices': InternalMemo.STATUS_CHOICES,
+        **extra_context,
     })
     return render(request, 'internal_memo/list.html', context)
+
+
+@login_required(login_url='/login')
+def memo_list(request):
+    memos = InternalMemo.objects.select_related('creator', 'reviewer', 'approver')
+    if not _can_view_all_memos(request.user):
+        memos = memos.filter(creator=request.user)
+    return _render_memo_list(request, memos, {
+        'page_title': 'ทะเบียนบันทึกภายใน',
+        'page_subtitle': 'ติดตามฉบับร่าง เอกสารที่ส่ง และสถานะการอนุมัติ',
+        'is_cc_page': False,
+    })
+
+
+@login_required(login_url='/login')
+def memo_cc_list(request):
+    memos = InternalMemo.objects.select_related(
+        'creator', 'reviewer', 'approver'
+    ).filter(cc_users=request.user).exclude(
+        status=InternalMemo.STATUS_DRAFT
+    ).distinct()
+    return _render_memo_list(request, memos, {
+        'page_title': 'สำเนาถึง',
+        'page_subtitle': 'บันทึกภายในที่ส่งสำเนาถึงคุณ',
+        'is_cc_page': True,
+    })
 
 
 @login_required(login_url='/login')

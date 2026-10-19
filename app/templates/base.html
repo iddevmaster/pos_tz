@@ -1284,6 +1284,9 @@ function initTabEvents() {
                   <li class="{% if request.path == '/internal-memos/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="/internal-memos/"><span class="font-default">ทะเบียนบันทึกภายใน</span></a>
                   </li>
+                  <li class="{% if request.path == '/internal-memos/cc/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="/internal-memos/cc/"><span class="font-default">สำเนาถึง</span></a>
+                  </li>
                   <li class="{% if request.path == '/internal-memos/approval/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="/internal-memos/approval/"><span class="font-default">ตรวจสอบ / อนุมัติ</span></a>
                   </li>
