@@ -58,6 +58,12 @@ def _validate_workflow(request, reviewers, approvers, errors):
     return require_review, reviewer, approver
 
 
+def _can_update_work_status(user, memo):
+    return memo.status == InternalMemo.STATUS_APPROVED and (
+        user.is_staff or memo.creator_id == user.id
+    )
+
+
 def _memo_user_display(memo, field_name):
     try:
         person = getattr(memo, field_name)
@@ -118,8 +124,13 @@ def _render_memo_list(request, memos, extra_context):
     keyword = request.GET.get('q', '').strip()
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
+    work_status = request.GET.get('work_status', '').strip()
     if status:
         memos = memos.filter(status=status)
+    if work_status == 'NONE':
+        memos = memos.filter(work_status='')
+    elif work_status:
+        memos = memos.filter(work_status=work_status)
     if branch:
         memos = memos.filter(branch=branch)
     if keyword:
@@ -136,12 +147,14 @@ def _render_memo_list(request, memos, extra_context):
         memo.creator_display = _memo_user_display(memo, 'creator')
         memo.reviewer_display = _memo_user_display(memo, 'reviewer')
         memo.approver_display = _memo_user_display(memo, 'approver')
+        memo.can_update_work = _can_update_work_status(request.user, memo)
 
     context = _base_context(request)
     context.update({
         'memos': memos,
         'branches': branches,
         'status_choices': InternalMemo.STATUS_CHOICES,
+        'work_status_choices': InternalMemo.WORK_STATUS_CHOICES,
         **extra_context,
     })
     return render(request, 'internal_memo/list.html', context)
@@ -381,9 +394,37 @@ def memo_detail(request, pk):
     memo.creator_display = _memo_user_display(memo, 'creator')
     memo.reviewer_display = _memo_user_display(memo, 'reviewer')
     memo.approver_display = _memo_user_display(memo, 'approver')
+    memo.can_update_work = _can_update_work_status(request.user, memo)
     context = _base_context(request)
     context['memo'] = memo
+    context['work_status_choices'] = InternalMemo.WORK_STATUS_CHOICES
     return render(request, 'internal_memo/detail.html', context)
+
+
+@login_required(login_url='/login')
+def memo_work_status(request, pk):
+    if request.method != 'POST':
+        raise Http404
+    memo = get_object_or_404(InternalMemo, pk=pk)
+    if not _can_update_work_status(request.user, memo):
+        raise Http404
+    work_status = request.POST.get('work_status', '').strip()
+    if work_status not in dict(InternalMemo.WORK_STATUS_CHOICES):
+        messages.error(request, 'สถานะการดำเนินงานไม่ถูกต้อง')
+    else:
+        memo.work_status = work_status
+        memo.work_status_updated_at = timezone.now()
+        memo.save(update_fields=[
+            'work_status', 'work_status_updated_at', 'updated_at'
+        ])
+        messages.success(
+            request,
+            f'อัปเดตการดำเนินงาน {memo.memo_number} เป็น "{memo.get_work_status_display()}" แล้ว',
+        )
+    next_url = request.POST.get('next', '')
+    if next_url.startswith('/') and not next_url.startswith('//'):
+        return redirect(next_url)
+    return redirect('internal_memo_detail', pk=pk)
 
 
 @login_required(login_url='/login')

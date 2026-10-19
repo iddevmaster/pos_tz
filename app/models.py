@@ -463,6 +463,14 @@ class InternalMemo(models.Model):
         (STATUS_APPROVED, 'อนุมัติแล้ว'),
         (STATUS_REJECTED, 'ไม่อนุมัติ'),
     )
+    WORK_ACKNOWLEDGED = 'ACKNOWLEDGED'
+    WORK_IN_PROGRESS = 'IN_PROGRESS'
+    WORK_DONE = 'DONE'
+    WORK_STATUS_CHOICES = (
+        (WORK_ACKNOWLEDGED, 'รับทราบ'),
+        (WORK_IN_PROGRESS, 'อยู่ระหว่างดำเนินงาน'),
+        (WORK_DONE, 'เสร็จสิ้น'),
+    )
 
     memo_number = models.CharField(max_length=24, unique=True, blank=True)
     recipient = models.CharField(max_length=255)
@@ -494,6 +502,10 @@ class InternalMemo(models.Model):
     reviewer_note = models.TextField(blank=True)
     decided_at = models.DateTimeField(blank=True, null=True)
     decision_note = models.TextField(blank=True)
+    work_status = models.CharField(
+        max_length=16, choices=WORK_STATUS_CHOICES, blank=True
+    )
+    work_status_updated_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

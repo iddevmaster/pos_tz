@@ -16,6 +16,7 @@ urlpatterns = [
     path('internal-memos/<int:pk>/', internal_memo.memo_detail, name='internal_memo_detail'),
     path('internal-memos/<int:pk>/submit/', internal_memo.memo_submit, name='internal_memo_submit'),
     path('internal-memos/<int:pk>/decide/', internal_memo.memo_decide, name='internal_memo_decide'),
+    path('internal-memos/<int:pk>/work-status/', internal_memo.memo_work_status, name='internal_memo_work_status'),
     path('customer-followup', customer_followup.followup_list, name='customer_followup_list'),
     path('customer-followup/pool', customer_followup.followup_pool, name='customer_followup_pool'),
     path('customer-followup/registry', customer_followup.followup_registry, name='customer_followup_registry'),
