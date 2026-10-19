@@ -24,8 +24,13 @@ MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
 MAX_ATTACHMENTS = 5
 
 
+ADMIN_GROUP_NAME = 'ผู้ดูแลระบบ'
+
+
 def _can_view_all_memos(user):
-    return user.is_staff
+    return user.is_staff or user_detail.objects.filter(
+        user_id=user.id, cm__cm_name=ADMIN_GROUP_NAME
+    ).exists()
 
 
 def _submitted_status(require_review):
