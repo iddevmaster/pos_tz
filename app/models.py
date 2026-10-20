@@ -448,18 +448,6 @@ class document(models.Model):
     doc_in_hrc = models.CharField(max_length=256, unique=True, blank=True)
 
 
-class InternalMemoCategory(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    sort_order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ('sort_order', 'name')
-
-    def __str__(self):
-        return self.name
-
-
 class InternalMemo(models.Model):
     STATUS_DRAFT = 'DRAFT'
     STATUS_PENDING_REVIEW = 'PENDING_REVIEW'
@@ -487,13 +475,6 @@ class InternalMemo(models.Model):
     memo_number = models.CharField(max_length=24, unique=True, blank=True)
     recipient = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
-    category = models.ForeignKey(
-        InternalMemoCategory,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        related_name='memos',
-    )
     branch = models.CharField(max_length=128, default='สำนักงานใหญ่')
     detail = models.TextField()
     creator = models.ForeignKey(
