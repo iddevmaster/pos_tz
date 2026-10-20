@@ -203,11 +203,12 @@
     <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail">
       <tbody>
         <tr>
-          <td colspan="12" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก</strong></td>
+          <td colspan="12" style="text-align: center;font-size: 18px;"><strong>รายการตั้งเบิก / บันทึกภายใน</strong></td>
         </tr>
         <tr>
           <td colspan="1">ลำดับ</td>
-            <td colspan="3">ตำแหน่ง</td>
+          <td colspan="1">เลขที่ Invoice</td>
+          <td colspan="2">ชื่อลูกค้า บริษัท/บุคคล</td>
           <td colspan="3">Event งาน(ชื่อหลักสูตร)</td>
         
           <td>วันที่จัดอบรม</td>
@@ -221,7 +222,8 @@
       
         <tr>
           <td>{{ forloop.counter }}</td>
-           <td  colspan="3" >{{ res.stage_name }}</td>
+          <td>{{ res.invoice|default:"-" }}</td>
+          <td colspan="2">{{ res.customer_name|default:"-" }}</td>
           <td colspan="3">{{ res.course.course_name }}</td>
          
           <td>{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}</td>

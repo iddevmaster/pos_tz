@@ -2351,12 +2351,15 @@ def register_report_summary_details_com(request ,id, year, m):
         coursse = course.objects.get(course_id=rs.course_id)
         paymets = register_payment.objects.filter(register_id=rs.register_id).first()
         evs = course_event.objects.get(ev_id=rs.ev_id)
+        sale = salesorder.objects.filter(
+            er__register_id=rs.register_id, er__ev_id=rs.ev_id
+        ).first()
  
         price += rs.tis_com_before_tax
         price_total += rs.tis_com_after_tax
         tax = rs.tis_com_before_tax - rs.tis_com_after_tax
         tax_all += rs.tis_com_before_tax - rs.tis_com_after_tax
-        r = {'stage_name':comstate.stage_name,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs,'tis_com_before_tax':rs.tis_com_before_tax,'tis_com_after_tax':rs.tis_com_after_tax,'tax':tax}
+        r = {'stage_name':comstate.stage_name,'customer_name':paymets.rp_name_customer,'invoice':sale.invoice if sale else None,'course':coursse,'tis_start_date':rs.tis_start_date,'rp_doc_number':paymets.rp_doc_number,'evs':evs,'tis_com_before_tax':rs.tis_com_before_tax,'tis_com_after_tax':rs.tis_com_after_tax,'tax':tax}
         obj.append(r)   
    
 
