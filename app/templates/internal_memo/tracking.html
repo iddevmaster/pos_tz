@@ -1,0 +1,31 @@
+{% extends 'base.html' %}{% load static %}
+{% block extrastyle %}<link rel="stylesheet" href="{% static 'css/internal_memo.css' %}">{% endblock %}
+{% block content %}<div class="memo-shell">
+  <div class="memo-head"><div><h3>ติดตามงาน · {{ memo.subject }}</h3><div class="memo-subtitle">{{ memo.memo_number }} · ผู้บันทึก {{ memo.creator_display }}</div></div>{% if memo.work_status %}<span class="memo-badge memo-work-{{ memo.work_status }}">{{ memo.get_work_status_display }}</span>{% endif %}</div>
+
+  {% if can_update %}<form method="post" enctype="multipart/form-data" class="memo-card">{% csrf_token %}
+    <div class="memo-card-title"><span class="memo-icon"><i class="bi bi-clipboard-check"></i></span>อัปเดตการดำเนินงาน</div>
+    <div class="memo-field mb-3"><label>สถานะ <span class="memo-required">*</span></label>
+      <div class="d-flex flex-wrap gap-3">{% for value,label in work_status_choices %}<div class="form-check"><input class="form-check-input" type="radio" name="work_status" id="work{{ value }}" value="{{ value }}" required {% if request.POST.work_status == value or not request.POST and memo.work_status == value %}checked{% endif %}><label class="form-check-label" for="work{{ value }}">{{ label }}</label></div>{% endfor %}</div>
+    </div>
+    <div class="memo-field mb-3"><label>รายละเอียด</label><textarea class="form-control" name="note" rows="4" placeholder="รายละเอียดการดำเนินงาน / สิ่งที่แก้ไข...">{{ request.POST.note }}</textarea></div>
+    <div class="memo-field mb-3"><label>รูปภาพหลังแก้ไข <span class="memo-hint">JPG, PNG · ไม่เกิน 10 MB · สูงสุด 5 รูป</span></label>
+      <label class="memo-drop" for="workImages"><span><i class="bi bi-camera fs-4"></i><br>คลิกเพื่อเลือกรูปภาพ</span></label><input hidden id="workImages" type="file" name="images" multiple accept=".jpg,.jpeg,.png,image/jpeg,image/png"><div id="workImageNames" class="memo-hint mt-2"></div>
+    </div>
+    <div class="memo-actions"><button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกการอัปเดต</button></div>
+  </form>{% endif %}
+
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-clock-history"></i></span>ประวัติการดำเนินงาน</div>
+    {% for log in work_logs %}<div class="memo-work-log">
+      <div class="memo-work-log-head"><span class="memo-badge memo-work-{{ log.work_status }}">{{ log.get_work_status_display }}</span><span><i class="bi bi-person"></i> {{ log.updated_by.get_full_name|default:log.updated_by.username }}</span><span class="text-muted">{{ log.created_at|date:'d/m/Y H:i' }}</span></div>
+      {% if log.note %}<div class="memo-content">{{ log.note }}</div>{% endif %}
+      {% if log.images.all %}<div class="memo-work-images">{% for image in log.images.all %}<a href="{{ image.file.url }}" target="_blank" rel="noopener" title="{{ image.original_name }}"><img src="{{ image.file.url }}" alt="{{ image.original_name }}"></a>{% endfor %}</div>{% endif %}
+    </div>{% empty %}<div class="memo-empty">ยังไม่มีการอัปเดต</div>{% endfor %}
+  </section>
+
+  <div class="memo-actions"><a class="btn btn-outline-secondary" href="{% url 'internal_memo_tracking_list' %}">กลับไปติดตามงาน</a><a class="btn btn-outline-primary" href="{% url 'internal_memo_detail' memo.pk %}">ดูบันทึก</a></div>
+</div>
+{% if can_update %}<script>
+document.getElementById('workImages').addEventListener('change',function(){if(this.files.length>5){alert('แนบรูปภาพได้สูงสุด 5 รูป');this.value='';}document.getElementById('workImageNames').textContent=Array.from(this.files).map(function(f){return f.name;}).join(' · ');});
+</script>{% endif %}
+{% endblock %}

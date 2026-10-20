@@ -241,6 +241,12 @@ listMenu = [
         "group_label": "บันทึกภายใน",
     },
     {
+        "value": "internal-memos/tracking/",
+        "label": "ติดตามงาน",
+        "group_value": "internalMemo",
+        "group_label": "บันทึกภายใน",
+    },
+    {
         "value": "internal-memos/approval/",
         "label": "ตรวจสอบ / อนุมัติ",
         "group_value": "internalMemo",

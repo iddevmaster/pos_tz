@@ -14,6 +14,8 @@ from ..constant import defaultTitle
 from ..models import (
     InternalMemo,
     InternalMemoAttachment,
+    InternalMemoWorkImage,
+    InternalMemoWorkLog,
     category_program_permission,
     user_detail,
 )
@@ -22,6 +24,7 @@ from ..models import (
 ALLOWED_ATTACHMENTS = {'.pdf', '.jpg', '.jpeg', '.png'}
 MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
 MAX_ATTACHMENTS = 5
+ALLOWED_WORK_IMAGES = {'.jpg', '.jpeg', '.png'}
 
 
 ADMIN_GROUP_NAME = 'ผู้ดูแลระบบ'
@@ -63,10 +66,54 @@ def _validate_workflow(request, reviewers, approvers, errors):
     return require_review, reviewer, approver
 
 
-def _can_update_work_status(user, memo):
-    return memo.status == InternalMemo.STATUS_APPROVED and (
-        user.is_staff or memo.creator_id == user.id
-    )
+def _can_update_work_status(user, memo, is_admin=None):
+    if memo.status != InternalMemo.STATUS_APPROVED:
+        return False
+    if is_admin is None:
+        is_admin = _can_view_all_memos(user)
+    return is_admin or memo.creator_id == user.id
+
+
+def _save_work_update(request, memo):
+    """Validate and record a work-status update. Returns a list of errors."""
+    work_status = request.POST.get('work_status', '').strip()
+    note = request.POST.get('note', '').strip()
+    images = request.FILES.getlist('images')
+    errors = []
+    if work_status not in dict(InternalMemo.WORK_STATUS_CHOICES):
+        errors.append('กรุณาเลือกสถานะการดำเนินงาน')
+    if len(images) > MAX_ATTACHMENTS:
+        errors.append('แนบรูปภาพได้สูงสุด 5 รูป')
+    for image in images:
+        if os.path.splitext(image.name)[1].lower() not in ALLOWED_WORK_IMAGES:
+            errors.append('รองรับเฉพาะรูปภาพ JPG และ PNG')
+            break
+        if image.size > MAX_ATTACHMENT_SIZE:
+            errors.append('รูปภาพแต่ละรูปต้องไม่เกิน 10 MB')
+            break
+    if errors:
+        return errors
+
+    with transaction.atomic():
+        now = timezone.now()
+        log = InternalMemoWorkLog.objects.create(
+            memo=memo,
+            work_status=work_status,
+            note=note,
+            updated_by=request.user,
+        )
+        for image in images:
+            InternalMemoWorkImage.objects.create(
+                log=log, file=image, original_name=image.name
+            )
+        memo.work_status = work_status
+        memo.work_status_updated_at = now
+        memo.work_status_updated_by = request.user
+        memo.save(update_fields=[
+            'work_status', 'work_status_updated_at',
+            'work_status_updated_by', 'updated_at',
+        ])
+    return []
 
 
 def _memo_user_display(memo, field_name):
@@ -148,11 +195,14 @@ def _render_memo_list(request, memos, extra_context):
         memos = memos.filter(created_at__date__lte=date_to)
 
     memos = list(memos)
+    is_admin = _can_view_all_memos(request.user)
     for memo in memos:
         memo.creator_display = _memo_user_display(memo, 'creator')
         memo.reviewer_display = _memo_user_display(memo, 'reviewer')
         memo.approver_display = _memo_user_display(memo, 'approver')
-        memo.can_update_work = _can_update_work_status(request.user, memo)
+        memo.can_update_work = _can_update_work_status(
+            request.user, memo, is_admin
+        )
 
     context = _base_context(request)
     context.update({
@@ -402,8 +452,73 @@ def memo_detail(request, pk):
     memo.can_update_work = _can_update_work_status(request.user, memo)
     context = _base_context(request)
     context['memo'] = memo
-    context['work_status_choices'] = InternalMemo.WORK_STATUS_CHOICES
     return render(request, 'internal_memo/detail.html', context)
+
+
+@login_required(login_url='/login')
+def memo_tracking_list(request):
+    is_admin = _can_view_all_memos(request.user)
+    memos = InternalMemo.objects.select_related(
+        'creator', 'work_status_updated_by'
+    ).filter(status=InternalMemo.STATUS_APPROVED)
+    if not is_admin:
+        memos = memos.filter(creator=request.user)
+
+    work_status = request.GET.get('work_status', '').strip()
+    keyword = request.GET.get('q', '').strip()
+    if work_status == 'NONE':
+        memos = memos.filter(work_status='')
+    elif work_status:
+        memos = memos.filter(work_status=work_status)
+    if keyword:
+        memos = memos.filter(
+            Q(memo_number__icontains=keyword) | Q(subject__icontains=keyword)
+        )
+
+    memos = list(memos.order_by('-decided_at'))
+    for memo in memos:
+        memo.creator_display = _memo_user_display(memo, 'creator')
+        memo.work_updated_by_display = _memo_user_display(
+            memo, 'work_status_updated_by'
+        )
+
+    context = _base_context(request)
+    context.update({
+        'memos': memos,
+        'work_status_choices': InternalMemo.WORK_STATUS_CHOICES,
+    })
+    return render(request, 'internal_memo/tracking_list.html', context)
+
+
+@login_required(login_url='/login')
+def memo_tracking(request, pk):
+    memo = _visible_memo_or_404(request, pk)
+    can_update = _can_update_work_status(request.user, memo)
+    if request.method == 'POST':
+        if not can_update:
+            raise Http404
+        errors = _save_work_update(request, memo)
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            messages.success(
+                request,
+                f'อัปเดตการดำเนินงาน {memo.memo_number} เป็น "{memo.get_work_status_display()}" แล้ว',
+            )
+            return redirect('internal_memo_tracking', pk=pk)
+
+    memo.creator_display = _memo_user_display(memo, 'creator')
+    context = _base_context(request)
+    context.update({
+        'memo': memo,
+        'can_update': can_update,
+        'work_logs': memo.work_logs.select_related(
+            'updated_by'
+        ).prefetch_related('images'),
+        'work_status_choices': InternalMemo.WORK_STATUS_CHOICES,
+    })
+    return render(request, 'internal_memo/tracking.html', context)
 
 
 @login_required(login_url='/login')
@@ -413,15 +528,11 @@ def memo_work_status(request, pk):
     memo = get_object_or_404(InternalMemo, pk=pk)
     if not _can_update_work_status(request.user, memo):
         raise Http404
-    work_status = request.POST.get('work_status', '').strip()
-    if work_status not in dict(InternalMemo.WORK_STATUS_CHOICES):
-        messages.error(request, 'สถานะการดำเนินงานไม่ถูกต้อง')
+    errors = _save_work_update(request, memo)
+    if errors:
+        for error in errors:
+            messages.error(request, error)
     else:
-        memo.work_status = work_status
-        memo.work_status_updated_at = timezone.now()
-        memo.save(update_fields=[
-            'work_status', 'work_status_updated_at', 'updated_at'
-        ])
         messages.success(
             request,
             f'อัปเดตการดำเนินงาน {memo.memo_number} เป็น "{memo.get_work_status_display()}" แล้ว',

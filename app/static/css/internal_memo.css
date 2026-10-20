@@ -50,3 +50,8 @@
 @media (max-width:900px) { .memo-grid,.memo-two-panels,.memo-meta { grid-template-columns:1fr; }.memo-filter { grid-template-columns:1fr 1fr; }.memo-head { flex-direction:column; }.memo-actions { position:static; }.memo-shell { padding:14px; } }
 .memo-work-ACKNOWLEDGED { color:#2856a8; background:#dce9ff; }.memo-work-IN_PROGRESS { color:#8a6900; background:#fff4cc; }.memo-work-DONE { color:#08783d; background:#d2ffe8; }
 .memo-work-select { min-width:170px; }
+.memo-work-log { border-top:1px solid #e6eaee; padding:12px 0; }
+.memo-work-log:first-of-type { border-top:0; }
+.memo-work-log-head { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:6px; }
+.memo-work-images { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.memo-work-images img { width:120px; height:120px; object-fit:cover; border-radius:8px; border:1px solid #e6eaee; }

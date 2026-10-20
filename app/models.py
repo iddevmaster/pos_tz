@@ -506,6 +506,13 @@ class InternalMemo(models.Model):
         max_length=16, choices=WORK_STATUS_CHOICES, blank=True
     )
     work_status_updated_at = models.DateTimeField(blank=True, null=True)
+    work_status_updated_by = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -518,6 +525,32 @@ class InternalMemoAttachment(models.Model):
         InternalMemo, on_delete=models.CASCADE, related_name='attachments'
     )
     file = models.FileField(upload_to='internal_memos/%Y/%m/')
+    original_name = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+class InternalMemoWorkLog(models.Model):
+    memo = models.ForeignKey(
+        InternalMemo, on_delete=models.CASCADE, related_name='work_logs'
+    )
+    work_status = models.CharField(
+        max_length=16, choices=InternalMemo.WORK_STATUS_CHOICES
+    )
+    note = models.TextField(blank=True)
+    updated_by = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='internal_memo_work_logs'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class InternalMemoWorkImage(models.Model):
+    log = models.ForeignKey(
+        InternalMemoWorkLog, on_delete=models.CASCADE, related_name='images'
+    )
+    file = models.FileField(upload_to='internal_memos/work/%Y/%m/')
     original_name = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
