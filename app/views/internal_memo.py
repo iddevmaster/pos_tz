@@ -67,11 +67,12 @@ def _validate_workflow(request, reviewers, approvers, errors):
 
 
 def _can_update_work_status(user, memo, is_admin=None):
+    """Only admins (is_staff or the ผู้ดูแลระบบ group) may update work status."""
     if memo.status != InternalMemo.STATUS_APPROVED:
         return False
     if is_admin is None:
         is_admin = _can_view_all_memos(user)
-    return is_admin or memo.creator_id == user.id
+    return is_admin
 
 
 def _save_work_update(request, memo):
@@ -452,6 +453,9 @@ def memo_detail(request, pk):
     memo.can_update_work = _can_update_work_status(request.user, memo)
     context = _base_context(request)
     context['memo'] = memo
+    context['work_logs'] = memo.work_logs.select_related(
+        'updated_by'
+    ).prefetch_related('images')
     return render(request, 'internal_memo/detail.html', context)
 
 
