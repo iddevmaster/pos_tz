@@ -14,6 +14,7 @@ from ..constant import defaultTitle
 from ..models import (
     InternalMemo,
     InternalMemoAttachment,
+    InternalMemoCategory,
     InternalMemoWorkImage,
     InternalMemoWorkLog,
     category_program_permission,
@@ -46,6 +47,14 @@ def _submitted_message(require_review):
     if require_review:
         return 'ส่งบันทึกให้ผู้ตรวจสอบ ชั้น 1 แล้ว'
     return 'ส่งบันทึกให้ผู้อนุมัติแล้ว'
+
+
+def _validate_category(request, categories, errors):
+    try:
+        return categories.get(pk=request.POST.get('category', '').strip())
+    except (InternalMemoCategory.DoesNotExist, ValueError):
+        errors.append('กรุณาเลือกประเภทเรื่อง')
+        return None
 
 
 def _validate_workflow(request, reviewers, approvers, errors):
@@ -251,6 +260,7 @@ def memo_create(request):
     approvers = users.filter(
         groups__name='Internal Memo Approver'
     ).distinct()
+    categories = InternalMemoCategory.objects.filter(is_active=True)
     if request.method == 'POST':
         recipient = request.POST.get('recipient', '').strip()
         subject = request.POST.get('subject', '').strip()
@@ -262,6 +272,7 @@ def memo_create(request):
         errors = []
         if not recipient:
             errors.append('กรุณาระบุผู้รับ')
+        category = _validate_category(request, categories, errors)
         if not subject:
             errors.append('กรุณาระบุเรื่อง')
         if not detail:
@@ -288,6 +299,7 @@ def memo_create(request):
                 memo = InternalMemo.objects.create(
                     recipient=recipient,
                     subject=subject,
+                    category=category,
                     branch=branch,
                     detail=detail,
                     creator=request.user,
@@ -316,6 +328,7 @@ def memo_create(request):
         'users': users,
         'reviewers': reviewers,
         'approvers': approvers,
+        'categories': categories,
     })
     return render(request, 'internal_memo/form.html', context)
 
@@ -335,6 +348,9 @@ def memo_edit(request, pk):
     approvers = users.filter(
         groups__name='Internal Memo Approver'
     ).distinct()
+    categories = InternalMemoCategory.objects.filter(
+        Q(is_active=True) | Q(pk=memo.category_id)
+    )
 
     if request.method == 'POST':
         recipient = request.POST.get('recipient', '').strip()
@@ -345,6 +361,7 @@ def memo_edit(request, pk):
 
         if not recipient:
             errors.append('กรุณาระบุผู้รับ')
+        category = _validate_category(request, categories, errors)
         if not subject:
             errors.append('กรุณาระบุเรื่อง')
         if not branch:
@@ -361,6 +378,7 @@ def memo_edit(request, pk):
         else:
             memo.recipient = recipient
             memo.subject = subject
+            memo.category = category
             memo.branch = branch
             memo.detail = detail
             memo.reviewer = reviewer
@@ -376,7 +394,7 @@ def memo_edit(request, pk):
             ):
                 memo.status = InternalMemo.STATUS_PENDING_REVIEW
             memo.save(update_fields=[
-                'recipient', 'subject', 'branch', 'detail', 'reviewer',
+                'recipient', 'subject', 'category', 'branch', 'detail', 'reviewer',
                 'require_review', 'approver', 'status', 'updated_at',
             ])
             memo.cc_users.set(users.filter(pk__in=request.POST.getlist('cc_users')))
@@ -394,6 +412,7 @@ def memo_edit(request, pk):
         'users': users,
         'reviewers': reviewers,
         'approvers': approvers,
+        'categories': categories,
         'selected_cc_ids': selected_cc_ids,
     })
     return render(request, 'internal_memo/edit.html', context)
