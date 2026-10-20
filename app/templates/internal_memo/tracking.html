@@ -3,6 +3,11 @@
 {% block content %}<div class="memo-shell">
   <div class="memo-head"><div><h3>ติดตามงาน · {{ memo.subject }}</h3><div class="memo-subtitle">{{ memo.memo_number }} · ผู้บันทึก {{ memo.creator_display }}</div></div>{% if memo.work_status %}<span class="memo-badge memo-work-{{ memo.work_status }}">{{ memo.get_work_status_display }}</span>{% endif %}</div>
 
+  <section class="memo-card"><div class="memo-card-title"><span class="memo-icon"><i class="bi bi-file-earmark-text"></i></span>บันทึกภายใน</div>
+    <div class="memo-meta mb-3"><div><span>ประเภทเรื่อง</span>{{ memo.category.name|default:'-' }}</div><div><span>เรื่อง</span>{{ memo.subject }}</div><div><span>เรียน</span>{{ memo.recipient }}</div></div>
+    <div class="memo-field"><label>รายละเอียด</label><div class="memo-content">{{ memo.detail }}</div></div>
+  </section>
+
   {% if can_update %}<form method="post" enctype="multipart/form-data" class="memo-card">{% csrf_token %}
     <div class="memo-card-title"><span class="memo-icon"><i class="bi bi-clipboard-check"></i></span>อัปเดตการดำเนินงาน</div>
     <div class="memo-field mb-3"><label>สถานะ <span class="memo-required">*</span></label>
