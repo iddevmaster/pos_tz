@@ -74,7 +74,7 @@ if(selectedValue != null){
     let student_firstname_th = firstnameEl ? firstnameEl.value : document.getElementById('customer_name').value;
     let student_lastname_th = lastnameEl ? lastnameEl.value : '-';
 
-    // นิติบุคคล: ต้องมีชื่อบริษัท และ TAX ID 13 หลัก
+    // นิติบุคคล: ต้องมีชื่อบริษัท และ TAX ID 13 หลัก (หรือ "-" ถ้าไม่มี)
     if (getCustomerEntity() == '2') {
       const companyEl = document.getElementById('company_name');
       const company_name = (companyEl || document.getElementById('customer_name')).value.trim();
@@ -87,10 +87,10 @@ if(selectedValue != null){
     });
         return false;
       }
-      if (!/^[0-9]{13}$/.test(document.getElementById('customer_tax').value.trim())) {
+      if (!/^([0-9]{13}|-)$/.test(document.getElementById('customer_tax').value.trim())) {
         Swal.fire({
        title: 'กรุณากรอกข้อมูลให้ถูกต้อง',
-       text: 'TAX ID นิติบุคคล ต้องเป็นตัวเลข 13 หลัก',
+       text: 'TAX ID นิติบุคคล ต้องเป็นตัวเลข 13 หลัก หรือกรอก - ถ้าไม่มี',
        icon: 'error',
      confirmButtonText: 'OK'
     });
@@ -656,8 +656,7 @@ const selectedValue = selectElement.value;
                 class="form-control"
                 name="customer_tax"
                 id="customer_tax"
-                inputmode="numeric"
-                placeholder="เลข 13 หลัก"
+                placeholder="เลข 13 หลัก หรือ - ถ้าไม่มี"
                 value="{{idcard_data.CitizenNo}}"
               />
             </div>
