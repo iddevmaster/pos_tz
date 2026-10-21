@@ -1974,8 +1974,14 @@ def editbill_form(request, rp_id):
         messages.success(request, "แก้ไขบิลเรียบร้อย!")
         return redirect("/finance/billing/editbill/" + str(ucon.rp_id))
 
+    # ev_vat = 1 ราคารวม VAT แล้ว, อื่นๆ = ราคายังไม่รวม VAT (ใช้คำนวณยอดอัตโนมัติในฟอร์ม)
+    try:
+        ev_vat = ucon.register.ev.ev_vat
+    except Exception:
+        ev_vat = 0
+
     context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': ucon,
-               'items': items, 'addons': addons}
+               'items': items, 'addons': addons, 'ev_vat': ev_vat}
     return render(request, 'finance/billing_edit_form.html', context)
 
 

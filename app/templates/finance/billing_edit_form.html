@@ -1,4 +1,37 @@
 {% extends 'base.html' %} {% load l10n %} {% block content %}
+<style>
+  /* ช่องที่ระบบคำนวณให้ (read only) */
+  .form-control.calc-readonly {
+    background-color: rgba(108, 117, 125, 0.15) !important;
+    border: 1px dashed rgba(108, 117, 125, 0.6) !important;
+    color: inherit;
+    font-weight: 600;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    -moz-appearance: textfield;
+  }
+  .form-control.calc-readonly::-webkit-inner-spin-button,
+  .form-control.calc-readonly::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .calc-badge,
+  .calc-auto > label::after {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    background: rgba(108, 117, 125, 0.18);
+    color: #6c757d;
+    vertical-align: middle;
+  }
+  .calc-auto > label::after {
+    content: "🔒 อัตโนมัติ";
+    margin-left: 0.35rem;
+  }
+</style>
 <script>
   // ยอดรวม Add-on = จำนวน x ราคา - ส่วนลด
   function calcAddon(row) {
@@ -11,18 +44,89 @@
     const tpl = document.getElementById("newAddonTemplate");
     const row = tpl.content.firstElementChild.cloneNode(true);
     document.getElementById("addonBody").appendChild(row);
+    calcItems();
+  }
+
+  // ยอดรวม Add-on ที่ยังไม่ถูกติ๊กลบ
+  function addonTotal() {
+    let sum = 0;
+    document.querySelectorAll("#addonBody tr").forEach(function (tr) {
+      const del = tr.querySelector(".js-delete");
+      if (del && del.checked) return;
+      sum += parseFloat(tr.querySelector(".js-result").value) || 0;
+    });
+    return sum;
+  }
+
+  // คำนวณเหมือนหน้าเปิดการขาย (register_noevent.html doStep3 + register.py spa_sale_step3)
+  // ยอดรวม = จำนวน x ราคา - ส่วนลด (+ Add-on เฉพาะรายการแรก)
+  //   รวม VAT   : ก่อน VAT = ยอดรวม x 100/107, VAT = ยอดรวม - ก่อน VAT, ยอดสุทธิ = ยอดรวม
+  //   ไม่รวม VAT: ก่อน VAT = ยอดรวม,          VAT = ยอดรวม x 7%,       ยอดสุทธิ = ยอดรวม + VAT
+  // rpi_price_total = ก่อน VAT, rpi_price_result = rpi_pay = ยอดสุทธิ
+  function calcItem(box, withAddon) {
+    if (!box.querySelector(".js-auto").checked) return;
+    const val = (sel) => parseFloat(box.querySelector(sel).value) || 0;
+    const r2 = (n) => Math.round(n * 100) / 100;
+    const set = (sel, v) => (box.querySelector(sel).value = v.toFixed(2));
+    const grand = val(".js-item-qty") * val(".js-item-price") - val(".js-item-discount") + (withAddon ? addonTotal() : 0);
+    let beforeVat, vatAmt, result;
+    if (box.querySelector(".js-item-vatmode").value == "1") {
+      beforeVat = r2((grand * 100) / 107);
+      vatAmt = r2(grand - beforeVat);
+      result = r2(grand);
+    } else {
+      beforeVat = r2(grand);
+      vatAmt = r2((grand * 7) / 100);
+      result = r2(grand + vatAmt);
+    }
+    set(".js-item-total", beforeVat);
+    set(".js-item-vat", vatAmt);
+    set(".js-item-result", result);
+    set(".js-item-pay", result);
+  }
+
+  // ช่องที่ระบบคำนวณให้ → read only เมื่อติ๊กคำนวณอัตโนมัติ
+  function syncReadonly(box) {
+    const auto = box.querySelector(".js-auto").checked;
+    box.querySelectorAll(".js-item-total, .js-item-vat, .js-item-result, .js-item-pay").forEach(function (el) {
+      el.readOnly = auto;
+      el.classList.toggle("calc-readonly", auto);
+      el.parentElement.classList.toggle("calc-auto", auto);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".js-item").forEach(syncReadonly);
+  });
+
+  function calcItems() {
+    document.querySelectorAll(".js-item").forEach(function (box, i) {
+      calcItem(box, i === 0);
+    });
   }
 
   document.addEventListener("input", function (e) {
     if (e.target.matches(".js-qty, .js-price, .js-discount")) {
       calcAddon(e.target.closest("tr"));
+      calcItems();
+    } else if (e.target.matches(".js-item-qty, .js-item-price, .js-item-discount")) {
+      calcItems();
     }
   });
 
   document.addEventListener("change", function (e) {
     if (e.target.matches(".js-delete")) {
       e.target.closest("tr").classList.toggle("table-danger", e.target.checked);
+      calcItems();
+    } else if (e.target.matches(".js-auto, .js-item-vatmode")) {
+      if (e.target.matches(".js-auto")) syncReadonly(e.target.closest(".js-item"));
+      calcItems();
     }
+  });
+
+  document.addEventListener("click", function (e) {
+    // ลบแถว Add-on ใหม่ แล้วคำนวณใหม่ (หลัง onclick ลบแถวไปแล้ว)
+    if (e.target.closest("#addonBody button")) setTimeout(calcItems);
   });
 </script>
 
@@ -116,14 +220,18 @@
     <div class="card">
       <div class="card-header">
         <h5 class="mb-0">รายการสินค้า</h5>
-        <small class="text-danger">ระบบไม่คำนวณยอดให้อัตโนมัติ กรุณาตรวจยอดรวม / VAT / ยอดสุทธิ ให้สัมพันธ์กันก่อนบันทึก</small>
+        <small class="text-muted">คำนวณแบบเดียวกับหน้าเปิดการขาย · เลือก "ราคานี้รวม VAT" ให้ถูก แล้วเมื่อติ๊ก "คำนวณอัตโนมัติ" ระบบจะคำนวณ ยอดรวม / VAT / ยอดสุทธิ / ยอดชำระ ให้เมื่อแก้จำนวน ราคา ส่วนลด หรือ Add-on (รวม Add-on ไว้ในรายการแรก)</small>
       </div>
       <div class="card-body">
         {% localize off %}
         {% for item in items %}
-        <div class="border rounded p-3 mb-3">
-          <div class="mb-2">
+        <div class="border rounded p-3 mb-3 js-item">
+          <div class="mb-2 d-flex justify-content-between align-items-center">
             <span class="badge bg-secondary">{{ item.type_payment|default:'-' }}</span>
+            <div class="form-check mb-0">
+              <input type="checkbox" class="form-check-input js-auto" id="auto_{{ item.rpi_id }}" {% if item.type_payment == 'FullPayment' %}checked{% endif %} />
+              <label class="form-check-label" for="auto_{{ item.rpi_id }}">คำนวณอัตโนมัติ</label>
+            </div>
           </div>
           <div class="row">
             <div class="col-md-3 mb-2">
@@ -140,39 +248,43 @@
             </div>
             <div class="col-md-2 mb-2">
               <label>จำนวน</label>
-              <input type="number" step="1" class="form-control" name="rpi_quantity_{{ item.rpi_id }}" value="{{ item.rpi_quantity }}" />
+              <input type="number" step="1" class="form-control js-item-qty" name="rpi_quantity_{{ item.rpi_id }}" value="{{ item.rpi_quantity }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ราคาต่อหน่วย</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_price_{{ item.rpi_id }}" value="{{ item.rpi_price }}" />
+              <input type="number" step="0.01" class="form-control js-item-price" name="rpi_price_{{ item.rpi_id }}" value="{{ item.rpi_price }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ส่วนลด</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_price_discount_{{ item.rpi_id }}" value="{{ item.rpi_price_discount }}" />
+              <input type="number" step="0.01" class="form-control js-item-discount" name="rpi_price_discount_{{ item.rpi_id }}" value="{{ item.rpi_price_discount }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ยอดรวม (ก่อน VAT)</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_price_total_{{ item.rpi_id }}" value="{{ item.rpi_price_total }}" />
+              <input type="number" step="0.01" class="form-control js-item-total" name="rpi_price_total_{{ item.rpi_id }}" value="{{ item.rpi_price_total }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>VAT</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_price_vat_{{ item.rpi_id }}" value="{{ item.rpi_price_vat }}" />
+              <input type="number" step="0.01" class="form-control js-item-vat" name="rpi_price_vat_{{ item.rpi_id }}" value="{{ item.rpi_price_vat }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ยอดสุทธิ</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_price_result_{{ item.rpi_id }}" value="{{ item.rpi_price_result }}" />
+              <input type="number" step="0.01" class="form-control js-item-result" name="rpi_price_result_{{ item.rpi_id }}" value="{{ item.rpi_price_result }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ยอดชำระ (rpi_pay)</label>
-              <input type="number" step="0.01" class="form-control" name="rpi_pay_{{ item.rpi_id }}" value="{{ item.rpi_pay }}" />
+              <input type="number" step="0.01" class="form-control js-item-pay" name="rpi_pay_{{ item.rpi_id }}" value="{{ item.rpi_pay }}" />
             </div>
             <div class="col-md-2 mb-2">
               <label>ยอดชำระแล้ว (rpi_price_pay)</label>
               <input type="number" step="0.01" class="form-control" name="rpi_price_pay_{{ item.rpi_id }}" value="{{ item.rpi_price_pay }}" />
             </div>
             <div class="col-md-2 mb-2">
-              <label>VAT (%)</label>
-              <input type="text" class="form-control" name="vat_{{ item.rpi_id }}" maxlength="64" value="{{ item.vat|default:'' }}" />
+              <label>ราคานี้รวม VAT</label>
+              {% if item.vat == '0' %}{% firstof '0' as vat_mode %}{% elif item.vat %}{% firstof '1' as vat_mode %}{% elif ev_vat == 1 %}{% firstof '1' as vat_mode %}{% else %}{% firstof '0' as vat_mode %}{% endif %}
+              <select class="form-select js-item-vatmode" name="vat_{{ item.rpi_id }}">
+                <option value="0" {% if vat_mode == '0' %}selected{% endif %}>ไม่รวม VAT</option>
+                <option value="1" {% if vat_mode == '1' %}selected{% endif %}>รวม VAT</option>
+              </select>
             </div>
             <div class="col-md-2 mb-2">
               <label>วันที่ชำระ</label>
@@ -209,7 +321,7 @@
               <th style="min-width:80px">จำนวน</th>
               <th style="min-width:110px">ราคา</th>
               <th style="min-width:110px">ส่วนลด</th>
-              <th style="min-width:120px">ยอดรวม</th>
+              <th style="min-width:120px">ยอดรวม <span class="calc-badge">🔒 อัตโนมัติ</span></th>
               <th>ลบ</th>
             </tr>
           </thead>
@@ -223,7 +335,7 @@
               <td><input type="number" step="1" class="form-control js-qty" name="addon_qty_{{ ao.addon_id }}" value="{{ ao.qty }}" /></td>
               <td><input type="number" step="0.01" class="form-control js-price" name="addon_rpi_price_{{ ao.addon_id }}" value="{{ ao.rpi_price }}" /></td>
               <td><input type="number" step="0.01" class="form-control js-discount" name="addon_rpi_price_discount_{{ ao.addon_id }}" value="{{ ao.rpi_price_discount }}" /></td>
-              <td><input type="number" step="0.01" class="form-control js-result" name="addon_rpi_price_result_{{ ao.addon_id }}" value="{{ ao.rpi_price_result }}" /></td>
+              <td><input type="number" step="0.01" class="form-control js-result calc-readonly" name="addon_rpi_price_result_{{ ao.addon_id }}" readonly value="{{ ao.rpi_price_result }}" /></td>
               <td class="text-center"><input type="checkbox" class="form-check-input js-delete" name="addon_delete_{{ ao.addon_id }}" value="1" /></td>
             </tr>
             {% endfor %}
@@ -239,7 +351,7 @@
             <td><input type="number" step="1" class="form-control js-qty" name="new_addon_qty" value="1" /></td>
             <td><input type="number" step="0.01" class="form-control js-price" name="new_addon_rpi_price" value="0" /></td>
             <td><input type="number" step="0.01" class="form-control js-discount" name="new_addon_rpi_price_discount" value="0" /></td>
-            <td><input type="number" step="0.01" class="form-control js-result" name="new_addon_rpi_price_result" value="0" /></td>
+            <td><input type="number" step="0.01" class="form-control js-result calc-readonly" name="new_addon_rpi_price_result" readonly value="0" /></td>
             <td class="text-center">
               <button type="button" class="btn btn-sm btn-light-danger" onclick="this.closest('tr').remove()">×</button>
             </td>

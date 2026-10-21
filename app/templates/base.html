@@ -843,17 +843,25 @@ if(document.getElementById('table1')!=null){
 </script>
 
 <!-- Toast Messages -->
+<style>
+  /* toastify ใน vendors เป็นเวอร์ชันเก่า ไม่รองรับ option style → กำหนดผ่าน className แทน */
+  .toastify.toast-msg {
+    color: #111827;
+    border-radius: 10px;
+    font-family: Sarabun, sans-serif;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+  }
+  .toastify.toast-msg .toast-close { color: #111827; opacity: .6; }
+  .toastify.toast-error { border: 1px solid #fca5a5; }
+  .toastify.toast-success { border: 1px solid #86efac; }
+</style>
 {% for msg in messages %}
 <script>
 Toastify({
   text:"{{msg}}",duration:3000,close:true,gravity:"top",position:"center",
   backgroundColor:"{% if msg.tags == 'error' %}#fef2f2{% else %}#f0fdf4{% endif %}",
-  style:{
-    border:"1px solid {% if msg.tags == 'error' %}#fca5a5{% else %}#86efac{% endif %}",
-    color:"{% if msg.tags == 'error' %}#dc2626{% else %}#16a34a{% endif %}",
-    borderRadius:'10px',fontFamily:'Sarabun,sans-serif',fontSize:'13px',
-    boxShadow:'0 4px 12px rgba(0,0,0,.1)',
-  }
+  className:"toast-msg {% if msg.tags == 'error' %}toast-error{% else %}toast-success{% endif %}",
 }).showToast();
 </script>
 {% endfor %}
