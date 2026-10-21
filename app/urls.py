@@ -312,6 +312,8 @@ urlpatterns = [
     path('finance/billing/cancelbill', finance.listbill),
     path('finance/billing/sendcancelbill', finance.cancellistbill, name="Cancelbill"
     ),
+    path('finance/billing/editbill', finance.editlistbill),
+    path('finance/billing/editbill/<int:rp_id>', finance.editbill_form),
     
 
     path('finance/overduepayment', finance.withdraw_list_overduepayment),

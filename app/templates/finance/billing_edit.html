@@ -1,0 +1,95 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>แก้ไขบิล</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">แก้ไขบิล</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form method="get" action="/finance/billing/editbill" autocomplete="off">
+        <div class="row">
+          <div class="col-lg-9 col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              id="rp_doc_number"
+              name="rp_doc_number"
+              value="{{ request.GET.rp_doc_number|default:'' }}"
+              required
+              placeholder="ค้นหาเลขใบเสร็จ"
+            />
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <button type="submit" class="btn btn-success">
+              <i class="icon dripicons-experiment"></i>
+              กรอง
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>เลขใบเสร็จ</th>
+            <th>ชื่อลูกค้า</th>
+            <th>เลขผู้เสียภาษี</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>วันที่ออกบิล</th>
+            <th>แก้ไขล่าสุด</th>
+            <th>ผู้ประสานงาน</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{res.register.register_number}}</td>
+            <td>{{res.rp_doc_number}}</td>
+            <td>{{res.rp_name_customer}}</td>
+            <td>{{res.rp_tax}}</td>
+            <td align="center">
+              {% if res.register.customer_type == 1 %}
+              <span class="badge bg-success">บุคคล</span>
+              {% else %}
+              <span class="badge bg-info">บริษัท</span>
+              {% endif %}
+            </td>
+            <td align="center">
+              {% if res.register.pay_type == 1 %}
+              <span class="badge bg-success">เงินสด</span>
+              {% else %}
+              <span class="badge bg-danger">เครดิต</span>
+              {% endif %}
+            </td>
+            <td>{{res.crt_date|date:"d/m/Y H:i"}}</td>
+            <td>{{res.upd_date|date:"d/m/Y H:i"|default:"-"}}</td>
+            <td>{{res.rp_name_seller}}</td>
+            <td>
+              <a class="btn btn-warning btn-sm" href="/finance/billing/editbill/{{res.rp_id}}">แก้ไข</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
