@@ -1,0 +1,68 @@
+{% extends 'base.html' %} {% block content %} {% load humanize static %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ใบเสนอราคาของฉัน</h3>
+    <p class="text-subtitle text-muted">ใบเสนอราคาเครดิตย้อนหลัง 6 เดือน</p>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">ใบเสนอราคา</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <!-- ขั้นตอน: รออนุมัติ → รอลูกค้ายืนยัน → ยืนยันแล้ว -->
+      <div class="mb-3">
+        <a href="/quotation/my" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          ทั้งหมด <span class="badge bg-light text-dark">{{ total }}</span>
+        </a>
+        {% for t in tabs %}
+        <a href="/quotation/my?status={{ t.value }}"
+          class="btn btn-sm {% if status == t.value %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          {{ t.label }} <span class="badge bg-light text-dark">{{ t.count }}</span>
+        </a>
+        {% endfor %}
+      </div>
+
+      <table class="table table-striped" id="table1">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>วันที่ออก</th>
+            <th>เลขใบเสนอ</th>
+            <th>ชื่อลูกค้า</th>
+            <th>สินค้าและวันที่จัด</th>
+            <th>ราคา</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in data %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{ res.register.crt_date|date:"d/m/Y" }}</td>
+            <td>{{ res.rp_doc_number }}</td>
+            <td>{{ res.custom }}</td>
+            <td>
+              {{ res.register.course.course_name }}
+              {% if res.register.ev %}รุ่น {{ res.register.ev.ev_generation }}
+              <br />วันที่ {{ res.register.ev.ev_date_start }} - {{ res.register.ev.ev_date_end }}{% endif %}
+            </td>
+            <td>{% if res.price is not None %}{{ res.price|floatformat:2|intcomma }}{% else %}-{% endif %}</td>
+            <td><span class="badge {{ res.status_badge }}">{{ res.status_label }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

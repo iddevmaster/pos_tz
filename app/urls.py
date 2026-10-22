@@ -62,6 +62,7 @@ urlpatterns = [
 
     path('finance/invoiceall', register.approve_list_invoice_invall),
     path('finance/overdueinvoice', register.approve_list_invoice_overdue),
+    path('quotation/my', register.quotation_my, name="QuotationMy"),
 
 
     path('approvebill/invoice/rv/',

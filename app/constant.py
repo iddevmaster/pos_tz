@@ -192,18 +192,26 @@ listMenu = [
         "group_label": "ครู - วิทยากร",
     },
 
+    # ใบเสนอราคา — เมนูเรียงตามขั้นตอน (sidebar เรียงตาม page_label จึงใส่เลขนำหน้า)
     {
-        "value": "approve/update/payment",
-        "label": "แก้ไขใบเสร็จ - ใบเสนอราคา",
-        "group_value": "z2NIxi",
-        "group_label": "อนุมัติเอกสาร",
+        "value": "quotation/my",
+        "label": "1. ใบเสนอราคาของฉัน",
+        "group_value": "QT0001",
+        "group_label": "ใบเสนอราคา",
     },
     {
         "value": "approve/update/event",
-        "label": "ใบเสนอราคารออนุมัติ",
-        "group_value": "z2NIxi",
-        "group_label": "อนุมัติเอกสาร",
+        "label": "2. รออนุมัติ",
+        "group_value": "QT0001",
+        "group_label": "ใบเสนอราคา",
     },
+    {
+        "value": "finance/invoiceall",
+        "label": "3. ยืนยันแล้ว",
+        "group_value": "QT0001",
+        "group_label": "ใบเสนอราคา",
+    },
+
         {
         "value": "approve/documents/internal",
         "label": "เอกสารบันทึกภายใน",
@@ -249,18 +257,6 @@ listMenu = [
     {
         "value": "finance/sale/commission",
         "label": "กำหนดรายการCommission",
-        "group_value": "naSt0v",
-        "group_label": "การเงิน",
-    },
-        {
-        "value": "finance/invoiceall",
-        "label": "ใบเสนอราคาที่ยืนยัน",
-        "group_value": "naSt0v",
-        "group_label": "การเงิน",
-    },
-        {
-        "value": "finance/overdueinvoice",
-        "label": "ใบเสนอราคาค้าง",
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },

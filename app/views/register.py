@@ -2615,7 +2615,70 @@ def approve_list_invoice_overdue(request):
         
     context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
 
-    return render(request, 'register/approve_list_event_bill_credit_over.html',context)   
+    return render(request, 'register/approve_list_event_bill_credit_over.html',context)
+
+
+# สถานะใบเสนอราคา (เครดิต) ตามขั้นตอน
+# register_main.status  W = รออนุมัติ , N = รอลูกค้ายืนยัน , Y = ยืนยันแล้ว , C = ยกเลิก
+QUOTATION_STATUS = {
+    'W': ('รออนุมัติ', 'bg-warning'),
+    'N': ('รอลูกค้ายืนยัน', 'bg-info'),
+    'Y': ('ยืนยันแล้ว', 'bg-success'),
+    'C': ('ยกเลิก', 'bg-danger'),
+}
+
+
+@login_required(login_url='/login')
+def quotation_my(request):
+    title = defaultTitle
+    user_id = request.user.id
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        objMenu.append({'group_label': rs['group_label'], 'group_value': rs['group_value'], 'children': children})
+
+    status = request.GET.get('status', '')
+    since = timezone.now() - relativedelta(months=6)
+
+    registers = register_main.objects.select_related('ev', 'course').filter(
+        seller_id=user_id, pay_type=2, crt_date__gte=since).order_by('-crt_date')
+    counts = {k: 0 for k in QUOTATION_STATUS}
+    for s in registers.values_list('status', flat=True):
+        if s in counts:
+            counts[s] += 1
+    if status in QUOTATION_STATUS:
+        registers = registers.filter(status=status)
+
+    payments = {p.register_id: p for p in register_payment.objects.filter(register__in=registers)}
+    items = {i.rp_id: i for i in register_payment_items.objects.filter(rp__in=payments.values())}
+
+    obj = []
+    for r in registers:
+        pay = payments.get(r.register_id)
+        item = items.get(pay.rp_id) if pay else None
+        label, badge = QUOTATION_STATUS.get(r.status, (r.status or '-', 'bg-secondary'))
+        obj.append({
+            'register': r,
+            'rp_doc_number': pay.rp_doc_number if pay else '-',
+            'custom': pay.rp_name_customer if pay else '-',
+            'price': item.rpi_price_result if item else None,
+            'status_label': label,
+            'status_badge': badge,
+        })
+
+    tabs = [{'value': k, 'label': v[0], 'count': counts[k]} for k, v in QUOTATION_STATUS.items()]
+    context = {'title': title, 'data': obj, 'tabs': tabs, 'status': status,
+               'total': sum(counts.values()), 'listMenuPermission': objMenu}
+    return render(request, 'register/quotation_my.html', context)
 
 
 @login_required(login_url='/login')
