@@ -763,6 +763,13 @@
             <i class="icon dripicons-plus" aria-hidden="true"></i> เพิ่มข้อมูล
           </button>
         </div>
+        <form action="{% url 'SyncTeacherIncomeDate' %}" method="post" class="d-inline mb-3"
+          onsubmit="return confirm('ยืนยัน sync วันที่ค่าตอบแทนวิทยากร ให้ตรงกับวันอบรมทุกรอบ ?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-info mb-3">
+            <i class="icon dripicons-clockwise" aria-hidden="true"></i> Sync วันที่ค่าตอบแทนวิทยากร
+          </button>
+        </form>
       </div>
     </div>
     <div class="card-body">

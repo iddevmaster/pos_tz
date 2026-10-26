@@ -125,6 +125,8 @@ urlpatterns = [
          name="UpdateCourseEvent"),
     path('course/event/delete/', course.course_event_delete,
          name="DeleteCourseEvent"),
+    path('course/event/sync-teacher-income-date', course.course_event_sync_teacher_income_date,
+         name="SyncTeacherIncomeDate"),
 #     path('course/event/teachers/list/<slug:ev_id>', course.course_teacher_event_list),
     path('calendar_event/', course.calendar_event),
     path('calendar_event_staff/', course.calendar_event_staff),

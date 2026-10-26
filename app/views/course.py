@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 
-from django.db.models import Count, Sum, Value, F
+from django.db.models import Count, Sum, Value, F, OuterRef, Subquery
 from ..models import course, course_event, user_group,category_program_permission,user_detail,teacher_income_setting,location_thai,pay_item,teacher,project_code,compensation,event_register,condition,conhead,fact_teacher_user,register_main,register_payment,training,register_payment_items,notifications
 from ..constant import defaultTitle
 from ..functions import addDay, addYear, dateTimeNow, dmytoymd,checkpermi
@@ -330,7 +330,34 @@ def course_event_update(request):
     content.location_id = local
     content.address = address
     content.save()
+
+    # sync วันอบรมไปยังค่าตอบแทนวิทยากรของรอบนี้
+    teacher_income_setting.objects.filter(ev=ev_id).update(
+        tis_start_date=ev_date_start,
+        tis_end_date=ev_date_end,
+        upd_date=dateTimeNow(),
+    )
+
     messages.success(request, "ทำรายการสำเร็จ !")
+    return redirect("/course/event")
+
+@login_required(login_url='/login')
+def course_event_sync_teacher_income_date(request):
+    if request.method != 'POST':
+        return redirect("/course/event")
+
+    # sync วันที่ค่าตอบแทนวิทยากรทุก record ให้ตรงกับวันอบรมของ event
+    ev_start = course_event.objects.filter(ev_id=OuterRef('ev_id')).values('ev_date_start')[:1]
+    ev_end = course_event.objects.filter(ev_id=OuterRef('ev_id')).values('ev_date_end')[:1]
+    updated = teacher_income_setting.objects.exclude(
+        tis_start_date=F('ev__ev_date_start'), tis_end_date=F('ev__ev_date_end'),
+    ).update(
+        tis_start_date=Subquery(ev_start),
+        tis_end_date=Subquery(ev_end),
+        upd_date=dateTimeNow(),
+    )
+
+    messages.success(request, f"Sync สำเร็จ ! อัปเดต {updated} รายการ")
     return redirect("/course/event")
 
 @login_required(login_url='/login')
