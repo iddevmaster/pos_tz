@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
+from django.core.paginator import Paginator
 # from django.http import HttpResponse, response
 from datetime import date, timedelta
 from dateutil import rrule
@@ -120,6 +121,61 @@ def register_home(request):
         'listMenuPermission': objMenu,
     }
     return render(request, 'dashboard/index.html', context)
+
+@login_required(login_url='/login')
+def register_payment_all(request):
+    user_id = request.user.id
+    try:
+        m = user_group.objects.get(user=user_id)
+    except user_group.DoesNotExist:
+        return render(request, '404.html')
+    # Menu
+    try:
+        u = user_detail.objects.get(user_id=user_id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+
+    q = request.GET.get('q', '').strip()
+    status = request.GET.get('status', '')
+    date_start = request.GET.get('date_start', '')
+    date_end = request.GET.get('date_end', '')
+
+    payments = register_payment.objects.select_related('register').annotate(
+        total=Sum('items__rpi_price_result')).order_by('-crt_date')
+    if q:
+        payments = payments.filter(Q(rp_doc_number__icontains=q) | Q(rp_name_customer__icontains=q))
+    if status:
+        payments = payments.filter(register__status=status)
+    if date_start:
+        payments = payments.filter(crt_date__date__gte=date_start)
+    if date_end:
+        payments = payments.filter(crt_date__date__lte=date_end)
+
+    page_obj = Paginator(payments, 50).get_page(request.GET.get('page'))
+    params = request.GET.copy()
+    params.pop('page', None)
+
+    context = {
+        'title': defaultTitle,
+        'listMenuPermission': objMenu,
+        'page_obj': page_obj,
+        'q': q,
+        'status': status,
+        'date_start': date_start,
+        'date_end': date_end,
+        'query_string': params.urlencode(),
+    }
+    return render(request, 'dashboard/payment_all.html', context)
 
 @login_required(login_url='/login')
 def register_homenotevent(request):

@@ -12,6 +12,7 @@ urlpatterns = [
     path('salesnotevent/reset', register.register_resetnoevent),
     path('salesnotevent/customer/create/',
          register.customer_createno, name="CreateCustomerNo"),
+    path('salesnotevent/payment/history', register.register_payment_all),
     path('salesnotevent/payment/<str:register_id>', register.paymentnoevent),
     path('salesnotevent/payment/create/', register.payment_createno, name="CreatePaymentno"),
     path('salesnotevent/payment/history/<str:register_id>', register.payment_historyno),
