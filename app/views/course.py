@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http.response import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
 from datetime import date, timedelta
 
 from django.db.models import Count, Sum, Value, F, OuterRef, Subquery
@@ -358,6 +359,9 @@ def course_event_sync_teacher_income_date(request):
     )
 
     messages.success(request, f"Sync สำเร็จ ! อัปเดต {updated} รายการ")
+    next_url = request.POST.get('next', '')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
     return redirect("/course/event")
 
 @login_required(login_url='/login')
