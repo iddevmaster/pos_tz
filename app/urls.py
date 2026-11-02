@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo,customer_followup
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo,customer_followup,transfer_data
 
 urlpatterns = [
     path('profile/edit/', user.profile_edit, name='profile_edit'),
@@ -19,6 +19,12 @@ urlpatterns = [
     path('internal-memos/<int:pk>/work-status/', internal_memo.memo_work_status, name='internal_memo_work_status'),
     path('internal-memos/tracking/', internal_memo.memo_tracking_list, name='internal_memo_tracking_list'),
     path('internal-memos/<int:pk>/tracking/', internal_memo.memo_tracking, name='internal_memo_tracking'),
+    path('transfer-data/daily-sales', transfer_data.daily_sales, name='transfer_data_daily_sales'),
+    path('transfer-data/daily-sales/export', transfer_data.daily_sales_export, name='transfer_data_daily_sales_export'),
+    path('transfer-data/daily-sales/mark', transfer_data.daily_sales_mark, name='transfer_data_daily_sales_mark'),
+    path('transfer-data/daily-sales/test-send', transfer_data.daily_sales_test_send, name='transfer_data_daily_sales_test_send'),
+    path('settings/ecount-api', transfer_data.ecount_api_setting_form, name='ecount_api_setting_form'),
+    path('settings/ecount-api/login', transfer_data.ecount_api_login, name='ecount_api_login'),
     path('customer-followup', customer_followup.followup_list, name='customer_followup_list'),
     path('customer-followup/pool', customer_followup.followup_pool, name='customer_followup_pool'),
     path('customer-followup/registry', customer_followup.followup_registry, name='customer_followup_registry'),

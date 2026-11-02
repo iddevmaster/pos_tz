@@ -1,0 +1,204 @@
+{% extends 'base.html' %} {% load humanize %} {% block content %}
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ยอดรายงานวัน เฉพาะเงินสด (Ecount)</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav
+      aria-label="breadcrumb"
+      class="breadcrumb-header float-start float-lg-end"
+    >
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          ยอดรายงานวัน
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  {% with status=today_status %}
+  <div class="alert {% if status.changed %}alert-warning{% elif status.log %}alert-success{% elif status.has_sales %}alert-danger{% else %}alert-secondary{% endif %}">
+    <strong>สถานะวันนี้ ({{status.sale_date|date:"d/m/Y"}}):</strong>
+    {% if status.changed %}
+    ยอดเปลี่ยนหลังส่ง ส่งไว้ {{status.log.amount|floatformat:2|intcomma}} บาท ยอดปัจจุบัน {{status.subtotal|floatformat:2|intcomma}} บาท ต้องส่งใหม่
+    {% elif status.log %}
+    ส่งแล้ว {{status.log.amount|floatformat:2|intcomma}} บาท เมื่อ {{status.log.sent_at|date:"d/m/Y H:i"}} โดย {{status.log.sent_by.first_name}} {{status.log.sent_by.last_name}}
+    {% elif status.has_sales %}
+    ยังไม่ส่ง ยอดวันนี้ {{status.subtotal|floatformat:2|intcomma}} บาท
+    {% else %}
+    ยังไม่มียอดขายเงินสด
+    {% endif %}
+  </div>
+  {% endwith %}
+  <div class="card">
+    <div class="card-body">
+      <form method="get" autocomplete="off" class="row align-items-end mb-4">
+        <div class="col-lg-3 col-md-4 mb-2">
+          <label for="start">ตั้งแต่วันที่</label>
+          <input
+            type="date"
+            class="form-control"
+            id="start"
+            name="start"
+            required
+            value="{{start}}"
+          />
+        </div>
+        <div class="col-lg-3 col-md-4 mb-2">
+          <label for="end">ถึงวันที่</label>
+          <input
+            type="date"
+            class="form-control"
+            id="end"
+            name="end"
+            required
+            value="{{end}}"
+          />
+        </div>
+        <div class="col-lg-6 col-md-4 mb-2">
+          <button type="submit" class="btn btn-success">แสดงยอด</button>
+          <a
+            class="btn btn-primary"
+            href="/transfer-data/daily-sales/export?start={{start}}&end={{end}}"
+          >
+            Export CSV
+          </a>
+          <button type="button" class="btn btn-outline-primary" id="test-send">ทดสอบส่ง API</button>
+        </div>
+      </form>
+
+      <div id="test-send-result" class="mb-4" hidden>
+        <div class="alert mb-2" role="alert"></div>
+        <div class="row">
+          <div class="col-lg-6 mb-2">
+            <label>Request ที่ส่งไป Ecount</label>
+            <pre class="border rounded p-2 bg-light js-request" style="white-space: pre-wrap; word-break: break-all; max-height: 400px;"></pre>
+          </div>
+          <div class="col-lg-6 mb-2">
+            <label>Response จาก Ecount</label>
+            <pre class="border rounded p-2 bg-light js-response" style="white-space: pre-wrap; word-break: break-all; max-height: 400px;"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>Item code</th>
+              <th>หลักสูตร</th>
+              <th class="text-end">จำนวนใบเสร็จ</th>
+              <th class="text-end">มูลค่าก่อน VAT</th>
+              <th class="text-end">ส่วนลด</th>
+              <th class="text-end">ภาษีมูลค่าเพิ่ม</th>
+              <th class="text-end">ยอดเงินสดรับ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for day in days %}
+            {% for row in day.rows %}
+            <tr>
+              <td>{{day.sale_date|date:"d/m/Y"}}</td>
+              <td>{{row.rpi_code}}</td>
+              <td>{{row.rpi_name}}</td>
+              <td class="text-end">{{row.total_bill}}</td>
+              <td class="text-end">{{row.total|floatformat:2|intcomma}}</td>
+              <td class="text-end">{{row.dis|floatformat:2|intcomma}}</td>
+              <td class="text-end">{{row.vat|floatformat:2|intcomma}}</td>
+              <td class="text-end">{{row.result|floatformat:2|intcomma}}</td>
+            </tr>
+            {% endfor %}
+            <tr class="fw-bold">
+              <td colspan="7" class="text-end">รวมวันที่ {{day.sale_date|date:"d/m/Y"}}</td>
+              <td class="text-end">{{day.subtotal|floatformat:2|intcomma}}</td>
+            </tr>
+            <tr>
+              <td colspan="8" class="text-end">
+                <form method="post" action="/transfer-data/daily-sales/mark" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="sale_date" value="{{day.sale_date|date:'Y-m-d'}}" />
+                  <input type="hidden" name="start" value="{{start}}" />
+                  <input type="hidden" name="end" value="{{end}}" />
+                  {% if day.changed %}
+                  <span class="badge bg-warning text-dark">ยอดเปลี่ยนหลังส่ง</span>
+                  ส่งไว้ {{day.log.amount|floatformat:2|intcomma}} บาท เมื่อ {{day.log.sent_at|date:"d/m/Y H:i"}} โดย {{day.log.sent_by.first_name}} {{day.log.sent_by.last_name}}
+                  <button type="submit" class="btn btn-sm btn-warning">บันทึกว่าส่งยอดใหม่แล้ว</button>
+                  <button type="submit" name="action" value="cancel" class="btn btn-sm btn-outline-secondary">ยกเลิกสถานะ</button>
+                  {% elif day.log %}
+                  <span class="badge bg-success">ส่งแล้ว</span>
+                  เมื่อ {{day.log.sent_at|date:"d/m/Y H:i"}} โดย {{day.log.sent_by.first_name}} {{day.log.sent_by.last_name}}
+                  <button type="submit" name="action" value="cancel" class="btn btn-sm btn-outline-secondary">ยกเลิกสถานะ</button>
+                  {% else %}
+                  <span class="badge bg-danger">ยังไม่ส่ง</span>
+                  <button type="submit" class="btn btn-sm btn-success">บันทึกว่าส่งแล้ว</button>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center">ไม่พบยอดขายในช่วงวันที่เลือก</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="fw-bold">
+              <td colspan="7" class="text-end">จำนวนยอดทั้งหมด</td>
+              <td class="text-end">{{total_sum|floatformat:2|intcomma}}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const result = document.getElementById('test-send-result');
+    const alertBox = result.querySelector('.alert');
+    const requestBox = result.querySelector('.js-request');
+    const responseBox = result.querySelector('.js-response');
+    const button = document.getElementById('test-send');
+    const csrf = '{{ csrf_token }}';
+    const pretty = (body) => (typeof body === 'string' ? body : JSON.stringify(body, null, 2));
+
+    function show(ok, message, request, response) {
+      alertBox.className = 'alert mb-2 ' + (ok ? 'alert-success' : 'alert-danger');
+      alertBox.textContent = message;
+      requestBox.textContent = pretty(request);
+      responseBox.textContent = pretty(response);
+      result.hidden = false;
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    button.addEventListener('click', async function () {
+      const body = new FormData();
+      body.append('csrfmiddlewaretoken', csrf);
+      button.disabled = true;
+      try {
+        const res = await fetch('/transfer-data/daily-sales/test-send', { method: 'POST', body: body });
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          show(data.ok, data.message, data.request, data.response);
+        } catch (e) {
+          show(false, 'เซิร์ฟเวอร์ตอบกลับไม่ใช่ JSON (HTTP ' + res.status + ')', null, text);
+        }
+      } catch (e) {
+        show(false, 'เรียกเซิร์ฟเวอร์ไม่สำเร็จ', null, String(e));
+      } finally {
+        button.disabled = false;
+      }
+    });
+  })();
+</script>
+
+{% endblock %}

@@ -143,6 +143,12 @@ listMenu = [
         "group_label": "ตั้งค่า",
     },
     {
+        "value": "settings/ecount-api",
+        "label": "ตั้งค่า API Ecount",
+        "group_value": "settings",
+        "group_label": "ตั้งค่า",
+    },
+    {
         "value": "register/management",
         "label": "ดำเนินการ",
         "group_value": "pRem5",
@@ -414,6 +420,12 @@ listMenu = [
         "label": "สรุปรายงานขายประจำวัน",
         "group_value": "WRltr2",
         "group_label": "รายงาน",
+    },
+    {
+        "value": "transfer-data/daily-sales",
+        "label": "ยอดรายงานวัน",
+        "group_value": "transferData",
+        "group_label": "Transfer data",
     },
     {
         "value": "report/register/export/learning_status",

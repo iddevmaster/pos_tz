@@ -816,3 +816,38 @@ class customer_followup_owner_log(models.Model):
 
     class Meta:
         ordering = ('-crt_date',)
+
+
+class transfer_data_log(models.Model):
+    """บันทึกการส่งยอดรายวันไป Ecount วันละ 1 แถวต่อ module"""
+    module = models.CharField(max_length=12)
+    sale_date = models.DateField()
+    amount = models.FloatField(default=0)
+    sent_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='transfer_data_sent')
+    sent_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('module', 'sale_date'), name='uniq_transfer_data_log_day'),
+        ]
+
+
+class ecount_api_setting(models.Model):
+    """ค่าการเชื่อมต่อ API ของ Ecount แยกตาม module"""
+    module = models.CharField(max_length=12, unique=True)
+    api_url = models.CharField(max_length=255, blank=True, default='')
+    tax = models.DecimalField(max_digits=5, decimal_places=2, default=7)
+    token = models.TextField(blank=True, default='')
+    login_url = models.CharField(max_length=255, blank=True, default='')
+    com_code = models.CharField(max_length=32, blank=True, default='')
+    user_id = models.CharField(max_length=64, blank=True, default='')
+    api_cert_key = models.CharField(max_length=128, blank=True, default='')
+    lan_type = models.CharField(max_length=16, blank=True, default='th-TH')
+    zone = models.CharField(max_length=8, blank=True, default='')
+    updated_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='ecount_api_setting_updated')
+    upd_date = models.DateTimeField(blank=True, null=True)

@@ -1251,6 +1251,8 @@ function initTabEvents() {
                   <i class="bi bi-journal-text"></i>
                   {% elif rs.group_value == "customerFollowup" %}
                   <i class="bi bi-telephone-forward"></i>
+                  {% elif rs.group_value == "transferData" %}
+                  <i class="bi bi-arrow-left-right"></i>
                   {% elif rs.group_value == "pRem5" %}
                   <i class="bi bi-book"></i>
                   {% elif rs.group_value == "5lgafI" %}
@@ -1492,6 +1494,13 @@ function initTabEvents() {
                   <li class="{% if request.path == '/certificate/setting' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                     <a href="/certificate/setting">
                       <span class="font-default">ตั้งค่าใบเซอร์</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if listMenuPermission|has_menu_permission:"settings/ecount-api" %}
+                  <li class="{% if request.path == '/settings/ecount-api' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="/settings/ecount-api">
+                      <span class="font-default">ตั้งค่า API Ecount</span>
                     </a>
                   </li>
                   {% endif %}
