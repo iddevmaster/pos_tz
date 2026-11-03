@@ -3307,7 +3307,7 @@ def register_report_compensation_withdraw_onemorefitter(request):
     try:
         getteachid = fact_teacher_user.objects.get(user_id=user_id)
         obj = []
-        pi = ['1','2','3','4','5']
+        pi = ['1','2','3','4','5','6','7','8']
         totalp = 0
         content = teacher_income_setting.objects.filter(teacher_id=getteachid.teacher_id,status='S',pi_id__in=pi)
 
@@ -3444,11 +3444,19 @@ def register_report_compensation_withdraw_onemorefitter(request):
              elif int(rs.pi_id) == 5:
               
               tot = teacher_income_setting.objects.filter(ev_id=rs.ev,pi=5).count()
-              all = 1000 
+              all = 1000
               price = all / tot
               tis_compensation = all / tot
-          
-              
+
+             elif int(rs.pi_id) == 6:
+              price = rs.tis_sum
+              tis_compensation = rs.tis_compensation
+
+             elif int(rs.pi_id) in (7, 8):
+              price = rs.tis_compensation
+              tis_compensation = rs.tis_compensation
+
+
             cours = course.objects.get(course_id=event.course_id)
             pay = pay_item.objects.get(id=rs.pi_id)
          
