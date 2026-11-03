@@ -39,6 +39,14 @@ THAI_MONTH_NAMES = [
     (12, 'ธันวาคม'),
 ]
 
+
+def com_by_bill_month(qs, year, month):
+    # กรองค่าคอมตามเดือนของบิล (register_payment ใบแรก) แทนเดือนที่ตั้งเบิก
+    first_bill_date = register_payment.objects.filter(
+        register_id=OuterRef('register_id')).order_by('rp_id').values('crt_date')[:1]
+    return qs.annotate(bill_date=Subquery(first_bill_date)).filter(
+        bill_date__year=year, bill_date__month=month)
+
 @login_required(login_url='/login')
 def register_print(request, rp_id):
     
@@ -2337,7 +2345,7 @@ def register_report_summary_details_com(request ,id, year, m):
 
 
 
-    customer_order_counts = com_income_setting.objects.filter(status='S',user_id=id,active=0,crt_date__year=year,crt_date__month=m)
+    customer_order_counts = com_by_bill_month(com_income_setting.objects.filter(status='S',user_id=id,active=0), year, m)
    
     tax = 0
     tax_all = 0
@@ -4329,7 +4337,7 @@ def register_report_summary_user_withdraw_com(request):
     # end_new = None
     obj = []
 
-    qs = com_income_setting.objects.filter(status='S',active=0,crt_date__year=m_y,crt_date__month=m_n).values('user_id','user__username','user__first_name','user__last_name').annotate(
+    qs = com_by_bill_month(com_income_setting.objects.filter(status='S',active=0), m_y, m_n).values('user_id','user__username','user__first_name','user__last_name').annotate(
     total_before_tax=Coalesce(Sum('tis_com_before_tax'), 0.0),
     total_after_tax=Coalesce(Sum('tis_com_after_tax'), 0.0),
     tax=ExpressionWrapper(
