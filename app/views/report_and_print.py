@@ -4524,7 +4524,64 @@ def register_report_summary_user_withdraw_com_one(request):
     result_list = list(result_dict.values())
     context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f}
   
-    return render(request, 'print/report_withdraw_summary_commission_one.html', context)   
+    return render(request, 'print/report_withdraw_summary_commission_one.html', context)
+
+
+@login_required(login_url='/login')
+def register_report_summary_com_one_print(request, year, m):
+    # หน้าพิมพ์สรุปค่าคอมของตัวเอง (ใช้ user ที่ login เท่านั้น)
+    user_id = request.user.id
+    getdatauser = request.user
+
+    # ใช้เงื่อนไขเดียวกับหน้าสรุป /report/withdraw/all/withdraw/comm/one
+    qs = com_income_setting.objects.filter(
+        status='S', user_id=user_id, crt_date__year=year, crt_date__month=m, active=0
+    ).order_by('tis_start_date', 'id')
+
+    obj = []
+    price = 0
+    price_total = 0
+    tax_all = 0
+    for rs in qs:
+        com = fact_commission.objects.filter(commit_id=rs.com_id).first()
+        comstate = commissionstages.objects.filter(stage_id=com.stage_id).first() if com else None
+        coursse = course.objects.filter(course_id=rs.course_id).first()
+        paymets = register_payment.objects.filter(register_id=rs.register_id).first()
+        evs = course_event.objects.filter(ev_id=rs.ev_id).first()
+        sale = salesorder.objects.filter(
+            er__register_id=rs.register_id, er__ev_id=rs.ev_id
+        ).first()
+
+        before = rs.tis_com_before_tax or 0
+        after = rs.tis_com_after_tax or 0
+        price += before
+        price_total += after
+        tax_all += before - after
+        obj.append({
+            'stage_name': comstate.stage_name if comstate else '',
+            'customer_name': paymets.rp_name_customer if paymets else None,
+            'rp_doc_number': paymets.rp_doc_number if paymets else None,
+            'invoice': sale.invoice if sale else None,
+            'course': coursse,
+            'evs': evs,
+            'tis_com_before_tax': before,
+            'tis_com_after_tax': after,
+            'tax': before - after,
+        })
+
+    context = {
+        'title': defaultTitle,
+        'data': obj,
+        'code': getdatauser,
+        'current_m': month_fomat(m),
+        'year_current': year,
+        'price': price,
+        'price_total': price_total,
+        'tax_all': tax_all,
+        'count': len(obj),
+        'today': datetime.date.today(),
+    }
+    return render(request, 'print/report_withdraw_summary_commission_one_print.html', context)
 
 
 @login_required(login_url='/login')

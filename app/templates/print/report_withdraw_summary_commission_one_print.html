@@ -1,0 +1,293 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>สรุปค่าคอม_{{code.username}}_{{year_current}}_{{current_m}}</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logo.png' %}" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: "Sarabun", sans-serif;
+      font-size: 13px;
+      background: #f2f2f2;
+      margin: 0;
+    }
+
+    .page {
+      width: 21cm;
+      min-height: 29.7cm;
+      padding: 1.2cm 1cm;
+      margin: 1cm auto;
+      border: 1px #d3d3d3 solid;
+      border-radius: 5px;
+      background: #fff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    .head {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .head .company {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .head .branch {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .head .title {
+      font-size: 17px;
+      margin-top: 6px;
+    }
+
+    .info {
+      width: 100%;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .info td {
+      padding: 2px 0;
+    }
+
+    .summary {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .summary .box {
+      flex: 1;
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .summary .box .label {
+      font-size: 12px;
+    }
+
+    .summary .box .value {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    table.detail {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table.detail th,
+    table.detail td {
+      border: 1px solid #333;
+      padding: 4px 5px;
+      vertical-align: top;
+    }
+
+    table.detail th {
+      background: #eee;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .r {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .c {
+      text-align: center;
+    }
+
+    .total td {
+      font-weight: 700;
+      background: #fafafa;
+    }
+
+    .sign {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    .sign div {
+      flex: 1;
+    }
+
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      background: #fff;
+      border-bottom: 1px solid #d3d3d3;
+    }
+
+    .print-toolbar button {
+      font-family: "Sarabun", sans-serif;
+      font-size: 14px;
+      height: 36px;
+      padding: 0 18px;
+      border: 1px solid #435ebe;
+      border-radius: 5px;
+      background: #435ebe;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .print-toolbar button.secondary {
+      background: #fff;
+      color: #435ebe;
+    }
+
+    @page {
+      size: A4;
+      margin: 1cm;
+    }
+
+    @media print {
+      .print-toolbar {
+        display: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .page {
+        width: 100%;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      table.detail th {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="print-toolbar">
+    <button type="button" onclick="window.print()">พิมพ์ / บันทึก PDF</button>
+    <button type="button" class="secondary" onclick="window.close()">ปิด</button>
+  </div>
+
+  <div class="page">
+    <div class="head">
+      <div class="company">บริษัท ไอดีไดรฟ์ จำกัด</div>
+      <div class="branch">ศูนย์เทรนนิ่ง TZ เซ็นเตอร์</div>
+      <div class="title">สรุปค่าคอมมิชชั่นของตัวเอง ประจำเดือน {{current_m}} ปี {{year_current}}</div>
+    </div>
+
+    <table class="info">
+      <tr>
+        <td>ชื่อ-สกุล: <strong>{{code.first_name}} {{code.last_name}}</strong></td>
+        <td>รหัสพนักงาน: <strong>{{code.username}}</strong></td>
+        <td style="text-align: right">วันที่พิมพ์: {{today|date:"d/m/Y"}}</td>
+      </tr>
+    </table>
+
+    <div class="summary">
+      <div class="box">
+        <div class="label">จำนวนรายการ</div>
+        <div class="value">{{count}}</div>
+      </div>
+      <div class="box">
+        <div class="label">ค่าคอมรวม (ก่อนหักภาษี)</div>
+        <div class="value">{{price|floatformat:2|intcomma}}</div>
+      </div>
+      <div class="box">
+        <div class="label">หัก ณ ที่จ่าย</div>
+        <div class="value">{{tax_all|floatformat:2|intcomma}}</div>
+      </div>
+      <div class="box">
+        <div class="label">รายได้สุทธิ</div>
+        <div class="value">{{price_total|floatformat:2|intcomma}}</div>
+      </div>
+    </div>
+
+    <table class="detail">
+      <thead>
+        <tr>
+          <th style="width: 30px">ลำดับ</th>
+          <th>เลขที่ Invoice</th>
+          <th>ชื่อลูกค้า บริษัท/บุคคล</th>
+          <th>หลักสูตร</th>
+          <th>วันที่จัดอบรม</th>
+          <th>เลขที่บิล</th>
+          <th>งวด</th>
+          <th>ค่าคอม</th>
+          <th>ภาษี</th>
+          <th>สุทธิ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for res in data %}
+        <tr>
+          <td class="c">{{ forloop.counter }}</td>
+          <td>{{ res.invoice|default:"-" }}</td>
+          <td>{{ res.customer_name|default:"-" }}</td>
+          <td>{{ res.course.course_name|default:"-" }}</td>
+          <td class="c">
+            {% if res.evs %}{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}{% else %}-{% endif %}
+          </td>
+          <td>{{ res.rp_doc_number|default:"-" }}</td>
+          <td class="c">{{ res.stage_name|default:"-" }}</td>
+          <td class="r">{{ res.tis_com_before_tax|floatformat:2|intcomma }}</td>
+          <td class="r">{{ res.tax|floatformat:2|intcomma }}</td>
+          <td class="r">{{ res.tis_com_after_tax|floatformat:2|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="10" class="c">ไม่มีรายการค่าคอมในเดือนนี้</td>
+        </tr>
+        {% endfor %}
+        <tr class="total">
+          <td colspan="7" class="r">รวมทั้งสิ้น</td>
+          <td class="r">{{ price|floatformat:2|intcomma }}</td>
+          <td class="r">{{ tax_all|floatformat:2|intcomma }}</td>
+          <td class="r">{{ price_total|floatformat:2|intcomma }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="sign">
+      <div>
+        ลงชื่อ ......................................<br />
+        ({{code.first_name}} {{code.last_name}})<br />
+        ผู้ขอเบิก<br />
+        วันที่ ........../........../..........
+      </div>
+      <div>
+        ลงชื่อ ......................................<br />
+        (......................................)<br />
+        ผู้ตรวจสอบ<br />
+        วันที่ ........../........../..........
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
