@@ -15,6 +15,7 @@ from ..forms.finance_form import billing_cycle_setting_form
 from ..forms.teacher_form import teacherIncomeSettingForm
 from decimal import Decimal
 from django.http import JsonResponse
+from django.db import transaction
 import json
 from django.http import JsonResponse
 from django.core import serializers
@@ -1828,6 +1829,165 @@ def cancellistbill(request):
     messages.success(request, "ยกเลิกเรียบร้อย!")
     return redirect("/finance/billing/cancelbill")
    
+
+EDITBILL_ROUTE = 'finance/billing/editbill'
+# ยกมาจาก branch idc: แก้ไข register_payment / register_payment_items / add_on
+EDIT_BILL_FIELDS = ['rp_code_customer', 'rp_name_customer', 'rp_tax', 'rp_branch', 'rp_address',
+                    'rp_phone', 'rp_email', 'rp_name_contact', 'rp_ref1', 'rp_ref2']
+EDIT_BILL_DATE_FIELDS = ['rp_confirm_date_price', 'rp_date_delivery']
+EDIT_ITEM_TEXT_FIELDS = ['rpi_code', 'rpi_name', 'rpi_unit', 'vat', 'stmetc']
+EDIT_ITEM_FLOAT_FIELDS = ['rpi_price', 'rpi_price_discount', 'rpi_price_total', 'rpi_price_vat',
+                          'rpi_price_result', 'rpi_pay', 'rpi_price_pay']
+EDIT_ADDON_TEXT_FIELDS = ['course_code', 'order_list', 'unit']
+EDIT_ADDON_FLOAT_FIELDS = ['rpi_price', 'rpi_price_discount', 'rpi_price_result']
+
+
+def _edit_bill_menu(request):
+    try:
+        u = user_detail.objects.get(user_id=request.user.id)
+        cm_id = u.cm
+    except user_detail.DoesNotExist:
+        cm_id = 0
+    if checkpermi(EDITBILL_ROUTE, cm_id) == 0:
+        return None
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        r = {'group_label': rs['group_label'],
+             'group_value': rs['group_value'], 'children': children}
+        objMenu.append(r)
+    return objMenu
+
+
+def _post_number(value, label, is_int=False):
+    value = (value or '').strip().replace(',', '')
+    if value == '':
+        return 0
+    try:
+        return int(float(value)) if is_int else float(value)
+    except ValueError:
+        raise ValueError("กรุณากรอกตัวเลขให้ถูกต้อง: " + label)
+
+
+@login_required(login_url='/login')
+def editbill_list(request):
+    objMenu = _edit_bill_menu(request)
+    if objMenu is None:
+        return render(request, '403.html')
+
+    rp_doc_number = (request.GET.get('rp_doc_number') or '').strip()
+    content = []
+    if rp_doc_number:
+        content = register_payment.objects.select_related('register').filter(
+            rp_doc_number__icontains=rp_doc_number).order_by('-rp_id')[:50]
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu,
+               'data': content, 'rp_doc_number': rp_doc_number}
+    return render(request, 'finance/billing_edit_list.html', context)
+
+
+@login_required(login_url='/login')
+def editbill_form(request, rp_id):
+
+    objMenu = _edit_bill_menu(request)
+    if objMenu is None:
+        return render(request, '403.html')
+
+    try:
+        ucon = register_payment.objects.select_related('register').exclude(status_bill='C').get(rp_id=rp_id)
+    except register_payment.DoesNotExist:
+        messages.error(request, "ไม่พบบิล หรือบิลถูกยกเลิกแล้ว")
+        return redirect('editbill_list')
+
+    # add_on ผูกกับบิลผ่าน register_id (ใบพิมพ์ใช้ register_id เป็นหลัก)
+    # คอลัมน์จริงใน DB: course_code/unit varchar(255), order_list text (ไม่ใช่ 20 ตาม model)
+    uid_nd = str(ucon.register_id).replace('-', '')
+    items = register_payment_items.objects.filter(rp_id=ucon.rp_id).order_by('rpi_id')
+    addons = add_on.objects.filter(register_id=uid_nd, status='Y').order_by('addon_id')
+
+    if request.method == 'POST':
+        P = request.POST
+        try:
+            with transaction.atomic():
+                # ── register_payment ──
+                for field in EDIT_BILL_FIELDS:
+                    if field in P:
+                        setattr(ucon, field, P[field].strip())
+                for field in EDIT_BILL_DATE_FIELDS:
+                    if field in P:
+                        setattr(ucon, field, P[field] or None)
+                ucon.upd_date = dateTimeNow()
+                ucon.save()
+
+                # ── register_payment_items ──
+                for item in items:
+                    s = '_' + str(item.rpi_id)
+                    for field in EDIT_ITEM_TEXT_FIELDS:
+                        if field + s in P:
+                            setattr(item, field, P[field + s].strip())
+                    item.rpi_quantity = _post_number(P.get('rpi_quantity' + s), 'จำนวน', True)
+                    for field in EDIT_ITEM_FLOAT_FIELDS:
+                        setattr(item, field, _post_number(P.get(field + s), field))
+                    if 'stmdate' + s in P:
+                        item.stmdate = P['stmdate' + s] or None
+                    item.save()
+
+                # ── add_on เดิม ──
+                for ao in addons:
+                    s = '_' + str(ao.addon_id)
+                    if P.get('addon_delete' + s):
+                        ao.status = 'N'
+                        ao.save()
+                        continue
+                    for field in EDIT_ADDON_TEXT_FIELDS:
+                        if 'addon_' + field + s in P:
+                            setattr(ao, field, P['addon_' + field + s].strip())
+                    ao.qty = _post_number(P.get('addon_qty' + s), 'จำนวน Add-on', True)
+                    for field in EDIT_ADDON_FLOAT_FIELDS:
+                        setattr(ao, field, _post_number(P.get('addon_' + field + s), 'Add-on ' + field))
+                    ao.save()
+
+                # ── add_on ใหม่ ──
+                new_rows = zip(P.getlist('new_addon_course_code'), P.getlist('new_addon_order_list'),
+                               P.getlist('new_addon_unit'), P.getlist('new_addon_qty'),
+                               P.getlist('new_addon_rpi_price'), P.getlist('new_addon_rpi_price_discount'),
+                               P.getlist('new_addon_rpi_price_result'))
+                for code, name, unit, qty, price, discount, result in new_rows:
+                    if not name.strip():
+                        continue
+                    ao = add_on.objects.create(
+                        course_code=code.strip()[:255],
+                        order_list=name.strip(),
+                        qty=_post_number(qty, 'จำนวน Add-on ใหม่', True),
+                        register_id=uid_nd,
+                        unit=(unit.strip() or 'ท่าน')[:255],
+                        rpi_price=_post_number(price, 'ราคา Add-on ใหม่'),
+                        rpi_price_discount=_post_number(discount, 'ส่วนลด Add-on ใหม่'),
+                        rpi_price_result=_post_number(result, 'ยอดรวม Add-on ใหม่'),
+                        status='Y',
+                        rp_id=ucon.rp_id,
+                    )
+                    fact_addon.objects.create(rp_id=ucon.rp_id, addon_id=ao.addon_id)
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect('editbill_form', rp_id=ucon.rp_id)
+
+        messages.success(request, "แก้ไขบิลเรียบร้อย!")
+        return redirect('editbill_form', rp_id=ucon.rp_id)
+
+    # ev_vat = 1 ราคารวม VAT แล้ว, อื่นๆ = ราคายังไม่รวม VAT (ใช้คำนวณยอดอัตโนมัติในฟอร์ม)
+    try:
+        ev_vat = ucon.register.ev.ev_vat
+    except Exception:
+        ev_vat = 0
+
+    context = {'title': defaultTitle, 'listMenuPermission': objMenu, 'data': ucon,
+               'items': items, 'addons': addons, 'ev_vat': ev_vat}
+    return render(request, 'finance/billing_edit_form.html', context)
+
 
 def payment_pay_deposit(request):
     
