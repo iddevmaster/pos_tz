@@ -56,14 +56,17 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["css", "legacy"], avoid: "tr" },
     };
+    var header = document.getElementById("pdfHeader");
+    header.style.display = "block";
     document.fonts.ready
       .then(function () {
-        return html2pdf().set(opt).from(document.getElementById("testTable")).save();
+        return html2pdf().set(opt).from(document.getElementById("pdfArea")).save();
       })
       .catch(function (e) {
         alert("สร้าง PDF ไม่สำเร็จ: " + e);
       })
       .then(function () {
+        header.style.display = "none";
         btn.disabled = false;
         btn.value = "Print";
       });
@@ -108,16 +111,27 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   </div>
 </div>
 
+<div id="pdfArea">
+<!-- หัวรายงานสำหรับ PDF เท่านั้น (แสดงตอนกด Print) -->
+<div id="pdfHeader" style="display: none; position: relative; padding: 10px 0 15px">
+  <div style="position: absolute; top: 0; left: 0; font-size: 22px; color: #000">POS TZ</div>
+  <div style="text-align: center">
+    <div style="font-size: 24px"><strong>บริษัท ไอดีไดรฟ์ จำกัด</strong></div>
+    <div style="font-size: 18px"><strong>ศูนย์เทรนนิ่ง TZ เซ็นเตอร์</strong></div>
+    <div style="font-size: 18px; padding-top: 8px">รายงาน ตั้งเบิกค่าCommission</div>
+    <div style="font-size: 18px; padding-top: 4px">ประจำเดือน {{mon}} ปี {{year}}</div>
+  </div>
+</div>
 <table style="width: 100%; border-collapse: collapse" border="1" class="table-detail" id="testTable">
   <tbody>
-    <tr style="font-weight: bold">
+    <tr style="font-weight: bold" class="no-pdf">
       <td colspan="10" align="center">บริษัท ไอดีไดร์ฟ จำกัด</td>
     </tr>
-    <tr style="font-weight: bold">
+    <tr style="font-weight: bold" class="no-pdf">
       <td colspan="10" align="center">สรุปรายงานการตั้งเบิกค่าตอบแทน</td>
     </tr>
-    <tr style="font-weight: bold">
-     
+    <tr style="font-weight: bold" class="no-pdf">
+
       <td colspan="10" align="center">ประจำเดือน {{mon}} ปี {{year}}</td>
     </tr>
     <tr>
@@ -242,3 +256,4 @@ padding-top: 10px;
     </tr> -->
   </tbody>
 </table>
+</div>
