@@ -36,7 +36,40 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       window.location.href = uri + base64(format(template, ctx));
     };
   })();
+
+  // Export ตารางเป็น PDF (ไม่รวมคอลัมน์ปุ่ม "คลิกดูรายละเอียด")
+  function exportPDF() {
+    var btn = document.getElementById("btnPdf");
+    btn.disabled = true;
+    btn.value = "กำลังสร้าง PDF...";
+    var opt = {
+      margin: [10, 8, 10, 8],
+      filename: "สรุปตั้งเบิกค่าตอบแทน_{{ year }}_{{ m }}.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        ignoreElements: function (el) {
+          return el.classList && el.classList.contains("no-pdf");
+        },
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"], avoid: "tr" },
+    };
+    document.fonts.ready
+      .then(function () {
+        return html2pdf().set(opt).from(document.getElementById("testTable")).save();
+      })
+      .catch(function (e) {
+        alert("สร้าง PDF ไม่สำเร็จ: " + e);
+      })
+      .then(function () {
+        btn.disabled = false;
+        btn.value = "Print";
+      });
+  }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link
   href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
   rel="stylesheet"
@@ -59,7 +92,8 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
   <div style="float: left">
   <input
       type="button"
-       onclick="window.open('/report/withdraw/all/summary/comm/{{year_current}}/{{m}}','','width=950,height=650'); return false;"
+      id="btnPdf"
+      onclick="exportPDF(); return false;"
       value="Print"
       style="height: 35px"
     />
@@ -94,7 +128,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td>รวมเป็นเงิน</td>
       <td>หัก ณ ที่จ่าย</td>
       <td>รายได้สุทธิ</td>
-      <td></td>
+      <td class="no-pdf"></td>
     </tr>
 
     {% for res in qs  %}
@@ -108,7 +142,7 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
       <td align="center">{{res.total_before_tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.tax|floatformat:2|intcomma }}</td>
       <td align="center">{{res.total_after_tax|floatformat:2|intcomma }}</td>
-       <td align="center"><button type="button" onclick="details('{{res.user_id}}','{{year}}','{{m}}')">
+       <td align="center" class="no-pdf"><button type="button" onclick="details('{{res.user_id}}','{{year}}','{{m}}')">
             คลิกดูรายละเอียด
         </button></td>
       <!-- <td align="center">{{res.requirements}}</td> -->
