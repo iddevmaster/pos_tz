@@ -294,6 +294,18 @@ listMenu = [
         "group_value": "naSt0v",
         "group_label": "การเงิน",
     },
+    {
+        "value": "finance/billing/all",
+        "label": "บิลทั้งหมด",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
+    {
+        "value": "finance/billing/editbill",
+        "label": "แก้ไขบิล",
+        "group_value": "naSt0v",
+        "group_label": "การเงิน",
+    },
 
     {
         "value": "billing/setting/form/create",

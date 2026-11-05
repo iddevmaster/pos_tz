@@ -1,0 +1,193 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>แก้ไขบิล {{ bill.rp_doc_number }}</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item">
+          <a href="/finance/billing/editbill?rp_doc_number={{ bill.rp_doc_number|urlencode }}">แก้ไขบิล</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ bill.rp_doc_number }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+{% if bill.status_bill == 'C' %}
+<div class="alert alert-danger">บิลนี้ถูกยกเลิกแล้ว ดูได้อย่างเดียว แก้ไขไม่ได้</div>
+{% else %}
+<div class="alert alert-warning">
+  การแก้ไขยอดเงินในหน้านี้จะไม่คำนวณค่าคอมมิชชั่นที่ตั้งไว้แล้วให้ใหม่ ถ้าแก้ยอดเงิน ต้องไปตรวจค่าคอมของบิลนี้เองด้วย
+</div>
+{% endif %}
+
+<form method="post" action="/finance/billing/editbill/{{ bill.rp_id }}" autocomplete="off">
+  {% csrf_token %}
+  <fieldset {% if bill.status_bill == 'C' %}disabled{% endif %}>
+
+  <section class="section">
+    <div class="card">
+      <div class="card-header"><h5>ข้อมูลใบสมัคร (เลขที่ {{ main.register_number }})</h5></div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">ประเภทลูกค้า</label>
+            <select name="customer_type" class="form-control">
+              <option value="1" {% if main.customer_type == 1 %}selected{% endif %}>บุคคล</option>
+              <option value="2" {% if main.customer_type != 1 %}selected{% endif %}>บริษัท</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">ประเภทการชำระเงิน</label>
+            <select name="pay_type" class="form-control">
+              <option value="1" {% if main.pay_type == 1 %}selected{% endif %}>เงินสด</option>
+              <option value="2" {% if main.pay_type != 1 %}selected{% endif %}>เครดิต</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h5>ข้อมูลหัวบิล</h5></div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">รหัสลูกค้า</label>
+            <input type="text" class="form-control" name="rp_code_customer" value="{{ bill.rp_code_customer|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-8 mb-3">
+            <label class="form-label">ชื่อลูกค้า</label>
+            <input type="text" class="form-control" name="rp_name_customer" value="{{ bill.rp_name_customer|default_if_none:'' }}" maxlength="128" required />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">เลขประจำตัวผู้เสียภาษี</label>
+            <input type="text" class="form-control" name="rp_tax" value="{{ bill.rp_tax|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">สาขา</label>
+            <input type="text" class="form-control" name="rp_branch" value="{{ bill.rp_branch|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">ผู้ติดต่อ</label>
+            <input type="text" class="form-control" name="rp_name_contact" value="{{ bill.rp_name_contact|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">ที่อยู่</label>
+            <textarea class="form-control" name="rp_address" rows="2" maxlength="512">{{ bill.rp_address|default_if_none:'' }}</textarea>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">เบอร์โทร</label>
+            <input type="text" class="form-control" name="rp_phone" value="{{ bill.rp_phone|default_if_none:'' }}" maxlength="64" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">อีเมล</label>
+            <input type="text" class="form-control" name="rp_email" value="{{ bill.rp_email|default_if_none:'' }}" maxlength="64" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">เลขที่ใบเสร็จรับเงิน</label>
+            <input type="text" class="form-control" name="number_receipt" value="{{ bill.number_receipt|default_if_none:'' }}" maxlength="256" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">วันที่ยืนยันราคา</label>
+            <input type="date" class="form-control" name="rp_confirm_date_price" value="{{ bill.rp_confirm_date_price|date:'Y-m-d' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">วันที่ส่งมอบ</label>
+            <input type="date" class="form-control" name="rp_date_delivery" value="{{ bill.rp_date_delivery|date:'Y-m-d' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">อ้างอิง 1</label>
+            <input type="text" class="form-control" name="rp_ref1" value="{{ bill.rp_ref1|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">อ้างอิง 2</label>
+            <input type="text" class="form-control" name="rp_ref2" value="{{ bill.rp_ref2|default_if_none:'' }}" maxlength="128" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% for it in items %}
+    <div class="card">
+      <div class="card-header"><h5>รายการในบิล {% if items|length > 1 %}#{{ forloop.counter }}{% endif %}</h5></div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">รหัสสินค้า</label>
+            <input type="text" class="form-control" name="rpi_code_{{ it.rpi_id }}" value="{{ it.rpi_code|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-5 mb-3">
+            <label class="form-label">ชื่อรายการ</label>
+            <input type="text" class="form-control" name="rpi_name_{{ it.rpi_id }}" value="{{ it.rpi_name|default_if_none:'' }}" maxlength="128" />
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">จำนวน</label>
+            <input type="number" class="form-control" name="rpi_quantity_{{ it.rpi_id }}" value="{{ it.rpi_quantity }}" />
+          </div>
+          <div class="col-md-2 mb-3">
+            <label class="form-label">หน่วย</label>
+            <input type="text" class="form-control" name="rpi_unit_{{ it.rpi_id }}" value="{{ it.rpi_unit|default_if_none:'' }}" maxlength="64" />
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ราคา</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_{{ it.rpi_id }}" value="{{ it.rpi_price|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ส่วนลด</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_discount_{{ it.rpi_id }}" value="{{ it.rpi_price_discount|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ยอดก่อน VAT</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_total_{{ it.rpi_id }}" value="{{ it.rpi_price_total|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">VAT</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_vat_{{ it.rpi_id }}" value="{{ it.rpi_price_vat|stringformat:'.2f' }}" />
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ยอดสุทธิ</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_result_{{ it.rpi_id }}" value="{{ it.rpi_price_result|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ยอดชำระ</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_pay_{{ it.rpi_id }}" value="{{ it.rpi_pay|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">ยอดที่ชำระแล้ว</label>
+            <input type="number" step="0.01" class="form-control" name="rpi_price_pay_{{ it.rpi_id }}" value="{{ it.rpi_price_pay|stringformat:'.2f' }}" />
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">วันที่ชำระ</label>
+            <input type="datetime-local" class="form-control" name="stmdate_{{ it.rpi_id }}" value="{{ it.stmdate|date:'Y-m-d\TH:i' }}" />
+          </div>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">หมายเหตุการชำระ</label>
+            <input type="text" class="form-control" name="stmetc_{{ it.rpi_id }}" value="{{ it.stmetc|default_if_none:'' }}" maxlength="64" />
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-secondary">บิลนี้ไม่มีรายการสินค้า</div>
+    {% endfor %}
+
+    <div align="center" class="mb-4">
+      {% if bill.status_bill != 'C' %}
+      <button type="submit" class="btn btn-success"
+        onclick="return confirm('ยืนยันบันทึกการแก้ไขบิล {{ bill.rp_doc_number }} ?')">
+        <i class="icon dripicons-checkmark"></i> บันทึก
+      </button>
+      {% endif %}
+      <a class="btn btn-light-secondary"
+        href="/finance/billing/editbill?rp_doc_number={{ bill.rp_doc_number|urlencode }}">กลับ</a>
+    </div>
+  </section>
+  </fieldset>
+</form>
+{% endblock %}

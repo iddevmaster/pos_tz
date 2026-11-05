@@ -1962,3 +1962,183 @@ def updatnumberscript(request):
 
 
 
+
+
+# ---------------------------------------------------------------
+# แก้ไขบิล (register_main / register_payment / register_payment_items)
+# ---------------------------------------------------------------
+EDIT_BILL_ROUTE = 'finance/billing/editbill'
+
+
+def _menu_for(cm_id):
+    listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values(
+        "group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
+    objMenu = []
+    for rs in list(listMenuPermission):
+        children = category_program_permission.objects.filter(
+            cm_id=cm_id, group_value=rs['group_value']).order_by("page_label")
+        objMenu.append({'group_label': rs['group_label'],
+                        'group_value': rs['group_value'], 'children': children})
+    return objMenu
+
+
+def _edit_bill_cm_id(request):
+    try:
+        return user_detail.objects.get(user_id=request.user.id).cm_id
+    except user_detail.DoesNotExist:
+        return 0
+
+
+def _to_float(value, default=0):
+    try:
+        return float(str(value).replace(',', '')) if value not in (None, '') else default
+    except ValueError:
+        return default
+
+
+def _to_int(value, default=0):
+    try:
+        return int(value) if value not in (None, '') else default
+    except ValueError:
+        return default
+
+
+@login_required(login_url='/login')
+def edit_bill_list(request):
+    cm_id = _edit_bill_cm_id(request)
+    if not request.user.is_superuser and checkpermi(EDIT_BILL_ROUTE, cm_id) == 0:
+        return render(request, '403.html')
+
+    q = (request.GET.get('rp_doc_number') or '').strip()
+    data = []
+    if q:
+        data = register_payment.objects.select_related('register').filter(
+            rp_doc_number__icontains=q).order_by('-crt_date')[:100]
+
+    context = {'title': defaultTitle, 'listMenuPermission': _menu_for(cm_id),
+               'data': data, 'q': q}
+    return render(request, 'finance/billing_edit_list.html', context)
+
+
+@login_required(login_url='/login')
+def edit_bill_form(request, rp_id):
+    from django.db import transaction
+
+    cm_id = _edit_bill_cm_id(request)
+    if not request.user.is_superuser and checkpermi(EDIT_BILL_ROUTE, cm_id) == 0:
+        return render(request, '403.html')
+
+    try:
+        bill = register_payment.objects.select_related('register').get(rp_id=rp_id)
+    except register_payment.DoesNotExist:
+        return render(request, '404.html')
+    main = bill.register
+    items = list(register_payment_items.objects.filter(rp_id=bill.rp_id).order_by('rpi_id'))
+
+    if request.method == 'POST':
+        if bill.status_bill == 'C':
+            messages.error(request, "บิลนี้ถูกยกเลิกแล้ว ไม่สามารถแก้ไขได้")
+            return redirect(f"/{EDIT_BILL_ROUTE}/{rp_id}")
+
+        P = request.POST
+        now = dateTimeNow()
+        with transaction.atomic():
+            # register_payment (หัวบิล)
+            for f in ['rp_code_customer', 'rp_name_customer', 'rp_tax', 'rp_name_contact',
+                      'rp_branch', 'rp_address', 'rp_phone', 'rp_email', 'rp_ref1',
+                      'rp_ref2', 'number_receipt']:
+                if f in P:
+                    setattr(bill, f, P.get(f, '').strip())
+            for f in ['rp_confirm_date_price', 'rp_date_delivery']:
+                if f in P:
+                    setattr(bill, f, P.get(f) or None)
+            bill.upd_date = now
+            bill.user_manage = request.user.id
+            bill.save()
+
+            # register_main (ข้อมูลใบสมัคร)
+            main.customer_type = _to_int(P.get('customer_type'), main.customer_type)
+            main.pay_type = _to_int(P.get('pay_type'), main.pay_type)
+            main.upd_date = now
+            main.user_update_id = request.user.id
+            main.save()
+
+            # register_payment_items (รายการในบิล)
+            for it in items:
+                k = f"_{it.rpi_id}"
+                if f"rpi_name{k}" not in P:
+                    continue
+                it.rpi_code = P.get(f"rpi_code{k}", '').strip()
+                it.rpi_name = P.get(f"rpi_name{k}", '').strip()
+                it.rpi_unit = P.get(f"rpi_unit{k}", '').strip()
+                it.rpi_quantity = _to_int(P.get(f"rpi_quantity{k}"), it.rpi_quantity)
+                for f in ['rpi_price', 'rpi_price_discount', 'rpi_price_total',
+                          'rpi_price_vat', 'rpi_price_result', 'rpi_pay', 'rpi_price_pay']:
+                    setattr(it, f, _to_float(P.get(f"{f}{k}"), getattr(it, f)))
+                it.vat = str(it.rpi_price_vat)
+                it.stmdate = P.get(f"stmdate{k}") or None
+                it.stmetc = P.get(f"stmetc{k}", '').strip()
+                it.save()
+
+        messages.success(request, "บันทึกการแก้ไขบิลเรียบร้อย!")
+        return redirect(f"/{EDIT_BILL_ROUTE}/{rp_id}")
+
+    context = {'title': defaultTitle, 'listMenuPermission': _menu_for(cm_id),
+               'bill': bill, 'main': main, 'items': items}
+    return render(request, 'finance/billing_edit_form.html', context)
+
+
+# ---------------------------------------------------------------
+# บิลทั้งหมด
+# ---------------------------------------------------------------
+ALL_BILL_ROUTE = 'finance/billing/all'
+
+
+@login_required(login_url='/login')
+def all_bill_list(request):
+    from django.core.paginator import Paginator
+    from django.db.models import Q, OuterRef, Subquery
+    from ..constant import THAI_MONTH_NAMES
+
+    cm_id = _edit_bill_cm_id(request)
+    if not request.user.is_superuser and checkpermi(ALL_BILL_ROUTE, cm_id) == 0:
+        return render(request, '403.html')
+
+    today = date.today()
+    month = _to_int(request.GET.get('month'), today.month)   # 0 = ทุกเดือน
+    year = _to_int(request.GET.get('year'), today.year)
+    q = (request.GET.get('q') or '').strip()
+    status = request.GET.get('status', '')                   # '', 'Y', 'C'
+    pay_type = request.GET.get('pay_type', '')               # '', '1', '2'
+
+    item_qs = register_payment_items.objects.filter(rp_id=OuterRef('rp_id')).order_by('rpi_id')
+    qs = register_payment.objects.select_related('register').filter(crt_date__year=year)
+    if month:
+        qs = qs.filter(crt_date__month=month)
+    if q:
+        qs = qs.filter(Q(rp_doc_number__icontains=q) | Q(rp_name_customer__icontains=q) |
+                       Q(register__register_number__icontains=q) | Q(number_receipt__icontains=q))
+    if status in ('Y', 'C'):
+        qs = qs.filter(status_bill=status)
+    if pay_type in ('1', '2'):
+        qs = qs.filter(register__pay_type=int(pay_type))
+    qs = qs.annotate(
+        total_result=Subquery(item_qs.values('rpi_price_result')[:1]),
+        total_vat=Subquery(item_qs.values('rpi_price_vat')[:1]),
+    ).order_by('-crt_date')
+
+    summary = qs.exclude(status_bill='C').aggregate(
+        cnt=Count('rp_id'), total=Sum('items__rpi_price_result'), vat=Sum('items__rpi_price_vat'))
+
+    page = Paginator(qs, 50).get_page(request.GET.get('page'))
+    params = request.GET.copy()
+    params.pop('page', None)
+
+    context = {
+        'title': defaultTitle, 'listMenuPermission': _menu_for(cm_id),
+        'page': page, 'summary': summary, 'qs_params': params.urlencode(),
+        'month': month, 'year': year, 'q': q, 'status': status, 'pay_type': pay_type,
+        'thai_months': THAI_MONTH_NAMES,
+        'can_edit': request.user.is_superuser or checkpermi(EDIT_BILL_ROUTE, cm_id) == 1,
+    }
+    return render(request, 'finance/billing_all_list.html', context)

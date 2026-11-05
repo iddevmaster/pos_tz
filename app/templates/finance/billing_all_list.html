@@ -1,0 +1,166 @@
+{% extends 'base.html' %} {% load humanize %} {% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>บิลทั้งหมด</h3>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item active" aria-current="page">บิลทั้งหมด</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form method="get" action="/finance/billing/all" autocomplete="off">
+        <div class="row">
+          <div class="col-lg-2 col-md-4 mb-3">
+            <label class="form-label">ปี (ค.ศ.)</label>
+            <input type="number" class="form-control" name="year" value="{{ year }}" required />
+          </div>
+          <div class="col-lg-2 col-md-4 mb-3">
+            <label class="form-label">เดือน</label>
+            <select name="month" class="form-control">
+              <option value="0" {% if month == 0 %}selected{% endif %}>ทุกเดือน</option>
+              {% for value, display in thai_months %}
+              <option value="{{ value }}" {% if value == month %}selected{% endif %}>{{ display }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-lg-2 col-md-4 mb-3">
+            <label class="form-label">สถานะบิล</label>
+            <select name="status" class="form-control">
+              <option value="" {% if status == '' %}selected{% endif %}>ทั้งหมด</option>
+              <option value="Y" {% if status == 'Y' %}selected{% endif %}>ปกติ</option>
+              <option value="C" {% if status == 'C' %}selected{% endif %}>ยกเลิก</option>
+            </select>
+          </div>
+          <div class="col-lg-2 col-md-4 mb-3">
+            <label class="form-label">การชำระเงิน</label>
+            <select name="pay_type" class="form-control">
+              <option value="" {% if pay_type == '' %}selected{% endif %}>ทั้งหมด</option>
+              <option value="1" {% if pay_type == '1' %}selected{% endif %}>เงินสด</option>
+              <option value="2" {% if pay_type == '2' %}selected{% endif %}>เครดิต</option>
+            </select>
+          </div>
+          <div class="col-lg-4 col-md-8 mb-3">
+            <label class="form-label">ค้นหา</label>
+            <input type="text" class="form-control" name="q" value="{{ q }}"
+              placeholder="เลขใบเสร็จ / ชื่อลูกค้า / เลขใบสมัคร" />
+          </div>
+        </div>
+        <div align="center">
+          <button type="submit" class="btn btn-success">
+            <i class="icon dripicons-experiment"></i> กรอง
+          </button>
+          <a class="btn btn-warning" href="/finance/billing/all">
+            <i class="icon dripicons-clockwise"></i> รีเซ็ต
+          </a>
+        </div>
+      </form>
+
+      <div class="row mt-4">
+        <div class="col-md-4 mb-2">
+          <div class="border rounded p-3 text-center">
+            <div>จำนวนบิล (ไม่รวมที่ยกเลิก)</div>
+            <h4 class="mb-0">{{ summary.cnt|default:0|intcomma }}</h4>
+          </div>
+        </div>
+        <div class="col-md-4 mb-2">
+          <div class="border rounded p-3 text-center">
+            <div>ยอดรวมสุทธิ</div>
+            <h4 class="mb-0">{{ summary.total|default:0|floatformat:2|intcomma }}</h4>
+          </div>
+        </div>
+        <div class="col-md-4 mb-2">
+          <div class="border rounded p-3 text-center">
+            <div>ภาษีมูลค่าเพิ่ม</div>
+            <h4 class="mb-0">{{ summary.vat|default:0|floatformat:2|intcomma }}</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>เลขใบเสร็จ</th>
+              <th>เลขที่ใบสมัคร</th>
+              <th>ชื่อลูกค้า</th>
+              <th>ประเภทลูกค้า</th>
+              <th>การชำระเงิน</th>
+              <th class="text-end">VAT</th>
+              <th class="text-end">ยอดสุทธิ</th>
+              <th>วันที่ออกบิล</th>
+              <th>ผู้ประสานงาน</th>
+              <th>สถานะ</th>
+              <th>#</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for res in page %}
+            <tr>
+              <td align="center">{{ page.start_index|add:forloop.counter0 }}</td>
+              <td>
+                <a href="/register/print/{{ res.rp_id }}" title="เปิดใบเสร็จ"
+                  onclick="window.open(this.href,'','width=950,height=650'); return false;">{{ res.rp_doc_number }}</a>
+              </td>
+              <td>{{ res.register.register_number }}</td>
+              <td>{{ res.rp_name_customer }}</td>
+              <td align="center">
+                {% if res.register.customer_type == 1 %}<span class="badge bg-success">บุคคล</span>
+                {% else %}<span class="badge bg-info">บริษัท</span>{% endif %}
+              </td>
+              <td align="center">
+                {% if res.register.pay_type == 1 %}<span class="badge bg-success">เงินสด</span>
+                {% else %}<span class="badge bg-danger">เครดิต</span>{% endif %}
+              </td>
+              <td class="text-end">{{ res.total_vat|default:0|floatformat:2|intcomma }}</td>
+              <td class="text-end">{{ res.total_result|default:0|floatformat:2|intcomma }}</td>
+              <td>{{ res.crt_date|date:"d/m/Y H:i" }}</td>
+              <td>{{ res.rp_name_seller }}</td>
+              <td align="center">
+                {% if res.status_bill == 'C' %}<span class="badge bg-danger">ยกเลิก</span>
+                {% else %}<span class="badge bg-success">ปกติ</span>{% endif %}
+              </td>
+              <td style="white-space: nowrap">
+                <button type="button" class="btn btn-info btn-sm"
+                  onclick="window.open('/register/print/{{ res.rp_id }}','','width=950,height=650'); return false;">
+                  พิมพ์
+                </button>
+                {% if can_edit and res.status_bill != 'C' %}
+                <a class="btn btn-primary btn-sm" href="/finance/billing/editbill/{{ res.rp_id }}">แก้ไข</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="12" align="center">ไม่พบบิล</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if page.paginator.num_pages > 1 %}
+      <nav>
+        <ul class="pagination justify-content-center">
+          {% if page.has_previous %}
+          <li class="page-item"><a class="page-link" href="?{{ qs_params }}&page=1">«</a></li>
+          <li class="page-item"><a class="page-link" href="?{{ qs_params }}&page={{ page.previous_page_number }}">‹</a></li>
+          {% endif %}
+          <li class="page-item active"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+          {% if page.has_next %}
+          <li class="page-item"><a class="page-link" href="?{{ qs_params }}&page={{ page.next_page_number }}">›</a></li>
+          <li class="page-item"><a class="page-link" href="?{{ qs_params }}&page={{ page.paginator.num_pages }}">»</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
