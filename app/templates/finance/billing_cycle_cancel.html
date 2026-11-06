@@ -160,6 +160,9 @@
 
                   
             <td>
+              {% if res.status_bill == 'C' %}
+              <span class="badge bg-secondary">ยกเลิกแล้ว</span>
+              {% else %}
           <button
                   class="btn btn-danger btn-sm"
                   type="button"
@@ -170,7 +173,7 @@
                 >
                  ยกเลิก
                 </button>
-     
+              {% endif %}
             </td>
           </tr>
           {% endfor %}
@@ -178,7 +181,72 @@
       </table>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title">บิลที่ยกเลิกแล้ว ({{ cancelled|length }} รายการ)</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped" id="tableCancelled">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เลขที่ใบสมัคร</th>
+            <th>เลขใบเสร็จ</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ประเภทลูกค้า</th>
+            <th>ประเภทการชำระเงิน</th>
+            <th>วันที่ออกบิล</th>
+            <th>วันที่ยกเลิก / แก้ไขล่าสุด</th>
+            <th>ผู้ประสานงาน</th>
+            <th>ประเภท</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in cancelled %}
+          <tr>
+            <td align="center">{{ forloop.counter }}</td>
+            <td>{{res.register.register_number}}</td>
+            <td>{{res.rp_doc_number}}</td>
+            <td>{{res.rp_name_customer}}</td>
+            <td align="center">
+              {% if res.register.customer_type == 1 %}
+              <span class="badge bg-success">บุคคล</span>
+              {% else %}
+              <span class="badge bg-info">บริษัท</span>
+              {% endif %}
+            </td>
+            <td align="center">
+              {% if res.register.pay_type == 1 %}
+              <span class="badge bg-success">เงินสด</span>
+              {% else %}
+              <span class="badge bg-danger">เครดิต</span>
+              {% endif %}
+            </td>
+            <td>{{res.crt_date|date:"d/m/Y H:i"}}</td>
+            <td>{{res.upd_date|date:"d/m/Y H:i"}}</td>
+            <td>{{res.rp_name_seller}}</td>
+            {% if res.register.ev_id %}
+            <td>มี Event</td>
+            {% else %}
+            <td>ไม่มี Event</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var t = document.getElementById("tableCancelled");
+    if (t && window.simpleDatatables) {
+      new simpleDatatables.DataTable(t);
+    }
+  });
+</script>
 
 
 

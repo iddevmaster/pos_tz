@@ -1785,11 +1785,12 @@ def listbill(request):
 
     content = register_payment.objects.select_related(
         'register').filter(rp_doc_number=rp_doc_numberd)
-    for rs in content:
-        print(rs.register.ev_id)
 
-    
-    context = {'title': title, 'listMenuPermission': objMenu,'data':content}
+    # รายการบิลที่ยกเลิกแล้ว แสดงด้านล่างหน้า
+    cancelled = register_payment.objects.select_related('register').filter(
+        status_bill='C').order_by('-upd_date', '-crt_date')
+
+    context = {'title': title, 'listMenuPermission': objMenu,'data':content,'cancelled':cancelled}
     return render(request, 'finance/billing_cycle_cancel.html', context)
 
 
@@ -1819,6 +1820,7 @@ def cancellistbill(request):
 
     ucon = register_payment.objects.get(rp_id=rp_ids,status_bill='Y')
     ucon.status_bill = 'C'
+    ucon.upd_date = timezone.now()  # ใช้เป็นวันที่ยกเลิกในตารางบิลที่ยกเลิก
     ucon.save()
     uuid_without_dashes = str(ucon.register.register_id).replace('-', '')
     com = com_income_setting.objects.filter(register_id=uuid_without_dashes)
