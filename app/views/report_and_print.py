@@ -4477,7 +4477,7 @@ def register_report_summary_user_withdraw_com_one(request):
 
   
     result_dict = {}
-    customer_order_counts = com_income_setting.objects.filter(status='S',user_id=user_id,crt_date__year=m_y,crt_date__month=m_n).values('user_id')
+    customer_order_counts = com_by_bill_month(com_income_setting.objects.filter(status='S',user_id=user_id), m_y, m_n).values('user_id')
     
     
     price = 0
@@ -4507,7 +4507,7 @@ def register_report_summary_user_withdraw_com_one(request):
     totalall = 0
 
 
-    first = com_income_setting.objects.filter(status='S',user_id=user_id,crt_date__year=m_y,crt_date__month=m_n,active=0)
+    first = com_by_bill_month(com_income_setting.objects.filter(status='S',user_id=user_id,active=0), m_y, m_n)
     
     for rsf in first:
      
@@ -4535,9 +4535,9 @@ def register_report_summary_com_one_print(request, year, m):
     getdatauser = request.user
 
     # ใช้เงื่อนไขเดียวกับหน้าสรุป /report/withdraw/all/withdraw/comm/one
-    qs = com_income_setting.objects.filter(
-        status='S', user_id=user_id, crt_date__year=year, crt_date__month=m, active=0
-    ).order_by('tis_start_date', 'id')
+    qs = com_by_bill_month(com_income_setting.objects.filter(
+        status='S', user_id=user_id, active=0
+    ), year, m).order_by('tis_start_date', 'id')
 
     obj = []
     price = 0
