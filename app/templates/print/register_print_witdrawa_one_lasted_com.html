@@ -210,10 +210,11 @@
           <td colspan="1">ลำดับ</td>
           <td colspan="1">เลขที่ Invoice</td>
           <td colspan="2">ชื่อลูกค้า บริษัท/บุคคล</td>
-          <td colspan="3">Event งาน(ชื่อหลักสูตร)</td>
+          <td colspan="2">Event งาน(ชื่อหลักสูตร)</td>
         
           <td>วันที่จัดอบรม</td>
-          <td>ใบเสร็จรับเงิน</td>
+          <td>เลขที่บิล</td>
+          <td>เลขที่ RV</td>
           <td>ยอดเงินรวม</td>
           <td>ภาษีที่จ่าย</td>
           <td colspan="1">จำนวนเงินสุทธิ</td>
@@ -225,11 +226,12 @@
           <td>{{ forloop.counter }}</td>
           <td>{{ res.invoice|default:"-" }}</td>
           <td colspan="2">{{ res.customer_name|default:"-" }}</td>
-          <td colspan="3">{{ res.course.course_name }}</td>
+          <td colspan="2">{{ res.course.course_name }}</td>
          
           <td>{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}</td>
    
           <td>{{res.rp_doc_number}}</td>
+          <td>{{ res.rv|default:"-" }}</td>
           <td>{{res.tis_com_before_tax|floatformat:2|intcomma }}</td>
           <td>{{res.tax|floatformat:2|intcomma }}</td>
            <td colspan="1">{{res.tis_com_after_tax|floatformat:2|intcomma }}</td>
