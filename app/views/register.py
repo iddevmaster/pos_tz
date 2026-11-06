@@ -118,7 +118,9 @@ def register_home(request):
     hundredDaysLater = _date + timedelta(days=365)
     obj = []
     
-    for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(2026, 2, 1), until=hundredDaysLater):
+    # เริ่มแสดงหลักสูตรตั้งแต่เดือนที่แล้ว (ย้อนหลัง 1 เดือน + เดือนปัจจุบัน + เดือนถัดไป)
+    start_month = datetime(_date.year, _date.month, 1) - relativedelta(months=1)
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=start_month, until=hundredDaysLater):
         
         _newdate = str(dt).split(" ")[0]
         yearstart = _newdate.split("-")[0]
@@ -2807,10 +2809,14 @@ def approve_list_payment_accept_invoice(request):
     # sale = register_main.objects.get(register_id=uuid_without_dashes)
     pay_item = register_payment_items.objects.get(register_id=uuid_without_dashes)
 
-    # factcom
-    get_com = fact_commission.objects.get(register_id=uuid_without_dashes,rpi_id=pay_item.rp_id)
-    get_com.status = 'N'
-    get_com.save()
+    # factcom: กรอก RV แล้ว = ลูกค้าจ่ายแล้ว → ปลดค่าคอม (W → N)
+    coms = fact_commission.objects.filter(register_id=uuid_without_dashes, rpi_id=pay_item.rp_id, status__in=['W', 'N'])
+    coms.filter(status='W').update(status='N')
+
+    # สร้างรายการเบิก com_income_setting status S ของใบเสนอราคานี้ทันที (fact_commission → Y)
+    # แถวที่ยังไม่กำหนดพนักงานขาย จะค้างเป็น N
+    from .finance import create_com_income
+    create_com_income(list(coms.filter(status='N')))
     
 
     # last_entry = commissionstages.objects.filter(com_head_id=2)

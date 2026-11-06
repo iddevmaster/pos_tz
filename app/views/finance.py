@@ -1261,14 +1261,17 @@ def withdraw_list_one_com(request):
         objMenu.append(r)
     title = defaultTitle
 
-    commit = fact_commission.objects.filter(status='N',user_id=user_id)
+    # แสดงเฉพาะค่าคอมจากบิลเงินสด (เครดิตไม่แสดง)
+    commit = _cash_commissions_pending(user_id)
     total_all = 0
     obj = []
     s = '0'
     for r in commit:
-        content_main = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
-        paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
-        stage = commissionstages.objects.get(stage_id=r.stage_id)
+        content_main = register_main.objects.select_related("course","ev").filter(register_id=r.register_id).first()
+        paymet = register_payment_items.objects.filter(register_id=r.register_id,rp_id=r.rpi_id).first()
+        stage = commissionstages.objects.filter(stage_id=r.stage_id).first()
+        if content_main is None or paymet is None or stage is None:
+            continue  # ข้อมูลบิลไม่ครบ ข้ามรายการนี้แทนการ error ทั้งหน้า
 
 
         #### คำนวน ####
@@ -1520,89 +1523,87 @@ def withdraw_list_one(request):
 
 
 
-@csrf_exempt
-def sendwithdrawcom(request):
-   
-    data = json.loads(request.body)
-    user_id = data.get("user_id")
-    day_current = date.today().day
-    day_curr= date.today()
-    year_current = request.GET.get('qyear', date.today().year)
-    month_current = request.GET.get('qmonths', date.today().month)
-    tis_group = '-'
-    # start = billone.bcs_start_day
-    # end = billone.bcs_end_day
-    # tis_group = f"{start} - {end}"
-    start = 21
-    get_last_day = last_day_of_month(
-            datetime.date(int(year_current), month_current, 1))
-    last_day = get_last_day.day
-    
-  
-    if 1 <= day_current <= 20:
-        tis_group = '1 - 20'
-    else:
-       tis_group = f"{start} - {last_day}"
-            
-    
-    content = fact_commission.objects.filter(user_id=user_id,status='N').order_by("stage_id")
-    
-    obj = []
-    for r in content:
-        
-        taxs = tax_setting.objects.get(tax_id=1)
-        getdaybill = register_main.objects.select_related("course","ev").get(register_id=r.register_id)
-        paymet = register_payment_items.objects.get(register_id=r.register_id,rp_id=r.rpi_id)
-        
-        stage = commissionstages.objects.get(stage_id=r.stage_id)
+def _cash_commissions_pending(user_id):
+    """ค่าคอมที่ยังไม่เบิก (status N) ของ user ที่มาจากบิลเงินสด (register_main.pay_type = 1)"""
+    import uuid
+    if not user_id:
+        return []
+    rows = list(fact_commission.objects.filter(status='N', user_id=user_id).order_by("stage_id"))
+    reg_ids = set()
+    for r in rows:
+        try:
+            reg_ids.add(uuid.UUID(str(r.register_id)).hex)
+        except (ValueError, TypeError):
+            pass
+    cash_ids = {u.hex for u in register_main.objects.filter(
+        register_id__in=reg_ids, pay_type=1).values_list('register_id', flat=True)}
+    return [r for r in rows if str(r.register_id).replace('-', '') in cash_ids]
 
+
+def create_com_income(rows):
+    """สร้างรายการเบิกค่าคอม (com_income_setting status S) จาก fact_commission ที่ส่งเข้ามา
+    แล้วเปลี่ยน fact_commission เป็น Y — ใช้ทั้งปุ่มเบิกค่าตอบแทน และตอนกรอก RV ของบิลเครดิต
+    คืนค่า list ของ commit_id ที่เบิกสำเร็จ"""
+    day_curr = date.today()
+    get_last_day = last_day_of_month(datetime.date(day_curr.year, day_curr.month, 1))
+    tis_group = '1 - 20' if 1 <= day_curr.day <= 20 else f"21 - {get_last_day.day}"
+
+    taxs = tax_setting.objects.get(tax_id=1)
+    withdraw_ids = []
+    for r in rows:
+        if not r.user_id:
+            continue  # ยังไม่กำหนดพนักงานขาย สร้างรายการเบิกไม่ได้
+        if com_income_setting.objects.filter(com_id=r.commit_id).exclude(status='C').exists():
+            continue  # เคยสร้างรายการเบิกไปแล้ว กันซ้ำ
+        getdaybill = register_main.objects.select_related("course","ev").filter(register_id=r.register_id).first()
+        paymet = register_payment_items.objects.filter(register_id=r.register_id,rp_id=r.rpi_id).first()
+        stage = commissionstages.objects.filter(stage_id=r.stage_id).first()
+        if getdaybill is None or paymet is None or stage is None:
+            continue  # ข้อมูลไม่ครบ ไม่เบิก และไม่เปลี่ยนสถานะ
 
         #### คำนวน ####
-        
         getpricebill_before_vat = paymet.rpi_price_result  #### ก่อน vat ####
         getpricebill_after_vat = (paymet.rpi_price_result * 7) / 107   #### ค่า vat 7% ####
-    
-        after_vat_cal = getpricebill_before_vat - getpricebill_after_vat  #### เงินบิล - เงินบิลหลังหักvat = ยอดเงินหักvat ####
+        after_vat_cal = getpricebill_before_vat - getpricebill_after_vat  #### ยอดเงินหักvat ####
         getcom = ((stage.commission_rate) / 100 ) #### แปลงrate ####
-       
-        total = Decimal(after_vat_cal) * Decimal(getcom) #### คำนวนค่าคอม ตาม rate  จากยอด  ####
-        taxaum = (Decimal(after_vat_cal) * Decimal(getcom) *  taxs.tax_com) / 100 
-       
+        total = Decimal(after_vat_cal) * Decimal(getcom) #### ค่าคอมตาม rate ####
+        taxaum = (Decimal(after_vat_cal) * Decimal(getcom) *  taxs.tax_com) / 100
         total_result = total - taxaum
-        ev_id = getdaybill.ev.ev_id
-   
 
-        com_id = r.commit_id
-        active = 0
-        tis_com_before_tax = total
-        tis_com_after_tax = total_result
-        register = r.register_id
-        status = 'S'
+        com_income_setting(
+            tis_com_before_vat=getpricebill_before_vat,
+            tis_com_after_vat=after_vat_cal,
+            tis_com_before_tax=total,
+            tis_com_after_tax=total_result,
+            tis_group=tis_group,
+            active=0,
+            ev_id=getdaybill.ev.ev_id,
+            register_id=r.register_id,
+            tax=taxs.tax_com,
+            com_id=r.commit_id,
+            course=getdaybill.course,
+            user_id=r.user_id,
+            status='S',
+            tis_start_date=day_curr,
+            crt_date=dateTimeNow(),
+            upd_date=dateTimeNow(),
+        ).save()
+        withdraw_ids.append(r.commit_id)
 
-        content = com_income_setting(
-        tis_com_before_vat=getpricebill_before_vat,
-        tis_com_after_vat=after_vat_cal,
-        tis_com_before_tax=tis_com_before_tax,
-        tis_com_after_tax=tis_com_after_tax,
-        tis_group=tis_group,
-        active=active,
-        ev_id=ev_id,
-        register_id=register,
-        tax=taxs.tax_com,
-        com_id=com_id,
-        course=getdaybill.course,
-        user_id=user_id,
-        status=status,
-        tis_start_date=day_curr,
-        crt_date=dateTimeNow(),
-        upd_date=dateTimeNow(),
-        )
-        content.save()
+    fact_commission.objects.filter(commit_id__in=withdraw_ids).update(status='Y')
+    return withdraw_ids
 
-    
-    upd_fa = fact_commission.objects.filter(user_id=user_id).update(status='Y')
+
+@csrf_exempt
+def sendwithdrawcom(request):
+    data = json.loads(request.body)
+    user_id = data.get("user_id")
+    # เบิกเฉพาะค่าคอมจากบิลเงินสด ให้ตรงกับที่แสดงในหน้า finance/sale/com
+    create_com_income(_cash_commissions_pending(user_id))
     datas = {'status':user_id}
     return JsonResponse(datas, status=200,safe=False)
+
+
 
 
 
