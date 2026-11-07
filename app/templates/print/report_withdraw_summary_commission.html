@@ -161,6 +161,10 @@ https://www.aspsnippets.com/questions/661908/Export-HTML-Table-with-CSS-to-Excel
         </button></td>
       <!-- <td align="center">{{res.requirements}}</td> -->
     </tr>
+    {% empty %}
+    <tr>
+      <td colspan="8" align="center">ไม่มีค่าคอมในเดือน {{mon}} ปี {{year}}</td>
+    </tr>
     {% endfor %}
     {% comment %} <tr>
       <td colspan="3">รวมเป็นค่าตอบแทน</td>

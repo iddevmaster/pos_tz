@@ -48,6 +48,7 @@ def com_by_bill_month(qs, year, month):
     return qs.filter(status='S').annotate(bill_date=Subquery(first_bill_date)).filter(
         bill_date__year=int(year), bill_date__month=int(month))
 
+
 @login_required(login_url='/login')
 def register_print(request, rp_id):
     
@@ -4315,9 +4316,9 @@ def register_report_summary_sale_com_one(request):
         return render(request, '404.html')
     obj = []
     day_current_m = date.today().month
-  
+
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
-    return render(request, 'report/billing_cycle_result_summary_withdraw_com_one.html', context) 
+    return render(request, 'report/billing_cycle_result_summary_withdraw_com_one.html', context)
 
 
 
@@ -4442,90 +4443,24 @@ def register_report_summary_user_withdraw_com(request):
 
 @login_required(login_url='/login')
 def register_report_summary_user_withdraw_com_one(request):
+    # สรุปรายการค่าคอมของตัวเอง: ดึงข้อมูลและแสดงผลแบบเดียวกับ /report/withdraw/all/com
+    # (register_report_summary_user_withdraw_com) ต่างกันแค่ where user_id = user ที่ login
     user_id = request.user.id
-   
-    month_select_now = request.POST.get('monthss', date.today().month)
-    year_select_now = request.POST.get('qyear', date.today().year)
-    
- 
-    m_n = month_select_now
-    m_y = year_select_now
-   
- 
-    day_same_m = request.POST.get('monthss', date.today().month)
-    
-    day_current_m = request.POST.get('monthss', date.today().month - 1)
+    m_n = request.POST.get('monthss', date.today().month)
+    m_y = request.POST.get('qyear', date.today().year)
 
-    year_current = request.POST.get('qyear', date.today().year)
-   
+    qs = com_by_bill_month(com_income_setting.objects.filter(status='S', active=0, user_id=user_id), m_y, m_n).values(
+        'user_id', 'user__username', 'user__first_name', 'user__last_name').annotate(
+        total_before_tax=Coalesce(Sum('tis_com_before_tax'), 0.0),
+        total_after_tax=Coalesce(Sum('tis_com_after_tax'), 0.0),
+        tax=ExpressionWrapper(
+            Coalesce(Sum('tis_com_before_tax'), 0.0) - Coalesce(Sum('tis_com_after_tax'), 0.0),
+            output_field=FloatField()
+        )
+    )
 
-
-
-    start = None
-    end = None
-    start_new = None
-    end_new = None
-    obj = []
-
-
-
-  
-   
-  
-
-    day_current_day = date.today().day
-
-  
-    result_dict = {}
-    customer_order_counts = com_by_bill_month(com_income_setting.objects.filter(status='S',user_id=user_id), m_y, m_n).values('user_id')
-    
-    
-    price = 0
-    totalp = 0
-    totalp_f = 0
-    sumtaxall = 0
-    sumtaxl = 0
-    sumtaxf = 0
-    totalall = 0
-
-   
-
-        
-    getdatauser = User.objects.get(pk=user_id)
-    code = getdatauser
-    name = getdatauser.first_name + '' + getdatauser.last_name
-   
-    
-  
-    
-    price = 0
-    totalp = 0
-    totalp_f = 0
-    sumtaxall = 0
-    sumtaxl = 0
-    sumtaxf = 0
-    totalall = 0
-
-
-    first = com_by_bill_month(com_income_setting.objects.filter(status='S',user_id=user_id,active=0), m_y, m_n)
-    
-    for rsf in first:
-     
-     
-        totalp_f += rsf.tis_com_before_tax
-        sumtaxf += rsf.tis_com_before_tax - rsf.tis_com_after_tax
-           
-    if user_id not in result_dict:
-                aa = totalp_f + totalp
-                sumtaxall = sumtaxl + sumtaxf
-                
-                totalall = aa - sumtaxall
-                result_dict[user_id] = {"Id": user_id, "price": totalp,"price_f": totalp_f, "tax": sumtaxall,"total":aa,'username':name,'code':code,'totalall':totalall}   
-       
-    result_list = list(result_dict.values())
-    context = {'title': defaultTitle, 'data': obj,'result_dict':result_list,'current_m':month_fomat(m_n),'year_current':year_current,'m':m_n,'totalp_f':totalp_f}
-  
-    return render(request, 'print/report_withdraw_summary_commission_one.html', context)
+    context = {'title': defaultTitle, 'data': [], 'mon': month_fomat(m_n), 'year': m_y, 'm': m_n, 'qs': qs}
+    return render(request, 'print/report_withdraw_summary_commission.html', context)
 
 
 @login_required(login_url='/login')
