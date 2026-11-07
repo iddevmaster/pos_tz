@@ -41,12 +41,9 @@ THAI_MONTH_NAMES = [
 
 
 def com_by_bill_month(qs, year, month):
-    # กรองค่าคอม (status S) ตามเดือนของบิล (register_payment.crt_date) ไม่ใช่วันที่กดเบิก
-    # เช่น บิล TZ69/10/138 ออก 16/10 แต่กดเบิก 02/11 → นับเป็นเดือน 10
-    first_bill_date = register_payment.objects.filter(
-        register_id=OuterRef('register_id')).order_by('rp_id').values('crt_date')[:1]
-    return qs.filter(status='S').annotate(bill_date=Subquery(first_bill_date)).filter(
-        bill_date__year=int(year), bill_date__month=int(month))
+    # กรองค่าคอม (status S) ตามเดือนของ com_income_setting.crt_date
+    # เลือกเดือนไหน ดึงรายการที่ crt_date อยู่ในเดือนนั้น
+    return qs.filter(status='S', crt_date__year=int(year), crt_date__month=int(month))
 
 
 @login_required(login_url='/login')
