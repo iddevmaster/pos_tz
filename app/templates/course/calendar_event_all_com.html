@@ -61,7 +61,7 @@ if (existingModal) {
     existingModal.hide();
 }
 
-   let aaaa = findevid(evss_id)
+   let aaaa = reloadBills()
 
 
         return data; // Return the fetched data
@@ -277,12 +277,35 @@ if (existingModal) {
 }
 
 
-  async function findevid(evid) {
+  // จำว่าตารางล่าสุดมาจากคลิกปฏิทิน (evid) หรือค้นหาเลขบิล (doc) เพื่อโหลดซ้ำหลังบันทึก
+  let lastBillQuery = null;
 
+  function reloadBills() {
+    if (lastBillQuery && lastBillQuery.doc) return findbill(lastBillQuery.doc);
+    return findevid(document.getElementById("evss_id").value);
+  }
+
+  async function findbill(doc) {
+    doc = (doc || '').trim();
+    if (!doc) {
+      Swal.fire({ title: 'กรุณากรอกเลขบิล', text: 'เช่น TZ69/09/002 หรือ TZ6909002', icon: 'warning' });
+      return;
+    }
+    const count = await findevid(null, doc);
+    const msg = document.getElementById('billSearchMsg');
+    msg.textContent = count === 0 ? `ไม่พบบิล "${doc}" (ต้องเป็นบิลที่ยืนยันการขายแล้ว)` : `พบ ${count} รายการ`;
+    msg.className = count === 0 ? 'text-danger' : 'text-muted';
+    if (count) document.getElementById('ttt').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function findevid(evid, doc) {
+
+    lastBillQuery = doc ? { doc: doc } : { evid: evid };
+    if (!doc) document.getElementById('billSearchMsg').textContent = '';
 
     const table = document.getElementById('ttt');
     table.style.display = 'block';
-    
+
     try {
       const response = await fetch('/api/calendar_event_api_bill_com', {
         method: 'POST', // Specify the HTTP method as POST
@@ -290,13 +313,10 @@ if (existingModal) {
           'Content-Type': 'application/json' // Tell the server we're sending JSON
           // You might need other headers like 'Authorization' if your API requires it
         },
-        body: JSON.stringify({ // Convert your JavaScript object to a JSON string
-          // Your data goes here
-          evid: evid,
-        })
+        body: JSON.stringify(doc ? { doc: doc } : { evid: evid })
       });
       const data = await response.json();
-      
+
       const tableBody = document.getElementById('json-table-body');
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
@@ -356,10 +376,11 @@ if (existingModal) {
         tableBody.appendChild(row);
         }else {
 
-          
+
         }
 
       });
+      return data.length;
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -371,6 +392,13 @@ if (existingModal) {
 
 
   document.addEventListener("DOMContentLoaded", function () {
+    // เปิดจากลิงก์ notice: /finance/sale/commission?doc=TZ69/11/014 -> ค้นหาบิลให้เลย
+    const docParam = new URLSearchParams(location.search).get('doc');
+    if (docParam) {
+      document.getElementById('billSearch').value = docParam;
+      findbill(docParam);
+    }
+
     var calendarEl = document.getElementById("calendar");
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -489,6 +517,22 @@ if (existingModal) {
 </div>
 
 <section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form class="row g-2 align-items-end" onsubmit="event.preventDefault(); findbill(document.getElementById('billSearch').value);">
+        <div class="col-12 col-md-5">
+          <label for="billSearch" class="form-label">ค้นหาบิลเพื่อกำหนดค่าคอม</label>
+          <input type="text" class="form-control" id="billSearch" placeholder="เลขบิล เช่น TZ69/09/002 หรือ TZ6909002 / เลขใบสมัคร R69/..." autocomplete="off" />
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">ค้นหา</button>
+        </div>
+        <div class="col-12 col-md">
+          <span id="billSearchMsg" class="text-muted"></span>
+        </div>
+      </form>
+    </div>
+  </div>
   <div class="card">
     <div class="card-body">
       <span id="msg" style="color: red"></span>

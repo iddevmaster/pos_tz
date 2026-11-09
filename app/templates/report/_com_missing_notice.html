@@ -53,7 +53,7 @@ notice มุมขวาบน (ตามเดือน/ปีที่ค้�
       document.getElementById(bodyId).classList.toggle('d-none');
     };
 
-    function fillComList(ulId, countId, rows) {
+    function fillComList(ulId, countId, rows, linkToSetup) {
       const ul = document.getElementById(ulId);
       ul.innerHTML = '';
       document.getElementById(countId).textContent = rows.length;
@@ -65,7 +65,21 @@ notice มุมขวาบน (ตามเดือน/ปีที่ค้�
       }
       rows.forEach(r => {
         const li = document.createElement('li');
-        li.textContent = `${r.rp_doc_number || r.register_number || '-'} | ${r.customer || '-'}${!MINE && r.seller ? ' | ' + r.seller : ''}`;
+        const docNo = r.rp_doc_number || r.register_number || '-';
+        const rest = ` | ${r.customer || '-'}${!MINE && r.seller ? ' | ' + r.seller : ''}`;
+        if (linkToSetup && docNo !== '-') {
+          // เปิดหน้ากำหนดค่าคอมใน tab ใหม่ พร้อมค้นหาบิลนี้ให้เลย
+          const a = document.createElement('a');
+          a.href = `/finance/sale/commission?doc=${encodeURIComponent(docNo)}`;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = docNo;
+          a.title = 'เปิดหน้ากำหนดค่าคอม (tab ใหม่)';
+          li.appendChild(a);
+          li.appendChild(document.createTextNode(rest));
+        } else {
+          li.textContent = docNo + rest;
+        }
         ul.appendChild(li);
       });
     }
@@ -85,8 +99,8 @@ notice มุมขวาบน (ตามเดือน/ปีที่ค้�
         document.querySelectorAll('.com-notice-month').forEach(el => el.textContent = label);
 
         document.getElementById('comCashTotal').textContent = cashTotal;
-        fillComList('comNoHeadList', 'comNoHeadCount', d.no_head);
-        fillComList('comNoUserList', 'comNoUserCount', d.no_user);
+        fillComList('comNoHeadList', 'comNoHeadCount', d.no_head, true);
+        fillComList('comNoUserList', 'comNoUserCount', d.no_user, true);
         document.getElementById('comNoticeCash').classList.toggle('d-none', cashTotal === 0);
 
         document.getElementById('comCreditTotal').textContent = noRv.length;

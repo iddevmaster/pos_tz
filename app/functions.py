@@ -267,6 +267,27 @@ def twoDigit(value):
     return str(r)
 
 
+# prefix เลขบิล: เงินสด = TZ, เครดิต = CREDIT_DOC_PREFIX (เปลี่ยนตรงนี้ที่เดียว)
+CASH_DOC_PREFIX = "TZ"
+CREDIT_DOC_PREFIX = "CR"
+
+
+def gen_rp_doc_number(pay_type):
+    """สร้างเลขบิล register_payment แยกเลขรันตาม prefix ต่อเดือน เช่น TZ69/11/012, CR69/11/001
+    ใช้เลขสูงสุดที่มีอยู่ + 1 (ไม่ใช้ count) กันเลขซ้ำกับบิลเก่าที่เคยรันร่วมกัน"""
+    from datetime import date
+    from .models import register_payment
+    today = date.today()
+    prefix = CREDIT_DOC_PREFIX if str(pay_type) == '2' else CASH_DOC_PREFIX
+    head = f"{prefix}{str(today.year + 543)[2:4]}/{twoDigit(today.month)}/"
+    last = 0
+    for doc in register_payment.objects.filter(rp_doc_number__startswith=head).values_list('rp_doc_number', flat=True):
+        tail = doc[len(head):]
+        if tail.isdigit():
+            last = max(last, int(tail))
+    return head + treeDigit(last + 1)
+
+
 def generateShortId():
     # choose from all lowercase letter
     length = 3

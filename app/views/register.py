@@ -17,7 +17,7 @@ from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
 from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission,fact_customer
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit,checkpermi
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number,checkpermi
 from ..constant import prefixEng,prefixThai
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
@@ -803,11 +803,7 @@ def payment_create(request):
     month_current = date.today().month
     year_current = date.today().year
     year_current_f = str(int(date.today().year) + 543)
-    totaldata = register_payment.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current).count()
-    running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
-        str(twoDigit(month_current)) + "/" + str(running_number)
+    rp_doc_number = gen_rp_doc_number(pay_type)
     # Item
     rpi_code = request.POST['rpi_code']
     rpi_name = request.POST['rpi_name']
@@ -1033,11 +1029,7 @@ def payment_createno(request):
     month_current = date.today().month
     year_current = date.today().year
     year_current_f = str(int(date.today().year) + 543)
-    totaldata = register_payment.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current).count()
-    running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
-        str(twoDigit(month_current)) + "/" + str(running_number)
+    rp_doc_number = gen_rp_doc_number(pay_type)
     # Item
     rpi_code = request.POST['rpi_code']
     rpi_name = request.POST['rpi_name']

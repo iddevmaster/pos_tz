@@ -579,7 +579,19 @@ def data_bill_com(request):
    
  
     # content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1)
-    content = register_payment.objects.select_related('register').filter(register__ev_id=ev_id,active=1,register__status='Y',status_bill='Y')
+    content = register_payment.objects.select_related('register').filter(active=1,register__status='Y',status_bill='Y')
+    doc = (data.get("doc") or '').strip()
+    if doc:
+        # ค้นหาด้วยเลขบิล TZ / เลขใบสมัคร R (พิมพ์มี / หรือไม่มีก็ได้ เช่น TZ69/09/002 หรือ TZ6909002)
+        from django.db.models import Q
+        from django.db.models.functions import Replace
+        key = doc.replace('/', '').replace(' ', '')
+        content = content.annotate(
+            doc_plain=Replace('rp_doc_number', Value('/'), Value('')),
+            reg_plain=Replace('register__register_number', Value('/'), Value('')),
+        ).filter(Q(doc_plain__icontains=key) | Q(reg_plain__icontains=key)).order_by('-crt_date')[:50]
+    else:
+        content = content.filter(register__ev_id=ev_id)
 
     for r in content:
         
@@ -614,10 +626,10 @@ def data_bill_com(request):
         
          
         seller = User.objects.filter(pk=r.register.seller_id).first()
-        
-        namessell = seller.first_name + '-' + seller.last_name
-        
-        res = {'register_id':uuid_without_dashes,'ev_id':ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code,'rpi_name':payment_i.rpi_name,'customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':r.rp_id,'commit_head':payment.commit_head}
+
+        namessell = (seller.first_name + '-' + seller.last_name) if seller else '-'
+
+        res = {'register_id':uuid_without_dashes,'ev_id':r.register.ev_id if doc else ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code if payment_i else '-','rpi_name':payment_i.rpi_name if payment_i else '-','customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':r.rp_id,'commit_head':payment.commit_head}
         obj.append(res)
 
 

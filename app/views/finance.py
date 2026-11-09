@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 import datetime
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number
 
 
 @login_required(login_url='/login')
@@ -2040,11 +2040,7 @@ def payment_pay_deposit(request):
     month_current = date.today().month
     year_current = date.today().year
     year_current_f = str(int(date.today().year) + 543)
-    totaldata = register_payment.objects.filter(
-        crt_date__month=month_current, crt_date__year=year_current).count()
-    running_number = treeDigit(totaldata + 1)
-    rp_doc_number = "TZ" + year_current_f[2:4] + "/" + \
-        str(twoDigit(month_current)) + "/" + str(running_number)
+    rp_doc_number = gen_rp_doc_number(pay_type)
     # Item
     rpi_code = request.POST['rpi_code']
     rpi_name = request.POST['rpi_name']
