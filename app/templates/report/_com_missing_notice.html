@@ -1,0 +1,107 @@
+{% comment %}
+notice มุมขวาบน (ตามเดือน/ปีที่ค้นหาในฟอร์มที่มี #qyear, #monthss) แยก 2 กล่องซ้อนกัน:
+  1) บิลเงินสด ขายสำเร็จ ที่ยังไม่ได้กำหนดค่าคอม
+  2) บิลเครดิต ยืนยันรายการอบรม / ยืนยันการขายแล้ว แต่ยังไม่กำหนดเลข RV
+ใช้: include ไฟล์นี้เฉยๆ -> ทุกคน / ใส่ with notice_mine=1 -> เฉพาะบิลที่ตัวเองเป็นเซลล์
+{% endcomment %}
+<div class="com-notice-stack">
+  <div id="comNoticeCash" class="com-notice d-none">
+    <div class="com-notice-head" onclick="toggleComNotice('comNoticeCashBody')">
+      <span>💵 <b>บิลเงินสด{% if notice_mine %}ของฉัน{% endif %} ยังไม่กำหนดค่าคอม</b> <span class="com-notice-month"></span></span>
+      <span class="badge bg-danger" id="comCashTotal">0</span>
+    </div>
+    <div id="comNoticeCashBody" class="com-notice-body d-none">
+      <div class="com-notice-title">ยังไม่เลือกประเภทค่าคอม <span class="badge bg-warning text-dark" id="comNoHeadCount">0</span></div>
+      <ul id="comNoHeadList"></ul>
+      <div class="com-notice-title">ยังไม่กำหนดพนักงานขาย <span class="badge bg-warning text-dark" id="comNoUserCount">0</span></div>
+      <ul id="comNoUserList"></ul>
+    </div>
+  </div>
+
+  <div id="comNoticeCredit" class="com-notice com-notice-credit d-none">
+    <div class="com-notice-head" onclick="toggleComNotice('comNoticeCreditBody')">
+      <span>💳 <b>บิลเครดิต{% if notice_mine %}ของฉัน{% endif %} ยังไม่กำหนดเลข RV</b> <span class="com-notice-month"></span></span>
+      <span class="badge bg-primary" id="comCreditTotal">0</span>
+    </div>
+    <div id="comNoticeCreditBody" class="com-notice-body d-none">
+      <div class="com-notice-title">ยืนยันรายการอบรม / ยืนยันการขายแล้ว <span class="badge bg-warning text-dark" id="comNoRvCount">0</span></div>
+      <ul id="comNoRvList"></ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .com-notice-stack { position: fixed; top: 80px; right: 16px; width: 340px; max-width: calc(100vw - 32px);
+    z-index: 1050; display: flex; flex-direction: column; gap: 10px; }
+  .com-notice { background: #fff; border: 1px solid #f5c2c7; border-left: 5px solid #dc3545;
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.15); font-size: 14px; }
+  .com-notice-credit { border-color: #b6d4fe; border-left-color: #0d6efd; }
+  .com-notice-head { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding: 10px 12px; cursor: pointer; }
+  .com-notice-body { max-height: 35vh; overflow-y: auto; padding: 0 12px 10px; border-top: 1px solid #eee; }
+  .com-notice-title { font-weight: 600; margin: 8px 0 4px; }
+  .com-notice-body ul { padding-left: 18px; margin: 0; }
+  .com-notice-body li { margin-bottom: 2px; }
+</style>
+
+<script>
+  (function () {
+    const MINE = {% if notice_mine %}true{% else %}false{% endif %};
+    const THAI_MONTH_SHORT = ['', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+
+    window.toggleComNotice = function (bodyId) {
+      document.getElementById(bodyId).classList.toggle('d-none');
+    };
+
+    function fillComList(ulId, countId, rows) {
+      const ul = document.getElementById(ulId);
+      ul.innerHTML = '';
+      document.getElementById(countId).textContent = rows.length;
+      if (!rows.length) {
+        const li = document.createElement('li');
+        li.textContent = '-';
+        ul.appendChild(li);
+        return;
+      }
+      rows.forEach(r => {
+        const li = document.createElement('li');
+        li.textContent = `${r.rp_doc_number || r.register_number || '-'} | ${r.customer || '-'}${!MINE && r.seller ? ' | ' + r.seller : ''}`;
+        ul.appendChild(li);
+      });
+    }
+
+    async function loadComNotice() {
+      const year = document.getElementById('qyear').value || new Date().getFullYear();
+      const month = document.getElementById('monthss').value;
+      const params = new URLSearchParams({ qyear: year, monthss: month });
+      if (MINE) params.set('mine', '1');
+      try {
+        const res = await fetch(`/api/report/com_missing_notice?${params}`);
+        if (!res.ok) return;
+        const d = await res.json();
+        const noRv = d.no_rv || [];
+        const cashTotal = d.no_head.length + d.no_user.length;
+        const label = `(${THAI_MONTH_SHORT[d.month] || d.month} ${d.year})`;
+        document.querySelectorAll('.com-notice-month').forEach(el => el.textContent = label);
+
+        document.getElementById('comCashTotal').textContent = cashTotal;
+        fillComList('comNoHeadList', 'comNoHeadCount', d.no_head);
+        fillComList('comNoUserList', 'comNoUserCount', d.no_user);
+        document.getElementById('comNoticeCash').classList.toggle('d-none', cashTotal === 0);
+
+        document.getElementById('comCreditTotal').textContent = noRv.length;
+        fillComList('comNoRvList', 'comNoRvCount', noRv);
+        document.getElementById('comNoticeCredit').classList.toggle('d-none', noRv.length === 0);
+      } catch (e) {
+        console.error('com notice', e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadComNotice, 0);
+      const monthSel = document.getElementById('monthss');
+      monthSel.addEventListener('change', loadComNotice);
+      if (monthSel.form) monthSel.form.addEventListener('submit', () => loadComNotice());
+    });
+  })();
+</script>

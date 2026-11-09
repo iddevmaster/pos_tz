@@ -2352,6 +2352,7 @@ def register_report_summary_details_com(request ,id, year, m):
     price_total = 0
     
     for rs in customer_order_counts:
+        print(rs)
        
         com = fact_commission.objects.get(commit_id=rs.com_id)
         comstate = commissionstages.objects.get(stage_id=com.stage_id)
@@ -4287,6 +4288,67 @@ def register_report_summary_sale_com(request):
   
     context = {'title': defaultTitle, 'data': obj,'listMenuPermission': objMenu,'thai_months': THAI_MONTH_NAMES,'current_month':day_current_m}
     return render(request, 'report/billing_cycle_result_summary_withdraw_com.html', context) 
+
+
+@login_required(login_url='/login')
+def report_com_missing_notice(request):
+    """notice มุมขวาบนหน้า report/withdraw/all/com
+    บิลเงินสด ขายสำเร็จ (close_the_sale=1, status Y) ของเดือนที่เลือก (ตาม register_main.crt_date)
+    ที่ยังไม่ได้กำหนดค่าคอม แยก 2 แบบ:
+      no_head = ยังไม่เลือกประเภทค่าคอม (register_payment.commit_head = 0)
+      no_user = เลือกแล้ว แต่ยังไม่กำหนดพนักงานขาย (fact_commission status N, user_id ว่าง)"""
+    from django.http import JsonResponse
+    try:
+        year = int(request.GET.get('qyear') or date.today().year)
+        month = int(request.GET.get('monthss') or date.today().month)
+    except ValueError:
+        return JsonResponse({'error': 'invalid month/year'}, status=400)
+
+    regs = register_main.objects.filter(
+        pay_type=1, close_the_sale=1, status='Y',
+        crt_date__year=year, crt_date__month=month,
+    )
+    if request.GET.get('mine') == '1':
+        regs = regs.filter(seller_id=request.user.id)  # เฉพาะบิลที่ตัวเองเป็นเซลล์
+
+    def bill_info(rp):
+        return {'register_number': rp.register.register_number,
+                'rp_doc_number': rp.rp_doc_number,
+                'customer': rp.rp_name_customer,
+                'seller': rp.rp_name_seller}
+
+    no_head = [bill_info(rp) for rp in register_payment.objects.select_related('register').filter(
+        register__in=regs, active=1, status_bill='Y', commit_head=0,
+    ).order_by('register__crt_date')]
+
+    reg_hex = {u.hex: u for u in regs.values_list('register_id', flat=True)}
+    missing_user_ids = set(fact_commission.objects.filter(
+        register_id__in=reg_hex.keys(), status='N', user_id__isnull=True,
+    ).values_list('register_id', flat=True))
+    no_user = [bill_info(rp) for rp in register_payment.objects.select_related('register').filter(
+        register_id__in=[reg_hex[h] for h in missing_user_ids if h in reg_hex], active=1, status_bill='Y',
+    ).order_by('register__crt_date')]
+
+    # บิลเครดิต: ยืนยันรายการอบรมแล้ว (event_register Y) + ยืนยันการขาย (status Y) แต่ยังไม่กรอกเลข RV (salesorder.status ว่าง)
+    # (ค่าคอมบิลเครดิตจะถูกสร้างตอนกรอก RV)
+    credit = salesorder.objects.select_related('er__register').filter(
+        status__isnull=True,
+        er__status='Y',
+        er__register__pay_type=2,
+        er__register__status='Y',  # ไม่เช็ค close_the_sale เพราะบางครั้ง user ไม่ได้กดปิดการขาย
+        er__register__crt_date__year=year,
+        er__register__crt_date__month=month,
+    )
+    if request.GET.get('mine') == '1':
+        credit = credit.filter(er__register__seller_id=request.user.id)
+    credit = list(credit.order_by('er__register__crt_date'))
+    pay_by_reg = {rp.register_id: rp for rp in register_payment.objects.select_related('register').filter(
+        register_id__in=[s.er.register_id for s in credit], active=1)}
+    no_rv = [bill_info(pay_by_reg[s.er.register_id]) for s in credit if s.er.register_id in pay_by_reg]
+
+    return JsonResponse({'year': year, 'month': month,
+                         'no_head': no_head, 'no_user': no_user, 'no_rv': no_rv,
+                         'total': len(no_head) + len(no_user) + len(no_rv)})
 
 
 @login_required(login_url='/login')

@@ -265,6 +265,7 @@ urlpatterns = [
 
     path('report/overdue/all/com', report_and_print.register_report_summary_com),  #ค้างจ่ายค่าคอม
     path('report/withdraw/all/com', report_and_print.register_report_summary_sale_com), #ตั้งเบิกค่าคอม
+    path('api/report/com_missing_notice', report_and_print.report_com_missing_notice), #notice บิลเงินสดที่ยังไม่กำหนดค่าคอม
 
 
     path('report/commit/credit', report_and_print.register_report_summary_com_credit),  #ค้างจ่ายค่าคอม  ///
