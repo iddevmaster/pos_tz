@@ -268,12 +268,13 @@ def twoDigit(value):
 
 
 # prefix เลขบิล: เงินสด = TZ, เครดิต = CREDIT_DOC_PREFIX (เปลี่ยนตรงนี้ที่เดียว)
+# ตอนนี้เครดิตใช้ TZ เหมือนเงินสด -> รันเลขต่อกันในชุดเดียว
 CASH_DOC_PREFIX = "TZ"
-CREDIT_DOC_PREFIX = "CR"
+CREDIT_DOC_PREFIX = "TZ"
 
 
 def gen_rp_doc_number(pay_type):
-    """สร้างเลขบิล register_payment แยกเลขรันตาม prefix ต่อเดือน เช่น TZ69/11/012, CR69/11/001
+    """สร้างเลขบิล register_payment แยกเลขรันตาม prefix ต่อเดือน เช่น TZ69/11/012
     ใช้เลขสูงสุดที่มีอยู่ + 1 (ไม่ใช้ count) กันเลขซ้ำกับบิลเก่าที่เคยรันร่วมกัน"""
     from datetime import date
     from .models import register_payment
@@ -286,6 +287,30 @@ def gen_rp_doc_number(pay_type):
         if tail.isdigit():
             last = max(last, int(tail))
     return head + treeDigit(last + 1)
+
+
+def creator_missing_com_bills(user_id):
+    """บิลเงินสดเดือนนี้ที่ user เป็นคนเปิดบิล (register_payment.user_create) แต่ยังกำหนดค่าคอมไม่ครบ
+      - ยังไม่เลือกประเภทค่าคอม (commit_head = 0) หรือ
+      - เลือกแล้วแต่ยังไม่กำหนดพนักงานขาย (fact_commission status N, user_id ว่าง)
+    ไม่นับบิลที่ขายไม่สำเร็จ (close_the_sale = 2) และหลักสูตรที่ตั้งว่าไม่มีค่าคอม (course.has_commission = 0)
+    -> ใช้ล็อคเว็บ (ComLockMiddleware)"""
+    from datetime import date
+    from .models import register_payment, fact_commission
+    today = date.today()
+    bills = list(register_payment.objects.select_related('register').filter(
+        user_create=user_id, active=1, status_bill='Y',
+        register__pay_type=1, register__status='Y',
+        crt_date__year=today.year, crt_date__month=today.month,
+    ).exclude(register__close_the_sale=2).exclude(
+        register__course__has_commission=0,  # หลักสูตรที่ตั้งว่าไม่มีค่าคอม ไม่ต้องกำหนด
+    ).order_by('crt_date'))
+    if not bills:
+        return []
+    no_user = set(fact_commission.objects.filter(
+        register_id__in={b.register_id.hex for b in bills}, status='N', user_id__isnull=True,
+    ).values_list('register_id', flat=True))
+    return [b for b in bills if b.commit_head == 0 or b.register_id.hex in no_user]
 
 
 def generateShortId():
