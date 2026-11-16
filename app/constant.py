@@ -526,8 +526,15 @@ listMenu = [
         "group_value": "naSt14",
         "group_label": "ทะเบียนเข้าอบรม",
     },
-  {
-        "value": "rt/sale",
+    # สิทธิ์เปิดการขาย (ไม่ใช่ path ของหน้าจริง: เมนูใน sidebar วาดเองใน base.html ดู can_sale_event / can_sale_noevent)
+    {
+        "value": "sale/event",
+        "label": "เปิดการขาย (มีอีเวน)",
+        "group_value": "WR14515",
+        "group_label": "เปิดการขาย",
+    },
+    {
+        "value": "sale/noevent",
         "label": "เปิดการขายแบบไม่มีอีเวน",
         "group_value": "WR14515",
         "group_label": "เปิดการขาย",

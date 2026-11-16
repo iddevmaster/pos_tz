@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo,customer_followup,transfer_data
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print,project,desbill,notification,internal_memo,customer_followup,transfer_data,dashboard
 
 urlpatterns = [
     path('profile/edit/', user.profile_edit, name='profile_edit'),
@@ -33,6 +33,7 @@ urlpatterns = [
     path('customer-followup/<int:pk>/claim', customer_followup.followup_claim, name='customer_followup_claim'),
     # Register
     path('', register.register_home),
+    path('my-sales', dashboard.my_sales),  # สรุปยอดขายของตัวเอง (หน้าแรกของคนที่ไม่มีสิทธิ์เปิดการขาย)
     path('salesnotevent', register.register_homenotevent),
     path('salesnotevent/create/', register.register_createnoevent, name="CreateRegisterNo"),
     path('salesnotevent/reset', register.register_resetnoevent),
@@ -341,6 +342,7 @@ urlpatterns = [
 #     path('finance/teacher', finance.withdraw_list), 
     path('finance/teacher', finance.withdraw_list_one),
     path('finance/sale/commission', finance.withdraw_list_commission),
+    path('com-lock/', finance.com_lock),
     path('finance/sale/com', finance.withdraw_list_one_com),
 
     path('finance/billing/cancelbill', finance.listbill),

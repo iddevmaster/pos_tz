@@ -6,6 +6,7 @@
     course_name,
     course_name_eng,
     active,
+    has_commission,
     crt_date,
     upd_date
   ) {
@@ -14,6 +15,7 @@
     document.getElementById("course_name_update").value = course_name;
     document.getElementById("course_name_eng_update").value = course_name_eng;
     document.getElementById("active_update").value = active;
+    document.getElementById("has_commission_update").value = has_commission;
     document.getElementById("datecrt").innerHTML =
       "วันที่สร้าง " + crt_date + " | วันที่ปรับปรุง " + upd_date;
   }
@@ -65,6 +67,7 @@
             <th>ชื่อหลักสูตรภาษาไทย</th>
             <th>ชื่อหลักสูตรภาษาอังกฤษ</th>
             <th>พร้อมทำงาน</th>
+            <th>ค่าคอม</th>
             <th>จัดการ</th>
           </tr>
         </thead>
@@ -83,6 +86,13 @@
               <font style="color: red">ปิด</font>
               {% endif %}
             </td>
+            <td align="center">
+              {% if res.has_commission == 0 %}
+              <span class="badge bg-secondary">ไม่มี</span>
+              {% else %}
+              <span class="badge bg-success">มี</span>
+              {% endif %}
+            </td>
             <td>
               <div align="center">
                 <button
@@ -92,6 +102,7 @@
                   '{{res.course_name}}',
                   '{{res.course_name_eng}}',
                   '{{res.active}}',
+                  '{{res.has_commission}}',
                   '{{res.crt_date}}',
                   '{{res.upd_date}}')"
                   class="btn btn-warning"
@@ -189,6 +200,14 @@
               <option value="1" selected>เปิด</option>
             </select>
           </div>
+
+          <div class="form-group">
+            <label>ค่าคอม</label>
+            <select class="form-control" name="has_commission" id="has_commission" required>
+              <option value="1" selected>มีค่าคอม (ต้องกำหนดค่าคอมหลังเปิดบิล)</option>
+              <option value="0">ไม่มีค่าคอม</option>
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -281,6 +300,14 @@
             >
               <option value="0">ปิด</option>
               <option value="1">เปิด</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>ค่าคอม</label>
+            <select class="form-control" name="has_commission" id="has_commission_update" required>
+              <option value="1">มีค่าคอม (ต้องกำหนดค่าคอมหลังเปิดบิล)</option>
+              <option value="0">ไม่มีค่าคอม</option>
             </select>
           </div>
           <p id="datecrt"></p>

@@ -73,6 +73,7 @@ class  course(models.Model):
     is_show_order = models.CharField(max_length=12, blank=True, default=None)
     is_type_condition = models.CharField(max_length=12, blank=True, default=None)
     is_show_condition = models.CharField(max_length=12, blank=True, default=None)
+    has_commission = models.IntegerField(default=1, blank=False)  # 1 = มีค่าคอม (ต้องกำหนดค่าคอมหลังเปิดบิล), 0 = ไม่มี
 
 # ev_vat  0  =ไม่รวม Vat,1 = รวม Vat
 

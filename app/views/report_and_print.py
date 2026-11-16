@@ -4307,7 +4307,7 @@ def report_com_missing_notice(request):
     regs = register_main.objects.filter(
         pay_type=1, close_the_sale=1, status='Y',
         crt_date__year=year, crt_date__month=month,
-    )
+    ).exclude(course__has_commission=0)  # หลักสูตรที่ไม่มีค่าคอม ไม่ต้องแจ้ง
     if request.GET.get('mine') == '1':
         regs = regs.filter(seller_id=request.user.id)  # เฉพาะบิลที่ตัวเองเป็นเซลล์
 
@@ -4338,7 +4338,7 @@ def report_com_missing_notice(request):
         er__register__status='Y',  # ไม่เช็ค close_the_sale เพราะบางครั้ง user ไม่ได้กดปิดการขาย
         er__register__crt_date__year=year,
         er__register__crt_date__month=month,
-    )
+    ).exclude(er__register__course__has_commission=0)
     if request.GET.get('mine') == '1':
         credit = credit.filter(er__register__seller_id=request.user.id)
     credit = list(credit.order_by('er__register__crt_date'))

@@ -629,7 +629,12 @@ def data_bill_com(request):
 
         namessell = (seller.first_name + '-' + seller.last_name) if seller else '-'
 
-        res = {'register_id':uuid_without_dashes,'ev_id':r.register.ev_id if doc else ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code if payment_i else '-','rpi_name':payment_i.rpi_name if payment_i else '-','customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':r.rp_id,'commit_head':payment.commit_head}
+        # หลักสูตรที่ตั้งว่าไม่มีค่าคอม -> หน้า finance/sale/commission ไม่แสดงปุ่มประเภทการจ่าย / กำหนด
+        # เช็คจาก register_main.course (บิลไม่มีรอบอบรม ev จะเป็น NULL)
+        bill_course = r.register.course if r.register.course_id else None
+        has_commission = bill_course.has_commission if bill_course else 1
+
+        res = {'has_commission':has_commission,'register_id':uuid_without_dashes,'ev_id':r.register.ev_id if doc else ev_id,'register_number': r.register.register_number,'pay_type':ct,'rp_name_seller':payment.rp_name_seller,'rp_name_customer':payment.rp_name_customer,'rpi_code':payment_i.rpi_code if payment_i else '-','rpi_name':payment_i.rpi_name if payment_i else '-','customer_type':cus_type,'rp_doc_number':payment.rp_doc_number,'seller':namessell,'rp_id':r.rp_id,'commit_head':payment.commit_head}
         obj.append(res)
 
 
@@ -647,7 +652,14 @@ def type_bill_com(request):
     register_id = data.get("register_id")
     commit_headdaa= data.get("commit_head")
     rps_id= data.get("rp_id")
-   
+
+    # บิลเงินสด ของหลักสูตรที่ตั้งว่าไม่มีค่าคอม (course.has_commission = 0) -> ไม่สร้างค่าคอม
+    if register_main.objects.filter(
+        register_id=register_id, pay_type=1, course__has_commission=0,
+    ).exists():
+        return JsonResponse({'status': 'no_commission',
+                             'message': 'หลักสูตรนี้ตั้งว่าไม่มีค่าคอม ไม่สามารถกำหนดค่าคอมได้'}, status=400)
+
     content_approve = register_payment.objects.filter(register_id=register_id)
     content_approve.update(commit_head=commit_headdaa)
 

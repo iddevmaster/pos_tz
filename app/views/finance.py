@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 import datetime
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number, creator_missing_com_bills
 
 
 @login_required(login_url='/login')
@@ -1218,7 +1218,8 @@ def withdraw_list_commission(request):
     path = request.path
     cleaned_path = path.strip('/')    
     checkpa = checkpermi(cleaned_path,cm_id)
-    if checkpa == 0:
+    # คนเปิดบิลที่ติดล็อคค่าคอม เข้าหน้านี้ได้เพื่อกำหนดค่าคอม
+    if checkpa == 0 and not creator_missing_com_bills(user_id):
         return render(request, '403.html')    
     listMenuPermission = category_program_permission.objects.filter(cm_id=cm_id).values("group_value", "group_label").annotate(dcount=Count('group_value')).order_by("group_label")
     objMenu = []
@@ -1238,6 +1239,16 @@ def withdraw_list_commission(request):
     return render(request, 'course/calendar_event_all_com.html', context)
 
 
+
+
+@login_required(login_url='/login')
+def com_lock(request):
+    """หน้าล็อค: คนเปิดบิลเงินสดเดือนนี้ที่ยังกำหนดค่าคอมไม่ครบ (ดู ComLockMiddleware)"""
+    bills = creator_missing_com_bills(request.user.id)
+    if not bills:
+        request.session.pop('com_lock_ok_until', None)
+        return redirect('/')
+    return render(request, 'finance/com_lock.html', {'title': defaultTitle, 'bills': bills})
 
 
 def withdraw_list_one_com(request):
@@ -1535,8 +1546,10 @@ def _cash_commissions_pending(user_id):
             reg_ids.add(uuid.UUID(str(r.register_id)).hex)
         except (ValueError, TypeError):
             pass
+    # ไม่นับหลักสูตรที่ตั้งว่าไม่มีค่าคอม (course.has_commission = 0) -> ไม่สร้างรายการเบิก
     cash_ids = {u.hex for u in register_main.objects.filter(
-        register_id__in=reg_ids, pay_type=1).values_list('register_id', flat=True)}
+        register_id__in=reg_ids, pay_type=1).exclude(
+        course__has_commission=0).values_list('register_id', flat=True)}
     return [r for r in rows if str(r.register_id).replace('-', '') in cash_ids]
 
 

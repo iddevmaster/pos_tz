@@ -103,14 +103,15 @@
                   role="group"
                   aria-label="Basic example"
                 >
-                     <button
-                    type="button"
+                  {# เปิดหน้ากำหนดค่าคอมในแท็บใหม่ พร้อมค้นหาเลขใบเสร็จนี้ให้เลย #}
+                  <a
                     class="btn btn-danger"
-                    onclick="window.open('/finance/sale/commission'); return false;"
+                    href="/finance/sale/commission?doc={{ res.main.rp_doc_number|urlencode:'' }}"
+                    target="_blank"
+                    rel="noopener"
                   >
-               
                     กำหนดค่าคอม
-                  </button>
+                  </a>
                   <button
                     type="button"
                     class="btn btn-secondary"

@@ -66,6 +66,7 @@ def course_create(request):
         course_name=course_name,
         course_name_eng=course_name_eng,
         active=active,
+        has_commission=1 if request.POST.get('has_commission', '1') == '1' else 0,
         crt_date=dateTimeNow(),
         upd_date=dateTimeNow(),
         module=m.module)
@@ -86,6 +87,7 @@ def course_update(request):
     content.course_name = course_name
     content.course_name_eng = course_name_eng
     content.active = active
+    content.has_commission = 1 if request.POST.get('has_commission', '1') == '1' else 0
     content.upd_date = dateTimeNow()
     content.save()
     messages.success(request, "ทำรายการสำเร็จ !")

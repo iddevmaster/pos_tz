@@ -49,6 +49,8 @@ const evss_id = document.getElementById("evss_id").value
 
         // Check if the request was successful (status code 200-299)
         if (!response.ok) {
+            const err = await response.json().catch(() => null);
+            if (err && err.message) alert(err.message);
             // If not successful, throw an error with the status
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -321,6 +323,24 @@ if (existingModal) {
       tableBody.innerHTML = ''; // Clears all rows
       data.forEach((item, index) => {
         console.log(item);
+        // หลักสูตรที่ตั้งว่าไม่มีค่าคอม: ไม่แสดงปุ่ม ประเภทการจ่าย และ #
+        if(item.has_commission == 0){
+        const row = document.createElement('tr');
+             row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.register_number}</td>
+                     <td>${item.rp_doc_number}</td>
+                    <td> ${item.rpi_code} - ${item.rpi_name}</td>
+                    <td>${item.rp_name_customer}</td>
+                    <td>${item.customer_type}</td>
+                    <td>${item.pay_type}</td>
+                     <td>${item.seller}</td>
+                    <td>-</td>
+                    <td>-</td>
+                `;
+        tableBody.appendChild(row);
+        return;
+        }
         if(item.commit_head == 0){
         const row = document.createElement('tr');
 

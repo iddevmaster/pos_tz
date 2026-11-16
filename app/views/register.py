@@ -17,7 +17,7 @@ from django.shortcuts import render
 import openpyxl
 from django.views.decorators.csrf import csrf_exempt
 from ..models import category_program_permission, course_event, customers, location_thai, course,fact_signature, register_main, register_payment, register_payment_items, student,register_ref, register_applove, user_group, user_detail, event_register,salesorder,desciption_bill,factbilldes,teacher_income_setting,User,document,teacher,signature,add_on,fact_addon,training,fact_teacher_user,commissionstages,fact_commission,fact_customer
-from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number,checkpermi
+from ..functions import dateTimeIntNow, dateTimeNow, dmytoymd, month_fomat,treeDigit, twoDigit, gen_rp_doc_number,checkpermi, require_sale_perm, SALE_PERM_EVENT, SALE_PERM_NOEVENT
 from ..constant import prefixEng,prefixThai
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
@@ -42,6 +42,7 @@ def customer_read_idcard(request):
 
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_EVENT, redirect_dashboard=True)
 def register_home(request):
     title = defaultTitle
     user_id = request.user.id
@@ -140,6 +141,7 @@ def register_home(request):
     return render(request, 'register/register.html', context)
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_NOEVENT, redirect_dashboard=True)
 def register_homenotevent(request):
     title = defaultTitle
     user_id = request.user.id
@@ -247,6 +249,7 @@ def register_resetnoevent(request):
     return redirect("/salesnotevent")
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_EVENT)
 def register_create(request):
     current_user = request.user
     seller_id = current_user.id
@@ -288,6 +291,7 @@ def register_create(request):
     return redirect("/")
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_NOEVENT)
 def register_createnoevent(request):
     current_user = request.user
     seller_id = current_user.id
@@ -326,6 +330,7 @@ def register_createnoevent(request):
     return redirect("/salesnotevent")
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_EVENT)
 def customer_create(request):
 
 
@@ -453,6 +458,7 @@ def customer_create(request):
     return redirect("/register/payment/" + str(register_id))
 
 @login_required(login_url='/login')
+@require_sale_perm(SALE_PERM_NOEVENT)
 def customer_createno(request):
     dddd = request.POST['customerType']
     register_id = request.session['register_id']

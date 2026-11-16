@@ -1,0 +1,191 @@
+{% extends 'base.html' %} {% load humanize %} {% block content %}
+
+<style>
+  .ms-kpi { border-radius: 10px; height: 100%; }
+  .ms-kpi .label { font-size: 13px; color: #6c757d; margin-bottom: 4px; }
+  .ms-kpi .value { font-size: 24px; font-weight: 700; line-height: 1.2; }
+  .ms-kpi .sub { font-size: 12px; color: #6c757d; margin-top: 4px; }
+  .ms-up { color: #198754; }
+  .ms-down { color: #dc3545; }
+  .ms-trend { display: flex; align-items: flex-end; gap: 6px; height: 180px; padding-top: 18px; }
+  .ms-trend .col-bar { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; min-width: 0; }
+  .ms-trend .bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+  .ms-trend .bar { width: 100%; background: #cfe2ff; border-radius: 4px 4px 0 0; min-height: 2px; position: relative; }
+  .ms-trend .bar.current { background: #0d6efd; }
+  .ms-trend .bar:hover::after { content: attr(data-value); position: absolute; bottom: 100%; left: 50%;
+    transform: translateX(-50%); background: #212529; color: #fff; font-size: 11px; padding: 2px 6px;
+    border-radius: 4px; white-space: nowrap; margin-bottom: 4px; z-index: 2; }
+  .ms-trend .lbl { font-size: 11px; color: #6c757d; margin-top: 4px; white-space: nowrap; }
+  .ms-progress { height: 6px; }
+  .ms-status .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+  .ms-status .item:last-child { border-bottom: 0; }
+</style>
+
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>สรุปยอดขายของฉัน</h3>
+    <p class="text-subtitle text-muted mb-0">{{ request.user.first_name }} {{ request.user.last_name }} · {{ month_label }}</p>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <form method="get" class="d-flex gap-2 justify-content-md-end mb-3 flex-wrap">
+      <input type="month" name="month" value="{{ month_value }}" class="form-control" style="max-width: 190px" onchange="this.form.submit()" />
+      {% if not is_current_month %}
+      <a href="/my-sales" class="btn btn-light">เดือนนี้</a>
+      {% endif %}
+      {% if can_sale_event %}
+      <a href="/" class="btn btn-primary"><i class="bi bi-plus-lg"></i> เปิดการขาย</a>
+      {% elif can_sale_noevent %}
+      <a href="/salesnotevent" class="btn btn-primary"><i class="bi bi-plus-lg"></i> เปิดการขาย</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<section class="section">
+  <!-- KPI -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card ms-kpi mb-0"><div class="card-body">
+        <div class="label">ยอดขายสุทธิ</div>
+        <div class="value">{{ total_sales|floatformat:2|intcomma }} ฿</div>
+        <div class="sub">
+          {% if change_pct is not None %}
+            {% if change_pct >= 0 %}
+            <span class="ms-up"><i class="bi bi-arrow-up-short"></i>{{ change_pct|floatformat:1 }}%</span>
+            {% else %}
+            <span class="ms-down"><i class="bi bi-arrow-down-short"></i>{{ change_pct|floatformat:1|cut:"-" }}%</span>
+            {% endif %}
+            จากเดือนก่อน ({{ prev_total|floatformat:2|intcomma }})
+          {% else %}
+            เดือนก่อนไม่มียอดขาย
+          {% endif %}
+        </div>
+      </div></div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card ms-kpi mb-0"><div class="card-body">
+        <div class="label">จำนวนบิล</div>
+        <div class="value">{{ bill_count|intcomma }}</div>
+        <div class="sub">เฉลี่ย {{ avg_bill|floatformat:2|intcomma }} ฿ / บิล</div>
+      </div></div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card ms-kpi mb-0"><div class="card-body">
+        <div class="label">เงินสด</div>
+        <div class="value">{{ cash_total|floatformat:2|intcomma }} ฿</div>
+        <div class="sub">ชำระทันที</div>
+      </div></div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card ms-kpi mb-0"><div class="card-body">
+        <div class="label">เครดิต</div>
+        <div class="value">{{ credit_total|floatformat:2|intcomma }} ฿</div>
+        <div class="sub">อนุมัติแล้ว</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <!-- แนวโน้ม -->
+    <div class="col-12 col-xl-8">
+      <div class="card h-100 mb-0">
+        <div class="card-header"><h5 class="mb-0">ยอดขาย 12 เดือน</h5></div>
+        <div class="card-body">
+          <div class="ms-trend">
+            {% for t in trend %}
+            <div class="col-bar">
+              <div class="bar-wrap">
+                <div class="bar {% if t.current %}current{% endif %}" style="height: {{ t.height }}%"
+                  data-value="{{ t.total|floatformat:0|intcomma }} ฿"></div>
+              </div>
+              <div class="lbl">{{ t.label }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- สถานะ -->
+    <div class="col-12 col-xl-4">
+      <div class="card h-100 mb-0">
+        <div class="card-header"><h5 class="mb-0">สถานะบิลเดือนนี้</h5></div>
+        <div class="card-body ms-status">
+          <div class="item"><span><i class="bi bi-check-circle text-success"></i> ปิดการขาย - สำเร็จ</span><b>{{ status_count.success }}</b></div>
+          <div class="item"><span><i class="bi bi-hourglass-split text-warning"></i> รอปิดการขาย</span><b>{{ status_count.waiting }}</b></div>
+          <div class="item"><span><i class="bi bi-x-circle text-danger"></i> ปิดการขาย - ไม่สำเร็จ</span><b>{{ status_count.fail }}</b></div>
+          <div class="item"><span><i class="bi bi-file-earmark-text text-secondary"></i> ใบเสนอราคารออนุมัติ</span><b>{{ status_count.quotation }}</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- แยกตามหลักสูตร -->
+  <div class="card">
+    <div class="card-header"><h5 class="mb-0">ยอดขายแยกตามหลักสูตร</h5></div>
+    <div class="card-body">
+      {% if by_course %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>หลักสูตร</th><th class="text-end">บิล</th><th class="text-end">ยอดขาย</th><th style="width: 30%">สัดส่วน</th></tr></thead>
+          <tbody>
+            {% for c in by_course %}
+            <tr>
+              <td>{{ c.name }}</td>
+              <td class="text-end">{{ c.bills }}</td>
+              <td class="text-end">{{ c.total|floatformat:2|intcomma }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress ms-progress flex-grow-1"><div class="progress-bar" style="width: {{ c.pct|floatformat:0 }}%"></div></div>
+                  <small class="text-muted">{{ c.pct|floatformat:0 }}%</small>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted mb-0">ยังไม่มียอดขายในเดือนนี้</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- รายการบิล -->
+  <div class="card">
+    <div class="card-header"><h5 class="mb-0">บิลของฉันเดือนนี้ ({{ bills|length }})</h5></div>
+    <div class="card-body">
+      {% if bills %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>วันที่</th><th>เลขที่ลงทะเบียน</th><th>เลขที่เอกสาร</th><th>ลูกค้า</th><th>หลักสูตร</th><th>ประเภท</th><th>สถานะ</th><th class="text-end">ยอดสุทธิ</th></tr>
+          </thead>
+          <tbody>
+            {% for b in bills %}
+            <tr>
+              <td class="text-nowrap">{{ b.reg.crt_date|date:"d/m/Y" }}</td>
+              <td><a href="{{ b.history_url }}">{{ b.reg.register_number }}</a></td>
+              <td>{{ b.doc }}</td>
+              <td>{{ b.customer }}</td>
+              <td>{% if b.reg.course_id %}{{ b.reg.course.course_name }}{% else %}-{% endif %}</td>
+              <td>{% if b.reg.pay_type == 1 %}เงินสด{% else %}เครดิต{% endif %}</td>
+              <td class="text-nowrap">
+                {% if b.reg.status != 'Y' %}<span class="badge bg-secondary">รออนุมัติ</span>
+                {% elif b.reg.close_the_sale == 1 %}<span class="badge bg-success">สำเร็จ</span>
+                {% elif b.reg.close_the_sale == 2 %}<span class="badge bg-danger">ไม่สำเร็จ</span>
+                {% else %}<span class="badge bg-warning text-dark">รอปิดการขาย</span>{% endif %}
+              </td>
+              <td class="text-end">{% if b.reg.status == 'Y' %}{{ b.total|floatformat:2|intcomma }}{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted mb-0">ยังไม่มีบิลในเดือนนี้</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

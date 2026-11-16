@@ -1226,23 +1226,35 @@ function initTabEvents() {
               </li>
               <li class="sidebar-title">เมนู</li>
          
+              {# สิทธิ์เปิดการขาย ตั้งที่หน้าสิทธิ์กลุ่มผู้ใช้ (context processor: app.context_processors.sale_permission) #}
+              <li class="{% if request.path == "/my-sales" %} sidebar-item active {% else %} sidebar-item {% endif %}">
+                <a href="/my-sales" class="sidebar-link">
+                  <i class="bi bi-graph-up-arrow"></i>
+                  <span class="font-default">สรุปยอดขายของฉัน</span>
+                </a>
+              </li>
+
+              {% if can_sale_event %}
               <li class="{% if request.path == "/" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/" class="sidebar-link">
                   <i class="icon dripicons-store"></i>
                   <span class="font-default">เปิดการขาย</span>
                 </a>
               </li>
+              {% endif %}
 
+              {% if can_sale_noevent %}
               <li class="{% if request.path == "/salesnotevent" %} sidebar-item active {% else %} sidebar-item {% endif %}">
                 <a href="/salesnotevent" class="sidebar-link">
                   <i class="icon dripicons-store"></i>
                   <span class="font-default">เปิดการขายแบบไม่มีอีเวน</span>
                 </a>
               </li>
+              {% endif %}
               {% comment %}
               <p>Current URL: {{ request.path }}</p>
               {% endcomment %} {% for rs in listMenuPermission %}
-              {% if rs.group_value != "settings" %}
+              {% if rs.group_value != "settings" and rs.group_value != "WR14515" %}{# WR14515 = สิทธิ์เปิดการขาย ใช้แสดงเมนูด้านบนแทน #}
               <li
                 class="{% if request.path|contains_parent == rs.group_value %} sidebar-item active has-sub {% else %} sidebar-item has-sub {% endif %}"
               >

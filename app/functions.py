@@ -337,3 +337,56 @@ def checkpermi(cleaned_path,cm_id):
 
   
     return checkpa
+
+
+# ---------- สิทธิ์เปิดการขาย ----------
+# ตั้งในหน้าสิทธิ์กลุ่มผู้ใช้ (user/category) กลุ่ม "เปิดการขาย" -> เก็บใน category_program_permission
+SALE_PERM_EVENT = 'sale/event'      # หน้า / , /register/...
+SALE_PERM_NOEVENT = 'sale/noevent'  # หน้า /salesnotevent/...
+SALE_DASHBOARD_URL = '/my-sales'    # คนที่ไม่มีสิทธิ์เปิดขาย ให้ไปหน้านี้แทน
+SALE_ADMIN_GROUP_NAME = 'ผู้ดูแลระบบ'  # กลุ่มผู้ใช้ที่ถือเป็น admin
+
+
+def user_sale_perms(request):
+    """คืน set ของสิทธิ์เปิดการขายที่ user มี (cache ไว้ใน request ไม่ query ซ้ำ)"""
+    cached = getattr(request, '_sale_perms', None)
+    if cached is not None:
+        return cached
+    perms = set()
+    user = getattr(request, 'user', None)
+    if user is not None and user.is_authenticated:
+        from app.models import category_program_permission, user_detail
+        detail = user_detail.objects.filter(user_id=user.id).select_related('cm').first()
+        cm_id = detail.cm_id if detail else None
+        # admin (is_staff หรือกลุ่ม "ผู้ดูแลระบบ" เหมือน internal_memo) เปิดการขายได้ทุกแบบเสมอ ไม่ต้องติ๊กสิทธิ์
+        if user.is_staff or (detail and detail.cm and detail.cm.cm_name == SALE_ADMIN_GROUP_NAME):
+            perms = {SALE_PERM_EVENT, SALE_PERM_NOEVENT}
+        elif cm_id:
+            perms = set(category_program_permission.objects.filter(
+                cm_id=cm_id, page_route__in=(SALE_PERM_EVENT, SALE_PERM_NOEVENT),
+            ).values_list('page_route', flat=True))
+    request._sale_perms = perms
+    return perms
+
+
+def require_sale_perm(perm, redirect_dashboard=False):
+    """decorator กันหน้า/ปุ่มเปิดการขาย สำหรับคนที่ไม่มีสิทธิ์
+    redirect_dashboard=True -> พาไปหน้าสรุปยอดขายของตัวเอง (ใช้กับหน้าแรก /) ไม่งั้นตอบ 403"""
+    from functools import wraps
+
+    def decorator(view):
+        @wraps(view)
+        def wrapper(request, *args, **kwargs):
+            from django.shortcuts import redirect, render
+            from django.http import JsonResponse
+            if not request.user.is_authenticated:
+                return redirect('/login')
+            if perm in user_sale_perms(request):
+                return view(request, *args, **kwargs)
+            if redirect_dashboard:
+                return redirect(SALE_DASHBOARD_URL)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'forbidden', 'message': 'คุณไม่มีสิทธิ์เปิดการขาย'}, status=403)
+            return render(request, '403.html', status=403)
+        return wrapper
+    return decorator

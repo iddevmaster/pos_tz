@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }} | กรุณากำหนดค่าคอม</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: #f4f6f9; font-family: "Sarabun", "Segoe UI", Tahoma, sans-serif; color: #333; }
+    .box { background: #fff; width: 100%; max-width: 620px; margin: 16px; border-radius: 12px;
+      border-top: 6px solid #dc3545; box-shadow: 0 8px 30px rgba(0,0,0,.12); padding: 28px 28px 22px; }
+    h1 { font-size: 22px; margin: 0 0 6px; color: #dc3545; }
+    p { margin: 0 0 14px; line-height: 1.6; }
+    .table-wrap { max-height: 50vh; overflow-y: auto; margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; }
+    th { background: #fafafa; position: sticky; top: 0; }
+    a.doc { color: #0d6efd; font-weight: 600; text-decoration: none; }
+    a.doc:hover { text-decoration: underline; }
+    .tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+    .tag-head { background: #f8d7da; color: #842029; }
+    .tag-user { background: #fff3cd; color: #664d03; }
+    .actions { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 9px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; }
+    .btn-primary { background: #0d6efd; color: #fff; }
+    .btn-light { background: #e9ecef; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🔒 กรุณากำหนดค่าคอมก่อนใช้งานต่อ</h1>
+    <p>คุณเปิดบิลเงินสดเดือนนี้ไว้ <b>{{ bills|length }} บิล</b> ที่ยังกำหนดค่าคอมไม่ครบ<br>
+       กดเลขบิลเพื่อไปกำหนดค่าคอม เมื่อครบแล้วระบบจะปลดล็อคให้อัตโนมัติ</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>เลขบิล</th><th>ลูกค้า</th><th>เซลล์</th><th>ที่ต้องทำ</th></tr></thead>
+        <tbody>
+          {% for b in bills %}
+          <tr>
+            <td><a class="doc" href="/finance/sale/commission?doc={{ b.rp_doc_number|urlencode }}">{{ b.rp_doc_number }}</a></td>
+            <td>{{ b.rp_name_customer }}</td>
+            <td>{{ b.rp_name_seller }}</td>
+            <td>{% if b.commit_head == 0 %}<span class="tag tag-head">เลือกประเภทค่าคอม</span>{% else %}<span class="tag tag-user">กำหนดพนักงานขาย</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <a class="btn btn-light" href="/logout/">ออกจากระบบ</a>
+      <a class="btn btn-primary" href="/com-lock/">ตรวจสอบอีกครั้ง</a>
+    </div>
+  </div>
+</body>
+</html>
