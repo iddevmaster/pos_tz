@@ -65,3 +65,15 @@ def contains_parent(path):
 @register.filter
 def subtractt(value, arg):
     return value - arg
+
+@register.filter
+def can_review_memo(user):
+    """เมนู 'ตรวจสอบ / อนุมัติ' บันทึกภายใน: เฉพาะ admin และผู้ที่ถูกตั้งเป็นผู้ตรวจสอบ/ผู้อนุมัติ"""
+    if not getattr(user, 'is_authenticated', False):
+        return False
+    if user.is_staff:
+        return True
+    if user.groups.filter(name__in=['Internal Memo Reviewer', 'Internal Memo Approver']).exists():
+        return True
+    from ..models import user_detail
+    return user_detail.objects.filter(user_id=user.id, cm__cm_name='ผู้ดูแลระบบ').exists()

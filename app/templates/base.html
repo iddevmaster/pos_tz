@@ -603,9 +603,11 @@
               <li class="{% if request.path == '/internal-memos/tracking/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/tracking/">ติดตามงาน</a>
               </li>
+              {% if user|can_review_memo %}
               <li class="{% if request.path == '/internal-memos/approval/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/approval/">ตรวจสอบ / อนุมัติ</a>
               </li>
+              {% endif %}
             </ul>
           </li>
           {% endwith %}
