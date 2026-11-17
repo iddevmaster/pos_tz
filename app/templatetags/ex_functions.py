@@ -53,7 +53,7 @@ def contains_parent(path):
 
     # วนลูปเพื่อค้นหา request.path ใน listMenu
     for item in listMenu:
-        if path.strip('/') == item['value']:
+        if path.strip('/') == item['value'].strip('/'):
             group_value = item['group_value']
             break
     print(group_value)

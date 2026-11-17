@@ -19,3 +19,11 @@ admin.site.register(commission_plan)
 admin.site.register(commission_plan_line)
 admin.site.register(commission_plan_allocation)
 admin.site.register(commission_payout)
+
+from .models import InternalMemoCategory
+
+
+@admin.register(InternalMemoCategory)
+class InternalMemoCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sort_order', 'is_active')
+    list_editable = ('sort_order', 'is_active')

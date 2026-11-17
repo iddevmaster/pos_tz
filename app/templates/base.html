@@ -537,6 +537,7 @@
       .topbar-user-name{ display:none; }
     }
   </style>
+  {% block extrastyle %}{% endblock %}
 </head>
 
 <body>
@@ -583,7 +584,34 @@
             </a>
           </li>
 
+          {% with memo_path=request.path|slice:":16" %}
+          <li class="{% if memo_path == '/internal-memos/' %}sidebar-item active has-sub{% else %}sidebar-item has-sub{% endif %}">
+            <a href="#" class="sidebar-link">
+              <i class="bi bi-journal-text"></i>
+              <span>บันทึกภายใน</span>
+            </a>
+            <ul class="{% if memo_path == '/internal-memos/' %}submenu active{% else %}submenu{% endif %}">
+              <li class="{% if request.path == '/internal-memos/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/internal-memos/create/">แบบฟอร์มบันทึกภายใน</a>
+              </li>
+              <li class="{% if request.path == '/internal-memos/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/internal-memos/">ทะเบียนบันทึกภายใน</a>
+              </li>
+              <li class="{% if request.path == '/internal-memos/cc/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/internal-memos/cc/">สำเนาถึง</a>
+              </li>
+              <li class="{% if request.path == '/internal-memos/tracking/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/internal-memos/tracking/">ติดตามงาน</a>
+              </li>
+              <li class="{% if request.path == '/internal-memos/approval/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                <a href="/internal-memos/approval/">ตรวจสอบ / อนุมัติ</a>
+              </li>
+            </ul>
+          </li>
+          {% endwith %}
+
           {% for rs in listMenuPermission %}
+          {% if rs.group_value != "internalMemo" %}
           <li class="{% if request.path|contains_parent == rs.group_value %}sidebar-item active has-sub{% else %}sidebar-item has-sub{% endif %}">
             <a href="#" class="sidebar-link">
               <i class="bi bi-layers-fill"></i>
@@ -597,6 +625,7 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
           {% endfor %}
 
           {% if user.is_staff == 1 %}
@@ -619,6 +648,7 @@
               <li class="submenu-item"><a href="/tax/setting/form/create">ตั้งค่าภาษี</a></li>
               <li class="submenu-item"><a href="/setting/form/bill/create">ตั้งค่าบิล</a></li>
               <li class="submenu-item"><a href="/commissionstages/setting/form">ตั้งค่าคอม</a></li>
+              <li class="{% if request.path == '/settings/internal-memo-approvers/' %}submenu-item active-menu{% else %}submenu-item{% endif %}"><a href="{% url 'internal_memo_approver_setting' %}">ตั้งค่าผู้ตรวจสอบ / ผู้อนุมัติ</a></li>
             </ul>
           </li>
           {% endif %}

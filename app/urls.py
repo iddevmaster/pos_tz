@@ -2,9 +2,23 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print, project, desbill, notification, customer, commission
+from .views import course, finance, register, master_data, general, api, teacher, user, report_and_print, project, desbill, notification, customer, commission, internal_memo
 
 urlpatterns = [
+    # Internal Memo (บันทึกภายใน)
+    path('internal-memos/', internal_memo.memo_list, name='internal_memo_list'),
+    path('internal-memos/create/', internal_memo.memo_create, name='internal_memo_create'),
+    path('internal-memos/cc/', internal_memo.memo_cc_list, name='internal_memo_cc_list'),
+    path('internal-memos/approval/', internal_memo.memo_approval, name='internal_memo_approval'),
+    path('settings/internal-memo-approvers/', internal_memo.memo_approver_setting, name='internal_memo_approver_setting'),
+    path('internal-memos/<int:pk>/edit/', internal_memo.memo_edit, name='internal_memo_edit'),
+    path('internal-memos/<int:pk>/delete/', internal_memo.memo_delete, name='internal_memo_delete'),
+    path('internal-memos/<int:pk>/', internal_memo.memo_detail, name='internal_memo_detail'),
+    path('internal-memos/<int:pk>/submit/', internal_memo.memo_submit, name='internal_memo_submit'),
+    path('internal-memos/<int:pk>/decide/', internal_memo.memo_decide, name='internal_memo_decide'),
+    path('internal-memos/<int:pk>/work-status/', internal_memo.memo_work_status, name='internal_memo_work_status'),
+    path('internal-memos/tracking/', internal_memo.memo_tracking_list, name='internal_memo_tracking_list'),
+    path('internal-memos/<int:pk>/tracking/', internal_memo.memo_tracking, name='internal_memo_tracking'),
     # Register
     path('', register.register_home),
     path('salesnotevent', register.register_homenotevent),

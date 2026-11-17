@@ -759,3 +759,129 @@ class commission_event_allocation(models.Model):
     paid_at = models.DateTimeField(null=True, blank=True)
     crt_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(blank=True, null=True)
+
+
+class InternalMemoCategory(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('sort_order', 'name')
+
+    def __str__(self):
+        return self.name
+
+
+class InternalMemo(models.Model):
+    STATUS_DRAFT = 'DRAFT'
+    STATUS_PENDING_REVIEW = 'PENDING_REVIEW'
+    STATUS_PENDING_APPROVAL = 'PENDING_APPROVAL'
+    # Kept as an alias for compatibility with older application code.
+    STATUS_PENDING = STATUS_PENDING_REVIEW
+    STATUS_APPROVED = 'APPROVED'
+    STATUS_REJECTED = 'REJECTED'
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, 'ฉบับร่าง'),
+        (STATUS_PENDING_REVIEW, 'รอผู้ตรวจสอบ ชั้น 1'),
+        (STATUS_PENDING_APPROVAL, 'รอผู้อนุมัติ ชั้น 2'),
+        (STATUS_APPROVED, 'อนุมัติแล้ว'),
+        (STATUS_REJECTED, 'ไม่อนุมัติ'),
+    )
+    WORK_ACKNOWLEDGED = 'ACKNOWLEDGED'
+    WORK_IN_PROGRESS = 'IN_PROGRESS'
+    WORK_DONE = 'DONE'
+    WORK_STATUS_CHOICES = (
+        (WORK_ACKNOWLEDGED, 'รับทราบ'),
+        (WORK_IN_PROGRESS, 'อยู่ระหว่างดำเนินงาน'),
+        (WORK_DONE, 'เสร็จสิ้น'),
+    )
+
+    memo_number = models.CharField(max_length=24, unique=True, blank=True)
+    recipient = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    category = models.ForeignKey(
+        InternalMemoCategory,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='memos',
+    )
+    branch = models.CharField(max_length=128, default='สำนักงานใหญ่')
+    detail = models.TextField()
+    creator = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='created_internal_memos'
+    )
+    reviewer = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='internal_memos_to_review',
+    )
+    require_review = models.BooleanField(default=True)
+    approver = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='internal_memos_to_approve'
+    )
+    cc_users = models.ManyToManyField(
+        User, blank=True, related_name='internal_memos_cc'
+    )
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT
+    )
+    submitted_at = models.DateTimeField(blank=True, null=True)
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    reviewer_note = models.TextField(blank=True)
+    decided_at = models.DateTimeField(blank=True, null=True)
+    decision_note = models.TextField(blank=True)
+    work_status = models.CharField(
+        max_length=16, choices=WORK_STATUS_CHOICES, blank=True
+    )
+    work_status_updated_at = models.DateTimeField(blank=True, null=True)
+    work_status_updated_by = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class InternalMemoAttachment(models.Model):
+    memo = models.ForeignKey(
+        InternalMemo, on_delete=models.CASCADE, related_name='attachments'
+    )
+    file = models.FileField(upload_to='internal_memos/%Y/%m/')
+    original_name = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+class InternalMemoWorkLog(models.Model):
+    memo = models.ForeignKey(
+        InternalMemo, on_delete=models.CASCADE, related_name='work_logs'
+    )
+    work_status = models.CharField(
+        max_length=16, choices=InternalMemo.WORK_STATUS_CHOICES
+    )
+    note = models.TextField(blank=True)
+    updated_by = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='internal_memo_work_logs'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class InternalMemoWorkImage(models.Model):
+    log = models.ForeignKey(
+        InternalMemoWorkLog, on_delete=models.CASCADE, related_name='images'
+    )
+    file = models.FileField(upload_to='internal_memos/work/%Y/%m/')
+    original_name = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
