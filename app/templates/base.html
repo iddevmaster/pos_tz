@@ -584,32 +584,42 @@
             </a>
           </li>
 
-          {% with memo_path=request.path|slice:":16" %}
+          {% with memo_path=request.path|slice:":16" can_review=user|can_review_memo %}
+          {% if listMenuPermission|has_menu_permission:"internal-memos/" or listMenuPermission|has_menu_permission:"internal-memos/create/" or can_review %}
           <li class="{% if memo_path == '/internal-memos/' %}sidebar-item active has-sub{% else %}sidebar-item has-sub{% endif %}">
             <a href="#" class="sidebar-link">
               <i class="bi bi-journal-text"></i>
               <span>บันทึกภายใน</span>
             </a>
             <ul class="{% if memo_path == '/internal-memos/' %}submenu active{% else %}submenu{% endif %}">
+              {% if listMenuPermission|has_menu_permission:"internal-memos/create/" %}
               <li class="{% if request.path == '/internal-memos/create/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/create/">แบบฟอร์มบันทึกภายใน</a>
               </li>
+              {% endif %}
+              {% if listMenuPermission|has_menu_permission:"internal-memos/" %}
               <li class="{% if request.path == '/internal-memos/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/">ทะเบียนบันทึกภายใน</a>
               </li>
+              {% endif %}
+              {% if listMenuPermission|has_menu_permission:"internal-memos/cc/" %}
               <li class="{% if request.path == '/internal-memos/cc/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/cc/">สำเนาถึง</a>
               </li>
+              {% endif %}
+              {% if listMenuPermission|has_menu_permission:"internal-memos/tracking/" %}
               <li class="{% if request.path == '/internal-memos/tracking/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/tracking/">ติดตามงาน</a>
               </li>
-              {% if user|can_review_memo %}
+              {% endif %}
+              {% if listMenuPermission|has_menu_permission:"internal-memos/approval/" or can_review %}
               <li class="{% if request.path == '/internal-memos/approval/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
                 <a href="/internal-memos/approval/">ตรวจสอบ / อนุมัติ</a>
               </li>
               {% endif %}
             </ul>
           </li>
+          {% endif %}
           {% endwith %}
 
           {% for rs in listMenuPermission %}

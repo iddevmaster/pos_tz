@@ -77,3 +77,14 @@ def can_review_memo(user):
         return True
     from ..models import user_detail
     return user_detail.objects.filter(user_id=user.id, cm__cm_name='ผู้ดูแลระบบ').exists()
+
+
+@register.filter
+def has_menu_permission(menu_groups, route):
+    """True เมื่อกลุ่มผู้ใช้มีสิทธิ์ route นี้ (ดูจาก listMenuPermission)"""
+    normalized = str(route).strip('/')
+    for group in menu_groups or []:
+        for child in group.get('children', []) if isinstance(group, dict) else []:
+            if str(getattr(child, 'page_route', '')).strip('/') == normalized:
+                return True
+    return False
