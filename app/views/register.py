@@ -2098,46 +2098,61 @@ def register_management(request):
     statuss = ['Y','I']
     content = register_main.objects.filter(
         crt_date__month=month_current, crt_date__year=year_current,status__in=statuss).exclude(register_number="-").order_by("-crt_date")
-    obj = []
-    for r in content:
-        print(r.register_number)
-        event = 'none'
-        if r.ev_id :
-            event = 'yes'
+    # ดึงข้อมูลประกอบทีละชุด (เดิมยิง ~9 query ต่อแถว -> หลักพัน query ต่อเดือน)
+    regs = list(content)
+    reg_ids = [r.register_id for r in regs]
 
-        # customer_list = customers.objects.select_related('register').filter(
-        #     register_id=r.register_id, register__crt_date__month=1).first()
-        factcustomer_list = fact_customer.objects.select_related('register').filter(
-            register_id=r.register_id).first()
-        
-        customer_list = customers.objects.filter(
-            pk=factcustomer_list.customer_id).first()
-        
-        total_payment = register_payment.objects.filter(
-            register_id=r.register_id).count()
-        payment_i = register_payment.objects.filter(
-            register_id=r.register_id).filter(register_id=r.register_id).first()
-        course_list = course_event.objects.select_related(
-            'course').filter(ev_id=r.ev_id).first()
-        
-        pay_item = register_payment_items.objects.filter(rp_id=payment_i.rp_id).first()
-        seller = User.objects.filter(pk=r.seller_id).first()
+    fc_map = {}  # fact_customer แถวแรก (pk น้อยสุด) ของแต่ละบิล
+    for fc in fact_customer.objects.filter(register_id__in=reg_ids).order_by('-pk'):
+        fc_map[fc.register_id] = fc
+    cust_map = customers.objects.in_bulk({fc.customer_id for fc in fc_map.values()})
 
-        getso = ''
-        if r.pay_type == 2:
-            
-            uuid_without_dashes = str(r.register_id).replace('-', '')
-            event_re = event_register.objects.filter(register_id=uuid_without_dashes,status='Y',ev_id=r.ev_id).first()
-            # sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
-            if event_re != None:
-               sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
-               getso = sale_re
-        
+    pay_first, pay_count, receipt_map = {}, {}, {}
+    for p in register_payment.objects.filter(register_id__in=reg_ids).order_by('rp_id'):
+        pay_first.setdefault(p.register_id, p)            # ใบแรก (ใช้หา pay_item แบบเดิม)
+        pay_count[p.register_id] = pay_count.get(p.register_id, 0) + 1
         # เลขใบเสร็จ: ใบล่าสุดที่ active (บิลเครดิตที่แก้ไขจะมีใบเก่า active=0) ไม่มีค่อยใช้ใบล่าสุด
-        receipt = register_payment.objects.filter(register_id=r.register_id).order_by('-active', '-rp_id').first()
-        res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,'seller':seller,'saleorder':getso,
+        cur = receipt_map.get(p.register_id)
+        if cur is None or (p.active, p.rp_id) >= (cur.active, cur.rp_id):
+            receipt_map[p.register_id] = p
+    item_map = {}  # รายการแรกของใบแรก
+    for it in register_payment_items.objects.filter(
+            rp_id__in=[p.rp_id for p in pay_first.values()]).order_by('-pk'):
+        item_map[it.rp_id] = it
+
+    ev_map = course_event.objects.select_related('course').in_bulk({r.ev_id for r in regs if r.ev_id})
+    seller_map = User.objects.in_bulk({r.seller_id for r in regs if r.seller_id})
+
+    so_map = {}  # บิลเครดิต: salesorder ของ event_register (status Y, ev เดียวกัน) แถวแรก
+    credit = [r for r in regs if r.pay_type == 2]
+    if credit:
+        er_map = {}
+        for er in event_register.objects.filter(
+                register_id__in=[r.register_id for r in credit], status='Y').order_by('-pk'):
+            er_map[(er.register_id, er.ev_id)] = er
+        so_by_er = {}
+        for so in salesorder.objects.filter(er_id__in=[er.pk for er in er_map.values()]).order_by('-pk'):
+            so_by_er[so.er_id] = so
+        for r in credit:
+            er = er_map.get((r.register_id, r.ev_id))
+            if er is not None:
+                so_map[r.register_id] = so_by_er.get(er.pk)
+
+    obj = []
+    for r in regs:
+        fc = fc_map.get(r.register_id)
+        if fc is None:
+            continue  # ไม่มีข้อมูลลูกค้า (เดิมหน้าจะ error ทั้งหน้า)
+        payment_i = pay_first.get(r.register_id)
+        receipt = receipt_map.get(r.register_id)
+        res = {'customer_list': cust_map.get(fc.customer_id), 'regis': r,
+               'pay_item': item_map.get(payment_i.rp_id) if payment_i else None,
+               'event': 'yes' if r.ev_id else 'none',
+               'seller': seller_map.get(r.seller_id),
+               'saleorder': so_map.get(r.register_id, '') if r.pay_type == 2 else '',
                'receipt_no': receipt.rp_doc_number if receipt else '',
-               'course_list': course_list, 'total_payment': total_payment}
+               'course_list': ev_map.get(r.ev_id) if r.ev_id else None,
+               'total_payment': pay_count.get(r.register_id, 0)}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
     return render(request, 'register/register_management.html', context)
