@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'app.middleware.LastActivityMiddleware',
+    'app.middleware.ComLockMiddleware',  # คนมีสิทธิ์ขายที่เปิดบิลเงินสดแล้วยังไม่กำหนดค่าคอม -> พาไป /com-lock/
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
