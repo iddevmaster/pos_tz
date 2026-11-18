@@ -769,6 +769,64 @@ def user_com(request):
     return JsonResponse(obj,safe=False)
 
 
+COM_NOTI_REF_TYPE = 'com_bill'  # แจ้งเตือนยืนยันค่าคอม 1 รายการต่อ 1 บิลต่อ 1 ผู้รับ (reference_id = rp_id)
+
+
+def _com_notify_message(item, user_id):
+    """ข้อความแจ้งเตือนยืนยันค่าคอม: เลขใบเสร็จ / คอร์ส / จำนวนเงินบิล / รายการค่าคอม ของผู้รับคนนี้ในบิลนี้
+    คืนค่า None ถ้าผู้รับไม่มีรายการค่าคอมในบิลนี้แล้ว"""
+    bill_rpi_ids = list(register_payment_items.objects.filter(rp_id=item.rp_id).values_list('rpi_id', flat=True))
+    stage_ids = list(fact_commission.objects.filter(rpi_id__in=bill_rpi_ids, user_id=user_id)
+                     .values_list('stage_id', flat=True))
+    if not stage_ids:
+        return None
+    bill_total = register_payment_items.objects.filter(rp_id=item.rp_id).aggregate(
+        s=Sum('rpi_price_result'))['s'] or 0
+    stage_names = list(commissionstages.objects.filter(stage_id__in=stage_ids)
+                       .order_by('seq', 'stage_id').values_list('stage_name', flat=True))
+    crs = item.register.course
+    msg = (f"ยืนยันค่าคอม | เลขใบเสร็จ {item.rp.rp_doc_number or '-'}"
+           f" | คอร์ส {crs.course_code} {crs.course_name}"
+           f" | จำนวนเงินบิล {bill_total:,.2f} บาท"
+           f" | รายการค่าคอม {', '.join(stage_names) or '-'}")
+    return msg[:255]
+
+
+def _sync_com_notification(item, user_id):
+    """สร้าง/อัปเดตแจ้งเตือนของผู้รับ 1 คนสำหรับบิลนี้ (ไม่สร้างซ้ำ)"""
+    now = dateTimeNow()
+    existing = notifications.objects.filter(
+        notification_type='com', reference_type=COM_NOTI_REF_TYPE,
+        reference_id=str(item.rp_id), user_id=user_id).order_by('notifications_id')
+    msg = _com_notify_message(item, user_id)
+    if msg is None:
+        # ผู้รับคนนี้ไม่มีค่าคอมในบิลนี้แล้ว (ถูกเปลี่ยนไปให้คนอื่น) -> ลบแจ้งเตือนที่ยังไม่ได้อ่าน
+        existing.filter(is_read='false').delete()
+        return
+    noti = existing.first()
+    if noti:
+        noti.message = msg
+        noti.is_read = 'false'
+        noti.upd_date = now
+        noti.save(update_fields=['message', 'is_read', 'upd_date'])
+        return
+    notifications.objects.create(
+        notification_type='com',
+        title='แจ้งเตือน',
+        message=msg,
+        reference_id=str(item.rp_id),
+        reference_type=COM_NOTI_REF_TYPE,
+        is_read='false',
+        read_at=now,
+        action_url='/finance/sale/com',
+        priority='easy',
+        user_id=user_id,
+        created_by='1',
+        cm_id=1,
+        crt_date=now,
+        upd_date=now)
+
+
 @csrf_exempt
 def update_com(request):
 
@@ -778,44 +836,26 @@ def update_com(request):
     user_id = data.get("user_id")
     types = data.get("type")
     content = fact_commission.objects.get(commit_id=commit_id)
+    rpi_id = content.rpi_id
 
-
-    noti = notifications(
-    notification_type='com',
-    title='แจ้งเตือน',
-    message='ยืนยันค่าคอม',
-    reference_id='123',
-    reference_type='task',
-    is_read='false',
-    read_at=dateTimeNow(),
-    action_url='/finance/sale/com',
-    priority='easy',
-    user_id=user_id,
-    created_by='1',
-    cm_id=1,
-    crt_date=dateTimeNow(),
-    upd_date=dateTimeNow())
-    noti.save()
- 
     if types == 'group':
-        content = fact_commission.objects.filter(rpi_id=content.rpi_id,status='N').update(
-            user_id=user_id
-        )
-
- 
-        obj = {'status':200}
-    else :    
-        content = fact_commission.objects.get(commit_id=commit_id)
+        group_qs = fact_commission.objects.filter(rpi_id=rpi_id, status='N')
+        prev_users = set(group_qs.values_list('user_id', flat=True))
+        group_qs.update(user_id=user_id)
+    else:
+        prev_users = {content.user_id}
         content.user_id = user_id
         content.save()
 
-       
+    # แจ้งเตือน 1 ครั้งต่อบิล: อัปเดตของผู้รับใหม่ และของผู้รับเดิม (ถ้าถูกเปลี่ยนคน)
+    try:
+        item = register_payment_items.objects.select_related('rp', 'register__course').get(rpi_id=rpi_id)
+        for uid in {int(user_id)} | {u for u in prev_users if u}:
+            _sync_com_notification(item, uid)
+    except Exception:
+        pass
 
-
-
-    
-        
-        obj = {'status':200}
+    obj = {'status':200}
     return JsonResponse(obj,safe=False)
 
 @csrf_exempt

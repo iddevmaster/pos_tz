@@ -11,6 +11,7 @@ urlpatterns = [
     path('internal-memos/cc/', internal_memo.memo_cc_list, name='internal_memo_cc_list'),
     path('internal-memos/approval/', internal_memo.memo_approval, name='internal_memo_approval'),
     path('settings/internal-memo-approvers/', internal_memo.memo_approver_setting, name='internal_memo_approver_setting'),
+    path('settings/sale-permission/', user.sale_permission_setting, name='sale_permission_setting'),
     path('internal-memos/<int:pk>/edit/', internal_memo.memo_edit, name='internal_memo_edit'),
     path('internal-memos/<int:pk>/delete/', internal_memo.memo_delete, name='internal_memo_delete'),
     path('internal-memos/<int:pk>/', internal_memo.memo_detail, name='internal_memo_detail'),

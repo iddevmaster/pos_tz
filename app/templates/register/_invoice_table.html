@@ -1,0 +1,43 @@
+<table class="table table-striped" id="{{ table_id }}">
+  <thead>
+    <tr>
+      <th>ลำดับ</th>
+      <th>เลขใบเสนอ</th>
+      <th>ชื่อลูกค้า</th>
+      <th>หลักสูตรและวันที่จัด</th>
+      <th>PO</th>
+      <th>SQ</th>
+      <th>SO</th>
+      <th>Invoice</th>
+      <th>#</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for res in rows %}
+    <tr>
+      <td align="center">{{ forloop.counter }}</td>
+      <td>{{res.rp_doc_number}}</td>
+      <td>{{res.custom}}</td>
+      <td>{{res.course_name}} รุ่น {{res.ev_generation}} <br>วันที่ {{res.start}} - {{res.end}}</td>
+      <td>{{res.po}}</td>
+      <td>{{res.sq}}</td>
+      <td>{{res.so}}</td>
+      <td>{{res.invoice|default:"-"}}</td>
+      <td>
+        {% if res.status == 'Y' %}
+        -
+        {% else %}
+        <div class="btn-group me-1 mb-1">
+          <button class="btn {{ btn_class }} btn-sm" type="button"
+            data-bs-toggle="modal" data-bs-target="#UpdateClick1"
+            data-invoice="{{ res.invoice|default:'' }}"
+            onclick="MyMo('{{res.sale_id}}', this.dataset.invoice)">
+            {{ btn_label }}
+          </button>
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -765,34 +765,43 @@ def calendar_event_api(request):
     start = request.GET.get('start', None)
     end = request.GET.get('end', None)
     _date = date.today()
-    a = date(2026, 1, 1)
-    b = date(2026, 12, 31)
     if start is not None and end is not None:
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        sobj = a
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        eobj = b
+        # FullCalendar ส่งช่วงที่มองเห็นมาทุกครั้งที่เปลี่ยนเดือน/view
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31  (end เป็น exclusive)
+        sobj = str(start).split("T")[0]
+        eobj = str(end).split("T")[0]
     else:
         sobj = _date + timedelta(days=0)
         eobj = _date + timedelta(days=1000)
     status = ['W','Y','I']
-    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
-    
- 
-    content = course_event.objects.select_related(
-        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
-   
+
+    # ใช้เงื่อนไข "คาบเกี่ยวช่วง" เพื่อให้ event ที่คร่อมเดือนยังแสดงครบ
+    content = list(course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__lt=eobj, ev_date_end__gte=sobj ,module=m.module, status__in=status))
+    ev_ids = [r.ev_id for r in content]
+
+    # Batch lookups (previously N+1 queries per event)
+    condition_map = {}
+    for cond in conhead.objects.filter(course_id__in={r.course_id for r in content}, is_active='Y').order_by('conhead_id'):
+        # course_id ใน DB ของ conhead เป็น string ส่วน course_event เป็น int -> ใช้ str เป็น key
+        condition_map.setdefault(str(cond.course_id), []).append({'conhead_id': cond.conhead_id, 'name': cond.name})
+    location_map = {
+        l.location_id: l for l in location_thai.objects.filter(
+            location_id__in={r.location_id for r in content})
+    }
+    teacher_map = {}
+    for x in teacher_income_setting.objects.filter(ev_id__in=ev_ids).select_related('teacher', 'pi').order_by('id'):
+        teacher_map.setdefault(x.ev_id, []).append(x)
+    pi3_sum_map = dict(
+        teacher_income_setting.objects.filter(ev_id__in=ev_ids, pi=3)
+        .values_list('ev_id').annotate(s=Sum('tis_sum'))
+    )
+
     obj = []
 
     sff = []
     for r in content:
-        
-        conditiondata = []
-        if r :
-            getcondition = conhead.objects.filter(course_id=r.course_id,is_active='Y')
-            for cond in list(getcondition):
-                 resx = {'conhead_id':cond.conhead_id,'name':cond.name}
-                 conditiondata.append(resx)
+        conditiondata = condition_map.get(str(r.course_id), [])
         end = str(r.ev_date_end)
       
         y, m, d = end.split("-")
@@ -810,19 +819,19 @@ def calendar_event_api(request):
          t = '#4be01b'    
         else:
          t = '#4be01b'
-        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
-        location = location_thai.objects.get(location_id=r.location_id)
-   
+        teacher_data = teacher_map.get(r.ev_id, [])
+        location = location_map[r.location_id]
+
         sff = []
-        
-        if teacher_data.count() > 0:
+
+        if teacher_data:
             sff = [
             {
                 "teacher_prefix_th": x.teacher.teacher_prefix_th,
                 "teacher_firstname_th": x.teacher.teacher_firstname_th,
                 "teacher_lastname_th": x.teacher.teacher_lastname_th,
                 "pi_id":x.pi_id,
-                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "pi_name":(x.pi.pi_name,),
                 "tis_quantity": x.tis_quantity,
                 "tis_unit": x.tis_unit,
                 "compensation":x.tis_compensation,
@@ -846,9 +855,9 @@ def calendar_event_api(request):
         if r.details:
             details = r.details
      
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_code) +" "+ str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")" ,'data':sff,
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#000000','title': str(r.course.course_code) +" "+ str(r.course.course_name) + " (รุ่นที่ " + str(r.ev_generation)+")" ,'data':sff,
         'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),'details':str(details),
-                'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (teacher_income_setting.objects.filter(ev=r.ev_id,pi=3).aggregate(Sum('tis_sum'))['tis_sum__sum'] or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference,'condition_type': r.condition_type,'condition':conditiondata,'condition_id':r.condition_id}
+                'limit_price_workhelp':r.limit_price_workhelp,'limit_price':r.limit_price,'dis_limit': r.limit_price - (pi3_sum_map.get(r.ev_id) or 0), 'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two,'ev_people_three': r.ev_people_three,'count_day':days_difference,'condition_type': r.condition_type,'condition':conditiondata,'condition_id':r.condition_id}
         obj.append(res)
        
     return JsonResponse(obj, safe=False)
@@ -865,36 +874,43 @@ def calendar_event_apiall(request):
     start = request.GET.get('start', None)
     end = request.GET.get('end', None)
     _date = date.today()
-    a = date(2026, 1, 1)
-    b = date(2026, 12, 31)
     if start is not None and end is not None:
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        sobj = a
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        eobj = b
+        # FullCalendar ส่งช่วงที่มองเห็นมาทุกครั้งที่เปลี่ยนเดือน/view
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31  (end เป็น exclusive)
+        sobj = str(start).split("T")[0]
+        eobj = str(end).split("T")[0]
     else:
         sobj = _date + timedelta(days=0)
         eobj = _date + timedelta(days=1000)
     status = ['W','Y','I','S']
-    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
-    
- 
-    content = course_event.objects.select_related(
-        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status)
-   
+
+    # ใช้เงื่อนไข "คาบเกี่ยวช่วง" เพื่อให้ event ที่คร่อมเดือนยังแสดงครบ
+    content = list(course_event.objects.select_related(
+        "course").filter(active=1, cancelled=1, ev_date_start__lt=eobj, ev_date_end__gte=sobj ,module=m.module, status__in=status))
+    ev_ids = [r.ev_id for r in content]
+
+    # Batch lookups (previously N+1 queries per event)
+    rec_map = dict(
+        register_payment_items.objects.filter(rp__register__ev_id__in=ev_ids)
+        .values_list('rp__register__ev_id').annotate(total=Sum('rpi_quantity'))
+    )
+    reg_map = dict(
+        training.objects.filter(ev_id__in=ev_ids)
+        .values_list('ev_id').annotate(c=Count('training_id'))
+    )
+    location_map = {
+        l.location_id: l for l in location_thai.objects.filter(
+            location_id__in={r.location_id for r in content})
+    }
+    teacher_map = {}
+    for x in teacher_income_setting.objects.filter(ev_id__in=ev_ids).select_related('teacher', 'pi').order_by('id'):
+        teacher_map.setdefault(x.ev_id, []).append(x)
+
     obj = []
     sff = []
     for r in content:
-        
-        to = 0
-        
-        billpa = register_payment.objects.select_related('register').filter(register__ev_id=r.ev_id)
-        for bi in billpa:
-                print(bi.rp_id)
-                t = register_payment_items.objects.get(rp_id=bi.rp_id)
-                to += t.rpi_quantity
-        
-        trcount = training.objects.filter(ev_id=r.ev_id).count()
+        to = rec_map.get(r.ev_id) or 0
+        trcount = reg_map.get(r.ev_id, 0)
         ev_traing = r.ev_training
         end = str(r.ev_date_end)
       
@@ -913,19 +929,17 @@ def calendar_event_apiall(request):
          t = '#4be01b'    
         else:
          t = '#4be01b'
-        teacher_data = teacher_income_setting.objects.filter(ev=r.ev_id)
-        location = location_thai.objects.get(location_id=r.location_id)
-   
-        
-        
-        if teacher_data.count() > 0:
+        teacher_data = teacher_map.get(r.ev_id, [])
+        location = location_map[r.location_id]
+
+        if teacher_data:
             sff = [
             {
                 "teacher_prefix_th": x.teacher.teacher_prefix_th,
                 "teacher_firstname_th": x.teacher.teacher_firstname_th,
                 "teacher_lastname_th": x.teacher.teacher_lastname_th,
                 "pi_id":x.pi_id,
-                "pi_name":pay_item.objects.filter(id=x.pi_id).values_list('pi_name').first(),
+                "pi_name":(x.pi.pi_name,),
                 "tis_quantity": x.tis_quantity,
                 "tis_unit": x.tis_unit,
                 "compensation":x.tis_compensation,
@@ -943,7 +957,7 @@ def calendar_event_apiall(request):
         delta = r.ev_date_end - r.ev_date_start
 
      
-        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#ffffff','title': str(r.course.course_code) + "(Rec" + str(to)+ '/' +str(ev_traing)+") "  + "(Reg" + str(trcount)+ '/' +str(ev_traing)+")" ,'data':sff,
+        res = {'backgroundColor':t,'borderColor':'#1e7e34','textColor':'#000000','title': str(r.course.course_code) + "(Rec" + str(to)+ '/' +str(ev_traing)+") "  + "(Reg" + str(trcount)+ '/' +str(ev_traing)+")" ,'data':sff,
         'address':"สถานที่จัด จ."+str(location.province_name)+" อ."+str(location.amphur_name)+" ที่อยู่ "+str(r.address),'start': r.ev_date_start, 'end': dmytoymd(nextdayend),'evs_id':r.ev_id,'ev_hour':r.ev_hour,'ev_hour_two':r.ev_hour_two,'ev_hour_three':r.ev_hour_three,'ev_people': r.ev_people,'ev_people_two': r.ev_people_two}
         obj.append(res)
        

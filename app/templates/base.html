@@ -1521,6 +1521,13 @@ function initTabEvents() {
                       <span class="font-default">ตั้งค่าผู้ตรวจสอบ / ผู้อนุมัติ</span>
                     </a>
                   </li>
+                  {% if request.user.is_staff %}
+                  <li class="{% if request.path == '/settings/sale-permission/' %}submenu-item active-menu{% else %}submenu-item{% endif %}">
+                    <a href="{% url 'sale_permission_setting' %}">
+                      <span class="font-default">ตั้งค่าผู้มีสิทธิ์เปิดการขาย</span>
+                    </a>
+                  </li>
+                  {% endif %}
                 </ul>
               
               </li>

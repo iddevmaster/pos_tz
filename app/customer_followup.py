@@ -79,7 +79,12 @@ def can_work_on(user, followup):
     return False
 
 
+FOLLOWUP_NOTIFY_ENABLED = False  # ปิดการแจ้งเตือนติดตามลูกค้า (เปลี่ยนเป็น True เพื่อเปิดกลับ)
+
+
 def _notify(user_ids, message, url, cm_id=6):
+    if not FOLLOWUP_NOTIFY_ENABLED:
+        return
     now = dateTimeNow()
     notifications.objects.bulk_create([
         notifications(

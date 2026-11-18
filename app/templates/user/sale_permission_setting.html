@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 order-md-1 order-last">
+    <h3>ตั้งค่าผู้มีสิทธิ์เปิดการขาย</h3>
+    <p class="text-muted mb-0">เลือกรายคนว่าใครเปิดการขายได้ คนที่ไม่มีสิทธิ์จะเห็นแค่หน้าสรุปยอดขายของตัวเอง</p>
+  </div>
+  <div class="col-12 col-md-6 order-md-2 order-first">
+    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+        <li class="breadcrumb-item">ตั้งค่า</li>
+        <li class="breadcrumb-item active" aria-current="page">ผู้มีสิทธิ์เปิดการขาย</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <form method="post">{% csrf_token %}
+        <div class="form-group mb-4">
+          <label class="mb-2"><strong>เปิดการขาย (มีอีเวน)</strong></label>
+          <select class="form-select select2" name="sale_event" multiple data-placeholder="ค้นหาและเลือกผู้ใช้...">
+            {% for o in user_options %}<option value="{{ o.id }}" {% if o.id in selected_event_ids %}selected{% endif %}>{{ o.label }}</option>{% endfor %}
+          </select>
+          <small class="text-muted">เข้าเมนู "เปิดการขาย" (หน้า / และ /register/...) ได้ · เลือกแล้ว {{ selected_event_ids|length }} คน</small>
+        </div>
+
+        <div class="form-group mb-4">
+          <label class="mb-2"><strong>เปิดการขายแบบไม่มีอีเวน</strong></label>
+          <select class="form-select select2" name="sale_noevent" multiple data-placeholder="ค้นหาและเลือกผู้ใช้...">
+            {% for o in user_options %}<option value="{{ o.id }}" {% if o.id in selected_noevent_ids %}selected{% endif %}>{{ o.label }}</option>{% endfor %}
+          </select>
+          <small class="text-muted">เข้าเมนู "เปิดการขายแบบไม่มีอีเวน" (/salesnotevent/...) ได้ · เลือกแล้ว {{ selected_noevent_ids|length }} คน</small>
+        </div>
+
+        <div class="text-end">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i>บันทึกการตั้งค่า</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if inherited %}
+  <div class="card">
+    <div class="card-body">
+      <h6 class="mb-1">มีสิทธิ์อยู่แล้วโดยไม่ต้องเลือก ({{ inherited|length }} คน)</h6>
+      <p class="text-muted small mb-2">ผู้ดูแลระบบเปิดการขายได้เสมอ และคนในกลุ่มผู้ใช้ที่ติ๊กสิทธิ์ "เปิดการขาย" ไว้ก็มีสิทธิ์ตามกลุ่ม</p>
+      <ul class="small mb-0">
+        {% for x in inherited %}<li>{{ x.user.get_full_name|default:x.user.username }} — {{ x.source }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

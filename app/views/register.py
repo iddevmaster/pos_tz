@@ -2501,33 +2501,24 @@ def approve_list_invoice_inv(request):
         prev_year = current_year
     try:
         obj = []
-        st = [0,1]
-        # salesorder
-        print(current_month)
-        print(prev_month)
-        print(current_year)
-        print(prev_year)
         # แสดงข้อมูล 3 เดือนย้อนหลัง (เดือนนี้ + 2 เดือนก่อนหน้า)
         start_date = date(current_year, current_month, 1) - relativedelta(months=2)
-        billpa = salesorder.objects.select_related('er').filter(
+        # ดึง register / event / course มาพร้อมกันใน query เดียว (เดิมยิงแยกทีละแถว ~8 query ต่อแถว)
+        billpa = list(salesorder.objects.select_related('er__register', 'er__ev__course').filter(
             status__isnull=True,
             crt_date__date__gte=start_date,
-        ).order_by('-crt_date')
-        # billpa = register_payment.objects.select_related('register').filter(register__close_the_sale__in=st,register__pay_type=2,register__status='Y',register__is_event='Y').order_by("-crt_date")[:200]
-        # billpa = event_register.objects.filter(status='Y')
-        for r in billpa:  
-
-            
-
-            main = register_main.objects.filter(register_id=r.er.register_id).first()
-            if main is None:
-                print("ไม่พบข้อมูล")
-            else:
-                
-                evcourse = course_event.objects.get(ev_id=r.er.ev.ev_id)
-                money = register_payment_items.objects.get(register_id=r.er.register.register_id)
-                main = register_main.objects.filter(register_id=r.er.register_id).first()
-                main_pay = register_payment.objects.get(register_id=r.er.register.register_id)
+        ).order_by('-crt_date'))
+        pay_map = {}
+        for p in register_payment.objects.filter(
+                register_id__in={r.er.register_id for r in billpa}).order_by('rp_id'):
+            pay_map.setdefault(p.register_id, p)
+        for r in billpa:
+            main = r.er.register
+            evcourse = r.er.ev
+            main_pay = pay_map.get(r.er.register_id)
+            if main_pay is None:
+                continue
+            if True:
                 res = {'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':r.er.register.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}
                 obj.append(res)
 
@@ -2561,9 +2552,12 @@ def approve_list_invoice_inv(request):
     # except:
     #     content = None
         
-    context = {'title': title,  'data': obj, 'listMenuPermission': objMenu}
+    # แยกรายการที่กรอก Invoice แล้ว / ยังไม่กรอก
+    data_pending = [x for x in obj if not (x['invoice'] or '').strip()]
+    data_done = [x for x in obj if (x['invoice'] or '').strip()]
+    context = {'title': title,  'data': obj, 'data_pending': data_pending, 'data_done': data_done, 'listMenuPermission': objMenu}
 
-    return render(request, 'register/approve_list_event_bill_credit_inv.html',context)    
+    return render(request, 'register/approve_list_event_bill_credit_inv.html',context)
 
 
 

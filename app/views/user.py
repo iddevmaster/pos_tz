@@ -525,3 +525,53 @@ def category_program_form_permission(request, pk):
         obj.append(newMenu)
     context = {'title': defaultTitle,'data': instance, 'listMenu': obj, 'listMenuPermission': objMenu}
     return render(request, 'user/category_program_form_permission.html', context)
+
+
+@login_required(login_url='/login')
+@user_passes_test(lambda user: user.is_staff, login_url='/403')
+def sale_permission_setting(request):
+    """เลือกรายคนว่าใครเปิดการขายได้ (มีอีเวน / ไม่มีอีเวน) เก็บใน django auth Group"""
+    from django.contrib.auth.models import Group
+    from ..functions import SALE_USER_GROUPS, SALE_PERM_EVENT, SALE_PERM_NOEVENT, SALE_ADMIN_GROUP_NAME
+
+    event_group, _ = Group.objects.get_or_create(name=SALE_USER_GROUPS[SALE_PERM_EVENT])
+    noevent_group, _ = Group.objects.get_or_create(name=SALE_USER_GROUPS[SALE_PERM_NOEVENT])
+    users = User.objects.filter(is_active=True).order_by('first_name', 'last_name', 'username')
+
+    if request.method == 'POST':
+        with transaction.atomic():
+            event_group.user_set.set(users.filter(pk__in=request.POST.getlist('sale_event')))
+            noevent_group.user_set.set(users.filter(pk__in=request.POST.getlist('sale_noevent')))
+        messages.success(request, 'บันทึกผู้มีสิทธิ์เปิดการขายเรียบร้อยแล้ว')
+        return redirect('sale_permission_setting')
+
+    # ผู้ที่มีสิทธิ์อยู่แล้วจากทางอื่น (admin / สิทธิ์กลุ่มผู้ใช้) แสดงไว้ให้ดูเฉย ๆ
+    group_names = dict(user_detail.objects.values_list('user_id', 'cm__cm_name'))
+    group_perm_rows = category_program_permission.objects.filter(
+        page_route__in=(SALE_PERM_EVENT, SALE_PERM_NOEVENT)).values_list('cm_id', 'page_route')
+    cm_perms = {}
+    for cm_id, route in group_perm_rows:
+        cm_perms.setdefault(cm_id, set()).add(route)
+    user_cm = dict(user_detail.objects.values_list('user_id', 'cm_id'))
+    inherited = []
+    for u in users:
+        if u.is_staff or group_names.get(u.id) == SALE_ADMIN_GROUP_NAME:
+            inherited.append({'user': u, 'source': 'ผู้ดูแลระบบ (เปิดได้ทุกแบบ)'})
+        elif cm_perms.get(user_cm.get(u.id)):
+            routes = cm_perms[user_cm[u.id]]
+            label = ' / '.join(x for x, r in (('มีอีเวน', SALE_PERM_EVENT), ('ไม่มีอีเวน', SALE_PERM_NOEVENT)) if r in routes)
+            inherited.append({'user': u, 'source': f'กลุ่ม {group_names.get(u.id)} ({label})'})
+
+    context = {
+        'title': defaultTitle,
+        'listMenuPermission': _menu_context(request.user.id),
+        'user_options': [
+            {'id': u.id,
+             'label': (u.get_full_name() or u.username) + (f' ({group_names[u.id]})' if group_names.get(u.id) else '')}
+            for u in users
+        ],
+        'selected_event_ids': set(event_group.user_set.values_list('id', flat=True)),
+        'selected_noevent_ids': set(noevent_group.user_set.values_list('id', flat=True)),
+        'inherited': inherited,
+    }
+    return render(request, 'user/sale_permission_setting.html', context)

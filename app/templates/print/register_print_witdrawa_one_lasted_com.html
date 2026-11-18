@@ -226,9 +226,9 @@
           <td>{{ forloop.counter }}</td>
           <td>{{ res.invoice|default:"-" }}</td>
           <td colspan="2">{{ res.customer_name|default:"-" }}</td>
-          <td colspan="2">{{ res.course.course_name }}</td>
+          <td colspan="2">{{ res.course.course_code|default:"-" }}<br><span style="font-size: 10px; white-space: nowrap;">{{ res.evs.number_code|default:"-" }}</span></td>
          
-          <td>{{ res.evs.ev_date_start }} - {{ res.evs.ev_date_end }}</td>
+          <td style="white-space: nowrap;">{{ res.evs.ev_date_start }} -<br>{{ res.evs.ev_date_end }}</td>
    
           <td>{{res.rp_doc_number}}</td>
           <td>{{ res.rv|default:"-" }}</td>

@@ -4,11 +4,19 @@
 
 
 
-  function MyMo(x) {
-
-
+  function MyMo(x, invoice) {
     document.getElementById("sale_id").value = x;
+    // แท็บ "กรอกแล้ว" จะเติมเลข Invoice เดิมให้แก้ไข
+    document.getElementById("invoice").value = invoice || "";
   }
+
+  // table1 ถูกสร้าง DataTable ใน base.html แล้ว ส่วน table2 สร้างที่นี่
+  document.addEventListener("DOMContentLoaded", function () {
+    var t2 = document.getElementById("table2");
+    if (t2 && window.simpleDatatables) {
+      new simpleDatatables.DataTable(t2);
+    }
+  });
 
   function goToDetail(slug, pk) {
 
@@ -143,71 +151,27 @@
         </div>
       </form> -->
 
-      <table class="table table-striped" id="table1">
-        <thead>
-          <tr>
-            <th>ลำดับ</th>
-            <th>เลขใบเสนอ</th>
-            <th>ชื่อลูกค้า</th>
-            <th>หลักสูตรและวันที่จัด</th>
-            <th>PO</th>
-            <th>SQ</th>
-            <th>SO</th>
-            <th>Invoice</th>
-          
-         
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for res in data %}
-          <tr>
-            <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.rp_doc_number}}</td>
-            <td>{{res.custom}}</td>
-            <td>{{res.course_name}} รุ่น {{res.ev_generation}} <br>วันที่ {{res.start}} - {{res.end}}</td>
+      <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-pending" type="button" role="tab">
+            ยังไม่กรอก Invoice <span class="badge bg-danger">{{ data_pending|length }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-done" type="button" role="tab">
+            กรอก Invoice แล้ว <span class="badge bg-success">{{ data_done|length }}</span>
+          </button>
+        </li>
+      </ul>
 
-            <td>{{res.po}}</td>
-            <td>{{res.sq}}</td>
-            <td>{{res.so}}</td>
-
-            <td>
-              {{res.invoice}}
-            </td>
-
-           
-
-            <td>
-
-
-              {% if res.status == 'Y' %}
-              -
-              {% else %}
-              <div class="btn-group me-1 mb-1">
-                <div class="dropdown">
-                  <button class="btn btn-success btn-sm" type="button" id="dropdownMenuButtonIcon"
-                    data-bs-toggle="modal" data-bs-target="#UpdateClick1" data-id="{{res.er_id}}"
-                    onclick="MyMo('{{res.sale_id}}')">
-                    กรอก Inv
-                  </button>
-                </div>
-              </div>
-
-
-              {% endif %}
-
-
-
-
-
-
-
-
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-pending" role="tabpanel">
+          {% include 'register/_invoice_table.html' with rows=data_pending table_id='table1' btn_label='กรอก Inv' btn_class='btn-success' %}
+        </div>
+        <div class="tab-pane fade" id="tab-done" role="tabpanel">
+          {% include 'register/_invoice_table.html' with rows=data_done table_id='table2' btn_label='แก้ไข Inv' btn_class='btn-warning' %}
+        </div>
+      </div>
     </div>
   </div>
 </section>

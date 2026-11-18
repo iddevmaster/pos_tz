@@ -345,6 +345,11 @@ SALE_PERM_EVENT = 'sale/event'      # หน้า / , /register/...
 SALE_PERM_NOEVENT = 'sale/noevent'  # หน้า /salesnotevent/...
 SALE_DASHBOARD_URL = '/my-sales'    # คนที่ไม่มีสิทธิ์เปิดขาย ให้ไปหน้านี้แทน
 SALE_ADMIN_GROUP_NAME = 'ผู้ดูแลระบบ'  # กลุ่มผู้ใช้ที่ถือเป็น admin
+# เลือกรายคนได้ที่หน้า /settings/sale-permission/ -> เก็บใน django auth Group (ไม่ต้องมีตารางใหม่)
+SALE_USER_GROUPS = {
+    SALE_PERM_EVENT: 'Sale Permission Event',
+    SALE_PERM_NOEVENT: 'Sale Permission NoEvent',
+}
 
 
 def user_sale_perms(request):
@@ -361,10 +366,16 @@ def user_sale_perms(request):
         # admin (is_staff หรือกลุ่ม "ผู้ดูแลระบบ" เหมือน internal_memo) เปิดการขายได้ทุกแบบเสมอ ไม่ต้องติ๊กสิทธิ์
         if user.is_staff or (detail and detail.cm and detail.cm.cm_name == SALE_ADMIN_GROUP_NAME):
             perms = {SALE_PERM_EVENT, SALE_PERM_NOEVENT}
-        elif cm_id:
-            perms = set(category_program_permission.objects.filter(
-                cm_id=cm_id, page_route__in=(SALE_PERM_EVENT, SALE_PERM_NOEVENT),
-            ).values_list('page_route', flat=True))
+        else:
+            # 1) สิทธิ์ตามกลุ่มผู้ใช้ (ติ๊กในหน้าสิทธิ์กลุ่ม)
+            if cm_id:
+                perms = set(category_program_permission.objects.filter(
+                    cm_id=cm_id, page_route__in=(SALE_PERM_EVENT, SALE_PERM_NOEVENT),
+                ).values_list('page_route', flat=True))
+            # 2) สิทธิ์รายคน (เลือกในหน้า /settings/sale-permission/)
+            user_groups = set(user.groups.filter(
+                name__in=SALE_USER_GROUPS.values()).values_list('name', flat=True))
+            perms |= {perm for perm, name in SALE_USER_GROUPS.items() if name in user_groups}
     request._sale_perms = perms
     return perms
 
