@@ -2133,7 +2133,10 @@ def register_management(request):
                sale_re = salesorder.objects.filter(er_id=event_re.er_id).first()
                getso = sale_re
         
+        # เลขใบเสร็จ: ใบล่าสุดที่ active (บิลเครดิตที่แก้ไขจะมีใบเก่า active=0) ไม่มีค่อยใช้ใบล่าสุด
+        receipt = register_payment.objects.filter(register_id=r.register_id).order_by('-active', '-rp_id').first()
         res = {'customer_list': customer_list,'regis':factcustomer_list.register,'pay_item':pay_item,'event':event,'seller':seller,'saleorder':getso,
+               'receipt_no': receipt.rp_doc_number if receipt else '',
                'course_list': course_list, 'total_payment': total_payment}
         obj.append(res)
     context = {'title': title,  'data': obj,'listMenuPermission': objMenu}
@@ -2240,7 +2243,11 @@ def update_close_the_sale(request):
     current_user = request.user
     user_id_authen = current_user.id
     register_id = request.POST['register_id']
-    confirm_price = float(request.POST['confirm_price'])
+    try:
+        confirm_price = round(float(str(request.POST['confirm_price']).replace(',', '').strip()), 2)
+    except ValueError:
+        messages.error(request, "ไม่สามารถทำรายการได้ ! กรอกราคาเป็นตัวเลขเท่านั้น")
+        return redirect("/register/management")
     close_the_sale = int(request.POST['close_the_sale'])
 
     if close_the_sale == 1:
@@ -2253,16 +2260,21 @@ def update_close_the_sale(request):
         content = None
         return redirect("/register/management")
     # เปรียบเทียบราคาเพื่อยืนยันการปิดการขาย
-    check_payment_cout = register_payment_items.objects.filter(register_id=register_id).order_by("-rpi_id").first()
-
-
-    rpi_price_default = check_payment_cout.rpi_price_total + float(check_payment_cout.rpi_price_vat)
-
-    if confirm_price != rpi_price_default :
-        messages.error(request, "ไม่สามารถทำรายการได้ !")
+    # ใบที่ใช้เทียบ = ใบล่าสุดที่ active (ไม่มีค่อยใช้ใบล่าสุด) -> ยอดรวม VAT ทั้งใบ (รองรับหลายรายการ)
+    target_rp = register_payment.objects.filter(register_id=register_id).order_by('-active', '-rp_id').first()
+    rp_items = list(register_payment_items.objects.filter(rp_id=target_rp.rp_id)) if target_rp else []
+    if not rp_items:
+        messages.error(request, "ไม่สามารถทำรายการได้ ! ไม่พบรายการในใบเสนอราคา/ใบเสร็จ")
         return redirect("/register/management")
-    check_payment = register_payment_items.objects.filter(
-        rpi_pay=confirm_price, register_id=register_id).order_by("-rpi_id").first()
+    bill_total = round(sum(float(i.rpi_price_total or 0) + float(i.rpi_price_vat or 0) for i in rp_items), 2)
+    # แบบเดิม: ยอดของรายการล่าสุด (บิลรายการเดียว = ยอดเดียวกับ bill_total)
+    last_item = register_payment_items.objects.filter(register_id=register_id).order_by("-rpi_id").first()
+    last_total = round(float(last_item.rpi_price_total or 0) + float(last_item.rpi_price_vat or 0), 2)
+
+    if abs(confirm_price - bill_total) >= 0.01 and abs(confirm_price - last_total) >= 0.01:
+        messages.error(request, "ไม่สามารถทำรายการได้ ! ราคาไม่ตรงกับยอดรวม (รวม VAT) ในใบเสนอราคา/ใบเสร็จ")
+        return redirect("/register/management")
+    check_payment = target_rp
     if check_payment:
         set_active = register_payment.objects.get(rp_id=check_payment.rp_id)
         set_active.active = 1
@@ -2517,6 +2529,9 @@ def approve_list_invoice_inv(request):
             evcourse = r.er.ev
             main_pay = pay_map.get(r.er.register_id)
             if main_pay is None:
+                continue
+            # บิลเครดิตที่ยังไม่ปิดการขาย-ขายสำเร็จ (close_the_sale != 1) ไม่ต้องแสดง ทั้งแท็บยังไม่กรอก/กรอกแล้ว
+            if main.pay_type == 2 and main.close_the_sale != 1:
                 continue
             if True:
                 res = {'rp_doc_number':main_pay.rp_doc_number,'register_number':main.register_number,'po':r.po,'sq':r.sq,'so':r.so,'register_id':r.er.register.register_id,'sale_id':r.sale_id,'invoice':r.invoice,'rv':r.rv,'status':r.status,'custom':main_pay.rp_name_customer,'course_name':evcourse.course.course_name,'start':evcourse.ev_date_start,'end':evcourse.ev_date_end,'ev_generation':evcourse.ev_generation}

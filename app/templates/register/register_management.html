@@ -111,7 +111,7 @@
           {% for res in data %}
           <tr>
             <td align="center">{{ forloop.counter }}</td>
-            <td>{{res.regis.register_number}}</td>
+            <td class="text-nowrap">{{res.regis.register_number}}{% if res.receipt_no %}<br><small class="text-muted">{{ res.receipt_no }}</small>{% endif %}</td>
             <td>{{res.course_list.course.course_name}}
              {% if res.event == 'yes' %}
               {{res.course_list.course.course_name}}

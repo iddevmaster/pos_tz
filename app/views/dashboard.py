@@ -111,10 +111,20 @@ def my_sales(request):
         t['height'] = round(t['total'] / trend_max * 100, 1)
 
     # ---- รายการบิล ----
+    # เลขที่เอกสาร/ลูกค้า: ดึงทุกบิลในเดือน (ไม่ใช่แค่ status Y) ใช้ใบที่ active ก่อน ไม่มีค่อยใช้ใบล่าสุด
+    # (ใบเสนอราคาเครดิตที่รออนุมัติ status N เก็บ register_payment ไว้แบบ active=0)
+    doc_rp = {}
+    for rp in register_payment.objects.filter(
+            register__in=[r.register_id for r in month_regs]).order_by('active', 'rp_id'):
+        doc_rp[rp.register_id] = rp
     bills = []
     for r in month_regs:
         info = totals.get(r.register_id, {})
-        rp = info.get('payment')
+        rp = info.get('payment') or doc_rp.get(r.register_id)
+        # แสดงเฉพาะบิลที่สมบูรณ์ (ทั้งเงินสด/เครดิต): ต้องมีสถานะ และมีใบเสร็จ/เลขที่เอกสารแล้ว
+        # ที่ลงทะเบียนค้างไว้แต่ยังไม่บันทึกบิล (status ว่าง ไม่มี register_payment) ไม่ต้องแสดง
+        if not r.status or not rp or not rp.rp_doc_number:
+            continue
         is_event = r.is_event != 'N'
         bills.append({
             'reg': r,
