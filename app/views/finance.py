@@ -1244,7 +1244,8 @@ def withdraw_list_commission(request):
 @login_required(login_url='/login')
 def com_lock(request):
     """หน้าล็อค: คนเปิดบิลเงินสดเดือนนี้ที่ยังกำหนดค่าคอมไม่ครบ (ดู ComLockMiddleware)"""
-    bills = creator_missing_com_bills(request.user.id)
+    from ..functions import user_sale_perms
+    bills = creator_missing_com_bills(request.user.id) if user_sale_perms(request) else []
     if not bills:
         request.session.pop('com_lock_ok_until', None)
         return redirect('/')

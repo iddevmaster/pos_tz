@@ -51,8 +51,9 @@ class ComLockMiddleware:
                 and request.headers.get('x-requested-with') != 'XMLHttpRequest'):
             now = int(time.time())
             if request.session.get(COM_LOCK_OK_KEY, 0) < now:
-                from .functions import creator_missing_com_bills
-                if creator_missing_com_bills(user.id):
+                from .functions import creator_missing_com_bills, user_sale_perms
+                # ล็อคเฉพาะคนที่มีสิทธิ์เปิดการขาย (ตั้งที่ /settings/sale-permission/ หรือสิทธิ์กลุ่ม / admin)
+                if user_sale_perms(request) and creator_missing_com_bills(user.id):
                     from django.shortcuts import redirect
                     return redirect(COM_LOCK_URL)
                 request.session[COM_LOCK_OK_KEY] = now + COM_LOCK_OK_TTL
