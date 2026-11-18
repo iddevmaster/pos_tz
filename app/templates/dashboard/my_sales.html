@@ -150,6 +150,7 @@
     </div>
   </div>
 
+  {% comment %} ปิดไว้ก่อน: รายการบิลของฉันเดือนนี้ — ลบ comment นี้เพื่อเปิดกลับ
   <!-- รายการบิล -->
   <div class="card">
     <div class="card-header"><h5 class="mb-0">บิลของฉันเดือนนี้ ({{ bills|length }})</h5></div>
@@ -186,6 +187,7 @@
       {% endif %}
     </div>
   </div>
+  {% endcomment %}
 </section>
 
 {% endblock %}
