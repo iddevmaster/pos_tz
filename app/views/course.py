@@ -1265,22 +1265,19 @@ def calendar_event_apizs(request):
     start = request.GET.get('start', None)
     end = request.GET.get('end', None)
     _date = date.today()
-    a = date(2026, 1, 1)
-    b = date(2026, 12, 31)
     if start is not None and end is not None:
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        sobj = a
-        # 2022-10-31T00:00:00+07:00 to  2022-10-31
-        eobj = b
+        # ใช้ช่วงที่ FullCalendar ส่งมาตามเดือนที่ดู (เดิม fix ไว้แค่ปี 2026 -> event ปี 2027 ไม่ขึ้นให้อนุมัติ)
+        # 2022-10-31T00:00:00+07:00 to  2022-10-31  (end เป็น exclusive)
+        sobj = str(start).split("T")[0]
+        eobj = str(end).split("T")[0]
     else:
         sobj = _date + timedelta(days=0)
         eobj = _date + timedelta(days=1000)
     status = ['','N','Y','I','S']
-    # contentxxx = event_register.objects.select_related('ev').filter(status__in=status,ev__active=1, ev__cancelled=1, ev__ev_date_start__gte=sobj, ev__ev_date_end__lte=eobj ,ev__module=m.module)
-    
- 
+
+    # เงื่อนไข "คาบเกี่ยวช่วง" ให้ event ที่คร่อมเดือนยังแสดง
     content = course_event.objects.select_related(
-        "course").filter(active=1, cancelled=1, ev_date_start__gte=sobj, ev_date_end__lte=eobj ,module=m.module, status__in=status,checkevent=1)
+        "course").filter(active=1, cancelled=1, ev_date_start__lt=eobj, ev_date_end__gte=sobj ,module=m.module, status__in=status,checkevent=1)
    
     obj = []
     sff = []
